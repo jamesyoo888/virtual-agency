@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { hostname: "replicate.delivery" },
       { hostname: "pbxt.replicate.delivery" },
       { hostname: "picsum.photos" },
+      { hostname: "image.pollinations.ai" },
     ],
   },
 };

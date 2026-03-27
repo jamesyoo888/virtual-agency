@@ -53,8 +53,12 @@ export async function createImageTo3DTask(
       enable_pbr: options?.enablePbr ?? true,
       surface_mode: options?.surfaceMode ?? "soft",
       symmetry_mode: options?.symmetryMode ?? "auto",
-      topology: options?.topology ?? "tris",
-      target_polycount: options?.targetPolycount ?? 30000,
+      // "quads" topology = cleaner mesh for rigging, animation, IP registration
+      topology: options?.topology ?? "quads",
+      // Higher polycount for face/hand detail required for character IP
+      target_polycount: options?.targetPolycount ?? 50000,
+      // Remesh for clean, uniform geometry
+      should_remesh: true,
     }),
   });
 

@@ -22,8 +22,8 @@ export async function POST(request: Request) {
       enablePbr: true,
       surfaceMode: "soft",
       symmetryMode: "auto",
-      topology: "tris",
-      targetPolycount: 30000,
+      topology: "quads",    // cleaner mesh for IP / rigging
+      targetPolycount: 50000, // enough detail for face features
     });
     return NextResponse.json({ taskId });
   } catch (e) {

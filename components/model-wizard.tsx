@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+// Note: AI-generated images use <img> directly to bypass Next.js image proxy
+// eslint-disable-next-line @next/next/no-img-element
 import { Loader2, Check, Upload, Box, Image as ImageIcon, RefreshCw, ExternalLink } from "lucide-react";
 
 // ── constants ────────────────────────────────────────────────────────────────
@@ -364,7 +365,7 @@ export default function ModelWizard() {
                   <button key={i} onClick={() => setSelectedConcept(url)}
                     className={`aspect-[3/4] relative rounded-lg overflow-hidden border-2 transition-all
                       ${selectedConcept === url ? "border-white" : "border-transparent hover:border-zinc-500"}`}>
-                    <Image src={url} alt={`Concept ${i + 1}`} fill className="object-cover" sizes="200px" />
+                    <img src={url} alt={`Concept ${i + 1}`} className="object-cover w-full h-full absolute inset-0" />
                     {selectedConcept === url && (
                       <div className="absolute inset-0 bg-white/10 flex items-center justify-center">
                         <Check className="w-6 h-6 text-white" />
@@ -396,7 +397,7 @@ export default function ModelWizard() {
               <div className="shrink-0">
                 <p className="text-xs text-zinc-500 mb-2">선택된 컨셉</p>
                 <div className="w-24 aspect-[3/4] relative rounded-lg overflow-hidden bg-zinc-900">
-                  <Image src={selectedConcept} alt="Concept" fill className="object-cover" sizes="96px" />
+                  <img src={selectedConcept} alt="Concept" className="object-cover w-full h-full absolute inset-0" />
                 </div>
               </div>
             )}
@@ -425,7 +426,7 @@ export default function ModelWizard() {
                         <button key={i} onClick={() => setSelectedAngles((prev) => ({ ...prev, [angle.key]: url }))}
                           className={`aspect-[3/4] relative rounded overflow-hidden border transition-all
                             ${selected === url ? "border-white" : "border-transparent hover:border-zinc-500"}`}>
-                          <Image src={url} alt="" fill className="object-cover" sizes="80px" />
+                          <img src={url} alt="" className="object-cover w-full h-full absolute inset-0" />
                           {selected === url && (
                             <div className="absolute inset-0 bg-white/10 flex items-center justify-center">
                               <Check className="w-3 h-3 text-white" />
@@ -482,7 +483,7 @@ export default function ModelWizard() {
               {selectedConcept && (
                 <div>
                   <div className="w-14 aspect-[3/4] relative rounded overflow-hidden bg-zinc-900">
-                    <Image src={selectedConcept} alt="concept" fill className="object-cover" sizes="56px" />
+                    <img src={selectedConcept} alt="concept" className="object-cover w-full h-full absolute inset-0" />
                   </div>
                   <p className="text-xs text-zinc-600 text-center mt-1">컨셉</p>
                 </div>
@@ -490,7 +491,7 @@ export default function ModelWizard() {
               {Object.entries(selectedAngles).map(([key, url]) => (
                 <div key={key}>
                   <div className="w-14 aspect-[3/4] relative rounded overflow-hidden bg-zinc-900">
-                    <Image src={url} alt={key} fill className="object-cover" sizes="56px" />
+                    <img src={url} alt={key} className="object-cover w-full h-full absolute inset-0" />
                   </div>
                   <p className="text-xs text-zinc-600 text-center mt-1">{ANGLES.find(a => a.key === key)?.label}</p>
                 </div>
@@ -546,7 +547,7 @@ export default function ModelWizard() {
               <div className="flex gap-4 items-start">
                 {meshyResult.thumbnail && (
                   <div className="w-24 aspect-square relative rounded-lg overflow-hidden bg-zinc-900 shrink-0">
-                    <Image src={meshyResult.thumbnail} alt="3D thumbnail" fill className="object-cover" sizes="96px" />
+                    <img src={meshyResult.thumbnail} alt="3D thumbnail" className="object-cover w-full h-full absolute inset-0" />
                   </div>
                 )}
                 <div className="space-y-2">
@@ -619,7 +620,7 @@ export default function ModelWizard() {
           <div className="flex gap-6 items-start">
             {createdModel.concept_image && (
               <div className="w-28 aspect-[3/4] relative rounded-xl overflow-hidden bg-zinc-900 shrink-0">
-                <Image src={createdModel.concept_image} alt={createdModel.name} fill className="object-cover" sizes="112px" />
+                <img src={createdModel.concept_image} alt={createdModel.name} className="object-cover w-full h-full absolute inset-0" />
               </div>
             )}
             <div className="space-y-2">
@@ -663,7 +664,7 @@ export default function ModelWizard() {
                     <button key={i} onClick={() => toggleFinal(url)}
                       className={`aspect-[3/4] relative rounded-lg overflow-hidden border-2 transition-all
                         ${selectedFinal.includes(url) ? "border-white" : "border-transparent hover:border-zinc-500"}`}>
-                      <Image src={url} alt={`Final ${i + 1}`} fill className="object-cover" sizes="120px" />
+                      <img src={url} alt={`Final ${i + 1}`} className="object-cover w-full h-full absolute inset-0" />
                       {selectedFinal.includes(url) && (
                         <div className="absolute inset-0 bg-white/10 flex items-center justify-center">
                           <Check className="w-4 h-4 text-white" />
