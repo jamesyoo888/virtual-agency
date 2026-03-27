@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -16,12 +16,22 @@ const MOOD_LABELS: Record<string, string> = {
   cold: "차가운", warm: "따뜻한", neutral: "중성적", edgy: "엣지있는",
 };
 
+const SUPABASE_CONFIGURED =
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project");
+
 export default async function AdminModelDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  if (!SUPABASE_CONFIGURED) {
+    redirect("/admin/models");
+  }
+
   const supabase = await createClient();
 
   const { data: model } = await supabase

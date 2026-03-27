@@ -2,7 +2,14 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
+const SUPABASE_CONFIGURED =
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project");
+
 export async function GET() {
+  if (!SUPABASE_CONFIGURED) return NextResponse.json([]);
+
   const supabase = await createClient();
   const { data: models, error } = await supabase
     .from("models")
@@ -14,19 +21,21 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  if (SUPABASE_CONFIGURED) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: client } = await supabase
-    .from("clients")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+    const { data: client } = await supabase
+      .from("clients")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
-  if (client?.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (client?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const body = await request.json();
@@ -45,6 +54,24 @@ export async function POST(request: Request) {
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
+
+  if (!SUPABASE_CONFIGURED) {
+    // Dev mode: return mock success without DB
+    return NextResponse.json({
+      id: crypto.randomUUID(),
+      name, slug, debut_date, bio, personality,
+      industry_tags: industry_tags ?? [],
+      genre_tags: genre_tags ?? [],
+      mood_tags: mood_tags ?? [],
+      instagram_handle,
+      base_price,
+      exclusive_price,
+      is_exclusive_available: is_exclusive_available ?? true,
+      concept_image,
+      status: "draft",
+      created_at: new Date().toISOString(),
+    }, { status: 201 });
+  }
 
   const adminSupabase = await createAdminClient();
   const { data, error } = await adminSupabase

@@ -5,12 +5,22 @@ import ModelCard from "@/components/model-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
+const SUPABASE_CONFIGURED =
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project");
+
 export default async function AdminModelsPage() {
-  const supabase = await createClient();
-  const { data: models } = await supabase
-    .from("models")
-    .select("*")
-    .order("created_at", { ascending: false });
+  let models: Model[] | null = null;
+
+  if (SUPABASE_CONFIGURED) {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("models")
+      .select("*")
+      .order("created_at", { ascending: false });
+    models = data;
+  }
 
   return (
     <div className="p-8">
