@@ -22,6 +22,7 @@ export default async function AdminLayout({
 
   if (client?.role !== "admin") redirect("/client/dashboard");
 
+
   return (
     <div className="flex min-h-screen bg-zinc-950 text-white">
       <NavAdmin />

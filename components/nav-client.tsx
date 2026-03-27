@@ -12,6 +12,7 @@ const links = [
   { href: "/client/products", label: "상품 관리" },
 ];
 
+
 export default function NavClient({ client }: { client: Client | null }) {
   const pathname = usePathname();
   const router = useRouter();

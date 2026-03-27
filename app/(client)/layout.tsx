@@ -14,6 +14,7 @@ export default async function ClientLayout({
 
   if (!user) redirect("/login?next=/client/dashboard");
 
+
   const { data: client } = await supabase
     .from("clients")
     .select("*")
