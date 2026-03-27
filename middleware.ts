@@ -3,11 +3,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   // Skip Supabase auth if env vars not configured yet (local dev without Supabase)
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL === "https://your-project.supabase.co"
-  ) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const isSupabaseConfigured =
+    supabaseUrl.length > 0 &&
+    !supabaseUrl.includes("placeholder") &&
+    !supabaseUrl.includes("your-project");
+  if (!isSupabaseConfigured) {
     return NextResponse.next({ request });
   }
 

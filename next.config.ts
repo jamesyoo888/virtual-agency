@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       { hostname: "*.supabase.co" },
       { hostname: "replicate.delivery" },
       { hostname: "pbxt.replicate.delivery" },
+      { hostname: "picsum.photos" },
     ],
   },
 };

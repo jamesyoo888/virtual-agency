@@ -7,21 +7,26 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const isConfigured =
+    supabaseUrl.length > 0 && supabaseUrl !== "https://placeholder.supabase.co";
 
-  if (!user) redirect("/login?next=/admin/models");
+  if (isConfigured) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const { data: client } = await supabase
-    .from("clients")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+    if (!user) redirect("/login?next=/admin/models");
 
-  if (client?.role !== "admin") redirect("/client/dashboard");
+    const { data: client } = await supabase
+      .from("clients")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
+    if (client?.role !== "admin") redirect("/client/dashboard");
+  }
 
   return (
     <div className="flex min-h-screen bg-zinc-950 text-white">
