@@ -30,15 +30,19 @@ const MOOD_OPTIONS = [
   { value: "neutral", label: "중성적" }, { value: "edgy", label: "엣지있는" },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CreatedModel = Record<string, any>;
+
 export default function ModelWizard() {
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [createdModel, setCreatedModel] = useState<CreatedModel | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -128,7 +132,8 @@ export default function ModelWizard() {
 
     if (res.ok) {
       const model = await res.json();
-      router.push(`/admin/models/${model.id}`);
+      setCreatedModel({ ...model, concept_image: conceptImage });
+      setStep(3);
     } else {
       const { error: msg } = await res.json();
       setError(msg ?? "저장에 실패했습니다.");
@@ -140,16 +145,16 @@ export default function ModelWizard() {
     <div>
       {/* Step indicator */}
       <div className="flex items-center gap-3 mb-8">
-        {[1, 2].map((s) => (
+        {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium
               ${step >= s ? "bg-white text-black" : "bg-zinc-800 text-zinc-500"}`}>
               {step > s ? <Check className="w-3.5 h-3.5" /> : s}
             </div>
             <span className={`text-sm ${step === s ? "text-white" : "text-zinc-500"}`}>
-              {s === 1 ? "컨셉 이미지" : "캐릭터 정보"}
+              {s === 1 ? "컨셉 이미지" : s === 2 ? "캐릭터 정보" : "완료"}
             </span>
-            {s < 2 && <div className="w-8 h-px bg-zinc-700" />}
+            {s < 3 && <div className="w-8 h-px bg-zinc-700" />}
           </div>
         ))}
       </div>
@@ -209,6 +214,78 @@ export default function ModelWizard() {
               className="bg-white text-black hover:bg-zinc-200"
             >
               다음 →
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Success */}
+      {step === 3 && createdModel && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-3 gap-8">
+            <div className="col-span-1">
+              {createdModel.concept_image ? (
+                <div className="aspect-[3/4] relative rounded-lg overflow-hidden bg-zinc-900">
+                  <Image src={createdModel.concept_image} alt={createdModel.name} fill className="object-cover" sizes="300px" />
+                </div>
+              ) : (
+                <div className="aspect-[3/4] rounded-lg bg-zinc-900 flex items-center justify-center text-zinc-600 text-sm">No image</div>
+              )}
+            </div>
+            <div className="col-span-2 space-y-5">
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <h2 className="text-2xl font-bold">{createdModel.name}</h2>
+                  <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">draft</Badge>
+                </div>
+                {createdModel.debut_date && (
+                  <p className="text-zinc-400 text-sm">데뷔일: {createdModel.debut_date}</p>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-zinc-900 rounded-lg p-4">
+                  <p className="text-xs text-zinc-500 mb-1">기본 단가</p>
+                  <p className="text-sm font-medium">{createdModel.base_price ? `₩${Number(createdModel.base_price).toLocaleString()}/일` : "-"}</p>
+                </div>
+                <div className="bg-zinc-900 rounded-lg p-4">
+                  <p className="text-xs text-zinc-500 mb-1">독점 단가</p>
+                  <p className="text-sm font-medium">{createdModel.exclusive_price ? `₩${Number(createdModel.exclusive_price).toLocaleString()}/일` : "-"}</p>
+                </div>
+              </div>
+              {createdModel.bio && (
+                <div>
+                  <p className="text-xs text-zinc-500 mb-2">바이오</p>
+                  <p className="text-sm text-zinc-200 leading-relaxed">{createdModel.bio}</p>
+                </div>
+              )}
+              {createdModel.industry_tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {createdModel.industry_tags.map((t: string) => (
+                    <Badge key={t} className="bg-zinc-800 text-zinc-300">{INDUSTRY_OPTIONS.find(o => o.value === t)?.label ?? t}</Badge>
+                  ))}
+                  {createdModel.mood_tags?.map((t: string) => (
+                    <Badge key={t} className="bg-zinc-800 text-zinc-300">{MOOD_OPTIONS.find(o => o.value === t)?.label ?? t}</Badge>
+                  ))}
+                </div>
+              )}
+              {createdModel.instagram_handle && (
+                <p className="text-sm text-zinc-400">{createdModel.instagram_handle}</p>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button
+              onClick={() => router.push("/admin/models/new")}
+              variant="outline"
+              className="border-zinc-700"
+            >
+              + 새 모델 추가
+            </Button>
+            <Button
+              onClick={() => router.push("/admin/models")}
+              className="bg-white text-black hover:bg-zinc-200"
+            >
+              목록으로
             </Button>
           </div>
         </div>
