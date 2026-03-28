@@ -602,13 +602,21 @@ export default function ModelWizard() {
 
           <div className="flex gap-3 justify-between pt-2">
             <Button variant="ghost" onClick={() => setStep(3)} className="text-zinc-400">← 이전</Button>
-            <Button onClick={handleSave} disabled={saving || meshyStatus !== "done"}
-              className="bg-white text-black hover:bg-zinc-200">
-              {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />저장 중...</> : "완료 → 최종 2D"}
-            </Button>
+            <div className="flex gap-2">
+              {meshyStatus !== "done" && (
+                <Button onClick={handleSave} disabled={saving} variant="outline"
+                  className="border-zinc-700 text-zinc-400 text-xs">
+                  {saving ? <><Loader2 className="w-3 h-3 animate-spin mr-1" />저장 중...</> : "3D 건너뛰고 저장"}
+                </Button>
+              )}
+              <Button onClick={handleSave} disabled={saving || meshyStatus !== "done"}
+                className="bg-white text-black hover:bg-zinc-200">
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />저장 중...</> : "완료 → 최종 2D"}
+              </Button>
+            </div>
           </div>
           {meshyStatus !== "done" && (
-            <p className="text-xs text-zinc-600 text-right -mt-4">3D 생성이 완료되어야 다음 단계로 진행됩니다.</p>
+            <p className="text-xs text-zinc-600 text-right -mt-4">Meshy 키 없으면 건너뛰기로 진행 가능</p>
           )}
         </div>
       )}

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Model } from "@/types";
 import { Badge } from "@/components/ui/badge";
 
@@ -29,11 +28,11 @@ export default function ModelCard({ model, variant }: Props) {
     <Link href={href} className="group block">
       <div className="aspect-[3/4] relative rounded-lg overflow-hidden bg-zinc-900 mb-3">
         {model.concept_image ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={model.concept_image}
             alt={model.name}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-zinc-700 text-xs">
@@ -72,7 +71,7 @@ export default function ModelCard({ model, variant }: Props) {
         )}
         {variant === "admin" && (
           <p className="text-xs text-zinc-500 mt-0.5">
-            팔로워 {model.follower_count.toLocaleString()}
+            팔로워 {(model.follower_count ?? 0).toLocaleString()}
           </p>
         )}
       </div>

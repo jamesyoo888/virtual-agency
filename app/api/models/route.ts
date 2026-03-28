@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { devModelStore } from "@/lib/dev-store";
 
 const SUPABASE_CONFIGURED =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -8,7 +9,7 @@ const SUPABASE_CONFIGURED =
   !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project");
 
 export async function GET() {
-  if (!SUPABASE_CONFIGURED) return NextResponse.json([]);
+  if (!SUPABASE_CONFIGURED) return NextResponse.json(devModelStore.list());
 
   const supabase = await createClient();
   const { data: models, error } = await supabase
@@ -56,8 +57,7 @@ export async function POST(request: Request) {
     .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
 
   if (!SUPABASE_CONFIGURED) {
-    // Dev mode: return mock success without DB
-    return NextResponse.json({
+    const model = {
       id: crypto.randomUUID(),
       name, slug, debut_date, bio, personality,
       industry_tags: industry_tags ?? [],
@@ -70,7 +70,9 @@ export async function POST(request: Request) {
       concept_image,
       status: "draft",
       created_at: new Date().toISOString(),
-    }, { status: 201 });
+    };
+    devModelStore.add(model);
+    return NextResponse.json(model, { status: 201 });
   }
 
   const adminSupabase = await createAdminClient();
