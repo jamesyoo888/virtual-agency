@@ -1,8 +1,16 @@
+import { generateImagesEasyDiffusion } from "@/lib/easy-diffusion/client";
+
 export async function generateConceptImages(
   prompt: string,
   count: number = 4
 ): Promise<string[]> {
-  // 1. Replicate FLUX 1.1 Pro — commercial grade, best photorealism
+  // 1. Easy Diffusion — local GPU, free, uses Realistic Vision V6
+  if (process.env.EASY_DIFFUSION_URL) {
+    const edImages = await generateImagesEasyDiffusion(prompt, count);
+    if (edImages.length > 0) return edImages;
+  }
+
+  // 2. Replicate FLUX 1.1 Pro — commercial grade, best photorealism
   if (process.env.REPLICATE_API_TOKEN) {
     // FLUX 1.1 Pro generates one image per prediction → run in parallel
     const predictions = await Promise.all(
