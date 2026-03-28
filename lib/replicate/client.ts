@@ -2,31 +2,43 @@ export async function generateConceptImages(
   prompt: string,
   count: number = 4
 ): Promise<string[]> {
-  // 1. Replicate FLUX (production)
+  // 1. Replicate FLUX 1.1 Pro — commercial grade, best photorealism
   if (process.env.REPLICATE_API_TOKEN) {
-    const response = await fetch(
-      "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
-          "Content-Type": "application/json",
-          Prefer: "wait",
-        },
-        body: JSON.stringify({
-          input: {
-            prompt,
-            num_outputs: count,
-            aspect_ratio: "3:4",
-            output_format: "webp",
-          },
-        }),
-      }
+    // FLUX 1.1 Pro generates one image per prediction → run in parallel
+    const predictions = await Promise.all(
+      Array.from({ length: count }, async () => {
+        const res = await fetch(
+          "https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
+              "Content-Type": "application/json",
+              Prefer: "wait",
+            },
+            body: JSON.stringify({
+              input: {
+                prompt,
+                aspect_ratio: "3:4",
+                output_format: "webp",
+                output_quality: 95,
+                safety_tolerance: 2,
+              },
+            }),
+          }
+        );
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          console.error("[Replicate] error:", res.status, err);
+          return null;
+        }
+        const data = await res.json();
+        // output is a single URL string or array
+        return Array.isArray(data.output) ? data.output[0] : data.output;
+      })
     );
-    if (response.ok) {
-      const data = await response.json();
-      if (data.output?.length) return data.output;
-    }
+    const urls = predictions.filter(Boolean) as string[];
+    if (urls.length > 0) return urls;
   }
 
   // 2. Pollinations.ai fallback — fetch server-side and return as data URLs
