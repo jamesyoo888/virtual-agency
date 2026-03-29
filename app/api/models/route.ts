@@ -45,13 +45,23 @@ export async function POST(request: Request) {
     industry_tags, genre_tags, mood_tags,
     instagram_handle, base_price, exclusive_price,
     is_exclusive_available, concept_image,
+    // wizard extra fields (mapped to spec aliases)
+    base_rate, exclusive_rate, personality_tone,
+    angle_images, final_images,
   } = body;
 
-  if (!name) {
+  // Support both field name variants from the wizard
+  const resolvedName = name;
+  const resolvedBio = bio;
+  const resolvedPersonality = personality ?? personality_tone;
+  const resolvedBasePrice = base_price ?? base_rate;
+  const resolvedExclusivePrice = exclusive_price ?? exclusive_rate;
+
+  if (!resolvedName) {
     return NextResponse.json({ error: "name is required" }, { status: 400 });
   }
 
-  const slug = name
+  const slug = resolvedName
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
@@ -59,15 +69,21 @@ export async function POST(request: Request) {
   if (!SUPABASE_CONFIGURED) {
     const model = {
       id: crypto.randomUUID(),
-      name, slug, debut_date, bio, personality,
+      name: resolvedName,
+      slug,
+      debut_date,
+      bio: resolvedBio,
+      personality: resolvedPersonality,
       industry_tags: industry_tags ?? [],
       genre_tags: genre_tags ?? [],
       mood_tags: mood_tags ?? [],
       instagram_handle,
-      base_price,
-      exclusive_price,
+      base_price: resolvedBasePrice,
+      exclusive_price: resolvedExclusivePrice,
       is_exclusive_available: is_exclusive_available ?? true,
       concept_image,
+      angle_images: angle_images ?? {},
+      final_images: final_images ?? [],
       status: "draft",
       created_at: new Date().toISOString(),
     };
@@ -76,16 +92,22 @@ export async function POST(request: Request) {
   }
 
   const adminSupabase = await createAdminClient();
+
+  // Insert the model row
   const { data, error } = await adminSupabase
     .from("models")
     .insert({
-      name, slug, debut_date, bio, personality,
+      name: resolvedName,
+      slug,
+      debut_date,
+      bio: resolvedBio,
+      personality: resolvedPersonality,
       industry_tags: industry_tags ?? [],
       genre_tags: genre_tags ?? [],
       mood_tags: mood_tags ?? [],
       instagram_handle,
-      base_price,
-      exclusive_price,
+      base_price: resolvedBasePrice,
+      exclusive_price: resolvedExclusivePrice,
       is_exclusive_available: is_exclusive_available ?? true,
       concept_image,
       status: "draft",
@@ -94,5 +116,41 @@ export async function POST(request: Request) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const modelId = data.id;
+
+  // Insert model_files rows for angle images and final images
+  const fileRows: { model_id: string; file_type: string; url: string; version: number }[] = [];
+
+  if (concept_image) {
+    fileRows.push({ model_id: modelId, file_type: "concept", url: concept_image, version: 1 });
+  }
+
+  if (angle_images && typeof angle_images === "object") {
+    for (const [, url] of Object.entries(angle_images)) {
+      if (url && typeof url === "string") {
+        fileRows.push({ model_id: modelId, file_type: "reference", url, version: 1 });
+      }
+    }
+  }
+
+  if (Array.isArray(final_images)) {
+    for (const url of final_images) {
+      if (url && typeof url === "string") {
+        fileRows.push({ model_id: modelId, file_type: "portfolio", url, version: 1 });
+      }
+    }
+  }
+
+  if (fileRows.length > 0) {
+    const { error: fileError } = await adminSupabase
+      .from("model_files")
+      .insert(fileRows);
+    if (fileError) {
+      // Non-fatal: return model but include warning
+      return NextResponse.json({ ...data, _warning: fileError.message }, { status: 201 });
+    }
+  }
+
   return NextResponse.json(data, { status: 201 });
 }

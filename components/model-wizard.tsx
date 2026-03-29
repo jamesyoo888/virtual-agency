@@ -97,6 +97,7 @@ export default function ModelWizard() {
   const [generatingFinal, setGeneratingFinal] = useState(false);
 
   const [saving, setSaving] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdModel, setCreatedModel] = useState<AnyRecord | null>(null);
 
@@ -239,6 +240,7 @@ export default function ModelWizard() {
       body: JSON.stringify({
         ...form,
         concept_image: selectedConcept,
+        angle_images: selectedAngles,
         base_price: form.base_price ? parseInt(form.base_price) : null,
         exclusive_price: form.exclusive_price ? parseInt(form.exclusive_price) : null,
       }),
@@ -253,6 +255,33 @@ export default function ModelWizard() {
       setError(msg ?? "저장 실패");
     }
     setSaving(false);
+  }
+
+  async function handleFinalize() {
+    if (!createdModel?.id) { router.push("/admin/models"); return; }
+    setFinalizing(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/models/${createdModel.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          final_images: selectedFinal,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "최종 저장 실패");
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "최종 저장 실패");
+      setFinalizing(false);
+      return;
+    }
+
+    router.push("/admin/models");
   }
 
   // ── render ────────────────────────────────────────────────────────────────
@@ -685,12 +714,20 @@ export default function ModelWizard() {
             )}
           </div>
 
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+
           <div className="flex gap-3 pt-2 border-t border-zinc-800">
             <Button onClick={() => router.push("/admin/models/new")} variant="outline" className="border-zinc-700">
               + 새 모델 추가
             </Button>
-            <Button onClick={() => router.push("/admin/models")} className="bg-white text-black hover:bg-zinc-200">
-              목록으로
+            <div className="flex-1" />
+            <Button onClick={handleFinalize} disabled={finalizing}
+              className="bg-white text-black hover:bg-zinc-200">
+              {finalizing
+                ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />저장 중...</>
+                : selectedFinal.length > 0
+                  ? `저장 및 완료 (${selectedFinal.length}장 선택)`
+                  : "저장 및 완료"}
             </Button>
           </div>
         </div>
