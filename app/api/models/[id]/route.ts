@@ -2,12 +2,16 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { devModelStore } from "@/lib/dev-store";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
   if (!SUPABASE_CONFIGURED) {
     const model = devModelStore.get(id);
@@ -31,9 +35,11 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const body = await req.json();
 
-  // Extract file-only fields that go to model_files, not models table
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const body = await req.json();
   const { final_images, angle_images, ...modelPatch } = body;
 
   if (!SUPABASE_CONFIGURED) {
@@ -46,7 +52,6 @@ export async function PATCH(
 
   const supabase = await createAdminClient();
 
-  // Update the models table only if there are non-file fields
   let updatedModel: Record<string, unknown> | null = null;
   if (Object.keys(modelPatch).length > 0) {
     const { data, error } = await supabase
@@ -58,12 +63,10 @@ export async function PATCH(
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     updatedModel = data;
   } else {
-    // Fetch current model to return
     const { data } = await supabase.from("models").select("*").eq("id", id).single();
     updatedModel = data;
   }
 
-  // Insert new model_files rows for final images
   const fileRows: { model_id: string; file_type: string; url: string; version: number }[] = [];
 
   if (Array.isArray(final_images)) {

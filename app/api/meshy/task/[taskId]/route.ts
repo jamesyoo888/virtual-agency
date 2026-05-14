@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMeshyTask, MESHY_CONFIGURED } from "@/lib/meshy/client";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 /**
  * GET /api/meshy/task/[taskId]
@@ -9,6 +10,9 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ taskId: string }> }
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { taskId } = await params;
 
   if (!MESHY_CONFIGURED || taskId.startsWith("dev-mock-")) {

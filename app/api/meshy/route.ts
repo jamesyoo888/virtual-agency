@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createImageTo3DTask, MESHY_CONFIGURED } from "@/lib/meshy/client";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 /**
  * POST /api/meshy
@@ -7,6 +8,9 @@ import { createImageTo3DTask, MESHY_CONFIGURED } from "@/lib/meshy/client";
  * Returns: { taskId: string }
  */
 export async function POST(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   if (!MESHY_CONFIGURED) {
     // Dev fallback: return a mock task ID
     return NextResponse.json({ taskId: `dev-mock-${Date.now()}`, mock: true });
