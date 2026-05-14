@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Users, Image, Video, LayoutDashboard } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Users, Image, Video, LayoutDashboard, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 const links = [
   { href: "/admin/models", label: "Model Studio", icon: Users },
@@ -11,8 +13,21 @@ const links = [
   { href: "/admin/video-studio", label: "Video Studio", icon: Video },
 ];
 
-export default function NavAdmin() {
+interface Props {
+  userEmail?: string | null;
+}
+
+export default function NavAdmin({ userEmail }: Props = {}) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    if (!SUPABASE_CONFIGURED) return;
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <nav className="w-56 shrink-0 border-r border-zinc-800 flex flex-col min-h-screen">
@@ -39,7 +54,7 @@ export default function NavAdmin() {
         ))}
       </div>
 
-      <div className="p-3 border-t border-zinc-800">
+      <div className="border-t border-zinc-800 p-3 space-y-1">
         <Link
           href="/"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
@@ -47,6 +62,23 @@ export default function NavAdmin() {
           <LayoutDashboard className="w-4 h-4" />
           Showcase
         </Link>
+        {SUPABASE_CONFIGURED && (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            로그아웃
+          </button>
+        )}
+        {userEmail && (
+          <p
+            className="px-3 pt-2 text-[10px] text-zinc-600 truncate"
+            title={userEmail}
+          >
+            {userEmail}
+          </p>
+        )}
       </div>
     </nav>
   );

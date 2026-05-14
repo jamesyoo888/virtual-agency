@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { Model } from "@/types";
 import ModelCard from "@/components/model-card";
 import CatalogFilters from "@/components/catalog-filters";
@@ -21,6 +23,21 @@ export const metadata = {
 export default async function CatalogPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const supabase = await createClient();
+
+  let userRole: "admin" | "client" | null = null;
+  if (SUPABASE_CONFIGURED) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const { data: clientRow } = await supabase
+        .from("clients")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      userRole = (clientRow?.role as "admin" | "client") ?? "client";
+    }
+  }
 
   let query = supabase
     .from("models")
@@ -53,9 +70,29 @@ export default async function CatalogPage({ searchParams }: PageProps) {
         <h1 className="text-lg font-bold tracking-widest uppercase">
           Virtual Agency
         </h1>
-        <nav className="flex gap-6 text-sm text-zinc-400">
-          <a href="#" className="hover:text-white transition-colors">Models</a>
-          <a href="#contact" className="hover:text-white transition-colors">문의</a>
+        <nav className="flex gap-4 text-sm text-zinc-400">
+          {userRole === "admin" ? (
+            <Link
+              href="/admin/models"
+              className="hover:text-white transition-colors"
+            >
+              Admin
+            </Link>
+          ) : userRole === "client" ? (
+            <Link
+              href="/client/dashboard"
+              className="hover:text-white transition-colors"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="hover:text-white transition-colors"
+            >
+              로그인
+            </Link>
+          )}
         </nav>
       </header>
 

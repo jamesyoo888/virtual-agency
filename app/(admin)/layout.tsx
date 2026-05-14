@@ -8,6 +8,8 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  let userEmail: string | null = null;
+
   if (SUPABASE_CONFIGURED) {
     const supabase = await createClient();
     const {
@@ -23,11 +25,13 @@ export default async function AdminLayout({
       .single();
 
     if (client?.role !== "admin") redirect("/client/dashboard");
+
+    userEmail = user.email ?? null;
   }
 
   return (
     <div className="flex min-h-screen bg-zinc-950 text-white">
-      <NavAdmin />
+      <NavAdmin userEmail={userEmail} />
       <main className="flex-1 overflow-auto">{children}</main>
     </div>
   );
