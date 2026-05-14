@@ -4,9 +4,11 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { Model } from "@/types";
 import ModelCard from "@/components/model-card";
 import CatalogFilters from "@/components/catalog-filters";
+import CatalogSearch from "@/components/catalog-search";
 
 interface PageProps {
   searchParams: Promise<{
+    q?: string;
     industry?: string;
     genre?: string;
     mood?: string;
@@ -45,6 +47,10 @@ export default async function CatalogPage({ searchParams }: PageProps) {
     .eq("status", "active")
     .order("follower_count", { ascending: false });
 
+  if (params.q) {
+    // PostgREST ilike — % wildcards, case-insensitive
+    query = query.ilike("name", `%${params.q.replace(/[%_]/g, "\\$&")}%`);
+  }
   if (params.industry) {
     query = query.contains("industry_tags", [params.industry]);
   }
@@ -114,6 +120,9 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
         {/* Grid */}
         <main className="flex-1 p-8">
+          <div className="mb-6">
+            <CatalogSearch />
+          </div>
           {!models || models.length === 0 ? (
             <div className="text-center py-24 text-zinc-500">
               <p>해당 조건의 모델이 없습니다.</p>
