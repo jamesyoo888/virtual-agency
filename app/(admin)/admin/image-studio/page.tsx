@@ -1,13 +1,47 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Download, ChevronDown, ChevronUp, ImageIcon } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Download, ChevronDown, ChevronUp, ImageIcon, Trash2 } from "lucide-react";
 
 interface GenerationResult {
   id: string;
   prompt: string;
   urls: string[];
   timestamp: Date;
+}
+
+const HISTORY_KEY = "va_image_studio_history_v1";
+const HISTORY_MAX = 3;
+
+function loadHistory(): GenerationResult[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Array<
+      Omit<GenerationResult, "timestamp"> & { timestamp: string }
+    >;
+    return parsed
+      .filter((r) => r && r.id && Array.isArray(r.urls))
+      .slice(0, HISTORY_MAX)
+      .map((r) => ({ ...r, timestamp: new Date(r.timestamp) }));
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(history: GenerationResult[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(
+      HISTORY_KEY,
+      JSON.stringify(
+        history.map((r) => ({ ...r, timestamp: r.timestamp.toISOString() }))
+      )
+    );
+  } catch {
+    // storage full or restricted — ignore
+  }
 }
 
 function SkeletonCard() {
@@ -96,7 +130,16 @@ export default function ImageStudioPage() {
   const [currentPrompt, setCurrentPrompt] = useState<string>("");
   const [history, setHistory] = useState<GenerationResult[]>([]);
 
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
+
   const abortRef = useRef<AbortController | null>(null);
+
+  function clearHistory() {
+    setHistory([]);
+    saveHistory([]);
+  }
 
   const handleGenerate = async () => {
     if (!prompt.trim() || loading) return;
@@ -141,7 +184,11 @@ export default function ImageStudioPage() {
         urls,
         timestamp: new Date(),
       };
-      setHistory((prev) => [newResult, ...prev].slice(0, 3));
+      setHistory((prev) => {
+        const next = [newResult, ...prev].slice(0, HISTORY_MAX);
+        saveHistory(next);
+        return next;
+      });
     } catch (err) {
       clearTimeout(timeoutId);
       if (err instanceof Error) {
@@ -303,9 +350,19 @@ export default function ImageStudioPage() {
           {/* Session history */}
           {history.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
-                세션 히스토리
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  세션 히스토리
+                </p>
+                <button
+                  onClick={clearHistory}
+                  className="flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+                  aria-label="히스토리 비우기"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  비우기
+                </button>
+              </div>
               <div className="flex flex-col gap-2">
                 {history.map((result) => (
                   <HistorySection key={result.id} result={result} />
