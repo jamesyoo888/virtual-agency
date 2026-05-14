@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -20,17 +20,16 @@ interface Props {
   };
 }
 
+const FILTER_KEYS = ["industry", "genre", "mood", "price_max", "exclusive"] as const;
+
 export default function CatalogFilters({ current }: Props) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   function update(key: string, value: string) {
-    const params = new URLSearchParams();
-    if (current.industry) params.set("industry", current.industry);
-    if (current.genre) params.set("genre", current.genre);
-    if (current.mood) params.set("mood", current.mood);
-    if (current.price_max) params.set("price_max", current.price_max);
-    if (current.exclusive) params.set("exclusive", current.exclusive);
+    // Start from the full current URL so search ?q= and other params are preserved
+    const params = new URLSearchParams(searchParams.toString());
 
     if (value && value !== "all") {
       params.set(key, value);
@@ -38,11 +37,16 @@ export default function CatalogFilters({ current }: Props) {
       params.delete(key);
     }
 
-    router.push(`${pathname}?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   }
 
   function reset() {
-    router.push(pathname);
+    // Only strip filter keys; keep ?q= and anything else
+    const params = new URLSearchParams(searchParams.toString());
+    for (const k of FILTER_KEYS) params.delete(k);
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   }
 
   const hasFilters = !!(
