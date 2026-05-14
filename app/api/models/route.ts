@@ -1,6 +1,6 @@
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
-import { devModelStore } from "@/lib/dev-store";
+import { devModelStore, type DevModel } from "@/lib/dev-store";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export async function GET() {
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
 
   if (!SUPABASE_CONFIGURED) {
-    const model = {
+    const model: DevModel = {
       id: crypto.randomUUID(),
       name: resolvedName,
       slug,

@@ -11,7 +11,13 @@ export type ProjectStatus =
 
 export type ContractTier = "non-exclusive" | "category" | "full";
 
-export type FileType = "concept" | "reference" | "generated" | "3d_mesh";
+export type FileType =
+  | "concept"
+  | "reference"
+  | "generated"
+  | "3d_mesh"
+  | "texture"
+  | "portfolio";
 
 export type SurfaceType = "matte" | "semi-gloss" | "glossy";
 
