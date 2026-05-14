@@ -1,11 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { generateConceptImages } from "@/lib/replicate/client";
 import { NextResponse } from "next/server";
-
-const SUPABASE_CONFIGURED =
-  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project");
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export async function POST(request: Request) {
   if (SUPABASE_CONFIGURED) {
@@ -14,12 +10,12 @@ export async function POST(request: Request) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { prompt, count = 4 } = await request.json();
+  const { prompt, count = 4, negative_prompt } = await request.json();
 
   if (!prompt) {
     return NextResponse.json({ error: "prompt is required" }, { status: 400 });
   }
 
-  const urls = await generateConceptImages(prompt, count);
+  const urls = await generateConceptImages(prompt, count, negative_prompt);
   return NextResponse.json({ urls });
 }

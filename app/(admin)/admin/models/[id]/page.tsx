@@ -9,30 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Edit, X, Check, Loader2 } from "lucide-react";
-
-// ── constants ────────────────────────────────────────────────────────────────
-
-const INDUSTRY_OPTIONS = [
-  { value: "beauty", label: "뷰티" },
-  { value: "tech", label: "테크" },
-  { value: "food", label: "푸드" },
-  { value: "luxury", label: "럭셔리" },
-  { value: "sports", label: "스포츠" },
-  { value: "lifestyle", label: "라이프스타일" },
-];
-const MOOD_OPTIONS = [
-  { value: "cold", label: "차가운" },
-  { value: "warm", label: "따뜻한" },
-  { value: "neutral", label: "중성적" },
-  { value: "edgy", label: "엣지있는" },
-];
-
-const INDUSTRY_LABELS: Record<string, string> = Object.fromEntries(
-  INDUSTRY_OPTIONS.map((o) => [o.value, o.label])
-);
-const MOOD_LABELS: Record<string, string> = Object.fromEntries(
-  MOOD_OPTIONS.map((o) => [o.value, o.label])
-);
+import {
+  INDUSTRY_OPTIONS,
+  MOOD_OPTIONS,
+  INDUSTRY_LABELS,
+  MOOD_LABELS,
+} from "@/lib/tags";
+import { ageInYears } from "@/lib/utils";
 
 // ── EditForm type ─────────────────────────────────────────────────────────────
 
@@ -190,12 +173,7 @@ export default function AdminModelDetailPage() {
   if (!model) return null;
 
   const m = model;
-  const debutDate = m.debut_date ? new Date(m.debut_date) : null;
-  const ageYears = debutDate
-    ? Math.floor(
-        (Date.now() - debutDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
-      )
-    : null;
+  const ageYears = ageInYears(m.debut_date);
 
   // ── render ───────────────────────────────────────────────────────────────────
 

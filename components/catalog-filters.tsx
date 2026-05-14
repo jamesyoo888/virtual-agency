@@ -4,34 +4,11 @@ import { useRouter, usePathname } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-
-const INDUSTRIES = [
-  { value: "beauty", label: "뷰티" },
-  { value: "tech", label: "테크" },
-  { value: "food", label: "푸드" },
-  { value: "luxury", label: "럭셔리" },
-  { value: "sports", label: "스포츠" },
-  { value: "lifestyle", label: "라이프스타일" },
-];
-
-const GENRES = [
-  { value: "ad", label: "광고" },
-  { value: "film", label: "영화" },
-  { value: "drama", label: "드라마" },
-  { value: "noir", label: "누아르" },
-  { value: "romance", label: "로맨스" },
-  { value: "sci-fi", label: "SF" },
-  { value: "historical", label: "사극" },
-  { value: "indie", label: "독립영화" },
-  { value: "horror", label: "공포" },
-];
-
-const MOODS = [
-  { value: "cold", label: "차가운" },
-  { value: "warm", label: "따뜻한" },
-  { value: "neutral", label: "중성적" },
-  { value: "edgy", label: "엣지있는" },
-];
+import {
+  INDUSTRY_OPTIONS as INDUSTRIES,
+  GENRE_OPTIONS as GENRES,
+  MOOD_OPTIONS as MOODS,
+} from "@/lib/tags";
 
 interface Props {
   current: {

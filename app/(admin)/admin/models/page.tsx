@@ -5,11 +5,7 @@ import { Model } from "@/types";
 import ModelCard from "@/components/model-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-
-const SUPABASE_CONFIGURED =
-  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project");
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export const dynamic = "force-dynamic"; // always re-render to pick up new models
 

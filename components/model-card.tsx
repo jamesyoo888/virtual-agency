@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Model } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { ageInYears } from "@/lib/utils";
 
 interface Props {
   model: Model;
@@ -19,10 +20,7 @@ export default function ModelCard({ model, variant }: Props) {
       ? `/admin/models/${model.id}`
       : `/models/${model.id}`;
 
-  const debutDate = model.debut_date ? new Date(model.debut_date) : null;
-  const ageYears = debutDate
-    ? Math.floor((Date.now() - debutDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25))
-    : null;
+  const ageYears = ageInYears(model.debut_date);
 
   return (
     <Link href={href} className="group block">

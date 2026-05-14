@@ -1,24 +1,12 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Model } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import InquiryForm from "@/components/inquiry-form";
-
-const INDUSTRY_LABELS: Record<string, string> = {
-  beauty: "뷰티", tech: "테크", food: "푸드",
-  luxury: "럭셔리", sports: "스포츠", lifestyle: "라이프스타일",
-};
-
-const GENRE_LABELS: Record<string, string> = {
-  ad: "광고", film: "영화", drama: "드라마", noir: "누아르",
-  romance: "로맨스", "sci-fi": "SF", historical: "사극",
-  indie: "독립영화", horror: "공포",
-};
-
-const MOOD_LABELS: Record<string, string> = {
-  cold: "차가운", warm: "따뜻한", neutral: "중성적", edgy: "엣지있는",
-};
+import { INDUSTRY_LABELS, GENRE_LABELS, MOOD_LABELS } from "@/lib/tags";
+import { ageInYears } from "@/lib/utils";
 
 export default async function ShowcaseModelPage({
   params,
@@ -40,9 +28,7 @@ export default async function ShowcaseModelPage({
   const m = model as Model;
 
   const debutDate = m.debut_date ? new Date(m.debut_date) : null;
-  const ageYears = debutDate
-    ? Math.floor((Date.now() - debutDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25))
-    : null;
+  const ageYears = ageInYears(m.debut_date);
 
   const { data: files } = await supabase
     .from("model_files")
@@ -54,9 +40,9 @@ export default async function ShowcaseModelPage({
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="border-b border-zinc-900 px-8 py-5">
-        <a href="/" className="text-lg font-bold tracking-widest uppercase hover:text-zinc-300">
+        <Link href="/" className="text-lg font-bold tracking-widest uppercase hover:text-zinc-300">
           Virtual Agency
-        </a>
+        </Link>
       </header>
 
       <div className="max-w-6xl mx-auto px-8 py-12">

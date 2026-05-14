@@ -110,14 +110,14 @@ export default function ImageStudioPage() {
     const timeoutId = setTimeout(() => abortRef.current?.abort(), 120_000);
 
     try {
-      const fullPrompt = negativePrompt.trim()
-        ? `${prompt.trim()} ### negative: ${negativePrompt.trim()}`
-        : prompt.trim();
-
       const res = await fetch("/api/generate/image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: fullPrompt, count }),
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          count,
+          negative_prompt: negativePrompt.trim() || undefined,
+        }),
         signal: abortRef.current.signal,
       });
 

@@ -1,17 +1,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import NavAdmin from "@/components/nav-admin";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const isConfigured =
-    supabaseUrl.length > 0 && supabaseUrl !== "https://placeholder.supabase.co";
-
-  if (isConfigured) {
+  if (SUPABASE_CONFIGURED) {
     const supabase = await createClient();
     const {
       data: { user },

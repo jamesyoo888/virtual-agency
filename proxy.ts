@@ -1,14 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Skip Supabase auth if env vars not configured yet (local dev without Supabase)
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const isSupabaseConfigured =
-    supabaseUrl.length > 0 &&
-    !supabaseUrl.includes("placeholder") &&
-    !supabaseUrl.includes("your-project");
-  if (!isSupabaseConfigured) {
+  if (!SUPABASE_CONFIGURED) {
     return NextResponse.next({ request });
   }
 

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,6 +19,7 @@ export default function InquiryForm({ modelId, modelName }: Props) {
   const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: `${modelName} 모델 문의`,
     brief: "",
@@ -32,6 +32,7 @@ export default function InquiryForm({ modelId, modelName }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSending(true);
+    setSubmitError(null);
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -48,7 +49,9 @@ export default function InquiryForm({ modelId, modelName }: Props) {
       status: "inquiry",
     });
 
-    if (!error) {
+    if (error) {
+      setSubmitError(error.message);
+    } else {
       setSent(true);
     }
     setSending(false);
@@ -126,6 +129,8 @@ export default function InquiryForm({ modelId, modelName }: Props) {
                 rows={3}
               />
             </div>
+
+            {submitError && <p className="text-sm text-red-400">{submitError}</p>}
 
             <Button
               type="submit"

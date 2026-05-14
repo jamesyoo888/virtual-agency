@@ -1,10 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import NavClient from "@/components/nav-client";
-
-const SUPABASE_CONFIGURED =
-  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  process.env.NEXT_PUBLIC_SUPABASE_URL !== "https://placeholder.supabase.co";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export default async function ClientLayout({
   children,

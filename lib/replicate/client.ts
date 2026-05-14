@@ -2,11 +2,12 @@ import { generateImagesEasyDiffusion } from "@/lib/easy-diffusion/client";
 
 export async function generateConceptImages(
   prompt: string,
-  count: number = 4
+  count: number = 4,
+  negativePrompt?: string
 ): Promise<string[]> {
   // 1. Easy Diffusion — local GPU, free, uses Realistic Vision V6
   if (process.env.EASY_DIFFUSION_URL) {
-    const edImages = await generateImagesEasyDiffusion(prompt, count);
+    const edImages = await generateImagesEasyDiffusion(prompt, count, negativePrompt);
     if (edImages.length > 0) return edImages;
   }
 

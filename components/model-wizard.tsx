@@ -7,28 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-// Note: AI-generated images use <img> directly to bypass Next.js image proxy
-// eslint-disable-next-line @next/next/no-img-element
+// AI-generated images use raw <img> to bypass Next.js image optimization.
 import { Loader2, Check, Upload, Box, Image as ImageIcon, RefreshCw, ExternalLink } from "lucide-react";
+import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 
 // ── constants ────────────────────────────────────────────────────────────────
 
-const INDUSTRY_OPTIONS = [
-  { value: "beauty", label: "뷰티" }, { value: "tech", label: "테크" },
-  { value: "food", label: "푸드" }, { value: "luxury", label: "럭셔리" },
-  { value: "sports", label: "스포츠" }, { value: "lifestyle", label: "라이프스타일" },
-];
-const GENRE_OPTIONS = [
-  { value: "ad", label: "광고" }, { value: "film", label: "영화" },
-  { value: "drama", label: "드라마" }, { value: "noir", label: "누아르" },
-  { value: "romance", label: "로맨스" }, { value: "sci-fi", label: "SF" },
-  { value: "historical", label: "사극" }, { value: "indie", label: "독립영화" },
-  { value: "horror", label: "공포" },
-];
-const MOOD_OPTIONS = [
-  { value: "cold", label: "차가운" }, { value: "warm", label: "따뜻한" },
-  { value: "neutral", label: "중성적" }, { value: "edgy", label: "엣지있는" },
-];
 const ANGLES = [
   { key: "front",    label: "정면",    suffix: "front view, facing camera" },
   { key: "three4",   label: "3/4 앵글", suffix: "three quarter angle view" },

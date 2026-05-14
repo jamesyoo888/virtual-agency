@@ -1,11 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { devModelStore } from "@/lib/dev-store";
-
-const SUPABASE_CONFIGURED =
-  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project");
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export async function GET(
   _req: Request,

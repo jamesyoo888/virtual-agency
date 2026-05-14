@@ -3,12 +3,18 @@ const ED_URL = process.env.EASY_DIFFUSION_URL;
 // Easy Diffusion model name (filename without extension)
 const SD_MODEL = "Realistic_Vision_V6.0_NV_B1_fp16";
 
-async function renderOne(prompt: string, sessionId: string): Promise<string | null> {
+const DEFAULT_NEGATIVE = "nsfw, blurry, low quality, deformed, ugly, watermark";
+
+async function renderOne(
+  prompt: string,
+  sessionId: string,
+  negativePrompt: string
+): Promise<string | null> {
   if (!ED_URL) return null;
 
   const body = {
     prompt: `${prompt}, photorealistic, high quality, studio lighting`,
-    negative_prompt: "nsfw, blurry, low quality, deformed, ugly, watermark",
+    negative_prompt: negativePrompt,
     seed: -1,
     used_random_seed: true,
     num_outputs: 1,
@@ -68,13 +74,18 @@ async function renderOne(prompt: string, sessionId: string): Promise<string | nu
 
 export async function generateImagesEasyDiffusion(
   prompt: string,
-  count: number = 4
+  count: number = 4,
+  negativePrompt?: string
 ): Promise<string[]> {
   if (!ED_URL) return [];
 
+  const negative = negativePrompt?.trim()
+    ? `${DEFAULT_NEGATIVE}, ${negativePrompt.trim()}`
+    : DEFAULT_NEGATIVE;
+
   const results = await Promise.all(
     Array.from({ length: count }, (_, i) =>
-      renderOne(prompt, `va_${Date.now()}_${i}`)
+      renderOne(prompt, `va_${Date.now()}_${i}`, negative)
     )
   );
 
