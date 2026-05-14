@@ -33,8 +33,14 @@ const STEPS = [
 // ── types ────────────────────────────────────────────────────────────────────
 
 type Step = 1 | 2 | 3 | 4 | 5;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRecord = Record<string, any>;
+interface CreatedModel {
+  id: string;
+  name?: string;
+  concept_image?: string | null;
+  debut_date?: string | null;
+  industry_tags?: string[];
+  mood_tags?: string[];
+}
 
 // ── main component ───────────────────────────────────────────────────────────
 
@@ -83,7 +89,7 @@ export default function ModelWizard() {
   const [saving, setSaving] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [createdModel, setCreatedModel] = useState<AnyRecord | null>(null);
+  const [createdModel, setCreatedModel] = useState<CreatedModel | null>(null);
 
   // ── helpers ──────────────────────────────────────────────────────────────
 
