@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/client/dashboard";
+  const nextParam = searchParams.get("next");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +25,7 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setError(error.message);
@@ -33,7 +33,17 @@ function LoginForm() {
       return;
     }
 
-    router.push(next);
+    let dest = nextParam;
+    if (!dest && data.user) {
+      const { data: clientRow } = await supabase
+        .from("clients")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+      dest = clientRow?.role === "admin" ? "/admin/models" : "/client/dashboard";
+    }
+
+    router.push(dest ?? "/client/dashboard");
     router.refresh();
   }
 
