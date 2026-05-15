@@ -82,6 +82,9 @@ function LoginForm() {
       </TabsList>
 
       <TabsContent value="login">
+        <p className="text-xs text-zinc-500 mb-4 leading-relaxed">
+          로그인하면 권한에 따라 자동으로 이동합니다 — 광고주는 대시보드, 운영자는 어드민으로.
+        </p>
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-zinc-300">이메일</Label>
