@@ -101,6 +101,32 @@ export const capsPatchSchema = z.object({
 
 export type CapsPatchInput = z.infer<typeof capsPatchSchema>;
 
+// Client inquiry submission. `brief` already includes the pre-formatted
+// purpose/budget line from the form — keep the API permissive but capped.
+export const inquiryCreateSchema = z.object({
+  model_id: z.string().min(1),
+  title: z.string().trim().min(1).max(200),
+  brief: z.string().max(5000).optional().nullable(),
+  budget_range: z.string().max(50).optional().nullable(),
+  purpose: z.string().max(50).optional().nullable(),
+});
+
+export type InquiryCreateInput = z.infer<typeof inquiryCreateSchema>;
+
+// Bulk status change for projects — admin Inbox can sweep many at once.
+export const projectBulkStatusSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(100),
+  status: z.enum([
+    "inquiry",
+    "brief_received",
+    "in_progress",
+    "review",
+    "delivered",
+  ]),
+});
+
+export type ProjectBulkStatusInput = z.infer<typeof projectBulkStatusSchema>;
+
 // Reviews — client submits a 1-5 rating, optional comment. Comment cap of 2k
 // is generous but bounds an abusive client; admin moderates anything that
 // slips through length checks.

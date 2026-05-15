@@ -86,18 +86,25 @@ export default function InquiryForm({ modelId, modelName }: Props) {
       return;
     }
 
-    const { error } = await supabase.from("projects").insert({
-      client_id: user.id,
-      model_id: modelId,
-      title: form.title,
-      brief: `목적: ${form.purpose}\n예산: ${form.budget_range}\n\n${form.brief}`,
-      status: "inquiry",
-    });
-
-    if (error) {
-      setSubmitError(error.message);
-    } else {
+    try {
+      const res = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model_id: modelId,
+          title: form.title,
+          brief: form.brief,
+          budget_range: form.budget_range,
+          purpose: form.purpose,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? `HTTP ${res.status}`);
+      }
       setSent(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "전송 실패");
     }
     setSending(false);
   }
