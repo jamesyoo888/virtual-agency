@@ -2,9 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Inbox } from "lucide-react";
+import { Inbox, Download } from "lucide-react";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
+import InboxSearch from "@/components/inbox-search";
 
 export const dynamic = "force-dynamic";
 
@@ -38,28 +39,69 @@ const STATUS_TONE: Record<string, string> = {
   delivered: "bg-green-500/15 text-green-300 border-green-500/30",
 };
 
-async function fetchProjects(statusFilter?: string): Promise<ProjectRow[]> {
+async function fetchProjects(
+  statusFilter?: string,
+  q?: string
+): Promise<ProjectRow[]> {
   if (!SUPABASE_CONFIGURED) return [];
   const supabase = await createClient();
-  let q = supabase
+  let query = supabase
     .from("projects")
     .select(
       "id, title, brief, status, created_at, client_id, model_id, model:models(name, concept_image), client:clients(email, company)"
     )
     .order("created_at", { ascending: false })
     .limit(200);
-  if (statusFilter && statusFilter !== "all") q = q.eq("status", statusFilter);
-  const { data } = await q;
-  return (data as unknown as ProjectRow[]) ?? [];
+  if (statusFilter && statusFilter !== "all") query = query.eq("status", statusFilter);
+  if (q && q.trim()) {
+    // Escape ilike wildcards (% _) — Supabase escape token is backslash.
+    const term = `%${q.trim().replace(/[%_]/g, "\\$&")}%`;
+    // OR across title + brief; client/company live on a joined table so we
+    // post-filter those in memory for the matched rows. Keeps the query a
+    // single round-trip without a stored function.
+    query = query.or(`title.ilike.${term},brief.ilike.${term}`);
+  }
+  const { data } = await query;
+  let rows = (data as unknown as ProjectRow[]) ?? [];
+
+  if (q && q.trim()) {
+    // Server-side filter falls back to in-memory union for joined fields so
+    // a search for "Acme Corp" hits projects whose company matches even when
+    // title/brief don't.
+    const supabaseAdmin = await createClient();
+    const term = q.trim().toLowerCase();
+    const { data: byClient } = await supabaseAdmin
+      .from("projects")
+      .select(
+        "id, title, brief, status, created_at, client_id, model_id, model:models(name, concept_image), client:clients!inner(email, company)"
+      )
+      .or(`company.ilike.%${term}%,email.ilike.%${term}%`, {
+        foreignTable: "clients",
+      })
+      .order("created_at", { ascending: false })
+      .limit(200);
+    const extra = (byClient as unknown as ProjectRow[]) ?? [];
+    const seen = new Set(rows.map((r) => r.id));
+    for (const r of extra) {
+      if (!seen.has(r.id) && (!statusFilter || statusFilter === "all" || r.status === statusFilter)) {
+        rows.push(r);
+        seen.add(r.id);
+      }
+    }
+    rows.sort((a, b) => b.created_at.localeCompare(a.created_at));
+    rows = rows.slice(0, 200);
+  }
+
+  return rows;
 }
 
 interface Props {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; q?: string }>;
 }
 
 export default async function AdminInboxPage({ searchParams }: Props) {
-  const { status } = await searchParams;
-  const projects = await fetchProjects(status);
+  const { status, q } = await searchParams;
+  const projects = await fetchProjects(status, q);
 
   const counts: Record<string, number> = { all: 0 };
   for (const p of projects) counts[p.status] = (counts[p.status] ?? 0) + 1;
@@ -69,42 +111,59 @@ export default async function AdminInboxPage({ searchParams }: Props) {
     <div className="p-8 max-w-6xl mx-auto">
       <header className="mb-8 flex items-center gap-3">
         <Inbox className="w-5 h-5 text-zinc-400" />
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">Inbox</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
             클라이언트 문의 + 진행 중 프로젝트 통합 보기
           </p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+        <a
+          href="/api/admin/exports/projects"
+          download
+          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 rounded-md px-2.5 py-1.5"
+          title="모든 프로젝트 CSV 다운로드"
+        >
+          <Download className="w-3 h-3" />
+          CSV
+        </a>
       </header>
 
-      <nav className="flex flex-wrap gap-1 mb-6 text-xs">
-        {[
-          { value: "all", label: "전체" },
-          { value: "inquiry", label: "문의" },
-          { value: "in_progress", label: "제작 중" },
-          { value: "review", label: "검토" },
-          { value: "delivered", label: "완료" },
-        ].map((tab) => {
-          const active = (status ?? "all") === tab.value;
-          const href = tab.value === "all" ? "/admin/inbox" : `/admin/inbox?status=${tab.value}`;
-          return (
-            <Link
-              key={tab.value}
-              href={href}
-              className={`px-3 py-1.5 rounded-md border transition-colors ${
-                active
-                  ? "bg-white text-black border-white"
-                  : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
-              }`}
-            >
-              {tab.label}
-              <span className="ml-1.5 opacity-60">
-                {counts[tab.value] ?? 0}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+        <nav className="flex flex-wrap gap-1 text-xs">
+          {[
+            { value: "all", label: "전체" },
+            { value: "inquiry", label: "문의" },
+            { value: "in_progress", label: "제작 중" },
+            { value: "review", label: "검토" },
+            { value: "delivered", label: "완료" },
+          ].map((tab) => {
+            const active = (status ?? "all") === tab.value;
+            const params = new URLSearchParams();
+            if (tab.value !== "all") params.set("status", tab.value);
+            if (q) params.set("q", q);
+            const qs = params.toString();
+            const href = qs ? `/admin/inbox?${qs}` : "/admin/inbox";
+            return (
+              <Link
+                key={tab.value}
+                href={href}
+                className={`px-3 py-1.5 rounded-md border transition-colors ${
+                  active
+                    ? "bg-white text-black border-white"
+                    : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                {tab.label}
+                <span className="ml-1.5 opacity-60">
+                  {counts[tab.value] ?? 0}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+        <InboxSearch />
+      </div>
 
       {!SUPABASE_CONFIGURED ? (
         <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
