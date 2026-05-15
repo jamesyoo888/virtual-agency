@@ -3,11 +3,14 @@ import {
   recentUsage,
   breakdownUsage,
   dailyHistory,
+  spendByUser,
   WINDOW_MS,
 } from "@/lib/cost/store";
 import { getCapConfig } from "@/lib/cost/cap";
 import CapsEditor from "@/components/caps-editor";
 import Sparkline from "@/components/sparkline";
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export const dynamic = "force-dynamic";
 
@@ -101,14 +104,32 @@ function CapCard({
   );
 }
 
+async function emailsForUserIds(ids: string[]): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  if (!SUPABASE_CONFIGURED || ids.length === 0) return map;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("clients")
+    .select("id, email")
+    .in("id", ids);
+  for (const row of (data ?? []) as { id: string; email: string | null }[]) {
+    if (row.email) map.set(row.id, row.email);
+  }
+  return map;
+}
+
 export default async function AdminUsagePage() {
-  const [totals, recent, caps, breakdown, history] = await Promise.all([
+  const [totals, recent, caps, breakdown, history, perUser] = await Promise.all([
     summarizeUsage(),
     recentUsage(50),
     getCapConfig(),
     breakdownUsage(WINDOW_MS.monthly),
     dailyHistory(7),
+    spendByUser(WINDOW_MS.monthly),
   ]);
+  const userEmails = await emailsForUserIds(
+    perUser.map((u) => u.user_id).filter((id) => id !== "(unknown)")
+  );
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8">
@@ -145,6 +166,22 @@ export default async function AdminUsagePage() {
         <BreakdownCard title="Route 별 (30d)" rows={breakdown.byRoute.map((r) => ({ name: r.route, cost: r.cost, count: r.count }))} />
         <BreakdownCard title="Model 별 (30d)" rows={breakdown.byModel.map((m) => ({ name: m.model, cost: m.cost, count: m.count }))} />
       </section>
+
+      {perUser.length > 1 && (
+        <section>
+          <BreakdownCard
+            title="Admin 별 (30d) — 다중 운영자 사용량"
+            rows={perUser.map((u) => ({
+              name:
+                u.user_id === "(unknown)"
+                  ? "(unknown)"
+                  : userEmails.get(u.user_id) ?? u.user_id.slice(0, 8),
+              cost: u.cost,
+              count: u.count,
+            }))}
+          />
+        </section>
+      )}
 
       <section>
         <div className="flex items-center justify-between mb-3">

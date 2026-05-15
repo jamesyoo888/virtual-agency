@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   if (!result.ok) return result.response;
 
   const estimated = estimateLipsyncCost();
-  const capDenied = await enforceCaps(estimated);
+  const capDenied = await enforceCaps(estimated, auth.userId);
   if (capDenied) return capDenied;
 
   if (!REPLICATE_CONFIGURED) {
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       route: "lipsync",
       model: prediction.provider,
       cost_usd: estimated,
+      user_id: auth.userId,
     });
     return NextResponse.json({
       id: prediction.id,

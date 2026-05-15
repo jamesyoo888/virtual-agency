@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
   const durationSec = result.data.durationSec ?? 5;
   const estimated = estimateVideoCost({ durationSec });
-  const capDenied = await enforceCaps(estimated);
+  const capDenied = await enforceCaps(estimated, auth.userId);
   if (capDenied) return capDenied;
 
   if (!VIDEO_CONFIGURED) {
@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       route: "video",
       model: prediction.provider,
       cost_usd: estimated,
+      user_id: auth.userId,
       metadata: { durationSec, aspectRatio: result.data.aspectRatio },
     });
     return NextResponse.json({

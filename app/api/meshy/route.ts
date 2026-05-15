@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   if (!result.ok) return result.response;
 
   const estimated = estimateMeshyCost();
-  const capDenied = await enforceCaps(estimated);
+  const capDenied = await enforceCaps(estimated, auth.userId);
   if (capDenied) return capDenied;
 
   if (!MESHY_CONFIGURED) {
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       route: "meshy",
       model: "meshy/image-to-3d",
       cost_usd: estimated,
+      user_id: auth.userId,
     });
     return NextResponse.json({ taskId });
   } catch (e) {

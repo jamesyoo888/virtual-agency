@@ -71,12 +71,18 @@ export async function recordUsage(entry: Omit<UsageEntry, "created_at">): Promis
 // ── querying ─────────────────────────────────────────────────────────────────
 /**
  * Sum costs over a rolling window. `windowMs=0` totals everything.
+ * Optional `userId` narrows the sum to a single admin — drives per-admin
+ * sub-caps (a runaway admin can't burn through the global budget alone).
  */
-export async function sumUsage(windowMs: number): Promise<number> {
+export async function sumUsage(
+  windowMs: number,
+  userId?: string | null
+): Promise<number> {
   if (!SUPABASE_CONFIGURED) {
     const cutoff = windowMs === 0 ? 0 : Date.now() - windowMs;
     return memStore()
       .filter((e) => new Date(e.created_at).getTime() >= cutoff)
+      .filter((e) => (userId ? e.user_id === userId : true))
       .reduce((acc, e) => acc + (Number(e.cost_usd) || 0), 0);
   }
 
@@ -86,6 +92,7 @@ export async function sumUsage(windowMs: number): Promise<number> {
     const since = new Date(Date.now() - windowMs).toISOString();
     query = query.gte("created_at", since);
   }
+  if (userId) query = query.eq("user_id", userId);
   const { data, error } = await query;
   if (error) {
     console.error("[usage] sum failed:", error.message);
@@ -100,18 +107,60 @@ export async function sumUsage(windowMs: number): Promise<number> {
 
 /**
  * Convenience: get all three rolling windows at once for the admin UI.
+ * Pass `userId` to scope to a single admin.
  */
-export async function summarizeUsage(): Promise<{
+export async function summarizeUsage(userId?: string | null): Promise<{
   daily: number;
   weekly: number;
   monthly: number;
 }> {
   const [daily, weekly, monthly] = await Promise.all([
-    sumUsage(WINDOW_MS.daily),
-    sumUsage(WINDOW_MS.weekly),
-    sumUsage(WINDOW_MS.monthly),
+    sumUsage(WINDOW_MS.daily, userId),
+    sumUsage(WINDOW_MS.weekly, userId),
+    sumUsage(WINDOW_MS.monthly, userId),
   ]);
   return { daily, weekly, monthly };
+}
+
+/**
+ * Per-admin spend over a rolling window. Used by /admin/usage to show which
+ * admin is responsible for the current totals. Returns an empty array on
+ * configuration miss rather than throwing.
+ */
+export async function spendByUser(windowMs: number): Promise<Array<{
+  user_id: string;
+  cost: number;
+  count: number;
+}>> {
+  let entries: UsageEntry[] = [];
+  if (!SUPABASE_CONFIGURED) {
+    const cutoff = windowMs === 0 ? 0 : Date.now() - windowMs;
+    entries = memStore().filter((e) => new Date(e.created_at).getTime() >= cutoff);
+  } else {
+    const supabase = await createAdminClient();
+    let q = supabase.from("usage_log").select("user_id, cost_usd, created_at");
+    if (windowMs > 0) {
+      q = q.gte("created_at", new Date(Date.now() - windowMs).toISOString());
+    }
+    const { data, error } = await q;
+    if (error) {
+      console.error("[usage] spendByUser failed:", error.message);
+      return [];
+    }
+    entries = (data as UsageEntry[]) ?? [];
+  }
+
+  const agg = new Map<string, { cost: number; count: number }>();
+  for (const e of entries) {
+    const id = e.user_id ?? "(unknown)";
+    const prev = agg.get(id) ?? { cost: 0, count: 0 };
+    prev.cost += Number(e.cost_usd) || 0;
+    prev.count += 1;
+    agg.set(id, prev);
+  }
+  return [...agg.entries()]
+    .map(([user_id, v]) => ({ user_id, ...v }))
+    .sort((a, b) => b.cost - a.cost);
 }
 
 /**

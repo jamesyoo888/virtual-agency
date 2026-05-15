@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   const { prompt, count = 4, negative_prompt } = result.data;
 
   const estimated = estimateImageCost({ count });
-  const capDenied = await enforceCaps(estimated);
+  const capDenied = await enforceCaps(estimated, auth.userId);
   if (capDenied) return capDenied;
 
   try {
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       route: "image",
       model: "flux-1.1-pro",
       cost_usd: estimated,
+      user_id: auth.userId,
       metadata: { count },
     });
     return NextResponse.json({ urls });

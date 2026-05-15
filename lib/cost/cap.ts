@@ -39,8 +39,16 @@ export interface CapCheckResult {
 /**
  * Check whether an upcoming call would breach any cap. Returns ok=true
  * when all caps either pass or are unset.
+ *
+ * `userId` optionally narrows the rolling window sums to one admin so a
+ * single operator's spend can be capped independently of the global total.
+ * The per-call check is unaffected — it's evaluated before any DB hit and
+ * applies regardless of who initiated the call.
  */
-export async function checkCaps(estimated: number): Promise<CapCheckResult> {
+export async function checkCaps(
+  estimated: number,
+  userId?: string | null
+): Promise<CapCheckResult> {
   const cfg = await getCapConfig();
 
   // 1. per-call — synchronous
@@ -65,7 +73,7 @@ export async function checkCaps(estimated: number): Promise<CapCheckResult> {
   if (cfg.monthly !== null) windowsToCheck.push({ window: "monthly", limit: cfg.monthly });
 
   const sums = await Promise.all(
-    windowsToCheck.map((w) => sumUsage(WINDOW_MS[w.window]))
+    windowsToCheck.map((w) => sumUsage(WINDOW_MS[w.window], userId))
   );
 
   for (let i = 0; i < windowsToCheck.length; i++) {
@@ -88,9 +96,10 @@ export async function checkCaps(estimated: number): Promise<CapCheckResult> {
  * or null if it's safe to proceed.
  */
 export async function enforceCaps(
-  estimated: number
+  estimated: number,
+  userId?: string | null
 ): Promise<NextResponse | null> {
-  const result = await checkCaps(estimated);
+  const result = await checkCaps(estimated, userId);
   if (result.ok) return null;
   const { window, limit, current, wouldBe } = result.exceeded!;
   return NextResponse.json(
