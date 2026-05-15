@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,18 +14,62 @@ interface Props {
   modelName: string;
 }
 
+const KRW = new Intl.NumberFormat("ko-KR");
+
+function readHashQuote(): { days: number; exclusive: boolean; total: number } | null {
+  if (typeof window === "undefined") return null;
+  const hash = window.location.hash;
+  if (!hash.startsWith("#inquire?")) return null;
+  try {
+    const params = new URLSearchParams(hash.slice("#inquire?".length));
+    const days = Number(params.get("days"));
+    const total = Number(params.get("total"));
+    if (!Number.isFinite(days) || days <= 0 || !Number.isFinite(total) || total <= 0) {
+      return null;
+    }
+    return {
+      days,
+      exclusive: params.get("exclusive") === "true",
+      total,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default function InquiryForm({ modelId, modelName }: Props) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  // Lazy-init from PriceCalculator handoff (hash like
+  // `#inquire?days=5&exclusive=true&total=2500000`) so we don't trip the
+  // react-hooks/set-state-in-effect rule.
+  const initialQuote = typeof window !== "undefined" ? readHashQuote() : null;
+  const [open, setOpen] = useState(!!initialQuote);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    title: `${modelName} 모델 문의`,
-    brief: "",
-    budget_range: "",
-    purpose: "",
+  const [form, setForm] = useState(() => {
+    const base = {
+      title: `${modelName} 모델 문의`,
+      brief: "",
+      budget_range: "",
+      purpose: "",
+    };
+    if (!initialQuote) return base;
+    const line = `[견적 가안] ${initialQuote.days}일${
+      initialQuote.exclusive ? " · 독점 라이선스" : ""
+    } / 예상 ₩${KRW.format(initialQuote.total)}\n\n`;
+    return { ...base, brief: line };
   });
+
+  // Wipe the hash once consumed so navigation back doesn't re-trigger.
+  useEffect(() => {
+    if (!initialQuote) return;
+    if (typeof window !== "undefined" && window.location.hash.startsWith("#inquire")) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    // initialQuote is captured at first render — intentionally not in deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const supabase = createClient();
 
@@ -37,6 +81,7 @@ export default function InquiryForm({ modelId, modelName }: Props) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
+      setSending(false);
       router.push(`/login?next=/models/${modelId}`);
       return;
     }

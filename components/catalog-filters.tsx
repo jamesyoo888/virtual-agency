@@ -9,6 +9,7 @@ import {
   GENRE_OPTIONS as GENRES,
   MOOD_OPTIONS as MOODS,
 } from "@/lib/tags";
+import { SORT_OPTIONS } from "@/lib/catalog/filter";
 
 interface Props {
   current: {
@@ -17,10 +18,11 @@ interface Props {
     mood?: string;
     price_max?: string;
     exclusive?: string;
+    sort?: string;
   };
 }
 
-const FILTER_KEYS = ["industry", "genre", "mood", "price_max", "exclusive"] as const;
+const FILTER_KEYS = ["industry", "genre", "mood", "price_max", "exclusive", "sort"] as const;
 
 export default function CatalogFilters({ current }: Props) {
   const router = useRouter();
@@ -126,6 +128,25 @@ export default function CatalogFilters({ current }: Props) {
           <SelectContent className="bg-zinc-900 border-zinc-800">
             <SelectItem value="all">전체</SelectItem>
             <SelectItem value="true">독점 가능만</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-xs text-zinc-400">정렬</Label>
+        <Select
+          value={current.sort ?? "popular"}
+          onValueChange={(v) => update("sort", v ?? "")}
+        >
+          <SelectTrigger className="bg-zinc-900 border-zinc-800 h-8 text-sm">
+            <SelectValue placeholder="인기순" />
+          </SelectTrigger>
+          <SelectContent className="bg-zinc-900 border-zinc-800">
+            {SORT_OPTIONS.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

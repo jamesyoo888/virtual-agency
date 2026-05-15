@@ -5,30 +5,86 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
+// Per-sitemap entry cap (Google: 50,000 URLs / 50 MB).
+// Keep modest — 1000 is plenty for a model agency and avoids overlong files.
+const PAGE_SIZE = 1000;
+const MAX_SHARDS = 50;
+
 export const revalidate = 3600;
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export async function generateSitemaps(): Promise<{ id: number }[]> {
+  if (!SUPABASE_CONFIGURED) return [{ id: 0 }];
+  try {
+    const supabase = await createClient();
+    const { count } = await supabase
+      .from("models")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "active");
+    const total = count ?? 0;
+    const shards = Math.max(1, Math.min(MAX_SHARDS, Math.ceil(total / PAGE_SIZE)));
+    return Array.from({ length: shards }, (_, id) => ({ id }));
+  } catch {
+    return [{ id: 0 }];
+  }
+}
+
+export default async function sitemap({
+  id,
+}: {
+  id: number;
+}): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: SITE_URL,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 1.0,
-    },
-  ];
+  // Shard 0 includes the static landing page; later shards are model-only.
+  const staticRoutes: MetadataRoute.Sitemap =
+    id === 0
+      ? [
+          {
+            url: SITE_URL,
+            lastModified: now,
+            changeFrequency: "daily",
+            priority: 1.0,
+          },
+          {
+            url: `${SITE_URL}/match`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.7,
+          },
+          {
+            url: `${SITE_URL}/faq`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.4,
+          },
+          {
+            url: `${SITE_URL}/legal/terms`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.2,
+          },
+          {
+            url: `${SITE_URL}/legal/privacy`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.2,
+          },
+        ]
+      : [];
 
   if (!SUPABASE_CONFIGURED) return staticRoutes;
 
   try {
     const supabase = await createClient();
+    const from = id * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
     const { data: models } = await supabase
       .from("models")
       .select("id, updated_at")
       .eq("status", "active")
       .order("updated_at", { ascending: false })
-      .limit(1000);
+      .range(from, to);
 
     const modelRoutes: MetadataRoute.Sitemap = (models ?? []).map((m) => ({
       url: `${SITE_URL}/models/${m.id}`,
