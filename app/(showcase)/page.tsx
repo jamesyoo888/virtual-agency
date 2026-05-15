@@ -17,6 +17,7 @@ import {
   paginate,
   type CatalogQueryParams,
 } from "@/lib/catalog/filter";
+import { getBucket } from "@/lib/experiments";
 
 function Value({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
@@ -43,6 +44,7 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
   const requestedPage = normalizePage(params.page);
   const view: CatalogView = params.view === "list" ? "list" : "grid";
+  const heroCtaVariant = await getBucket("hero_cta");
 
   let userRole: "admin" | "client" | null = null;
   let models: Model[] = [];
@@ -165,13 +167,22 @@ export default async function CatalogPage({ searchParams }: PageProps) {
             필요한 모델을 카탈로그에서 찾거나 컨셉으로 매칭하세요.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3 mt-6">
-          <Link
-            href="/match"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
-          >
-            광고 컨셉으로 매칭 →
-          </Link>
+        <div className="flex flex-wrap gap-3 mt-6" data-exp-hero-cta={heroCtaVariant}>
+          {heroCtaVariant === "match" ? (
+            <Link
+              href="/match"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
+            >
+              광고 컨셉으로 매칭 →
+            </Link>
+          ) : (
+            <Link
+              href="#catalog"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
+            >
+              모델 둘러보기 →
+            </Link>
+          )}
           <Link
             href="/faq"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
@@ -217,7 +228,7 @@ export default async function CatalogPage({ searchParams }: PageProps) {
         </aside>
 
         {/* Grid */}
-        <main className="flex-1 px-5 py-6 md:p-8">
+        <main id="catalog" className="flex-1 px-5 py-6 md:p-8">
           <div className="mb-6">
             <CatalogSearch />
           </div>
