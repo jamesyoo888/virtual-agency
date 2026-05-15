@@ -6,6 +6,7 @@ import { Inbox, Download } from "lucide-react";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
 import InboxSearch from "@/components/inbox-search";
+import InboxBulkBar from "@/components/inbox-bulk-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -129,6 +130,10 @@ export default async function AdminInboxPage({ searchParams }: Props) {
         </a>
       </header>
 
+      <div className="mb-3">
+        <InboxBulkBar projectIds={projects.map((p) => p.id)} />
+      </div>
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
         <nav className="flex flex-wrap gap-1 text-xs">
           {[
@@ -176,7 +181,12 @@ export default async function AdminInboxPage({ searchParams }: Props) {
       ) : (
         <div className="rounded-xl border border-zinc-800 overflow-hidden divide-y divide-zinc-800">
           {projects.map((p) => (
-            <div key={p.id} className="flex gap-4 p-4 hover:bg-zinc-900/40 transition-colors">
+            <div
+              key={p.id}
+              data-bulk-id={p.id}
+              id={`project-${p.id}`}
+              className="flex gap-4 p-4 hover:bg-zinc-900/40 transition-colors"
+            >
               <div className="w-12 h-15 aspect-[4/5] relative rounded bg-zinc-900 overflow-hidden shrink-0">
                 {p.model?.concept_image && (
                   <Image
