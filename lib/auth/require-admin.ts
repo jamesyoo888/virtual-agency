@@ -35,3 +35,40 @@ export async function requireAdmin(): Promise<NextResponse | null> {
 
   return null;
 }
+
+/**
+ * Same admin gate, but returns the user_id when authorized — for routes that
+ * want to attribute usage / rate-limit per-admin rather than globally.
+ */
+export async function requireAdminWithId(): Promise<
+  { ok: false; response: NextResponse } | { ok: true; userId: string }
+> {
+  if (!SUPABASE_CONFIGURED) return { ok: true, userId: "dev" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+    };
+  }
+
+  const { data: client } = await supabase
+    .from("clients")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (client?.role !== "admin") {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
+    };
+  }
+
+  return { ok: true, userId: user.id };
+}
