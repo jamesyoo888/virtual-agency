@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 import { parseBody } from "@/lib/api/validate";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { notifyStatusChanged } from "@/lib/email/notify";
 
 const STATUSES = [
   "inquiry",
@@ -38,6 +39,16 @@ export async function PATCH(
   }
 
   const supabase = await createAdminClient();
+
+  // Read prior state so we can detect a real status transition before sending
+  // the notification (the PATCH is idempotent and the UI can fire repeat
+  // requests with the same status).
+  const { data: prior } = await supabase
+    .from("projects")
+    .select("status, title, client_id, model:models(name)")
+    .eq("id", id)
+    .single();
+
   const { data, error } = await supabase
     .from("projects")
     .update({ ...parsed.data, updated_at: new Date().toISOString() })
@@ -46,5 +57,32 @@ export async function PATCH(
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  if (parsed.data.status && prior && prior.status !== parsed.data.status) {
+    const priorRecord = prior as unknown as {
+      status: string;
+      title: string;
+      client_id: string;
+      model?: { name?: string } | null;
+    };
+
+    const { data: client } = await supabase
+      .from("clients")
+      .select("email, name")
+      .eq("id", priorRecord.client_id)
+      .single();
+
+    // Fire-and-await but never let an email failure roll back the status
+    // change — `notifyStatusChanged` swallows + logs provider errors.
+    await notifyStatusChanged(client?.email ?? null, {
+      clientName: client?.name ?? null,
+      modelName: priorRecord.model?.name ?? null,
+      projectTitle: priorRecord.title,
+      projectId: id,
+      from: priorRecord.status,
+      to: parsed.data.status,
+    });
+  }
+
   return NextResponse.json(data);
 }

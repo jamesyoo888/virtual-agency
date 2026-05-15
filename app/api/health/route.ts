@@ -16,6 +16,7 @@ export async function GET() {
       easy_diffusion: Boolean(process.env.EASY_DIFFUSION_URL),
       replicate: Boolean(process.env.REPLICATE_API_TOKEN),
       meshy: Boolean(process.env.MESHY_API_KEY),
+      email: (process.env.EMAIL_PROVIDER ?? "log").toLowerCase(),
     },
     video: {
       primary: process.env.REPLICATE_VIDEO_MODEL ?? "kwaivgi/kling-v1.6-pro",
