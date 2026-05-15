@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import NavAdmin from "@/components/nav-admin";
+import CapWarningBanner from "@/components/cap-warning-banner";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 export default async function AdminLayout({
@@ -32,7 +33,10 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen bg-zinc-950 text-white">
       <NavAdmin userEmail={userEmail} />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto">
+        <CapWarningBanner />
+        {children}
+      </main>
     </div>
   );
 }

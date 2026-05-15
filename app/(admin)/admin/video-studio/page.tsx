@@ -1,11 +1,24 @@
-export default function VideoStudioPage() {
-  return (
-    <div className="p-8 flex items-center justify-center h-full min-h-[60vh]">
-      <div className="text-center text-zinc-500">
-        <p className="text-lg font-medium mb-2">Video Studio</p>
-        <p className="text-sm">Phase 3에서 구현 예정</p>
-        <p className="text-xs mt-1">타임라인 UI, 영상 생성, 립싱크</p>
-      </div>
-    </div>
-  );
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { devModelStore } from "@/lib/dev-store";
+import type { Model } from "@/types";
+import VideoStudio from "@/components/video-studio";
+
+export const dynamic = "force-dynamic";
+
+export default async function VideoStudioPage() {
+  let models: Model[] = [];
+
+  if (SUPABASE_CONFIGURED) {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("models")
+      .select("id, name, concept_image")
+      .order("created_at", { ascending: false });
+    models = (data as Model[]) ?? [];
+  } else {
+    models = devModelStore.list() as Model[];
+  }
+
+  return <VideoStudio models={models} />;
 }

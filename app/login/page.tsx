@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +16,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -49,6 +51,10 @@ function LoginForm() {
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) {
+      setError("이용약관과 개인정보 처리방침에 동의해주세요.");
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -135,8 +141,32 @@ function LoginForm() {
               placeholder="6자 이상"
             />
           </div>
+
+          <label className="flex items-start gap-2 text-xs text-zinc-400 leading-relaxed">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 accent-white"
+            />
+            <span>
+              <Link href="/legal/terms" className="text-zinc-300 underline hover:text-white" target="_blank">
+                이용약관
+              </Link>
+              과{" "}
+              <Link href="/legal/privacy" className="text-zinc-300 underline hover:text-white" target="_blank">
+                개인정보 처리방침
+              </Link>
+              에 동의합니다.
+            </span>
+          </label>
+
           {error && <p className="text-sm text-zinc-400">{error}</p>}
-          <Button type="submit" className="w-full bg-white text-black hover:bg-zinc-200" disabled={loading}>
+          <Button
+            type="submit"
+            className="w-full bg-white text-black hover:bg-zinc-200"
+            disabled={loading || !agreed}
+          >
             {loading ? "처리 중..." : "회원가입"}
           </Button>
         </form>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
+import ProjectTimeline from "@/components/project-timeline";
 
 const STATUS_LABELS: Record<string, string> = {
   inquiry: "문의",
@@ -27,10 +28,14 @@ export default async function ClientDashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Layout middleware redirects unauthenticated users; this guard satisfies the
+  // type-checker and prevents a server crash if the page is reached out-of-order.
+  if (!user) return null;
+
   const { data: projects } = await supabase
     .from("projects")
     .select("*, model:models(name, concept_image)")
-    .eq("client_id", user!.id)
+    .eq("client_id", user.id)
     .order("created_at", { ascending: false });
 
   return (
@@ -58,24 +63,33 @@ export default async function ClientDashboardPage() {
           {(projects as (Project & { model?: { name: string; concept_image: string | null } })[]).map((p) => (
             <div
               key={p.id}
-              className="flex items-center gap-4 bg-zinc-900 rounded-xl p-4 hover:bg-zinc-800 transition-colors"
+              className="bg-zinc-900 rounded-xl p-5 space-y-5 hover:bg-zinc-900/70 transition-colors"
             >
-              <div className="w-12 h-12 rounded-lg bg-zinc-800 overflow-hidden shrink-0">
-                {p.model?.concept_image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.model.concept_image} alt="" className="w-full h-full object-cover" />
-                )}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-lg bg-zinc-800 overflow-hidden shrink-0">
+                  {p.model?.concept_image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.model.concept_image} alt="" className="w-full h-full object-cover" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{p.title}</p>
+                  <p className="text-sm text-zinc-400">{p.model?.name ?? "모델 미선택"}</p>
+                </div>
+                <Badge className={STATUS_COLORS[p.status]}>
+                  {STATUS_LABELS[p.status]}
+                </Badge>
+                <Link
+                  href={`/client/quote/${p.id}`}
+                  className="text-xs text-zinc-400 hover:text-white underline underline-offset-2 shrink-0"
+                >
+                  견적서
+                </Link>
+                <p className="text-xs text-zinc-500 shrink-0">
+                  {new Date(p.created_at).toLocaleDateString("ko-KR")}
+                </p>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{p.title}</p>
-                <p className="text-sm text-zinc-400">{p.model?.name ?? "모델 미선택"}</p>
-              </div>
-              <Badge className={STATUS_COLORS[p.status]}>
-                {STATUS_LABELS[p.status]}
-              </Badge>
-              <p className="text-xs text-zinc-500 shrink-0">
-                {new Date(p.created_at).toLocaleDateString("ko-KR")}
-              </p>
+              <ProjectTimeline status={p.status} />
             </div>
           ))}
         </div>

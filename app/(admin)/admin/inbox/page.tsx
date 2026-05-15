@@ -1,0 +1,181 @@
+import Link from "next/link";
+import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { Inbox } from "lucide-react";
+import ProjectStatusSelect from "@/components/project-status-select";
+import InquiryAcceptButton from "@/components/inquiry-accept-button";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = { title: "Inbox — Virtual Agency Admin" };
+
+interface ProjectRow {
+  id: string;
+  title: string;
+  brief: string | null;
+  status: string;
+  created_at: string;
+  client_id: string;
+  model_id: string | null;
+  model?: { name: string | null; concept_image: string | null } | null;
+  client?: { email: string | null; company: string | null } | null;
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  inquiry: "문의",
+  brief_received: "브리프 접수",
+  in_progress: "제작 중",
+  review: "검토",
+  delivered: "납품 완료",
+};
+
+const STATUS_TONE: Record<string, string> = {
+  inquiry: "bg-yellow-500/15 text-yellow-300 border-yellow-500/30",
+  brief_received: "bg-blue-500/15 text-blue-300 border-blue-500/30",
+  in_progress: "bg-purple-500/15 text-purple-300 border-purple-500/30",
+  review: "bg-orange-500/15 text-orange-300 border-orange-500/30",
+  delivered: "bg-green-500/15 text-green-300 border-green-500/30",
+};
+
+async function fetchProjects(statusFilter?: string): Promise<ProjectRow[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  const supabase = await createClient();
+  let q = supabase
+    .from("projects")
+    .select(
+      "id, title, brief, status, created_at, client_id, model_id, model:models(name, concept_image), client:clients(email, company)"
+    )
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (statusFilter && statusFilter !== "all") q = q.eq("status", statusFilter);
+  const { data } = await q;
+  return (data as unknown as ProjectRow[]) ?? [];
+}
+
+interface Props {
+  searchParams: Promise<{ status?: string }>;
+}
+
+export default async function AdminInboxPage({ searchParams }: Props) {
+  const { status } = await searchParams;
+  const projects = await fetchProjects(status);
+
+  const counts: Record<string, number> = { all: 0 };
+  for (const p of projects) counts[p.status] = (counts[p.status] ?? 0) + 1;
+  counts.all = projects.length;
+
+  return (
+    <div className="p-8 max-w-6xl mx-auto">
+      <header className="mb-8 flex items-center gap-3">
+        <Inbox className="w-5 h-5 text-zinc-400" />
+        <div>
+          <h1 className="text-2xl font-bold">Inbox</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">
+            클라이언트 문의 + 진행 중 프로젝트 통합 보기
+          </p>
+        </div>
+      </header>
+
+      <nav className="flex flex-wrap gap-1 mb-6 text-xs">
+        {[
+          { value: "all", label: "전체" },
+          { value: "inquiry", label: "문의" },
+          { value: "in_progress", label: "제작 중" },
+          { value: "review", label: "검토" },
+          { value: "delivered", label: "완료" },
+        ].map((tab) => {
+          const active = (status ?? "all") === tab.value;
+          const href = tab.value === "all" ? "/admin/inbox" : `/admin/inbox?status=${tab.value}`;
+          return (
+            <Link
+              key={tab.value}
+              href={href}
+              className={`px-3 py-1.5 rounded-md border transition-colors ${
+                active
+                  ? "bg-white text-black border-white"
+                  : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+              }`}
+            >
+              {tab.label}
+              <span className="ml-1.5 opacity-60">
+                {counts[tab.value] ?? 0}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {!SUPABASE_CONFIGURED ? (
+        <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
+          Supabase 미설정 — Inbox 는 production 에서만 동작합니다.
+        </div>
+      ) : projects.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
+          해당 상태의 항목이 없습니다.
+        </div>
+      ) : (
+        <div className="rounded-xl border border-zinc-800 overflow-hidden divide-y divide-zinc-800">
+          {projects.map((p) => (
+            <div key={p.id} className="flex gap-4 p-4 hover:bg-zinc-900/40 transition-colors">
+              <div className="w-12 h-15 aspect-[4/5] relative rounded bg-zinc-900 overflow-hidden shrink-0">
+                {p.model?.concept_image && (
+                  <Image
+                    src={p.model.concept_image}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                    unoptimized
+                  />
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="font-medium truncate">{p.title}</p>
+                  <span
+                    className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${
+                      STATUS_TONE[p.status] ?? "bg-zinc-800 text-zinc-400 border-zinc-700"
+                    }`}
+                  >
+                    {STATUS_LABEL[p.status] ?? p.status}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  {p.model?.name ?? "모델 미선택"}
+                  {p.client?.company && ` · ${p.client.company}`}
+                  {p.client?.email && (
+                    <a
+                      href={`mailto:${p.client.email}`}
+                      className="ml-1 text-zinc-400 hover:text-white"
+                    >
+                      {p.client.email}
+                    </a>
+                  )}
+                  <span className="ml-2 text-zinc-600">
+                    {new Date(p.created_at).toLocaleString("ko-KR", {
+                      hour12: false,
+                    })}
+                  </span>
+                </p>
+                {p.brief && (
+                  <p className="text-xs text-zinc-400 mt-2 line-clamp-2 whitespace-pre-line">
+                    {p.brief}
+                  </p>
+                )}
+              </div>
+
+              <div className="shrink-0 self-center flex items-center gap-2">
+                {p.status === "inquiry" && (
+                  <InquiryAcceptButton projectId={p.id} />
+                )}
+                <ProjectStatusSelect projectId={p.id} currentStatus={p.status} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

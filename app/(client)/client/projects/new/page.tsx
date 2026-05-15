@@ -18,10 +18,11 @@ export default function NewProjectPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const NO_PRODUCT = "__none__";
   const [form, setForm] = useState({
     title: "",
     model_id: "" as string,
-    product_id: "" as string,
+    product_id: NO_PRODUCT,
     brief: "",
   });
 
@@ -60,7 +61,7 @@ export default function NewProjectPage() {
       client_id: user.id,
       title: form.title,
       model_id: form.model_id || null,
-      product_id: form.product_id || null,
+      product_id: form.product_id && form.product_id !== NO_PRODUCT ? form.product_id : null,
       brief: form.brief,
       status: "inquiry",
     });
@@ -120,13 +121,13 @@ export default function NewProjectPage() {
           <Label>상품 연결 (선택)</Label>
           <Select
             value={form.product_id}
-            onValueChange={(v) => setForm((f) => ({ ...f, product_id: v ?? "" }))}
+            onValueChange={(v) => setForm((f) => ({ ...f, product_id: v ?? NO_PRODUCT }))}
           >
             <SelectTrigger className="bg-zinc-900 border-zinc-800">
               <SelectValue placeholder="상품을 선택하세요 (선택사항)" />
             </SelectTrigger>
             <SelectContent className="bg-zinc-900 border-zinc-800">
-              <SelectItem value="">없음</SelectItem>
+              <SelectItem value={NO_PRODUCT}>없음</SelectItem>
               {products.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
                   {p.name}
