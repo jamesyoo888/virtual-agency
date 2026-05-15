@@ -12,6 +12,8 @@ import { INDUSTRY_LABELS, GENRE_LABELS, MOOD_LABELS } from "@/lib/tags";
 import { ageInYears } from "@/lib/utils";
 import PriceCalculator from "@/components/price-calculator";
 import PortfolioGallery from "@/components/portfolio-gallery";
+import ReviewList, { type PublicReview } from "@/components/review-list";
+import { aggregateApproved } from "@/lib/reviews";
 import {
   breadcrumbLd,
   ldScript,
@@ -48,6 +50,34 @@ async function fetchModel(id: string): Promise<{
     .limit(12);
 
   return { model: data as Model, files: (files as ModelFile[]) ?? [] };
+}
+
+async function fetchApprovedReviews(
+  modelId: string
+): Promise<PublicReview[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("reviews")
+    .select("id, rating, comment, created_at, client:clients(company)")
+    .eq("model_id", modelId)
+    .eq("status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(12);
+  if (!data) return [];
+  return (data as unknown as Array<{
+    id: string;
+    rating: number;
+    comment: string | null;
+    created_at: string;
+    client?: { company: string | null } | null;
+  }>).map((r) => ({
+    id: r.id,
+    rating: r.rating,
+    comment: r.comment,
+    created_at: r.created_at,
+    client_company: r.client?.company ?? null,
+  }));
 }
 
 async function fetchSimilarModels(model: Model, limit = 4): Promise<Model[]> {
@@ -124,7 +154,13 @@ export default async function ShowcaseModelPage({
   if (!model) notFound();
 
   const m = model;
-  const similar = await fetchSimilarModels(m);
+  const [similar, reviews] = await Promise.all([
+    fetchSimilarModels(m),
+    fetchApprovedReviews(m.id),
+  ]);
+  const aggregate = aggregateApproved(
+    reviews.map((r) => ({ rating: r.rating, status: "approved" as const }))
+  );
 
   const debutDate = m.debut_date ? new Date(m.debut_date) : null;
   const ageYears = ageInYears(m.debut_date);
@@ -133,7 +169,12 @@ export default async function ShowcaseModelPage({
     process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-murex.vercel.app";
   const offer = modelOfferLd(m);
   const ldGraph = [
-    modelPersonLd(m),
+    modelPersonLd(
+      m,
+      aggregate
+        ? { ratingValue: aggregate.rating_value, reviewCount: aggregate.rating_count }
+        : undefined
+    ),
     breadcrumbLd([
       { name: "Catalog", url: `${siteUrl}/` },
       { name: m.name, url: `${siteUrl}/models/${m.id}` },
@@ -269,6 +310,15 @@ export default async function ShowcaseModelPage({
               images={files.map((f) => ({ id: f.id, url: f.url }))}
             />
           </div>
+        )}
+
+        {/* Approved reviews — social proof */}
+        {aggregate && reviews.length > 0 && (
+          <ReviewList
+            reviews={reviews}
+            ratingValue={aggregate.rating_value}
+            ratingCount={aggregate.rating_count}
+          />
         )}
 
         {/* Similar models — discovery boost */}

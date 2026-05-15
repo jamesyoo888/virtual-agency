@@ -101,6 +101,24 @@ export const capsPatchSchema = z.object({
 
 export type CapsPatchInput = z.infer<typeof capsPatchSchema>;
 
+// Reviews — client submits a 1-5 rating, optional comment. Comment cap of 2k
+// is generous but bounds an abusive client; admin moderates anything that
+// slips through length checks.
+export const reviewCreateSchema = z.object({
+  project_id: z.string().min(1),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().trim().max(2000).optional().nullable(),
+});
+
+export type ReviewCreateInput = z.infer<typeof reviewCreateSchema>;
+
+export const reviewModerateSchema = z.object({
+  status: z.enum(["approved", "rejected"]),
+  rejection_reason: z.string().trim().max(500).optional().nullable(),
+});
+
+export type ReviewModerateInput = z.infer<typeof reviewModerateSchema>;
+
 // Bulk status change for /api/admin/models/bulk-status — cap the batch size
 // so a runaway client can't ask the DB to update tens of thousands of rows
 // in a single request.

@@ -12,6 +12,7 @@ import {
   Receipt,
   Inbox,
   BarChart3,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -20,6 +21,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 const links = [
   { href: "/admin", label: "대시보드", icon: LayoutDashboard },
   { href: "/admin/inbox", label: "Inbox", icon: Inbox },
+  { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/models", label: "Model Studio", icon: Users },
   { href: "/admin/image-studio", label: "Image Studio", icon: Image },
   { href: "/admin/video-studio", label: "Video Studio", icon: Video },

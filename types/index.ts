@@ -149,6 +149,28 @@ export interface GenerationHistory {
   created_at: string;
 }
 
+export type ReviewStatus = "pending" | "approved" | "rejected";
+
+export interface Review {
+  id: string;
+  project_id: string;
+  model_id: string;
+  client_id: string;
+  rating: number; // 1-5
+  comment: string | null;
+  status: ReviewStatus;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  rejection_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewAggregate {
+  rating_value: number; // average, 1 decimal
+  rating_count: number;
+}
+
 export interface InquiryFormData {
   company: string;
   contact_name: string;
