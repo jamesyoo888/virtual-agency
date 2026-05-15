@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Star } from "lucide-react";
+import { Star, Download } from "lucide-react";
 import ReviewModerateButtons from "@/components/review-moderate-buttons";
 
 export const dynamic = "force-dynamic";
@@ -65,12 +65,22 @@ export default async function AdminReviewsPage({ searchParams }: Props) {
     <div className="p-8 max-w-5xl mx-auto">
       <header className="mb-8 flex items-center gap-3">
         <Star className="w-5 h-5 text-zinc-400" />
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">Reviews</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
             클라이언트 리뷰 모더레이션 — 승인 시 공개 상세에 노출
           </p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+        <a
+          href="/api/admin/exports/reviews"
+          download
+          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 rounded-md px-2.5 py-1.5"
+          title="모든 리뷰 CSV 다운로드"
+        >
+          <Download className="w-3 h-3" />
+          CSV
+        </a>
       </header>
 
       <nav className="flex flex-wrap gap-1 mb-6 text-xs">
