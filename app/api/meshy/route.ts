@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { createImageTo3DTask, MESHY_CONFIGURED } from "@/lib/meshy/client";
-import { requireAdmin } from "@/lib/auth/require-admin";
+import { requireAdminWithId } from "@/lib/auth/require-admin";
+import { parseBody } from "@/lib/api/validate";
+import { meshyCreateSchema } from "@/lib/api/schemas";
+import { estimateMeshyCost } from "@/lib/cost/pricing";
+import { enforceCaps } from "@/lib/cost/cap";
+import { recordUsage } from "@/lib/cost/store";
+import { enforceRateLimit } from "@/lib/api/rate-limit";
 
 /**
  * POST /api/meshy
@@ -8,30 +14,44 @@ import { requireAdmin } from "@/lib/auth/require-admin";
  * Returns: { taskId: string }
  */
 export async function POST(request: Request) {
-  const denied = await requireAdmin();
-  if (denied) return denied;
+  const auth = await requireAdminWithId();
+  if (!auth.ok) return auth.response;
+
+  const rateDenied = enforceRateLimit({
+    key: "meshy",
+    subject: auth.userId,
+    limit: 10,
+    windowMs: 60_000,
+  });
+  if (rateDenied) return rateDenied;
+
+  const result = await parseBody(request, meshyCreateSchema);
+  if (!result.ok) return result.response;
+
+  const estimated = estimateMeshyCost();
+  const capDenied = await enforceCaps(estimated);
+  if (capDenied) return capDenied;
 
   if (!MESHY_CONFIGURED) {
-    // Dev fallback: return a mock task ID
     return NextResponse.json({ taskId: `dev-mock-${Date.now()}`, mock: true });
   }
 
-  const { imageUrl } = await request.json();
-  if (!imageUrl) {
-    return NextResponse.json({ error: "imageUrl is required" }, { status: 400 });
-  }
-
   try {
-    const taskId = await createImageTo3DTask(imageUrl, {
+    const taskId = await createImageTo3DTask(result.data.imageUrl, {
       enablePbr: true,
       surfaceMode: "soft",
       symmetryMode: "auto",
-      topology: "quads",    // cleaner mesh for IP / rigging
-      targetPolycount: 50000, // enough detail for face features
+      topology: "quads",
+      targetPolycount: 50000,
+    });
+    await recordUsage({
+      route: "meshy",
+      model: "meshy/image-to-3d",
+      cost_usd: estimated,
     });
     return NextResponse.json({ taskId });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: msg }, { status: 502 });
   }
 }

@@ -17,5 +17,10 @@ export async function GET() {
       replicate: Boolean(process.env.REPLICATE_API_TOKEN),
       meshy: Boolean(process.env.MESHY_API_KEY),
     },
+    video: {
+      primary: process.env.REPLICATE_VIDEO_MODEL ?? "kwaivgi/kling-v1.6-pro",
+      fallback: process.env.REPLICATE_VIDEO_FALLBACK_MODEL ?? "minimax/video-01",
+      lipsync: process.env.REPLICATE_LIPSYNC_MODEL ?? "sync/lipsync-2-pro",
+    },
   });
 }

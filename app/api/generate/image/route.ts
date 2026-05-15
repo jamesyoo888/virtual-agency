@@ -1,17 +1,50 @@
 import { generateConceptImages } from "@/lib/replicate/client";
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth/require-admin";
+import { requireAdminWithId } from "@/lib/auth/require-admin";
+import { parseBody } from "@/lib/api/validate";
+import { generateImageSchema } from "@/lib/api/schemas";
+import { estimateImageCost } from "@/lib/cost/pricing";
+import { enforceCaps } from "@/lib/cost/cap";
+import { recordUsage } from "@/lib/cost/store";
+import { enforceRateLimit } from "@/lib/api/rate-limit";
 
 export async function POST(request: Request) {
-  const denied = await requireAdmin();
-  if (denied) return denied;
+  const auth = await requireAdminWithId();
+  if (!auth.ok) return auth.response;
 
-  const { prompt, count = 4, negative_prompt } = await request.json();
+  // 20 image-gen requests per minute per admin — high enough that legitimate
+  // wizard / studio use never hits it, low enough that a runaway script
+  // shows up before the cost cap fires.
+  const rateDenied = enforceRateLimit({
+    key: "image",
+    subject: auth.userId,
+    limit: 20,
+    windowMs: 60_000,
+  });
+  if (rateDenied) return rateDenied;
 
-  if (!prompt) {
-    return NextResponse.json({ error: "prompt is required" }, { status: 400 });
+  const result = await parseBody(request, generateImageSchema);
+  if (!result.ok) return result.response;
+
+  const { prompt, count = 4, negative_prompt } = result.data;
+
+  const estimated = estimateImageCost({ count });
+  const capDenied = await enforceCaps(estimated);
+  if (capDenied) return capDenied;
+
+  try {
+    const urls = await generateConceptImages(prompt, count, negative_prompt);
+    // Record worst-case cost — we don't reliably know which fallback served the
+    // request (Easy Diffusion / Pollinations are free); the cap is conservative.
+    await recordUsage({
+      route: "image",
+      model: "flux-1.1-pro",
+      cost_usd: estimated,
+      metadata: { count },
+    });
+    return NextResponse.json({ urls });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "image generation failed";
+    return NextResponse.json({ error: msg }, { status: 502 });
   }
-
-  const urls = await generateConceptImages(prompt, count, negative_prompt);
-  return NextResponse.json({ urls });
 }

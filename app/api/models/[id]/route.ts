@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { devModelStore } from "@/lib/dev-store";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { parseBody } from "@/lib/api/validate";
+import { modelPatchSchema } from "@/lib/api/schemas";
 
 export async function GET(
   _req: Request,
@@ -39,8 +41,10 @@ export async function PATCH(
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const body = await req.json();
-  const { final_images, angle_images, ...modelPatch } = body;
+  const parseResult = await parseBody(req, modelPatchSchema);
+  if (!parseResult.ok) return parseResult.response;
+
+  const { final_images, angle_images, ...modelPatch } = parseResult.data;
 
   if (!SUPABASE_CONFIGURED) {
     const patch: Record<string, unknown> = { ...modelPatch };

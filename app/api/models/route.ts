@@ -2,6 +2,9 @@ import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { devModelStore, type DevModel } from "@/lib/dev-store";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { requireAdmin } from "@/lib/auth/require-admin";
+import { parseBody } from "@/lib/api/validate";
+import { modelCreateSchema } from "@/lib/api/schemas";
 
 export async function GET() {
   if (!SUPABASE_CONFIGURED) return NextResponse.json(devModelStore.list());
@@ -17,33 +20,20 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (SUPABASE_CONFIGURED) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+  const denied = await requireAdmin();
+  if (denied) return denied;
 
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const parseResult = await parseBody(request, modelCreateSchema);
+  if (!parseResult.ok) return parseResult.response;
 
-    const { data: client } = await supabase
-      .from("clients")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (client?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-  }
-
-  const body = await request.json();
   const {
     name, debut_date, bio, personality,
     industry_tags, genre_tags, mood_tags,
     instagram_handle, base_price, exclusive_price,
     is_exclusive_available, concept_image,
-    // wizard extra fields (mapped to spec aliases)
     base_rate, exclusive_rate, personality_tone,
     angle_images, final_images,
-  } = body;
+  } = parseResult.data;
 
   // Support both field name variants from the wizard
   const resolvedName = name;
@@ -52,14 +42,13 @@ export async function POST(request: Request) {
   const resolvedBasePrice = base_price ?? base_rate;
   const resolvedExclusivePrice = exclusive_price ?? exclusive_rate;
 
-  if (!resolvedName) {
-    return NextResponse.json({ error: "name is required" }, { status: 400 });
-  }
-
-  const slug = resolvedName
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
+  // Slug strips non-ASCII (Korean etc.); fall back to a stable prefix when empty.
+  const slugBase =
+    resolvedName
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "") || "model";
+  const slug = `${slugBase}-${Date.now()}`;
 
   if (!SUPABASE_CONFIGURED) {
     const model: DevModel = {
