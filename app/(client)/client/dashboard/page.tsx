@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import ProjectTimeline from "@/components/project-timeline";
+import DashboardStatusWatcher from "@/components/dashboard-status-watcher";
+import ReviewSubmit from "@/components/review-submit";
 
 const STATUS_LABELS: Record<string, string> = {
   inquiry: "문의",
@@ -38,8 +40,26 @@ export default async function ClientDashboardPage() {
     .eq("client_id", user.id)
     .order("created_at", { ascending: false });
 
+  // Pre-fetch the client's existing reviews so a delivered project that
+  // already has a pending/approved review hides the submit form. One query
+  // is cheaper than per-row lookups when rendering the list.
+  const { data: ownReviews } = await supabase
+    .from("reviews")
+    .select("project_id, status")
+    .eq("client_id", user.id);
+  const reviewByProject = new Map(
+    (ownReviews ?? []).map((r) => [r.project_id as string, r.status as "pending" | "approved" | "rejected"])
+  );
+
+  const watcherInitial = (projects ?? []).map((p) => ({
+    id: p.id,
+    title: p.title,
+    status: p.status,
+  }));
+
   return (
     <div>
+      <DashboardStatusWatcher initial={watcherInitial} />
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">대시보드</h1>
         <Link href="/client/projects/new">
@@ -90,6 +110,13 @@ export default async function ClientDashboardPage() {
                 </p>
               </div>
               <ProjectTimeline status={p.status} />
+              {p.status === "delivered" && (
+                <ReviewSubmit
+                  projectId={p.id}
+                  projectTitle={p.title}
+                  existingStatus={reviewByProject.get(p.id) ?? null}
+                />
+              )}
             </div>
           ))}
         </div>
