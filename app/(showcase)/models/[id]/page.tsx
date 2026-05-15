@@ -14,6 +14,7 @@ import PriceCalculator from "@/components/price-calculator";
 import PortfolioGallery from "@/components/portfolio-gallery";
 import ReviewList, { type PublicReview } from "@/components/review-list";
 import { aggregateApproved } from "@/lib/reviews";
+import { trackModelView } from "@/lib/analytics/track-view";
 import {
   breadcrumbLd,
   ldScript,
@@ -154,6 +155,8 @@ export default async function ShowcaseModelPage({
   if (!model) notFound();
 
   const m = model;
+  // Fire-and-forget — don't block render on the view insert.
+  void trackModelView(m.id);
   const [similar, reviews] = await Promise.all([
     fetchSimilarModels(m),
     fetchApprovedReviews(m.id),
