@@ -5,6 +5,8 @@ import {
   generateImageSchema,
   meshyCreateSchema,
   modelBulkStatusSchema,
+  creatorApplicationSchema,
+  creatorApplicationReviewSchema,
 } from "@/lib/api/schemas";
 
 describe("modelCreateSchema", () => {
@@ -107,5 +109,73 @@ describe("modelBulkStatusSchema", () => {
     expect(
       modelBulkStatusSchema.safeParse({ ids: ["a"], status: "ghost" }).success
     ).toBe(false);
+  });
+});
+
+describe("creatorApplicationSchema", () => {
+  it("requires a display_name", () => {
+    expect(creatorApplicationSchema.safeParse({}).success).toBe(false);
+    expect(creatorApplicationSchema.safeParse({ display_name: "" }).success).toBe(false);
+    expect(
+      creatorApplicationSchema.safeParse({ display_name: "  " }).success
+    ).toBe(false);
+  });
+
+  it("accepts a minimal payload", () => {
+    const r = creatorApplicationSchema.safeParse({ display_name: "Studio X" });
+    expect(r.success).toBe(true);
+  });
+
+  it("validates portfolio_url shape but tolerates empty string", () => {
+    expect(
+      creatorApplicationSchema.safeParse({
+        display_name: "X",
+        portfolio_url: "not-a-url",
+      }).success
+    ).toBe(false);
+    expect(
+      creatorApplicationSchema.safeParse({
+        display_name: "X",
+        portfolio_url: "https://example.com/me",
+      }).success
+    ).toBe(true);
+    expect(
+      creatorApplicationSchema.safeParse({
+        display_name: "X",
+        portfolio_url: "",
+      }).success
+    ).toBe(true);
+  });
+
+  it("caps bio + notes at 2000 chars", () => {
+    const tooLong = "x".repeat(2001);
+    expect(
+      creatorApplicationSchema.safeParse({
+        display_name: "X",
+        bio: tooLong,
+      }).success
+    ).toBe(false);
+  });
+});
+
+describe("creatorApplicationReviewSchema", () => {
+  it("requires status to be approved or rejected", () => {
+    expect(
+      creatorApplicationReviewSchema.safeParse({ status: "approved" }).success
+    ).toBe(true);
+    expect(
+      creatorApplicationReviewSchema.safeParse({ status: "rejected" }).success
+    ).toBe(true);
+    expect(
+      creatorApplicationReviewSchema.safeParse({ status: "pending" }).success
+    ).toBe(false);
+  });
+
+  it("accepts an optional rejection reason", () => {
+    const r = creatorApplicationReviewSchema.safeParse({
+      status: "rejected",
+      rejection_reason: "포트폴리오가 비어있습니다",
+    });
+    expect(r.success).toBe(true);
   });
 });
