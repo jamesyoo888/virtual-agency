@@ -5,6 +5,7 @@ import { parseBody } from "@/lib/api/validate";
 import { inquiryCreateSchema } from "@/lib/api/schemas";
 import { notifyInquiryWebhook } from "@/lib/webhooks";
 import { notifyInquiryReceived } from "@/lib/email/notify";
+import { canEmailClient } from "@/lib/preferences";
 
 /**
  * Client-initiated inquiry creation. Replaces the previous browser-only
@@ -78,7 +79,9 @@ export async function POST(request: Request) {
       .single(),
   ]);
 
-  const notifications = await Promise.allSettled([
+  // Webhook always fires (admin-side awareness); the receipt email respects
+  // the client's opt-out preference.
+  const tasks: Promise<unknown>[] = [
     notifyInquiryWebhook({
       projectId: project.id,
       projectTitle: project.title,
@@ -88,14 +91,19 @@ export async function POST(request: Request) {
       briefExcerpt: composedBrief || null,
       budgetRange: budget_range ?? null,
     }),
-    notifyInquiryReceived(client.data?.email ?? user.email ?? null, {
-      clientName: client.data?.name ?? null,
-      modelName: model.data?.name ?? "선택한 모델",
-      projectTitle: project.title,
-      brief: composedBrief || null,
-      projectId: project.id,
-    }),
-  ]);
+  ];
+  if (await canEmailClient(user.id, "inquiry_receipt")) {
+    tasks.push(
+      notifyInquiryReceived(client.data?.email ?? user.email ?? null, {
+        clientName: client.data?.name ?? null,
+        modelName: model.data?.name ?? "선택한 모델",
+        projectTitle: project.title,
+        brief: composedBrief || null,
+        projectId: project.id,
+      })
+    );
+  }
+  const notifications = await Promise.allSettled(tasks);
 
   return NextResponse.json(
     {

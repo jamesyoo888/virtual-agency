@@ -13,6 +13,7 @@ import {
   Inbox,
   BarChart3,
   Star,
+  KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -27,6 +28,7 @@ const links = [
   { href: "/admin/video-studio", label: "Video Studio", icon: Video },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/usage", label: "Usage", icon: Receipt },
+  { href: "/admin/invites", label: "Invites", icon: KeyRound },
 ];
 
 interface Props {

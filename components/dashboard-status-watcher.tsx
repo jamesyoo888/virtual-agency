@@ -25,6 +25,8 @@ interface ProjectSnapshot {
 interface Props {
   /** Server-rendered initial snapshot — avoids a flash of "changed" toasts on first mount. */
   initial: ProjectSnapshot[];
+  /** Per-user toggle for the status-change toast. Defaults to on. */
+  toastEnabled?: boolean;
 }
 
 /**
@@ -37,7 +39,7 @@ interface Props {
  * client and an extra postgres pub; for ~5 projects per client and a 30s SLA
  * the cost/complexity does not pay back. Swap-in is straightforward later.
  */
-export default function DashboardStatusWatcher({ initial }: Props) {
+export default function DashboardStatusWatcher({ initial, toastEnabled = true }: Props) {
   const router = useRouter();
   const toast = useToast();
   const lastSeen = useRef<Map<string, string>>(new Map());
@@ -106,10 +108,14 @@ export default function DashboardStatusWatcher({ initial }: Props) {
       }
 
       if (changed.length > 0) {
-        for (const { p } of changed) {
-          const label = STATUS_LABELS[p.status] ?? p.status;
-          toast.info(`"${p.title}" → ${label}`);
+        if (toastEnabled) {
+          for (const { p } of changed) {
+            const label = STATUS_LABELS[p.status] ?? p.status;
+            toast.info(`"${p.title}" → ${label}`);
+          }
         }
+        // Always refresh — preference only governs the toast, the underlying
+        // server state needs to land in the list either way.
         router.refresh();
       }
     }
@@ -124,7 +130,7 @@ export default function DashboardStatusWatcher({ initial }: Props) {
       cancelled = true;
       clearInterval(handle);
     };
-  }, [initial, toast, router]);
+  }, [initial, toast, router, toastEnabled]);
 
   return null;
 }

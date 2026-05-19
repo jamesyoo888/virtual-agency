@@ -5,6 +5,7 @@ import { parseBody } from "@/lib/api/validate";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { notifyStatusChanged } from "@/lib/email/notify";
+import { canEmailClient } from "@/lib/preferences";
 
 const STATUSES = [
   "inquiry",
@@ -72,16 +73,20 @@ export async function PATCH(
       .eq("id", priorRecord.client_id)
       .single();
 
-    // Fire-and-await but never let an email failure roll back the status
-    // change — `notifyStatusChanged` swallows + logs provider errors.
-    await notifyStatusChanged(client?.email ?? null, {
-      clientName: client?.name ?? null,
-      modelName: priorRecord.model?.name ?? null,
-      projectTitle: priorRecord.title,
-      projectId: id,
-      from: priorRecord.status,
-      to: parsed.data.status,
-    });
+    // Respect the client's notification opt-out before incurring the email
+    // provider call. Defaults to allowed when no preference row exists.
+    if (await canEmailClient(priorRecord.client_id, "status_changes")) {
+      // Fire-and-await but never let an email failure roll back the status
+      // change — `notifyStatusChanged` swallows + logs provider errors.
+      await notifyStatusChanged(client?.email ?? null, {
+        clientName: client?.name ?? null,
+        modelName: priorRecord.model?.name ?? null,
+        projectTitle: priorRecord.title,
+        projectId: id,
+        from: priorRecord.status,
+        to: parsed.data.status,
+      });
+    }
   }
 
   return NextResponse.json(data);

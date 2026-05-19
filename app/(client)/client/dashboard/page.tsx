@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import ProjectTimeline from "@/components/project-timeline";
 import DashboardStatusWatcher from "@/components/dashboard-status-watcher";
 import ReviewSubmit from "@/components/review-submit";
+import { getClientPreferences } from "@/lib/preferences";
 
 const STATUS_LABELS: Record<string, string> = {
   inquiry: "문의",
@@ -57,9 +58,14 @@ export default async function ClientDashboardPage() {
     status: p.status,
   }));
 
+  const prefs = await getClientPreferences(user.id);
+
   return (
     <div>
-      <DashboardStatusWatcher initial={watcherInitial} />
+      <DashboardStatusWatcher
+        initial={watcherInitial}
+        toastEnabled={prefs.toast_status_changes}
+      />
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">대시보드</h1>
         <Link href="/client/projects/new">
