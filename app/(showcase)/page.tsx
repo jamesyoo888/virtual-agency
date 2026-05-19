@@ -80,15 +80,22 @@ export default async function CatalogPage({ searchParams }: PageProps) {
           return { column: "name", ascending: true };
         case "popular":
         default:
-          return { column: "follower_count", ascending: false };
+          // Falls back to follower_count if the popularity_score view
+          // hasn't been migrated yet — see catch block below.
+          return { column: "popularity_score", ascending: false };
       }
     })();
 
     const from = (requestedPage - 1) * CATALOG_PAGE_SIZE;
     const to = from + CATALOG_PAGE_SIZE - 1;
 
+    // Popular sort goes through the `models_with_popularity` view which
+    // joins in last-30d view counts. All other sorts work on the base
+    // `models` table for cheaper queries.
+    const source = sort === "popular" ? "models_with_popularity" : "models";
+
     let query = supabase
-      .from("models")
+      .from(source)
       .select("*", { count: "exact" })
       .eq("status", "active")
       .order(order.column, { ascending: order.ascending })
@@ -104,7 +111,21 @@ export default async function CatalogPage({ searchParams }: PageProps) {
     if (params.price_max) query = query.lte("base_price", parseInt(params.price_max));
     if (params.exclusive === "true") query = query.eq("is_exclusive_available", true);
 
-    const { data, count } = await query;
+    let { data, count, error } = await query;
+    // If the popularity view hasn't been applied yet (migration 006), fall
+    // back to the base models table so the catalog still renders. Detected
+    // by the PostgREST "PGRST205" / "relation does not exist" pattern.
+    if (error && sort === "popular") {
+      console.warn("[catalog] popularity view unavailable, falling back to follower_count:", error.message);
+      const fallback = await supabase
+        .from("models")
+        .select("*", { count: "exact" })
+        .eq("status", "active")
+        .order("follower_count", { ascending: false })
+        .range(from, to);
+      data = fallback.data;
+      count = fallback.count;
+    }
     models = (data as Model[] | null) ?? [];
     totalCount = count ?? models.length;
     totalPages = Math.max(1, Math.ceil(totalCount / CATALOG_PAGE_SIZE));
@@ -183,6 +204,12 @@ export default async function CatalogPage({ searchParams }: PageProps) {
               모델 둘러보기 →
             </Link>
           )}
+          <Link
+            href="/rfp"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
+          >
+            RFP 작성 →
+          </Link>
           <Link
             href="/faq"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"

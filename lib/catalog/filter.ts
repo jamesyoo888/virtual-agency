@@ -60,7 +60,23 @@ export function paginate<T>(
   };
 }
 
-function sortModels(models: Model[], sort: CatalogSort): Model[] {
+/**
+ * Blended popularity score: a recent page-view is worth ~10 followers.
+ * Heavy lean on behavior so a cold IG count can still be overtaken by
+ * actual catalog traction.
+ */
+export function popularityScore(
+  model: Pick<Model, "follower_count">,
+  views30d: number = 0
+): number {
+  return (model.follower_count ?? 0) + views30d * 10;
+}
+
+function sortModels(
+  models: Model[],
+  sort: CatalogSort,
+  viewCounts?: Map<string, number>
+): Model[] {
   const arr = [...models];
   switch (sort) {
     case "recent":
@@ -80,7 +96,11 @@ function sortModels(models: Model[], sort: CatalogSort): Model[] {
       return arr.sort((a, b) => a.name.localeCompare(b.name, "ko"));
     case "popular":
     default:
-      return arr.sort((a, b) => (b.follower_count ?? 0) - (a.follower_count ?? 0));
+      return arr.sort((a, b) => {
+        const aScore = popularityScore(a, viewCounts?.get(a.id) ?? 0);
+        const bScore = popularityScore(b, viewCounts?.get(b.id) ?? 0);
+        return bScore - aScore;
+      });
   }
 }
 
@@ -91,7 +111,8 @@ function sortModels(models: Model[], sort: CatalogSort): Model[] {
  */
 export function filterModelsForCatalog(
   models: Model[],
-  params: CatalogQueryParams
+  params: CatalogQueryParams,
+  viewCounts?: Map<string, number>
 ): Model[] {
   const filtered = models
     .filter((m) => m.status === "active")
@@ -117,5 +138,5 @@ export function filterModelsForCatalog(
       return true;
     });
 
-  return sortModels(filtered, normalizeSort(params.sort));
+  return sortModels(filtered, normalizeSort(params.sort), viewCounts);
 }

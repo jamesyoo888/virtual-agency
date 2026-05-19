@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { BLUR_DATA_URL } from "@/lib/blur";
 
 interface Props {
   images: { id: string; url: string }[];
@@ -58,6 +59,12 @@ export default function PortfolioGallery({ images }: Props) {
               className="object-cover transition-transform group-hover:scale-105"
               sizes="(min-width: 768px) 25vw, 50vw"
               unoptimized
+              // First 4 tiles are likely in the initial viewport on desktop;
+              // the rest defer until they scroll in. Saves bandwidth on
+              // tall portfolios (10+ images) without hurting LCP.
+              loading={i < 4 ? "eager" : "lazy"}
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           </button>
         ))}

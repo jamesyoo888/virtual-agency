@@ -15,6 +15,8 @@ import PortfolioGallery from "@/components/portfolio-gallery";
 import ReviewList, { type PublicReview } from "@/components/review-list";
 import { aggregateApproved } from "@/lib/reviews";
 import { trackModelView } from "@/lib/analytics/track-view";
+import { fetchCoViewedModels } from "@/lib/analytics/co-viewed";
+import { BLUR_DATA_URL } from "@/lib/blur";
 import {
   breadcrumbLd,
   ldScript,
@@ -157,10 +159,22 @@ export default async function ShowcaseModelPage({
   const m = model;
   // Fire-and-forget — don't block render on the view insert.
   void trackModelView(m.id);
-  const [similar, reviews] = await Promise.all([
-    fetchSimilarModels(m),
+  const [coViewed, tagSimilar, reviews] = await Promise.all([
+    fetchCoViewedModels(m.id, 4),
+    fetchSimilarModels(m, 6),
     fetchApprovedReviews(m.id),
   ]);
+  // Prefer collaborative ranking; pad with tag-based similarity so the row
+  // never looks empty on a cold catalog (and so we degrade cleanly before
+  // migration 007 is applied).
+  const seen = new Set<string>();
+  const similar = [...coViewed, ...tagSimilar]
+    .filter((sm) => {
+      if (seen.has(sm.id)) return false;
+      seen.add(sm.id);
+      return true;
+    })
+    .slice(0, 4);
   const aggregate = aggregateApproved(
     reviews.map((r) => ({ rating: r.rating, status: "approved" as const }))
   );
@@ -203,7 +217,16 @@ export default async function ShowcaseModelPage({
           <div>
             {m.concept_image ? (
               <div className="aspect-[3/4] relative rounded-2xl overflow-hidden bg-zinc-900">
-                <Image src={m.concept_image} alt={m.name} fill className="object-cover" />
+                <Image
+                  src={m.concept_image}
+                  alt={m.name}
+                  fill
+                  className="object-cover"
+                  priority
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                />
               </div>
             ) : (
               <div className="aspect-[3/4] rounded-2xl bg-zinc-900" />
@@ -324,10 +347,12 @@ export default async function ShowcaseModelPage({
           />
         )}
 
-        {/* Similar models — discovery boost */}
+        {/* Similar models — collaborative + tag fallback */}
         {similar.length > 0 && (
           <div className="mt-16 pt-12 border-t border-zinc-900">
-            <h2 className="text-xl font-semibold mb-6">유사한 모델</h2>
+            <h2 className="text-xl font-semibold mb-6">
+              {coViewed.length > 0 ? "이 모델을 본 사람이 본 다른 모델" : "유사한 모델"}
+            </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {similar.map((sm) => (
                 <Link
@@ -343,6 +368,10 @@ export default async function ShowcaseModelPage({
                         fill
                         className="object-cover transition-transform group-hover:scale-105"
                         unoptimized
+                        loading="lazy"
+                        placeholder="blur"
+                        blurDataURL={BLUR_DATA_URL}
+                        sizes="(min-width: 768px) 25vw, 50vw"
                       />
                     )}
                   </div>

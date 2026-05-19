@@ -52,6 +52,12 @@ export default async function sitemap({
             priority: 0.7,
           },
           {
+            url: `${SITE_URL}/rfp`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.7,
+          },
+          {
             url: `${SITE_URL}/faq`,
             lastModified: now,
             changeFrequency: "monthly",
@@ -86,12 +92,33 @@ export default async function sitemap({
       .order("updated_at", { ascending: false })
       .range(from, to);
 
-    const modelRoutes: MetadataRoute.Sitemap = (models ?? []).map((m) => ({
-      url: `${SITE_URL}/models/${m.id}`,
-      lastModified: m.updated_at ? new Date(m.updated_at) : now,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
+    const ids = (models ?? []).map((m) => m.id);
+
+    // Models with approved reviews carry social proof → boost priority and
+    // changefreq. Single round-trip, no per-row lookup. We pull only the
+    // distinct model_ids in the current shard's slice; the count itself
+    // isn't needed — presence is enough to lift the bucket.
+    let boostedSet = new Set<string>();
+    if (ids.length > 0) {
+      const { data: reviewed } = await supabase
+        .from("reviews")
+        .select("model_id")
+        .in("model_id", ids)
+        .eq("status", "approved");
+      boostedSet = new Set((reviewed ?? []).map((r) => r.model_id as string));
+    }
+
+    const modelRoutes: MetadataRoute.Sitemap = (models ?? []).map((m) => {
+      const boosted = boostedSet.has(m.id);
+      return {
+        url: `${SITE_URL}/models/${m.id}`,
+        lastModified: m.updated_at ? new Date(m.updated_at) : now,
+        // Reviewed models are crawled more aggressively — fresh social proof
+        // earns the URL more attention from search engines.
+        changeFrequency: boosted ? ("daily" as const) : ("weekly" as const),
+        priority: boosted ? 1.0 : 0.8,
+      };
+    });
 
     return [...staticRoutes, ...modelRoutes];
   } catch {
