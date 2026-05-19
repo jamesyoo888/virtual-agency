@@ -36,6 +36,14 @@ export const EXPERIMENTS = {
     key: "hero_cta",
     variants: ["match", "browse"],
   } satisfies ExperimentDef<"match" | "browse">,
+  // Compares the two similar-models strategies on the model detail page.
+  // `collaborative` = "people who viewed this also viewed" (lib/analytics/co-viewed).
+  // `tag`           = industry/genre tag overlap.
+  // We want to know which surface drives more downstream clicks.
+  similar_strategy: {
+    key: "similar_strategy",
+    variants: ["collaborative", "tag"],
+  } satisfies ExperimentDef<"collaborative" | "tag">,
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

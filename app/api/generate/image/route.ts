@@ -7,6 +7,7 @@ import { estimateImageCost } from "@/lib/cost/pricing";
 import { enforceCaps } from "@/lib/cost/cap";
 import { recordUsage } from "@/lib/cost/store";
 import { enforceRateLimit } from "@/lib/api/rate-limit";
+import { uploadGeneratedImages } from "@/lib/storage/upload";
 
 export async function POST(request: Request) {
   const auth = await requireAdminWithId();
@@ -33,7 +34,11 @@ export async function POST(request: Request) {
   if (capDenied) return capDenied;
 
   try {
-    const urls = await generateConceptImages(prompt, count, negative_prompt);
+    const rawUrls = await generateConceptImages(prompt, count, negative_prompt);
+    // Pin durable copies in Supabase Storage. data: URLs (Easy Diffusion) and
+    // 24h-lived Replicate URLs both get copied to the public bucket. On any
+    // failure the helper returns the original URL — never blocks the call.
+    const urls = await uploadGeneratedImages(rawUrls, "image-studio");
     // Record worst-case cost — we don't reliably know which fallback served the
     // request (Easy Diffusion / Pollinations are free); the cap is conservative.
     await recordUsage({

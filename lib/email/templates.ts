@@ -140,6 +140,66 @@ export interface QuoteReadyVars {
   amount: number;
 }
 
+export interface DigestVars {
+  clientName?: string | null;
+  active: Array<{ id: string; title: string; status_ko: string; modelName: string | null; isRecent: boolean }>;
+  recentChangesCount: number;
+  deliveredCount: number;
+}
+
+export function weeklyDigest(vars: DigestVars): RenderedEmail {
+  const greet = vars.clientName ? `${vars.clientName}님,` : "안녕하세요,";
+  const url = `${BASE_URL}/client/dashboard`;
+  const prefsUrl = `${BASE_URL}/client/preferences`;
+  const subject = `[Virtual Agency] 이번 주 진행 현황 — ${vars.active.length}개 프로젝트`;
+
+  // Plain text — short list, ordered by recency, recent items get a chevron.
+  const lines = vars.active.length === 0
+    ? ["현재 진행 중인 프로젝트가 없습니다."]
+    : vars.active.map(
+        (p) =>
+          `${p.isRecent ? "› " : "  "}${p.title}${p.modelName ? ` (${p.modelName})` : ""} — ${p.status_ko}`
+      );
+
+  const text =
+    `${greet}\n\n이번 주 활동 요약입니다.\n\n` +
+    `활성 프로젝트 ${vars.active.length}건 · 이번 주 변경 ${vars.recentChangesCount}건 · 누적 납품 ${vars.deliveredCount}건\n\n` +
+    `${lines.join("\n")}\n\n` +
+    `대시보드: ${url}\n` +
+    `수신 거부: ${prefsUrl}\n`;
+
+  const items = vars.active
+    .map(
+      (p) => `<li style="margin:6px 0;color:#d4d4d8">
+        ${p.isRecent ? '<span style="color:#34d399">●</span> ' : '<span style="color:#3f3f46">○</span> '}
+        <strong style="color:#fafafa">${escape(p.title)}</strong>
+        ${p.modelName ? `<span style="color:#71717a"> · ${escape(p.modelName)}</span>` : ""}
+        <span style="float:right;font-size:12px;color:#a1a1aa">${escape(p.status_ko)}</span>
+      </li>`
+    )
+    .join("");
+
+  const html = wrap(
+    subject,
+    `<h2 style="margin:0 0 12px;font-size:20px;color:#fafafa">이번 주 진행 요약</h2>
+<p style="margin:0 0 16px;color:#d4d4d8">${escape(greet)}</p>
+<div style="display:flex;gap:8px;margin:0 0 18px">
+  <div style="flex:1;background:#0a0a0a;border:1px solid #27272a;border-radius:8px;padding:12px"><p style="margin:0;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:.05em">활성</p><p style="margin:4px 0 0;color:#fafafa;font-weight:600">${vars.active.length}건</p></div>
+  <div style="flex:1;background:#0a0a0a;border:1px solid #27272a;border-radius:8px;padding:12px"><p style="margin:0;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:.05em">이번 주 변경</p><p style="margin:4px 0 0;color:#fafafa;font-weight:600">${vars.recentChangesCount}건</p></div>
+  <div style="flex:1;background:#0a0a0a;border:1px solid #27272a;border-radius:8px;padding:12px"><p style="margin:0;font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:.05em">누적 납품</p><p style="margin:4px 0 0;color:#fafafa;font-weight:600">${vars.deliveredCount}건</p></div>
+</div>
+${
+  vars.active.length === 0
+    ? '<p style="margin:0 0 18px;color:#a1a1aa">현재 진행 중인 프로젝트가 없습니다. 새 프로젝트를 시작해 보세요.</p>'
+    : `<ul style="list-style:none;padding:0;margin:0 0 18px;border-top:1px solid #27272a">${items}</ul>`
+}
+<p style="margin:0"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">대시보드 열기</a></p>
+<p style="margin:18px 0 0;font-size:11px;color:#71717a">주간 요약을 그만 받으시려면 <a href="${prefsUrl}" style="color:#a1a1aa">알림 설정</a>에서 끌 수 있습니다.</p>`
+  );
+
+  return { subject, html, text };
+}
+
 export function quoteReady(vars: QuoteReadyVars): RenderedEmail {
   const greet = vars.clientName ? `${vars.clientName}님,` : "안녕하세요,";
   const url = `${BASE_URL}/client/quote/${vars.projectId}`;

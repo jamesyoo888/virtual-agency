@@ -18,6 +18,7 @@ import {
   type CatalogQueryParams,
 } from "@/lib/catalog/filter";
 import { getBucket } from "@/lib/experiments";
+import { trackImpression } from "@/lib/experiments-track";
 
 function Value({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
@@ -45,6 +46,7 @@ export default async function CatalogPage({ searchParams }: PageProps) {
   const requestedPage = normalizePage(params.page);
   const view: CatalogView = params.view === "list" ? "list" : "grid";
   const heroCtaVariant = await getBucket("hero_cta");
+  void trackImpression("hero_cta", { surface: "catalog_hero" });
 
   let userRole: "admin" | "client" | null = null;
   let models: Model[] = [];
@@ -111,12 +113,14 @@ export default async function CatalogPage({ searchParams }: PageProps) {
     if (params.price_max) query = query.lte("base_price", parseInt(params.price_max));
     if (params.exclusive === "true") query = query.eq("is_exclusive_available", true);
 
-    let { data, count, error } = await query;
+    const initial = await query;
+    let data = initial.data;
+    let count = initial.count;
     // If the popularity view hasn't been applied yet (migration 006), fall
     // back to the base models table so the catalog still renders. Detected
     // by the PostgREST "PGRST205" / "relation does not exist" pattern.
-    if (error && sort === "popular") {
-      console.warn("[catalog] popularity view unavailable, falling back to follower_count:", error.message);
+    if (initial.error && sort === "popular") {
+      console.warn("[catalog] popularity view unavailable, falling back to follower_count:", initial.error.message);
       const fallback = await supabase
         .from("models")
         .select("*", { count: "exact" })

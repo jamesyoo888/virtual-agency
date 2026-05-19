@@ -14,9 +14,11 @@ import {
   inquiryReceived,
   statusChanged,
   quoteReady,
+  weeklyDigest,
   type InquiryReceivedVars,
   type StatusChangedVars,
   type QuoteReadyVars,
+  type DigestVars,
 } from "./templates";
 
 async function safeSend(
@@ -74,5 +76,15 @@ export async function notifyQuoteReady(
   return safeSend(to, quoteReady(vars), {
     kind: "quote_ready",
     project: vars.projectId,
+  });
+}
+
+export async function notifyWeeklyDigest(
+  to: string | null | undefined,
+  vars: DigestVars & { clientId: string }
+) {
+  return safeSend(to, weeklyDigest(vars), {
+    kind: "weekly_digest",
+    client: vars.clientId,
   });
 }

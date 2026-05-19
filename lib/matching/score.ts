@@ -22,6 +22,13 @@ export interface MatchBrief {
   budgetPerDay?: number | null;
   needsExclusive?: boolean;
   freeText?: string;
+  /**
+   * Optional "persona" weights — map of model_id → number of past inquiries
+   * by the calling client. Each prior inquiry adds a small bonus (cap'd) so
+   * a returning advertiser sees the people they've already worked with float
+   * to the top *without* drowning out the rules-based fit. Empty by default.
+   */
+  personaInquiries?: Map<string, number>;
 }
 
 export interface MatchScore {
@@ -29,6 +36,11 @@ export interface MatchScore {
   score: number;
   reasons: string[];
 }
+
+/** Cap on how much a returning client's history can move a single model. */
+const PERSONA_MAX_BONUS = 12;
+/** Points granted per past inquiry (saturates at PERSONA_MAX_BONUS). */
+const PERSONA_PER_INQUIRY = 4;
 
 const INDUSTRY_VALUES = new Set(INDUSTRY_OPTIONS.map((o) => o.value));
 const GENRE_VALUES = new Set(GENRE_OPTIONS.map((o) => o.value));
@@ -125,6 +137,16 @@ export function scoreModel(model: Model, brief: MatchBrief): MatchScore {
 
   // Light popularity tiebreaker so big-name models float on ties.
   score += Math.min(5, Math.log10(1 + (model.follower_count ?? 0)));
+
+  // Persona bonus — returning client previously inquired about this model.
+  // Capped so a single repeat advertiser can't pin the same model at #1
+  // forever; the rules-based fit still dominates the score.
+  const past = brief.personaInquiries?.get(model.id) ?? 0;
+  if (past > 0) {
+    const bonus = Math.min(PERSONA_MAX_BONUS, past * PERSONA_PER_INQUIRY);
+    score += bonus;
+    reasons.push(`이전 협업 ${past}회 (+${bonus}pt)`);
+  }
 
   return { model, score, reasons };
 }

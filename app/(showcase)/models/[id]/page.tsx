@@ -17,6 +17,9 @@ import { aggregateApproved } from "@/lib/reviews";
 import { trackModelView } from "@/lib/analytics/track-view";
 import { fetchCoViewedModels } from "@/lib/analytics/co-viewed";
 import { BLUR_DATA_URL } from "@/lib/blur";
+import { getBucket } from "@/lib/experiments";
+import { trackImpression } from "@/lib/experiments-track";
+import SimilarModelsRow from "@/components/similar-models-row";
 import {
   breadcrumbLd,
   ldScript,
@@ -159,22 +162,42 @@ export default async function ShowcaseModelPage({
   const m = model;
   // Fire-and-forget — don't block render on the view insert.
   void trackModelView(m.id);
-  const [coViewed, tagSimilar, reviews] = await Promise.all([
+  const [coViewed, tagSimilar, reviews, similarBucket] = await Promise.all([
     fetchCoViewedModels(m.id, 4),
     fetchSimilarModels(m, 6),
     fetchApprovedReviews(m.id),
+    getBucket("similar_strategy"),
   ]);
-  // Prefer collaborative ranking; pad with tag-based similarity so the row
-  // never looks empty on a cold catalog (and so we degrade cleanly before
-  // migration 007 is applied).
-  const seen = new Set<string>();
-  const similar = [...coViewed, ...tagSimilar]
-    .filter((sm) => {
-      if (seen.has(sm.id)) return false;
-      seen.add(sm.id);
-      return true;
-    })
+  // Per-bucket similar list. `collaborative` shows only co-viewed; `tag`
+  // shows only tag-overlap. If the chosen bucket has no candidates we fall
+  // back to the other source so the visitor still sees something — that
+  // fallback impression is logged as the *fallback* variant so the A/B
+  // numbers reflect what the user actually saw, not the bucket they got.
+  const collaborativeOnly = coViewed.slice(0, 4);
+  const tagOnly = tagSimilar
+    .filter((sm) => !collaborativeOnly.some((cv) => cv.id === sm.id))
     .slice(0, 4);
+  let similar: Model[];
+  let renderedVariant: "collaborative" | "tag";
+  if (similarBucket === "collaborative" && collaborativeOnly.length > 0) {
+    similar = collaborativeOnly;
+    renderedVariant = "collaborative";
+  } else if (similarBucket === "tag" && tagOnly.length > 0) {
+    similar = tagOnly;
+    renderedVariant = "tag";
+  } else if (collaborativeOnly.length > 0) {
+    similar = collaborativeOnly;
+    renderedVariant = "collaborative";
+  } else {
+    similar = tagOnly;
+    renderedVariant = "tag";
+  }
+  // Only count an impression when the block actually renders.
+  if (similar.length > 0) {
+    void trackImpression("similar_strategy", {
+      surface: `model_detail_${renderedVariant}`,
+    });
+  }
   const aggregate = aggregateApproved(
     reviews.map((r) => ({ rating: r.rating, status: "approved" as const }))
   );
@@ -347,45 +370,24 @@ export default async function ShowcaseModelPage({
           />
         )}
 
-        {/* Similar models — collaborative + tag fallback */}
+        {/* Similar models — A/B between collaborative-only and tag-only. */}
         {similar.length > 0 && (
           <div className="mt-16 pt-12 border-t border-zinc-900">
             <h2 className="text-xl font-semibold mb-6">
-              {coViewed.length > 0 ? "이 모델을 본 사람이 본 다른 모델" : "유사한 모델"}
+              {renderedVariant === "collaborative"
+                ? "이 모델을 본 사람이 본 다른 모델"
+                : "유사한 모델"}
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {similar.map((sm) => (
-                <Link
-                  key={sm.id}
-                  href={`/models/${sm.id}`}
-                  className="group block"
-                >
-                  <div className="aspect-[3/4] relative rounded-lg overflow-hidden bg-zinc-900 mb-2">
-                    {sm.concept_image && (
-                      <Image
-                        src={sm.concept_image}
-                        alt={sm.name}
-                        fill
-                        className="object-cover transition-transform group-hover:scale-105"
-                        unoptimized
-                        loading="lazy"
-                        placeholder="blur"
-                        blurDataURL={BLUR_DATA_URL}
-                        sizes="(min-width: 768px) 25vw, 50vw"
-                      />
-                    )}
-                  </div>
-                  <p className="text-sm font-medium group-hover:text-zinc-300">
-                    {sm.name}
-                  </p>
-                  {sm.base_price && (
-                    <p className="text-xs text-zinc-500">
-                      ₩{sm.base_price.toLocaleString()} / 일
-                    </p>
-                  )}
-                </Link>
-              ))}
-            </div>
+            <SimilarModelsRow
+              items={similar.map((sm) => ({
+                id: sm.id,
+                name: sm.name,
+                concept_image: sm.concept_image,
+                base_price: sm.base_price,
+              }))}
+              experimentKey="similar_strategy"
+              surface={`model_detail_${renderedVariant}`}
+            />
           </div>
         )}
       </div>

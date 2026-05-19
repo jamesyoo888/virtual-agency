@@ -4,6 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
 import { rankModels, extractTagsFromText } from "@/lib/matching/score";
+import { loadPersonaInquiries } from "@/lib/matching/persona";
 import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import ShareLinkButton from "@/components/share-link-button";
@@ -61,6 +62,21 @@ export default async function MatchPage({ searchParams }: PageProps) {
   // Augment explicit tags with anything parsed out of the freeform brief —
   // gives the user a "type a sentence" path that still scores meaningfully.
   const fromText = extractTagsFromText(brief);
+  const hasInput =
+    brief.length > 0 ||
+    industries.length > 0 ||
+    fromText.industries.length > 0 ||
+    genres.length > 0 ||
+    fromText.genres.length > 0 ||
+    moods.length > 0 ||
+    fromText.moods.length > 0 ||
+    !!budgetPerDay ||
+    needsExclusive;
+
+  const [models, personaInquiries] = hasInput
+    ? await Promise.all([fetchActiveModels(), loadPersonaInquiries()])
+    : [[] as Model[], new Map<string, number>()];
+
   const mergedBrief = {
     industries: [...new Set([...industries, ...fromText.industries])],
     genres: [...new Set([...genres, ...fromText.genres])],
@@ -68,17 +84,9 @@ export default async function MatchPage({ searchParams }: PageProps) {
     budgetPerDay,
     needsExclusive,
     freeText: brief,
+    personaInquiries,
   };
 
-  const hasInput =
-    brief.length > 0 ||
-    mergedBrief.industries.length > 0 ||
-    mergedBrief.genres.length > 0 ||
-    mergedBrief.moods.length > 0 ||
-    !!budgetPerDay ||
-    needsExclusive;
-
-  const models = hasInput ? await fetchActiveModels() : [];
   const ranked = hasInput ? rankModels(models, mergedBrief).slice(0, 12) : [];
 
   return (

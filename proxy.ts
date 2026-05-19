@@ -92,6 +92,13 @@ export async function proxy(request: NextRequest) {
     );
   }
 
+  // Protect creator routes (external creators with owned models).
+  if (pathname.startsWith("/creator") && !user) {
+    return NextResponse.redirect(
+      new URL(`/login?next=${pathname}`, request.url)
+    );
+  }
+
   assignExperimentCookies(request, supabaseResponse);
   return supabaseResponse;
 }

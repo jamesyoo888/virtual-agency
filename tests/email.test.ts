@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-import { inquiryReceived, statusChanged, quoteReady } from "@/lib/email/templates";
+import { inquiryReceived, statusChanged, quoteReady, weeklyDigest } from "@/lib/email/templates";
 import {
   notifyInquiryReceived,
   notifyStatusChanged,
@@ -56,6 +56,38 @@ describe("email/templates", () => {
     });
     expect(r.html).not.toContain("<script>alert");
     expect(r.html).toContain("&lt;script&gt;");
+  });
+
+  it("weeklyDigest shows summary counts and recent markers", () => {
+    const r = weeklyDigest({
+      clientName: "김 PM",
+      active: [
+        { id: "p1", title: "Spring KV", status_ko: "제작 중", modelName: "Luna", isRecent: true },
+        { id: "p2", title: "Lookbook", status_ko: "검토", modelName: null, isRecent: false },
+      ],
+      recentChangesCount: 1,
+      deliveredCount: 3,
+    });
+    expect(r.subject).toContain("2개 프로젝트");
+    expect(r.text).toContain("활성 프로젝트 2건");
+    expect(r.text).toContain("이번 주 변경 1건");
+    expect(r.text).toContain("누적 납품 3건");
+    // Recent line uses the chevron marker; non-recent uses the indent.
+    expect(r.text).toContain("› Spring KV");
+    expect(r.text).toContain("  Lookbook");
+    // Unsubscribe link present.
+    expect(r.text).toContain("/client/preferences");
+  });
+
+  it("weeklyDigest renders an empty-state line when there are no active projects", () => {
+    const r = weeklyDigest({
+      clientName: null,
+      active: [],
+      recentChangesCount: 0,
+      deliveredCount: 0,
+    });
+    expect(r.text).toContain("진행 중인 프로젝트가 없습니다");
+    expect(r.html).toContain("현재 진행 중인 프로젝트가 없습니다");
   });
 });
 

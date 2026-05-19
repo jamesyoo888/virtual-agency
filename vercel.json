@@ -3,5 +3,11 @@
     "app/api/generate/image/route.ts": {
       "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/weekly-digest",
+      "schedule": "0 0 * * 1"
+    }
+  ]
 }

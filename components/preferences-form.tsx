@@ -25,6 +25,11 @@ const FIELDS: {
     description: "견적서가 준비되면 메일로 안내합니다.",
   },
   {
+    key: "email_weekly_digest",
+    label: "주간 요약 이메일",
+    description: "매주 월요일 진행 중 프로젝트의 변화를 한 통으로 모아 보냅니다.",
+  },
+  {
     key: "toast_status_changes",
     label: "화면 토스트 알림",
     description: "대시보드를 열어둔 상태에서 상태 변경 시 토스트를 표시합니다.",

@@ -6,6 +6,7 @@ import { inquiryCreateSchema } from "@/lib/api/schemas";
 import { notifyInquiryWebhook } from "@/lib/webhooks";
 import { notifyInquiryReceived } from "@/lib/email/notify";
 import { canEmailClient } from "@/lib/preferences";
+import { trackConversion } from "@/lib/experiments-track";
 
 /**
  * Client-initiated inquiry creation. Replaces the previous browser-only
@@ -78,6 +79,11 @@ export async function POST(request: Request) {
       .eq("id", user.id)
       .single(),
   ]);
+
+  // Conversion event for the hero CTA experiment. The visitor's bucket was
+  // assigned by the proxy and is read inside trackConversion via cookies, so
+  // we don't need to pass the variant explicitly. Fire-and-forget.
+  void trackConversion("hero_cta", { surface: "inquiry_submit", userId: user.id });
 
   // Webhook always fires (admin-side awareness); the receipt email respects
   // the client's opt-out preference.

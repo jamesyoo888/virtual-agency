@@ -4,11 +4,13 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
 import { rankModels, type MatchBrief } from "@/lib/matching/score";
+import { loadPersonaInquiries } from "@/lib/matching/persona";
 import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import RfpFilterChips from "@/components/rfp-filter-chips";
 import RfpPrintButton from "@/components/rfp-print-button";
-import { ArrowLeft, FileText } from "lucide-react";
+import { composeRfpBrief, budgetBandToRange } from "@/lib/rfp/compose";
+import { ArrowLeft, FileText, Send } from "lucide-react";
 
 export const metadata = {
   title: "광고주 RFP — Virtual Agency",
@@ -93,6 +95,10 @@ export default async function RfpPage({ searchParams }: PageProps) {
 
   let recommended: { model: Model; score: number; reasons: string[] }[] = [];
   if (hasInput) {
+    const [models, personaInquiries] = await Promise.all([
+      fetchActiveModels(),
+      loadPersonaInquiries(),
+    ]);
     const brief: MatchBrief = {
       industries,
       genres: [], // RFPs don't carry genre directly — leave to mood/industry signal
@@ -100,8 +106,8 @@ export default async function RfpPage({ searchParams }: PageProps) {
       budgetPerDay,
       needsExclusive,
       freeText: `${campaign} ${message} ${heroCopy}`,
+      personaInquiries,
     };
-    const models = await fetchActiveModels();
     recommended = rankModels(models, brief).slice(0, 5);
   }
 
@@ -110,6 +116,23 @@ export default async function RfpPage({ searchParams }: PageProps) {
     industries, moods, targetAge, budgetBand, budgetPerDay, needsExclusive,
     recommended: recommended.map((r) => ({ id: r.model.id, name: r.model.name, score: Math.round(r.score) })),
   };
+
+  // Brief text that gets piped into the inquiry form when the user clicks
+  // "이 추천으로 문의 시작" on a recommended model. Encoded once here so we
+  // don't repeat the work per card. Empty when there's no useful input.
+  const rfpBriefText = hasInput
+    ? composeRfpBrief({
+        campaign, advertiser, launch, durationDays: duration,
+        channels, message, heroCopy, industries, moods, targetAge,
+        budgetBand, budgetPerDay, needsExclusive,
+      })
+    : "";
+  const inquiryHashParams = new URLSearchParams();
+  if (rfpBriefText) inquiryHashParams.set("brief", rfpBriefText);
+  const mappedBudget = budgetBandToRange(budgetBand);
+  if (mappedBudget) inquiryHashParams.set("budget_range", mappedBudget);
+  inquiryHashParams.set("purpose", "ad");
+  const inquiryHash = inquiryHashParams.toString();
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -279,6 +302,16 @@ export default async function RfpPage({ searchParams }: PageProps) {
                             )}
                           </p>
                         )}
+                        <div className="mt-1.5 print:hidden">
+                          <Link
+                            href={`/models/${r.model.id}#inquire?${inquiryHash}`}
+                            className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded-md transition-colors"
+                            data-rfp-inquire={r.model.id}
+                          >
+                            <Send className="w-3 h-3" />
+                            이 추천으로 문의 시작
+                          </Link>
+                        </div>
                       </div>
                     </article>
                   ))}

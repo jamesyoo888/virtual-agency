@@ -16,22 +16,44 @@ interface Props {
 
 const KRW = new Intl.NumberFormat("ko-KR");
 
-function readHashQuote(): { days: number; exclusive: boolean; total: number } | null {
+interface HashPrefill {
+  /** Quote handoff from PriceCalculator. */
+  days?: number;
+  exclusive?: boolean;
+  total?: number;
+  /** Free-form brief seed (RFP → inquiry, or other surfaces). */
+  brief?: string;
+  /** Optional pre-selected purpose / budget hints. */
+  purpose?: string;
+  budgetRange?: string;
+}
+
+function readHashPrefill(): HashPrefill | null {
   if (typeof window === "undefined") return null;
   const hash = window.location.hash;
-  if (!hash.startsWith("#inquire?")) return null;
+  if (!hash.startsWith("#inquire")) return null;
   try {
-    const params = new URLSearchParams(hash.slice("#inquire?".length));
+    // Tolerate both "#inquire" (no params) and "#inquire?…".
+    const qIdx = hash.indexOf("?");
+    if (qIdx === -1) return {};
+    const params = new URLSearchParams(hash.slice(qIdx + 1));
+
     const days = Number(params.get("days"));
     const total = Number(params.get("total"));
-    if (!Number.isFinite(days) || days <= 0 || !Number.isFinite(total) || total <= 0) {
-      return null;
-    }
-    return {
-      days,
-      exclusive: params.get("exclusive") === "true",
-      total,
-    };
+    const out: HashPrefill = {};
+    if (Number.isFinite(days) && days > 0) out.days = days;
+    if (Number.isFinite(total) && total > 0) out.total = total;
+    if (params.get("exclusive") === "true") out.exclusive = true;
+
+    const brief = params.get("brief");
+    if (brief && brief.length > 0) out.brief = brief.slice(0, 2000);
+
+    const purpose = params.get("purpose");
+    if (purpose) out.purpose = purpose;
+    const budgetRange = params.get("budget_range");
+    if (budgetRange) out.budgetRange = budgetRange;
+
+    return Object.keys(out).length > 0 ? out : {};
   } catch {
     return null;
   }
@@ -39,11 +61,12 @@ function readHashQuote(): { days: number; exclusive: boolean; total: number } | 
 
 export default function InquiryForm({ modelId, modelName }: Props) {
   const router = useRouter();
-  // Lazy-init from PriceCalculator handoff (hash like
-  // `#inquire?days=5&exclusive=true&total=2500000`) so we don't trip the
-  // react-hooks/set-state-in-effect rule.
-  const initialQuote = typeof window !== "undefined" ? readHashQuote() : null;
-  const [open, setOpen] = useState(!!initialQuote);
+  // Lazy-init from a hash handoff. Two surfaces feed in:
+  //   PriceCalculator on /models/<id> (`days`, `exclusive`, `total`)
+  //   RFP page (`brief`, optional `purpose`, `budget_range`)
+  // Both write to `#inquire?…`; we coalesce whichever fields are present.
+  const initialPrefill = typeof window !== "undefined" ? readHashPrefill() : null;
+  const [open, setOpen] = useState(!!initialPrefill);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -54,20 +77,33 @@ export default function InquiryForm({ modelId, modelName }: Props) {
       budget_range: "",
       purpose: "",
     };
-    if (!initialQuote) return base;
-    const line = `[견적 가안] ${initialQuote.days}일${
-      initialQuote.exclusive ? " · 독점 라이선스" : ""
-    } / 예상 ₩${KRW.format(initialQuote.total)}\n\n`;
-    return { ...base, brief: line };
+    if (!initialPrefill) return base;
+
+    const parts: string[] = [];
+    if (initialPrefill.days && initialPrefill.total) {
+      parts.push(
+        `[견적 가안] ${initialPrefill.days}일${
+          initialPrefill.exclusive ? " · 독점 라이선스" : ""
+        } / 예상 ₩${KRW.format(initialPrefill.total)}`
+      );
+    }
+    if (initialPrefill.brief) parts.push(initialPrefill.brief);
+
+    return {
+      ...base,
+      brief: parts.join("\n\n") + (parts.length > 0 ? "\n\n" : ""),
+      budget_range: initialPrefill.budgetRange ?? "",
+      purpose: initialPrefill.purpose ?? "",
+    };
   });
 
   // Wipe the hash once consumed so navigation back doesn't re-trigger.
   useEffect(() => {
-    if (!initialQuote) return;
+    if (!initialPrefill) return;
     if (typeof window !== "undefined" && window.location.hash.startsWith("#inquire")) {
       history.replaceState(null, "", window.location.pathname + window.location.search);
     }
-    // initialQuote is captured at first render — intentionally not in deps.
+    // initialPrefill is captured at first render — intentionally not in deps.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -14,6 +14,7 @@ import {
   BarChart3,
   Star,
   KeyRound,
+  FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -27,6 +28,7 @@ const links = [
   { href: "/admin/image-studio", label: "Image Studio", icon: Image },
   { href: "/admin/video-studio", label: "Video Studio", icon: Video },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/admin/experiments", label: "Experiments", icon: FlaskConical },
   { href: "/admin/usage", label: "Usage", icon: Receipt },
   { href: "/admin/invites", label: "Invites", icon: KeyRound },
 ];
