@@ -20,6 +20,7 @@ import { BLUR_DATA_URL } from "@/lib/blur";
 import { getBucket } from "@/lib/experiments";
 import { trackImpression } from "@/lib/experiments-track";
 import SimilarModelsRow from "@/components/similar-models-row";
+import BookmarkButton from "@/components/bookmark-button";
 import {
   breadcrumbLd,
   ldScript,
@@ -84,6 +85,23 @@ async function fetchApprovedReviews(
     created_at: r.created_at,
     client_company: r.client?.company ?? null,
   }));
+}
+
+async function viewerWithBookmark(
+  modelId: string
+): Promise<{ userId: string | null; bookmarked: boolean }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { userId: null, bookmarked: false };
+  const { data } = await supabase
+    .from("model_bookmarks")
+    .select("id")
+    .eq("client_id", user.id)
+    .eq("model_id", modelId)
+    .maybeSingle();
+  return { userId: user.id, bookmarked: !!data };
 }
 
 async function fetchSimilarModels(model: Model, limit = 4): Promise<Model[]> {
@@ -162,11 +180,12 @@ export default async function ShowcaseModelPage({
   const m = model;
   // Fire-and-forget — don't block render on the view insert.
   void trackModelView(m.id);
-  const [coViewed, tagSimilar, reviews, similarBucket] = await Promise.all([
+  const [coViewed, tagSimilar, reviews, similarBucket, viewer] = await Promise.all([
     fetchCoViewedModels(m.id, 4),
     fetchSimilarModels(m, 6),
     fetchApprovedReviews(m.id),
     getBucket("similar_strategy"),
+    SUPABASE_CONFIGURED ? viewerWithBookmark(m.id) : Promise.resolve({ userId: null, bookmarked: false }),
   ]);
   // Per-bucket similar list. `collaborative` shows only co-viewed; `tag`
   // shows only tag-overlap. If the chosen bucket has no candidates we fall
@@ -345,8 +364,14 @@ export default async function ShowcaseModelPage({
               exclusiveAvailable={m.is_exclusive_available ?? false}
             />
 
-            <div id="inquire-anchor" className="mt-6">
+            <div id="inquire-anchor" className="mt-6 space-y-3">
               <InquiryForm modelId={m.id} modelName={m.name} />
+              <BookmarkButton
+                modelId={m.id}
+                initial={viewer.bookmarked}
+                unauthenticated={!viewer.userId}
+                loginNext={`/models/${m.id}`}
+              />
             </div>
           </div>
         </div>

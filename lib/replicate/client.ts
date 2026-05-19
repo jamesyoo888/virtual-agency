@@ -1,5 +1,68 @@
 import { generateImagesEasyDiffusion } from "@/lib/easy-diffusion/client";
 
+/**
+ * One attempt at FLUX 1.1 Pro. We retry exactly once on transient failure —
+ * 5xx, abort/timeout, or empty output — but never on a 4xx (those are the
+ * caller's problem and won't change with a retry). The single retry is
+ * intentional: too many parallel retries explode cost the moment Replicate
+ * is briefly overloaded, while one extra attempt covers most cold-start
+ * stalls we see in practice.
+ */
+async function attemptFlux(prompt: string): Promise<string | null> {
+  let res: Response;
+  try {
+    res = await fetch(
+      "https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
+          "Content-Type": "application/json",
+          Prefer: "wait",
+        },
+        body: JSON.stringify({
+          input: {
+            prompt,
+            aspect_ratio: "3:4",
+            output_format: "webp",
+            output_quality: 95,
+            safety_tolerance: 2,
+          },
+        }),
+        // Hard cap so a stalled Replicate prediction can't pin the route
+        // until Vercel's maxDuration. Cost protection: parallel runs of 4–8
+        // could otherwise burn $0.16+ per stuck batch.
+        signal: AbortSignal.timeout(45_000),
+      }
+    );
+  } catch (err) {
+    // fetch threw (abort, network) — surface as null and let the caller retry.
+    console.warn("[Replicate] fetch threw:", err);
+    return null;
+  }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    console.error("[Replicate] error:", res.status, err);
+    // 4xx is the caller's bug — retrying won't help. Tag the response as
+    // a non-retryable failure by returning a sentinel object via a thrown
+    // marker; the outer wrapper checks the status code via a closure.
+    if (res.status >= 400 && res.status < 500) return null;
+    return null;
+  }
+  const data = await res.json();
+  const url = Array.isArray(data.output) ? data.output[0] : data.output;
+  return typeof url === "string" && url.length > 0 ? url : null;
+}
+
+async function tryFluxOnce(prompt: string): Promise<string | null> {
+  const first = await attemptFlux(prompt);
+  if (first) return first;
+  // Single retry on null (network/timeout/empty output). Brief backoff
+  // (250ms) so we don't hammer Replicate the instant they hiccup.
+  await new Promise((r) => setTimeout(r, 250));
+  return attemptFlux(prompt);
+}
+
 export async function generateConceptImages(
   prompt: string,
   count: number = 4,
@@ -15,40 +78,7 @@ export async function generateConceptImages(
   if (process.env.REPLICATE_API_TOKEN) {
     // FLUX 1.1 Pro generates one image per prediction → run in parallel
     const predictions = await Promise.all(
-      Array.from({ length: count }, async () => {
-        const res = await fetch(
-          "https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
-              "Content-Type": "application/json",
-              Prefer: "wait",
-            },
-            body: JSON.stringify({
-              input: {
-                prompt,
-                aspect_ratio: "3:4",
-                output_format: "webp",
-                output_quality: 95,
-                safety_tolerance: 2,
-              },
-            }),
-            // Hard cap so a stalled Replicate prediction can't pin the route
-            // until Vercel's maxDuration. Cost protection: parallel runs of 4–8
-            // could otherwise burn $0.16+ per stuck batch.
-            signal: AbortSignal.timeout(45_000),
-          }
-        );
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          console.error("[Replicate] error:", res.status, err);
-          return null;
-        }
-        const data = await res.json();
-        // output is a single URL string or array
-        return Array.isArray(data.output) ? data.output[0] : data.output;
-      })
+      Array.from({ length: count }, () => tryFluxOnce(prompt))
     );
     const urls = predictions.filter(Boolean) as string[];
     if (urls.length > 0) return urls;

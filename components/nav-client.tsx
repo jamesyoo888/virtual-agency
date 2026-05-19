@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 
 const links = [
   { href: "/client/dashboard", label: "프로젝트" },
+  { href: "/client/bookmarks", label: "북마크" },
   { href: "/client/products", label: "상품 관리" },
   { href: "/client/preferences", label: "알림 설정" },
 ];

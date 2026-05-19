@@ -15,7 +15,7 @@ import { toCSV, csvFilename } from "@/lib/csv";
  * with a proper Content-Disposition for browser download.
  */
 
-const KINDS = new Set(["projects", "inquiries", "reviews"]);
+const KINDS = new Set(["projects", "inquiries", "reviews", "experiments"]);
 
 export async function GET(
   _request: Request,
@@ -107,6 +107,58 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(kind)}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "experiments") {
+    const { data, error } = await supabase
+      .from("experiment_events")
+      .select("key, variant, kind, surface, created_at, viewer_cookie, user_id")
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    type ExpRow = {
+      key: string;
+      variant: string;
+      kind: string;
+      surface: string | null;
+      created_at: string;
+      viewer_cookie: string;
+      user_id: string | null;
+    };
+    const rows = ((data ?? []) as ExpRow[]).map((r) => ({
+      experiment: r.key,
+      variant: r.variant,
+      event: r.kind,
+      surface: r.surface ?? "",
+      // Truncate the cookie so the CSV doesn't expose the full visitor id
+      // beyond what's useful for sanity-checking dedup — the prefix is
+      // enough to recognize repeat events without enabling reverse-lookup.
+      viewer_id_prefix: r.viewer_cookie.slice(0, 8),
+      user_id: r.user_id ?? "",
+      created_at: r.created_at,
+    }));
+
+    const columns = [
+      "experiment",
+      "variant",
+      "event",
+      "surface",
+      "viewer_id_prefix",
+      "user_id",
+      "created_at",
+    ] as const;
+
+    const csv = toCSV(rows, columns);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("experiments")}"`,
         "Cache-Control": "no-store",
       },
     });

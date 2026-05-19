@@ -85,14 +85,24 @@ export default async function ExperimentsPage() {
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8">
-      <header className="flex items-center gap-3">
-        <FlaskConical className="w-5 h-5 text-zinc-400" />
-        <div>
-          <h1 className="text-2xl font-bold">Experiments</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
-            cookie 기반 A/B 버킷별 노출·전환. 신뢰 구간은 95% Wilson lower bound.
-          </p>
+      <header className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <FlaskConical className="w-5 h-5 text-zinc-400" />
+          <div>
+            <h1 className="text-2xl font-bold">Experiments</h1>
+            <p className="text-sm text-zinc-500 mt-0.5">
+              cookie 기반 A/B 버킷별 노출·전환. 신뢰 구간은 95% Wilson lower bound.
+            </p>
+          </div>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+        <a
+          href="/api/admin/exports/experiments"
+          download
+          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+        >
+          CSV
+        </a>
       </header>
 
       {report.length === 0 && (

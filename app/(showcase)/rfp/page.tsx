@@ -10,6 +10,7 @@ import ModelCard from "@/components/model-card";
 import RfpFilterChips from "@/components/rfp-filter-chips";
 import RfpPrintButton from "@/components/rfp-print-button";
 import { composeRfpBrief, budgetBandToRange } from "@/lib/rfp/compose";
+import { persistRfpSubmission } from "@/lib/rfp/persist";
 import { ArrowLeft, FileText, Send } from "lucide-react";
 
 export const metadata = {
@@ -109,6 +110,20 @@ export default async function RfpPage({ searchParams }: PageProps) {
       personaInquiries,
     };
     recommended = rankModels(models, brief).slice(0, 5);
+    // Persist when authed — feeds future persona weighting and the admin
+    // RFP funnel view. Fire-and-forget; never blocks the render.
+    void persistRfpSubmission(
+      {
+        campaign, advertiser, launch, durationDays: duration,
+        channels, message, heroCopy, industries, moods, targetAge,
+        budgetBand, budgetPerDay, needsExclusive,
+      },
+      recommended.map((r) => ({
+        id: r.model.id,
+        name: r.model.name,
+        score: Math.round(r.score),
+      }))
+    );
   }
 
   const printPayload = {
