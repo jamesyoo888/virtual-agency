@@ -154,3 +154,28 @@ export const modelBulkStatusSchema = z.object({
 });
 
 export type ModelBulkStatusInput = z.infer<typeof modelBulkStatusSchema>;
+
+// Creator onboarding application — submitted by any authed client, reviewed
+// by admins. Caps are generous but stop a malicious 1MB pitch.
+export const creatorApplicationSchema = z.object({
+  display_name: z.string().trim().min(1, "display_name required").max(120),
+  bio: z.string().trim().max(2000).optional().nullable(),
+  portfolio_url: z
+    .string()
+    .trim()
+    .url("portfolio_url must be a valid URL")
+    .max(500)
+    .optional()
+    .or(z.literal("")),
+  instagram_handle: z.string().trim().max(60).optional().nullable(),
+  notes: z.string().trim().max(2000).optional().nullable(),
+});
+
+export type CreatorApplicationInput = z.infer<typeof creatorApplicationSchema>;
+
+export const creatorApplicationReviewSchema = z.object({
+  status: z.enum(["approved", "rejected"]),
+  rejection_reason: z.string().trim().max(500).optional().nullable(),
+});
+
+export type CreatorApplicationReviewInput = z.infer<typeof creatorApplicationReviewSchema>;

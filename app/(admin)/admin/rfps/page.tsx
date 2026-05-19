@@ -57,14 +57,24 @@ export default async function AdminRfpsPage() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
-      <header className="flex items-center gap-3">
-        <FileText className="w-5 h-5 text-zinc-400" />
-        <div>
-          <h1 className="text-2xl font-bold">RFP 이력</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
-            최근 100건. 광고주가 무엇을 찾는지 — 문의 이전 단계의 수요 신호.
-          </p>
+      <header className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <FileText className="w-5 h-5 text-zinc-400" />
+          <div>
+            <h1 className="text-2xl font-bold">RFP 이력</h1>
+            <p className="text-sm text-zinc-500 mt-0.5">
+              최근 100건. 광고주가 무엇을 찾는지 — 문의 이전 단계의 수요 신호.
+            </p>
+          </div>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+        <a
+          href="/api/admin/exports/rfps"
+          download
+          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+        >
+          CSV
+        </a>
       </header>
 
       {(industryTop.length > 0 || moodTop.length > 0) && (

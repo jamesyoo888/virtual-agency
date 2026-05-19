@@ -49,6 +49,8 @@ export default async function CatalogPage({ searchParams }: PageProps) {
   void trackImpression("hero_cta", { surface: "catalog_hero" });
 
   let userRole: "admin" | "client" | null = null;
+  let userId: string | null = null;
+  let bookmarkedIds = new Set<string>();
   let models: Model[] = [];
   let totalCount = 0;
   let totalPages = 1;
@@ -61,12 +63,15 @@ export default async function CatalogPage({ searchParams }: PageProps) {
       data: { user },
     } = await supabase.auth.getUser();
     if (user) {
-      const { data: clientRow } = await supabase
-        .from("clients")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+      userId = user.id;
+      const [{ data: clientRow }, { data: bookmarks }] = await Promise.all([
+        supabase.from("clients").select("role").eq("id", user.id).single(),
+        supabase.from("model_bookmarks").select("model_id").eq("client_id", user.id),
+      ]);
       userRole = (clientRow?.role as "admin" | "client") ?? "client";
+      bookmarkedIds = new Set(
+        ((bookmarks ?? []) as { model_id: string }[]).map((b) => b.model_id)
+      );
     }
 
     const sort = normalizeSort(params.sort);
@@ -287,6 +292,8 @@ export default async function CatalogPage({ searchParams }: PageProps) {
                       model={model}
                       variant="showcase"
                       layout="list"
+                      bookmarked={bookmarkedIds.has(model.id)}
+                      bookmarkUnauthenticated={!userId}
                     />
                   ))}
                 </div>
@@ -298,6 +305,8 @@ export default async function CatalogPage({ searchParams }: PageProps) {
                       model={model}
                       variant="showcase"
                       layout="card"
+                      bookmarked={bookmarkedIds.has(model.id)}
+                      bookmarkUnauthenticated={!userId}
                     />
                   ))}
                 </div>

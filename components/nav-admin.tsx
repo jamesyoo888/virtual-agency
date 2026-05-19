@@ -16,6 +16,7 @@ import {
   KeyRound,
   FlaskConical,
   FileText,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -33,6 +34,7 @@ const links = [
   { href: "/admin/rfps", label: "RFPs", icon: FileText },
   { href: "/admin/usage", label: "Usage", icon: Receipt },
   { href: "/admin/invites", label: "Invites", icon: KeyRound },
+  { href: "/admin/creators", label: "Creators", icon: Sparkles },
 ];
 
 interface Props {

@@ -15,7 +15,7 @@ import { toCSV, csvFilename } from "@/lib/csv";
  * with a proper Content-Disposition for browser download.
  */
 
-const KINDS = new Set(["projects", "inquiries", "reviews", "experiments"]);
+const KINDS = new Set(["projects", "inquiries", "reviews", "experiments", "rfps"]);
 
 export async function GET(
   _request: Request,
@@ -107,6 +107,97 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(kind)}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "rfps") {
+    const { data, error } = await supabase
+      .from("rfp_submissions")
+      .select(
+        "id, client_id, inputs, recommended, created_at, client:clients(email, company)"
+      )
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    type RfpRow = {
+      id: string;
+      client_id: string;
+      inputs: Record<string, unknown>;
+      recommended: { id: string; name: string; score: number }[];
+      created_at: string;
+      client?: { email: string | null; company: string | null } | { email: string | null; company: string | null }[] | null;
+    };
+    const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
+      Array.isArray(v) ? v[0] ?? null : v ?? null;
+
+    const rows = ((data ?? []) as unknown as RfpRow[]).map((r) => {
+      const client = pickOne(r.client);
+      const inp = r.inputs as {
+        campaign?: string;
+        advertiser?: string;
+        launch?: string;
+        durationDays?: string;
+        budgetPerDay?: number | null;
+        budgetBand?: string;
+        needsExclusive?: boolean;
+        industries?: string[];
+        moods?: string[];
+        channels?: string[];
+        targetAge?: string;
+      };
+      const top3 = (r.recommended ?? [])
+        .slice(0, 3)
+        .map((rec) => `${rec.name}(${rec.score})`)
+        .join(", ");
+      return {
+        id: r.id,
+        client_company: client?.company ?? "",
+        client_email: client?.email ?? "",
+        campaign: inp.campaign ?? "",
+        advertiser: inp.advertiser ?? "",
+        launch: inp.launch ?? "",
+        duration_days: inp.durationDays ?? "",
+        budget_per_day: inp.budgetPerDay ?? "",
+        budget_band: inp.budgetBand ?? "",
+        exclusive: inp.needsExclusive ? "yes" : "",
+        industries: (inp.industries ?? []).join("|"),
+        moods: (inp.moods ?? []).join("|"),
+        channels: (inp.channels ?? []).join("|"),
+        target_age: inp.targetAge ?? "",
+        top_3_recommendations: top3,
+        created_at: r.created_at,
+      };
+    });
+
+    const columns = [
+      "id",
+      "client_company",
+      "client_email",
+      "campaign",
+      "advertiser",
+      "launch",
+      "duration_days",
+      "budget_per_day",
+      "budget_band",
+      "exclusive",
+      "industries",
+      "moods",
+      "channels",
+      "target_age",
+      "top_3_recommendations",
+      "created_at",
+    ] as const;
+
+    const csv = toCSV(rows, columns);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("rfps")}"`,
         "Cache-Control": "no-store",
       },
     });

@@ -6,7 +6,7 @@ import { Model } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { ageInYears } from "@/lib/utils";
 import { useCompareState } from "@/components/compare-drawer";
-import { GitCompareArrows } from "lucide-react";
+import { GitCompareArrows, Bookmark, BookmarkCheck } from "lucide-react";
 import ModelQuickView from "@/components/model-quick-view";
 import { INDUSTRY_LABELS, GENRE_LABELS } from "@/lib/tags";
 
@@ -49,6 +49,73 @@ interface Props {
   model: Model;
   variant: "admin" | "showcase";
   layout?: "card" | "list";
+  /**
+   * Optional bookmark state pre-fetched server-side by the catalog page.
+   * When the visitor isn't authed, `unauthenticated` should be true and the
+   * heart click routes to /login instead of toggling.
+   */
+  bookmarked?: boolean;
+  bookmarkUnauthenticated?: boolean;
+}
+
+function BookmarkHeart({
+  modelId,
+  initial,
+  unauthenticated,
+}: {
+  modelId: string;
+  initial: boolean;
+  unauthenticated: boolean;
+}) {
+  const [active, setActive] = useState(initial);
+  const [pending, setPending] = useState(false);
+
+  async function toggle(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (unauthenticated) {
+      window.location.href = `/login?next=/models/${modelId}`;
+      return;
+    }
+    if (pending) return;
+    const next = !active;
+    setActive(next);
+    setPending(true);
+    try {
+      const res = await fetch("/api/client/bookmarks", {
+        method: next ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model_id: modelId }),
+      });
+      if (!res.ok && res.status !== 201) throw new Error(`HTTP ${res.status}`);
+    } catch {
+      setActive(!next); // roll back
+    } finally {
+      setPending(false);
+    }
+  }
+
+  const Icon = active ? BookmarkCheck : Bookmark;
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-pressed={active}
+      aria-label={active ? "북마크 제거" : "북마크 추가"}
+      title={
+        unauthenticated
+          ? "로그인 후 북마크할 수 있습니다"
+          : active
+            ? "북마크 제거"
+            : "북마크 추가"
+      }
+      className={`absolute top-2 left-2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+        active ? "bg-white text-black opacity-100" : "bg-black/70 text-white opacity-0 group-hover:opacity-100 hover:bg-black/90"
+      }`}
+    >
+      <Icon className="w-3.5 h-3.5" />
+    </button>
+  );
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -57,7 +124,13 @@ const STATUS_COLORS: Record<string, string> = {
   inactive: "bg-zinc-500/20 text-zinc-400 border-zinc-500/30",
 };
 
-export default function ModelCard({ model, variant, layout = "card" }: Props) {
+export default function ModelCard({
+  model,
+  variant,
+  layout = "card",
+  bookmarked = false,
+  bookmarkUnauthenticated = false,
+}: Props) {
   const href =
     variant === "admin"
       ? `/admin/models/${model.id}`
@@ -252,8 +325,20 @@ export default function ModelCard({ model, variant, layout = "card" }: Props) {
             </div>
           )}
 
+          {/*
+            Exclusive badge sits a hair below the heart so they don't collide
+            on hover. The heart only renders for the showcase variant — admin
+            grids have their own controls and don't need the visitor flow.
+          */}
+          {variant === "showcase" && (
+            <BookmarkHeart
+              modelId={model.id}
+              initial={bookmarked}
+              unauthenticated={bookmarkUnauthenticated}
+            />
+          )}
           {variant === "showcase" && model.is_exclusive_available && (
-            <div className="absolute top-2 left-2">
+            <div className="absolute top-11 left-2">
               <Badge className="bg-white/10 text-white border-white/20 text-xs">
                 독점가능
               </Badge>

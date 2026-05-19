@@ -46,11 +46,10 @@ export default async function CreatorLayout({ children }: { children: React.Reac
           <Link href="/" className="text-sm font-bold tracking-widest uppercase">
             Virtual Agency
           </Link>
-          {isCreator && (
-            <nav className="flex items-center gap-4 text-sm text-zinc-400">
-              <Link href="/creator/dashboard" className="hover:text-white">Dashboard</Link>
-            </nav>
-          )}
+          <nav className="flex items-center gap-4 text-sm text-zinc-400">
+            {isCreator && <Link href="/creator/dashboard" className="hover:text-white">Dashboard</Link>}
+            <Link href="/creator/onboard" className="hover:text-white">Onboarding</Link>
+          </nav>
         </div>
         <p className="text-xs text-zinc-600 truncate max-w-[12rem]" title={user.email ?? ""}>
           {user.email}

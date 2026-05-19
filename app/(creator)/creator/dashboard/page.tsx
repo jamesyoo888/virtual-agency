@@ -21,14 +21,22 @@ export default async function CreatorDashboardPage() {
         <h1 className="text-2xl font-bold mb-3">크리에이터 등록이 필요합니다</h1>
         <p className="text-sm text-zinc-500 mb-6">
           현재 계정에는 본인이 소유한 모델이 없습니다. 외부 크리에이터로 작품을 등록하려면
-          관리자에게 onboarding 을 요청하세요.
+          신청서를 작성해 주세요.
         </p>
-        <Link
-          href="/client/dashboard"
-          className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white underline underline-offset-2"
-        >
-          ← 클라이언트 대시보드로 돌아가기
-        </Link>
+        <div className="flex items-center justify-center gap-4">
+          <Link
+            href="/creator/onboard"
+            className="inline-flex items-center gap-1.5 text-sm bg-white text-black px-4 py-2 rounded-md hover:bg-zinc-200"
+          >
+            크리에이터 신청
+          </Link>
+          <Link
+            href="/client/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white underline underline-offset-2"
+          >
+            ← 클라이언트 대시보드
+          </Link>
+        </div>
       </div>
     );
   }
