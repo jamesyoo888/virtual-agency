@@ -60,6 +60,7 @@ export async function createImageTo3DTask(
       // Remesh for clean, uniform geometry
       should_remesh: true,
     }),
+    signal: AbortSignal.timeout(20_000),
   });
 
   if (!res.ok) {
@@ -81,6 +82,7 @@ export async function getMeshyTask(taskId: string): Promise<MeshyTask> {
     {
       headers: { Authorization: `Bearer ${MESHY_API_KEY}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
     }
   );
 

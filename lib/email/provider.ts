@@ -79,6 +79,9 @@ class ResendProvider implements EmailProvider {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
+        // Resend usually responds <2s; cap at 10s so a hung provider
+        // doesn't block status-change handlers or inquiry creation.
+        signal: AbortSignal.timeout(10_000),
       });
       if (!res.ok) {
         const text = await res.text().catch(() => "");

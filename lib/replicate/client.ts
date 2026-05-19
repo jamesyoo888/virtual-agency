@@ -34,6 +34,10 @@ export async function generateConceptImages(
                 safety_tolerance: 2,
               },
             }),
+            // Hard cap so a stalled Replicate prediction can't pin the route
+            // until Vercel's maxDuration. Cost protection: parallel runs of 4–8
+            // could otherwise burn $0.16+ per stuck batch.
+            signal: AbortSignal.timeout(45_000),
           }
         );
         if (!res.ok) {
