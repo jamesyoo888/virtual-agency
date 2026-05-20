@@ -314,8 +314,51 @@ export default async function CatalogPage({ searchParams }: PageProps) {
             <CatalogSearch />
           </div>
           {models.length === 0 ? (
-            <div className="text-center py-24 text-zinc-500">
-              <p>해당 조건의 모델이 없습니다.</p>
+            <div className="py-16 max-w-xl mx-auto text-center">
+              <p className="text-zinc-300 font-medium">
+                해당 조건의 모델이 없습니다.
+              </p>
+              <p className="text-sm text-zinc-500 mt-1">
+                필터를 조금 풀거나, 아래 인기 카테고리에서 시작해 보세요.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <Link
+                  href="/"
+                  className="text-xs border border-zinc-800 hover:border-zinc-600 rounded-md px-3 py-1.5 text-zinc-300 hover:text-white"
+                >
+                  필터 초기화
+                </Link>
+                <Link
+                  href="/explore/beauty"
+                  className="text-xs border border-zinc-800 hover:border-zinc-600 rounded-md px-3 py-1.5 text-zinc-300 hover:text-white"
+                >
+                  뷰티
+                </Link>
+                <Link
+                  href="/explore/tech"
+                  className="text-xs border border-zinc-800 hover:border-zinc-600 rounded-md px-3 py-1.5 text-zinc-300 hover:text-white"
+                >
+                  테크
+                </Link>
+                <Link
+                  href="/explore/luxury"
+                  className="text-xs border border-zinc-800 hover:border-zinc-600 rounded-md px-3 py-1.5 text-zinc-300 hover:text-white"
+                >
+                  럭셔리
+                </Link>
+                <Link
+                  href="/explore/mood/cold"
+                  className="text-xs border border-zinc-800 hover:border-zinc-600 rounded-md px-3 py-1.5 text-zinc-300 hover:text-white"
+                >
+                  차가운 무드
+                </Link>
+                <Link
+                  href="/match"
+                  className="text-xs bg-white text-black rounded-md px-3 py-1.5 hover:bg-zinc-200"
+                >
+                  AI 매칭으로 찾기
+                </Link>
+              </div>
             </div>
           ) : (
             <>

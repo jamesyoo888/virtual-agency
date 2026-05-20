@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import { getPostBySlug } from "@/lib/blog/posts";
+import { INDUSTRY_LABELS, MOOD_LABELS, GENRE_LABELS } from "@/lib/tags";
 import type { Model } from "@/types";
 
 export const runtime = "nodejs";
@@ -46,10 +47,74 @@ async function loadModel(id: string | null): Promise<Model | null> {
 
 const KRW = new Intl.NumberFormat("ko-KR");
 
+function bigCard(eyebrow: string, title: string, lede: string) {
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          padding: 72,
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: 18,
+          background: "linear-gradient(135deg, #0a0a0a 0%, #18181b 100%)",
+          color: "white",
+          fontFamily: "sans-serif",
+        }}
+      >
+        <p style={{ fontSize: 18, letterSpacing: "0.4em", color: "#a1a1aa" }}>
+          {eyebrow}
+        </p>
+        <p style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.05 }}>
+          {title}
+        </p>
+        <p style={{ fontSize: 22, color: "#a1a1aa", lineHeight: 1.4 }}>{lede}</p>
+      </div>
+    ),
+    { width: 1200, height: 630 }
+  );
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("model");
   const blogSlug = searchParams.get("blog");
+  const isCases = searchParams.get("cases") === "1";
+  const exploreIndustry = searchParams.get("explore_industry");
+  const exploreMood = searchParams.get("explore_mood");
+  const exploreGenre = searchParams.get("explore_genre");
+
+  // Static-card surfaces first — these never need a DB read.
+  if (isCases) {
+    return bigCard(
+      "VIRTUAL AGENCY · CASES",
+      "실제 납품 사례",
+      "광고주 사명은 anonymized. 산업·납기·모델은 실제 데이터입니다."
+    );
+  }
+  if (exploreIndustry && INDUSTRY_LABELS[exploreIndustry]) {
+    return bigCard(
+      "VIRTUAL AGENCY · EXPLORE",
+      `${INDUSTRY_LABELS[exploreIndustry]} 캠페인 모델`,
+      "이 산업에 특화된 AI 버추얼 모델을 둘러보세요."
+    );
+  }
+  if (exploreMood && MOOD_LABELS[exploreMood]) {
+    return bigCard(
+      "VIRTUAL AGENCY · MOOD",
+      `${MOOD_LABELS[exploreMood]} 분위기의 모델`,
+      "무드에 맞춰 캐스팅된 AI 버추얼 모델 카탈로그."
+    );
+  }
+  if (exploreGenre && GENRE_LABELS[exploreGenre]) {
+    return bigCard(
+      "VIRTUAL AGENCY · GENRE",
+      `${GENRE_LABELS[exploreGenre]} 비주얼의 모델`,
+      "장르 톤에 어울리는 AI 버추얼 모델 카탈로그."
+    );
+  }
 
   const baseStyle = {
     width: "100%",

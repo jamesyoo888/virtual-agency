@@ -82,6 +82,7 @@ export async function generateMetadata({
   }
   const tag = industry as IndustryTag;
   const copy = INDUSTRY_COPY[tag];
+  const ogImage = `${SITE_URL}/api/og?explore_industry=${encodeURIComponent(tag)}`;
   return {
     title: `${copy.heroTitle} — Virtual Agency`,
     description: copy.seoDescription,
@@ -90,6 +91,13 @@ export async function generateMetadata({
       title: copy.heroTitle,
       description: copy.seoDescription,
       url: `${SITE_URL}/explore/${tag}`,
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image" as const,
+      title: copy.heroTitle,
+      description: copy.seoDescription,
+      images: [ogImage],
     },
   };
 }

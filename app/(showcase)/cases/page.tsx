@@ -8,10 +8,24 @@ import { ArrowRight } from "lucide-react";
 
 export const revalidate = 3600;
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-murex.vercel.app";
+
 export const metadata = {
   title: "사례 — Virtual Agency",
   description:
     "광고주가 실제로 납품받은 캠페인 사례. 산업·납기·결과 anonymized.",
+  openGraph: {
+    title: "사례 — Virtual Agency",
+    description: "광고주가 실제로 납품받은 캠페인 사례.",
+    images: [`${SITE_URL}/api/og?cases=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "사례 — Virtual Agency",
+    description: "광고주가 실제로 납품받은 캠페인 사례.",
+    images: [`${SITE_URL}/api/og?cases=1`],
+  },
 };
 
 interface CaseRow {

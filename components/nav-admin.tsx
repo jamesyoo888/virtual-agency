@@ -40,6 +40,7 @@ const links = [
   { href: "/admin/invites", label: "Invites", icon: KeyRound },
   { href: "/admin/creators", label: "Creators", icon: Sparkles },
   { href: "/admin/clients", label: "Clients", icon: Building2 },
+  { href: "/admin/referrals", label: "Referrals", icon: Users },
   { href: "/admin/health", label: "Health", icon: Activity },
 ];
 

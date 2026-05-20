@@ -30,6 +30,7 @@ export async function generateMetadata({
   }
   const tag = genre as GenreTag;
   const copy = GENRE_COPY[tag];
+  const ogImage = `${SITE_URL}/api/og?explore_genre=${encodeURIComponent(tag)}`;
   return {
     title: `${copy.heroTitle} — Virtual Agency`,
     description: copy.seoDescription,
@@ -38,6 +39,13 @@ export async function generateMetadata({
       title: copy.heroTitle,
       description: copy.seoDescription,
       url: `${SITE_URL}/explore/genre/${tag}`,
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image" as const,
+      title: copy.heroTitle,
+      description: copy.seoDescription,
+      images: [ogImage],
     },
   };
 }
