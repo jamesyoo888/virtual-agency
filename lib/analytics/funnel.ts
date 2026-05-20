@@ -95,3 +95,64 @@ export function stageConversionRate(
 }
 
 export const FUNNEL_STAGES = STAGES;
+
+export interface SourceBreakdownRow {
+  /** "(direct)" when both utm_source and referrer are null. */
+  source: string;
+  total: number;
+  delivered: number;
+  conversionRate: number;
+}
+
+/**
+ * Per-source rollup of the same projects considered by `loadFunnel`. We
+ * surface only the top-N sources by inquiry count — the long tail of
+ * one-off referrers isn't actionable for a marketing decision. "Direct"
+ * (no utm, no referrer) is grouped explicitly so it doesn't disappear.
+ */
+export async function loadFunnelBySource(
+  windowDays: number = 30,
+  topN: number = 6
+): Promise<SourceBreakdownRow[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  const supabase = await createAdminClient();
+  const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("projects")
+    .select("status, utm_source, referrer")
+    .gte("created_at", since)
+    .limit(5000);
+  if (error) {
+    console.warn("[funnel:by-source] read failed:", error.message);
+    return [];
+  }
+
+  type Row = { status: string; utm_source: string | null; referrer: string | null };
+  const byKey = new Map<string, { total: number; delivered: number }>();
+  for (const r of (data ?? []) as Row[]) {
+    const key = r.utm_source ?? (r.referrer ? hostnameOf(r.referrer) : "(direct)");
+    const entry = byKey.get(key) ?? { total: 0, delivered: 0 };
+    entry.total += 1;
+    if (r.status === "delivered") entry.delivered += 1;
+    byKey.set(key, entry);
+  }
+
+  return [...byKey.entries()]
+    .map(([source, c]) => ({
+      source,
+      total: c.total,
+      delivered: c.delivered,
+      conversionRate: c.total > 0 ? c.delivered / c.total : 0,
+    }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, topN);
+}
+
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    // Best-effort fallback for malformed referrer strings.
+    return url.slice(0, 64);
+  }
+}

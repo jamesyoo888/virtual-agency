@@ -64,6 +64,12 @@ export default async function sitemap({
             priority: 0.4,
           },
           {
+            url: `${SITE_URL}/pricing`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.6,
+          },
+          {
             url: `${SITE_URL}/legal/terms`,
             lastModified: now,
             changeFrequency: "yearly",

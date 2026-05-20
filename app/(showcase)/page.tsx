@@ -19,6 +19,7 @@ import {
 } from "@/lib/catalog/filter";
 import { getBucket } from "@/lib/experiments";
 import { trackImpression } from "@/lib/experiments-track";
+import { loadSocialProof } from "@/lib/social-proof";
 
 function Value({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
@@ -45,7 +46,10 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
   const requestedPage = normalizePage(params.page);
   const view: CatalogView = params.view === "list" ? "list" : "grid";
-  const heroCtaVariant = await getBucket("hero_cta");
+  const [heroCtaVariant, socialProof] = await Promise.all([
+    getBucket("hero_cta"),
+    loadSocialProof(),
+  ]);
   void trackImpression("hero_cta", { surface: "catalog_hero" });
 
   let userRole: "admin" | "client" | null = null;
@@ -220,12 +224,51 @@ export default async function CatalogPage({ searchParams }: PageProps) {
             RFP 작성 →
           </Link>
           <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
+          >
+            가격
+          </Link>
+          <Link
             href="/faq"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
           >
             FAQ
           </Link>
         </div>
+
+        {(socialProof.deliveredCount > 0 ||
+          socialProof.activeModels > 0 ||
+          socialProof.averageRating !== null) && (
+          <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
+            {socialProof.deliveredCount > 0 && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl md:text-3xl font-bold tabular-nums text-zinc-100">
+                  {socialProof.deliveredCount.toLocaleString()}
+                </span>
+                <span className="text-xs uppercase tracking-wider text-zinc-500">납품 캠페인</span>
+              </div>
+            )}
+            {socialProof.activeModels > 0 && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl md:text-3xl font-bold tabular-nums text-zinc-100">
+                  {socialProof.activeModels.toLocaleString()}
+                </span>
+                <span className="text-xs uppercase tracking-wider text-zinc-500">활성 모델</span>
+              </div>
+            )}
+            {socialProof.averageRating !== null && socialProof.reviewCount > 0 && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl md:text-3xl font-bold tabular-nums text-zinc-100">
+                  ★ {socialProof.averageRating.toFixed(1)}
+                </span>
+                <span className="text-xs uppercase tracking-wider text-zinc-500">
+                  평균 평점 ({socialProof.reviewCount}건)
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Value props */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 max-w-5xl">

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import { summarizeUsage } from "@/lib/cost/store";
-import { loadFunnel, stageConversionRate } from "@/lib/analytics/funnel";
+import { loadFunnel, loadFunnelBySource, stageConversionRate } from "@/lib/analytics/funnel";
 import {
   Users,
   Inbox,
@@ -130,11 +130,12 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent, funnel] = await Promise.all([
+  const [kpis, usage, recent, funnel, bySource] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
     loadRecentInquiries(),
     loadFunnel(30),
+    loadFunnelBySource(30, 6),
   ]);
 
   return (
@@ -273,6 +274,27 @@ export default async function AdminHomePage() {
           <p className="mt-3 text-xs text-zinc-600">
             누적 (각 단계 도달 ≧). 화살표는 다음 단계 진행률.
           </p>
+
+          {bySource.length > 0 && (
+            <div className="mt-5 pt-5 border-t border-zinc-800">
+              <p className="text-xs uppercase tracking-wider text-zinc-500 mb-2">
+                출처별 (30d, 상위 {bySource.length})
+              </p>
+              <ul className="space-y-1.5">
+                {bySource.map((s) => (
+                  <li key={s.source} className="flex items-center justify-between text-xs">
+                    <span className="text-zinc-300 truncate">{s.source}</span>
+                    <span className="text-zinc-500 tabular-nums whitespace-nowrap">
+                      {s.total.toLocaleString()} → {s.delivered.toLocaleString()}
+                      <span className={`ml-2 ${s.conversionRate >= 0.3 ? "text-emerald-400" : s.conversionRate > 0 ? "text-zinc-400" : "text-zinc-600"}`}>
+                        {(s.conversionRate * 100).toFixed(0)}%
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
       )}
 
