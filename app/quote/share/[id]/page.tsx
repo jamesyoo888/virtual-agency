@@ -66,7 +66,17 @@ export default async function SharedQuotePage({
     <div className="min-h-screen bg-white text-zinc-900 print:bg-white">
       <div className="print:hidden border-b border-zinc-200 px-6 py-4 flex items-center justify-between bg-zinc-50">
         <p className="text-xs text-zinc-500">공유된 견적서 (열람 전용)</p>
-        <PrintButton />
+        <div className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+          <a
+            href={`/api/client/quote/${id}/pdf?t=${t}`}
+            download
+            className="text-xs px-3 py-1.5 rounded-md border border-zinc-300 text-zinc-700 hover:border-zinc-500 hover:text-zinc-900"
+          >
+            PDF
+          </a>
+          <PrintButton />
+        </div>
       </div>
 
       <main className="max-w-3xl mx-auto p-8 md:p-12 print:p-8">

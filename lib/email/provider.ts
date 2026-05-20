@@ -1,16 +1,15 @@
 /**
- * Email provider abstraction. Picking between Resend / SES / Postmark is still
- * an open decision (see status.md decision queue). Until that lands, this
- * module:
- *  - defines the `EmailProvider` interface every implementation must satisfy;
- *  - ships a `ResendProvider` that activates only when `RESEND_API_KEY` is set
- *    and `EMAIL_PROVIDER=resend`;
- *  - falls back to a `LogProvider` that just logs the payload to the server
- *    console — safe for dev and staging, and lets us call `sendEmail()` from
- *    business logic today without coupling to a vendor.
+ * Email provider abstraction. Decision (2026-05-20): Resend is the canonical
+ * provider — single-key swap, good deliverability for Korean B2B addresses.
  *
- * When a final provider is chosen, replace `pickProvider()` and add a sibling
- * implementation. Call sites do not change.
+ *  - `RESEND_API_KEY` alone is sufficient to activate the Resend path. No
+ *    need to also set `EMAIL_PROVIDER=resend` — the key's presence is the
+ *    signal.
+ *  - When the key is missing (local dev, preview deploys without secrets),
+ *    `LogProvider` logs the payload to the server console so business logic
+ *    keeps working without a vendor connection.
+ *  - Set `EMAIL_PROVIDER=log` to force-disable sends in an environment that
+ *    *does* carry the key — useful for staging dry-runs.
  */
 
 export type EmailAddress = string;
@@ -108,10 +107,12 @@ let cached: EmailProvider | null = null;
 export function pickProvider(): EmailProvider {
   if (cached) return cached;
 
-  const choice = (process.env.EMAIL_PROVIDER ?? "log").toLowerCase();
+  const explicit = process.env.EMAIL_PROVIDER?.toLowerCase();
   const from = process.env.EMAIL_FROM ?? "Virtual Agency <noreply@aihubs.uk>";
 
-  if (choice === "resend" && process.env.RESEND_API_KEY) {
+  // `EMAIL_PROVIDER=log` is the explicit dry-run escape hatch — honor it even
+  // when an API key exists.
+  if (explicit !== "log" && process.env.RESEND_API_KEY) {
     cached = new ResendProvider(process.env.RESEND_API_KEY, from);
     return cached;
   }

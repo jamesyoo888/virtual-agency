@@ -29,7 +29,7 @@ import {
   modelOfferLd,
   modelPersonLd,
 } from "@/lib/seo/json-ld";
-import { fetchDeliveredCasesForModel } from "@/lib/analytics/model-cases";
+import { fetchDeliveredCasesForModel, anonymize } from "@/lib/analytics/model-cases";
 
 type Params = { id: string };
 
@@ -86,7 +86,11 @@ async function fetchApprovedReviews(
     rating: r.rating,
     comment: r.comment,
     created_at: r.created_at,
-    client_company: r.client?.company ?? null,
+    // Anonymize at the server boundary — the raw company name must never
+    // ship to the visitor's React tree. Korean B2B convention is to mask
+    // mid-characters but reveal first/last so the reader can still
+    // recognize repeat patterns ("L*****G" reads as 엘**그).
+    client_company: r.client?.company ? anonymize(r.client.company) : null,
   }));
 }
 

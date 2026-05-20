@@ -95,6 +95,14 @@ export default async function QuotePage({
         </Link>
         <div className="flex items-center gap-2">
           <QuoteShareButton projectId={project.id} />
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+          <a
+            href={`/api/client/quote/${project.id}/pdf`}
+            download
+            className="text-xs px-3 py-1.5 rounded-md border border-zinc-300 text-zinc-700 hover:border-zinc-500 hover:text-zinc-900"
+          >
+            PDF
+          </a>
           <PrintButton />
         </div>
       </div>
