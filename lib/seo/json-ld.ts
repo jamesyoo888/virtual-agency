@@ -86,6 +86,37 @@ export function breadcrumbLd(items: { name: string; url: string }[]) {
   };
 }
 
+export interface ArticleLdInput {
+  title: string;
+  description: string;
+  slug: string;
+  publishedAt: string;
+  tags?: string[];
+}
+
+export function blogPostingLd(input: ArticleLdInput) {
+  const url = `${SITE_URL}/blog/${input.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": url,
+    headline: input.title,
+    description: input.description,
+    url,
+    datePublished: input.publishedAt,
+    dateModified: input.publishedAt,
+    inLanguage: "ko-KR",
+    keywords: input.tags?.join(", "),
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    author: { "@type": "Organization", name: ORG_NAME, url: SITE_URL },
+    publisher: {
+      "@type": "Organization",
+      name: ORG_NAME,
+      url: SITE_URL,
+    },
+  };
+}
+
 /** Serialize a JSON-LD object for embedding in a <script type="application/ld+json"> tag. */
 export function ldScript(obj: unknown): string {
   // Prevent </script> injection in case any string contains it.

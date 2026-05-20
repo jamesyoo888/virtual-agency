@@ -38,6 +38,11 @@ export default function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/cases" className="hover:text-white">
+                사례
+              </Link>
+            </li>
+            <li>
               <Link href="/blog" className="hover:text-white">
                 블로그
               </Link>

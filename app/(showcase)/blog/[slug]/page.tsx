@@ -2,6 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listPosts, getPostBySlug } from "@/lib/blog/posts";
 import { ArrowLeft } from "lucide-react";
+import { blogPostingLd, breadcrumbLd, ldScript } from "@/lib/seo/json-ld";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const revalidate = 3600;
 
@@ -43,8 +47,29 @@ export default async function BlogPostPage({
     .filter((p) => p.slug !== post.slug)
     .slice(0, 3);
 
+  const articleLd = blogPostingLd({
+    title: post.title,
+    description: post.excerpt,
+    slug: post.slug,
+    publishedAt: post.publishedAt,
+    tags: post.tags,
+  });
+  const crumbsLd = breadcrumbLd([
+    { name: "Home", url: SITE_URL },
+    { name: "Blog", url: `${SITE_URL}/blog` },
+    { name: post.title, url: `${SITE_URL}/blog/${post.slug}` },
+  ]);
+
   return (
     <div className="min-h-screen bg-black text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(articleLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(crumbsLd) }}
+      />
       <article className="max-w-2xl mx-auto px-6 py-16 md:py-24">
         <Link
           href="/blog"

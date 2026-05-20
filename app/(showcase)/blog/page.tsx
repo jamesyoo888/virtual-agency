@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { listPosts } from "@/lib/blog/posts";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Rss } from "lucide-react";
 
 export const revalidate = 3600;
 
@@ -27,6 +27,12 @@ export default function BlogIndexPage() {
             AI 버추얼 모델 시장의 변화, 광고주 의사결정 가이드, 라이선스
             해설. Virtual Agency 가 직접 운영하며 얻은 인사이트만 정리합니다.
           </p>
+          <a
+            href="/blog/rss.xml"
+            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 mt-4"
+          >
+            <Rss className="w-3 h-3" /> RSS 구독
+          </a>
         </header>
 
         <ul className="space-y-8 border-t border-zinc-900">

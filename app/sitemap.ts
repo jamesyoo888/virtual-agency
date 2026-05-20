@@ -77,6 +77,12 @@ export default async function sitemap({
             priority: 0.3,
           },
           {
+            url: `${SITE_URL}/cases`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.6,
+          },
+          {
             url: `${SITE_URL}/blog`,
             lastModified: now,
             changeFrequency: "weekly",

@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ToastProvider } from "@/components/toast";
 import AttributionSnapshotClient from "@/components/attribution-snapshot";
+import { organizationLd, ldScript } from "@/lib/seo/json-ld";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,6 +61,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ldScript(organizationLd()) }}
+        />
         <ToastProvider>{children}</ToastProvider>
         <AttributionSnapshotClient />
         <Analytics />

@@ -18,6 +18,7 @@ import {
   FileText,
   Sparkles,
   Heart,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -37,6 +38,7 @@ const links = [
   { href: "/admin/usage", label: "Usage", icon: Receipt },
   { href: "/admin/invites", label: "Invites", icon: KeyRound },
   { href: "/admin/creators", label: "Creators", icon: Sparkles },
+  { href: "/admin/clients", label: "Clients", icon: Building2 },
 ];
 
 interface Props {
