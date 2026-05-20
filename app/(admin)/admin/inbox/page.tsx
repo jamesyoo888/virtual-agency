@@ -206,7 +206,12 @@ export default async function AdminInboxPage({ searchParams }: Props) {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline justify-between gap-3">
-                  <p className="font-medium truncate">{p.title}</p>
+                  <Link
+                    href={`/admin/projects/${p.id}`}
+                    className="font-medium truncate hover:underline"
+                  >
+                    {p.title}
+                  </Link>
                   <span
                     className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${
                       STATUS_TONE[p.status] ?? "bg-zinc-800 text-zinc-400 border-zinc-700"

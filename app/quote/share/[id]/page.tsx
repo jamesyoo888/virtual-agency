@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { verifyQuoteToken } from "@/lib/quote/share-token";
 import PrintButton from "@/components/print-button";
-import QuoteShareButton from "@/components/quote-share-button";
 import type { Project, Model } from "@/types";
 
 const KRW = new Intl.NumberFormat("ko-KR");
@@ -21,61 +20,38 @@ type ProjectWithModel = Project & {
 };
 
 export const metadata = {
-  title: "견적서",
-  robots: { index: false },
+  title: "견적서 공유 — Virtual Agency",
+  robots: { index: false, follow: false },
 };
 
-async function fetchProjectForQuote(
-  id: string
-): Promise<ProjectWithModel | null> {
-  if (!SUPABASE_CONFIGURED) {
-    // Dev demo: produce a synthetic quote so the page renders for screenshots
-    // and design review without needing a seeded DB.
-    const now = new Date().toISOString();
-    return {
-      id,
-      client_id: "dev",
-      model_id: null,
-      product_id: null,
-      title: "데모 캠페인",
-      brief: "여름 한정 신제품 런칭 광고. 영상 1편 + 정지 이미지 5컷.",
-      reference_images: [],
-      status: "inquiry",
-      invoice_amount: 5_000_000,
-      created_at: now,
-      updated_at: now,
-      model: {
-        name: "Demo Model",
-        base_price: 5_000_000,
-        exclusive_price: 25_000_000,
-        concept_image: null,
-      },
-    } as unknown as ProjectWithModel;
-  }
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+interface PageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ t?: string }>;
+}
 
+async function loadProject(id: string): Promise<ProjectWithModel | null> {
+  if (!SUPABASE_CONFIGURED) return null;
+  const supabase = await createAdminClient();
   const { data } = await supabase
     .from("projects")
     .select(
       "*, model:models(name, base_price, exclusive_price, concept_image)"
     )
     .eq("id", id)
-    .eq("client_id", user.id)
     .single();
   return (data as ProjectWithModel | null) ?? null;
 }
 
-export default async function QuotePage({
+export default async function SharedQuotePage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+  searchParams,
+}: PageProps) {
   const { id } = await params;
-  const project = await fetchProjectForQuote(id);
+  const { t } = await searchParams;
+
+  if (!t || !verifyQuoteToken(id, t)) notFound();
+
+  const project = await loadProject(id);
   if (!project) notFound();
 
   const createdAt = new Date(project.created_at);
@@ -88,15 +64,9 @@ export default async function QuotePage({
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 print:bg-white">
-      {/* Header — hidden on print */}
-      <div className="print:hidden border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3 bg-zinc-50">
-        <Link href="/client/dashboard" className="text-sm text-zinc-600 hover:text-zinc-900">
-          ← 대시보드
-        </Link>
-        <div className="flex items-center gap-2">
-          <QuoteShareButton projectId={project.id} />
-          <PrintButton />
-        </div>
+      <div className="print:hidden border-b border-zinc-200 px-6 py-4 flex items-center justify-between bg-zinc-50">
+        <p className="text-xs text-zinc-500">공유된 견적서 (열람 전용)</p>
+        <PrintButton />
       </div>
 
       <main className="max-w-3xl mx-auto p-8 md:p-12 print:p-8">
@@ -118,7 +88,9 @@ export default async function QuotePage({
 
         <section className="grid grid-cols-2 gap-8 mb-12 text-sm">
           <div>
-            <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">발행</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+              발행
+            </p>
             <p className="font-semibold">Virtual Agency</p>
             <p className="text-zinc-600">AI 버추얼 모델 에이전시</p>
             <p className="text-zinc-600 mt-1">
@@ -129,7 +101,9 @@ export default async function QuotePage({
             </p>
           </div>
           <div>
-            <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">프로젝트</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">
+              프로젝트
+            </p>
             <p className="font-semibold">{project.title}</p>
             <p className="text-zinc-600 mt-1">
               상태: {STATUS_LABELS[project.status] ?? project.status}
@@ -156,7 +130,9 @@ export default async function QuotePage({
             <thead>
               <tr className="border-b-2 border-zinc-900">
                 <th className="text-left py-2 font-semibold">항목</th>
-                <th className="text-right py-2 font-semibold w-40">금액 (KRW)</th>
+                <th className="text-right py-2 font-semibold w-40">
+                  금액 (KRW)
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -177,7 +153,9 @@ export default async function QuotePage({
               </tr>
               <tr className="border-b border-zinc-200">
                 <td className="py-3 text-zinc-600">소계</td>
-                <td className="text-right tabular-nums">₩{KRW.format(subtotal)}</td>
+                <td className="text-right tabular-nums">
+                  ₩{KRW.format(subtotal)}
+                </td>
               </tr>
               <tr className="border-b border-zinc-200">
                 <td className="py-3 text-zinc-600">부가세 (10%)</td>
@@ -196,11 +174,16 @@ export default async function QuotePage({
         <section className="text-xs text-zinc-500 leading-relaxed space-y-1">
           <p>· 상기 견적은 발행일로부터 30일간 유효합니다.</p>
           <p>· 결제 조건 및 납기는 별도 협의 후 확정됩니다.</p>
-          <p>· 본 견적은 표준 라이선스 기준이며, 사용 범위·기간에 따라 변경될 수 있습니다.</p>
+          <p>
+            · 본 견적은 표준 라이선스 기준이며, 사용 범위·기간에 따라
+            변경될 수 있습니다.
+          </p>
         </section>
 
         <footer className="mt-16 pt-6 border-t border-zinc-200 text-center">
-          <p className="text-xs text-zinc-500">Virtual Agency · AI Virtual Models</p>
+          <p className="text-xs text-zinc-500">
+            Virtual Agency · AI Virtual Models · 본 링크는 열람 전용입니다.
+          </p>
         </footer>
       </main>
 

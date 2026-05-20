@@ -37,6 +37,16 @@ export default function SiteFooter() {
                 FAQ
               </Link>
             </li>
+            <li>
+              <Link href="/blog" className="hover:text-white">
+                블로그
+              </Link>
+            </li>
+            <li>
+              <Link href="/press" className="hover:text-white">
+                프레스
+              </Link>
+            </li>
           </ul>
         </div>
 
