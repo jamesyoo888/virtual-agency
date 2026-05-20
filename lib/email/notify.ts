@@ -15,10 +15,14 @@ import {
   statusChanged,
   quoteReady,
   weeklyDigest,
+  inquiryFollowup,
+  referralThanks,
   type InquiryReceivedVars,
   type StatusChangedVars,
   type QuoteReadyVars,
   type DigestVars,
+  type InquiryFollowupVars,
+  type ReferralThanksVars,
 } from "./templates";
 
 async function safeSend(
@@ -75,6 +79,26 @@ export async function notifyQuoteReady(
 ) {
   return safeSend(to, quoteReady(vars), {
     kind: "quote_ready",
+    project: vars.projectId,
+  });
+}
+
+export async function notifyReferralThanks(
+  to: string | null | undefined,
+  vars: ReferralThanksVars & { referrerId: string }
+) {
+  return safeSend(to, referralThanks(vars), {
+    kind: "referral_thanks",
+    referrer: vars.referrerId,
+  });
+}
+
+export async function notifyInquiryFollowup(
+  to: string | null | undefined,
+  vars: InquiryFollowupVars
+) {
+  return safeSend(to, inquiryFollowup(vars), {
+    kind: "inquiry_followup",
     project: vars.projectId,
   });
 }

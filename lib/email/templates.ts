@@ -200,6 +200,66 @@ ${
   return { subject, html, text };
 }
 
+export interface ReferralThanksVars {
+  clientName?: string | null;
+  refereeCompany: string | null;
+}
+
+export function referralThanks(vars: ReferralThanksVars): RenderedEmail {
+  const greet = vars.clientName ? `${vars.clientName}님,` : "안녕하세요,";
+  const url = `${BASE_URL}/client/dashboard`;
+  const refereeLabel = vars.refereeCompany
+    ? `${vars.refereeCompany} 측에서`
+    : "추천하신 광고주가";
+  const subject = `[Virtual Agency] 추천한 광고주가 첫 문의를 보냈습니다`;
+
+  const text =
+    `${greet}\n\n${refereeLabel} Virtual Agency 에 첫 문의를 접수했습니다. ` +
+    `링크가 정확히 동작 중이라는 신호이며, 추후 운영 정책에 따라 추천 보상이 적용될 수 있습니다.\n\n` +
+    `대시보드: ${url}\n`;
+
+  const html = wrap(
+    subject,
+    `<h2 style="margin:0 0 12px;font-size:20px;color:#fafafa">추천 광고주가 첫 문의를 보냈습니다</h2>
+<p style="margin:0 0 16px;color:#d4d4d8">${escape(greet)} <strong style="color:#fafafa">${escape(refereeLabel)}</strong> Virtual Agency 에 첫 문의를 접수했습니다.</p>
+<p style="margin:0 0 18px;color:#d4d4d8">링크가 정확히 동작 중이라는 신호이며, 추후 운영 정책에 따라 추천 보상이 적용될 수 있습니다.</p>
+<p style="margin:0"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">대시보드 열기</a></p>`
+  );
+
+  return { subject, html, text };
+}
+
+export interface InquiryFollowupVars {
+  clientName?: string | null;
+  modelName: string | null;
+  projectTitle: string;
+  projectId: string;
+  daysSinceInquiry: number;
+}
+
+export function inquiryFollowup(vars: InquiryFollowupVars): RenderedEmail {
+  const greet = vars.clientName ? `${vars.clientName}님,` : "안녕하세요,";
+  const url = `${BASE_URL}/client/dashboard`;
+  const modelPart = vars.modelName ? ` ${vars.modelName} 모델에 대한` : "";
+  const subject = `[Virtual Agency] 문의 진행이 멈춰 있어 다시 안내드립니다`;
+
+  const text =
+    `${greet}\n\n${vars.daysSinceInquiry}일 전 접수된${modelPart} "${vars.projectTitle}" 문의가 ` +
+    `아직 브리프 단계로 넘어가지 않았습니다. 추가 정보가 필요하시거나 우선순위 조정이 필요하면 ` +
+    `대시보드에서 회신해 주세요. 답신만 주시면 담당자가 24시간 내 다시 안내드립니다.\n\n` +
+    `대시보드: ${url}\n`;
+
+  const html = wrap(
+    subject,
+    `<h2 style="margin:0 0 12px;font-size:20px;color:#fafafa">문의 진행 도움이 필요하신가요?</h2>
+<p style="margin:0 0 16px;color:#d4d4d8">${escape(greet)} ${vars.daysSinceInquiry}일 전 접수된${modelPart ? ` <strong style="color:#fafafa">${escape(vars.modelName ?? "")}</strong> 모델에 대한` : ""} "<strong style="color:#fafafa">${escape(vars.projectTitle)}</strong>" 문의가 아직 다음 단계로 넘어가지 않았습니다.</p>
+<p style="margin:0 0 18px;color:#d4d4d8">추가 정보가 필요하시거나 우선순위 조정이 필요하면 대시보드에서 회신해 주세요. 답신만 주시면 담당자가 24시간 내 다시 안내드립니다.</p>
+<p style="margin:0"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">대시보드 열기</a></p>`
+  );
+
+  return { subject, html, text };
+}
+
 export function quoteReady(vars: QuoteReadyVars): RenderedEmail {
   const greet = vars.clientName ? `${vars.clientName}님,` : "안녕하세요,";
   const url = `${BASE_URL}/client/quote/${vars.projectId}`;

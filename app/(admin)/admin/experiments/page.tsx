@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { EXPERIMENTS } from "@/lib/experiments";
+import { EXPERIMENTS, labelFor } from "@/lib/experiments";
 import {
   rateString,
   wilsonLower,
@@ -221,7 +221,10 @@ export default async function ExperimentsPage({
                           >
                             <td className="py-2.5 font-medium">
                               <span className={isWinner ? "text-emerald-400" : "text-zinc-200"}>
-                                {v.variant}
+                                {labelFor(exp.key, v.variant)}
+                                <span className="ml-2 text-[10px] text-zinc-500 font-normal">
+                                  {v.variant}
+                                </span>
                                 {isWinner && (
                                   <span className="ml-2 text-[10px] text-emerald-500">▲ leader</span>
                                 )}

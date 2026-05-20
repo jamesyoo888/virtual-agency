@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/storage-cleanup",
       "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/cron/inquiry-followup",
+      "schedule": "0 1 * * *"
     }
   ]
 }

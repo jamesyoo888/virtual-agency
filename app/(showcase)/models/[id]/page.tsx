@@ -12,6 +12,8 @@ import { INDUSTRY_LABELS, GENRE_LABELS, MOOD_LABELS } from "@/lib/tags";
 import { ageInYears } from "@/lib/utils";
 import PriceCalculator from "@/components/price-calculator";
 import PortfolioGallery from "@/components/portfolio-gallery";
+import PortfolioVideoGrid from "@/components/portfolio-video-grid";
+import { isVideoUrl } from "@/lib/media/type";
 import ReviewList, { type PublicReview } from "@/components/review-list";
 import { aggregateApproved } from "@/lib/reviews";
 import { trackModelView } from "@/lib/analytics/track-view";
@@ -378,15 +380,31 @@ export default async function ShowcaseModelPage({
           </div>
         </div>
 
-        {/* Portfolio grid */}
-        {files && files.length > 0 && (
-          <div className="mt-16">
-            <h2 className="text-xl font-semibold mb-6">Portfolio</h2>
-            <PortfolioGallery
-              images={files.map((f) => ({ id: f.id, url: f.url }))}
-            />
-          </div>
-        )}
+        {/* Portfolio grid — videos rendered as a separate section. */}
+        {(() => {
+          const videos = (files ?? []).filter((f) => isVideoUrl(f.url));
+          const images = (files ?? []).filter((f) => !isVideoUrl(f.url));
+          return (
+            <>
+              {images.length > 0 && (
+                <div className="mt-16">
+                  <h2 className="text-xl font-semibold mb-6">Portfolio</h2>
+                  <PortfolioGallery
+                    images={images.map((f) => ({ id: f.id, url: f.url }))}
+                  />
+                </div>
+              )}
+              {videos.length > 0 && (
+                <div className="mt-16">
+                  <h2 className="text-xl font-semibold mb-6">Video portfolio</h2>
+                  <PortfolioVideoGrid
+                    videos={videos.map((f) => ({ id: f.id, url: f.url }))}
+                  />
+                </div>
+              )}
+            </>
+          );
+        })()}
 
         {/* Approved reviews — social proof */}
         {aggregate && reviews.length > 0 && (

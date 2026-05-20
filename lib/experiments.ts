@@ -57,6 +57,23 @@ export const EXPERIMENTS = {
 export type ExperimentKey = keyof typeof EXPERIMENTS;
 export type VariantOf<K extends ExperimentKey> = (typeof EXPERIMENTS)[K]["variants"][number];
 
+/**
+ * Human-readable Korean labels shown on `/admin/experiments`. Keyed by
+ * `experiment_key.variant` (dot-separated). Missing entries fall back to the
+ * raw variant string. Add a row here when shipping a new experiment so the
+ * admin dashboard reads as plain language ("문의 폼" instead of "match").
+ */
+export const VARIANT_LABELS: Record<string, string> = {
+  "hero_cta.match": "AI 매칭 폼",
+  "hero_cta.browse": "카탈로그 둘러보기",
+  "similar_strategy.collaborative": "함께 본 모델",
+  "similar_strategy.tag": "태그 유사 모델",
+};
+
+export function labelFor(experimentKey: string, variant: string): string {
+  return VARIANT_LABELS[`${experimentKey}.${variant}`] ?? variant;
+}
+
 export function cookieNameFor(key: string): string {
   return `${EXPERIMENT_COOKIE_PREFIX}${key}`;
 }

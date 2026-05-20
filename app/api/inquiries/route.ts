@@ -4,7 +4,8 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { parseBody } from "@/lib/api/validate";
 import { inquiryCreateSchema } from "@/lib/api/schemas";
 import { notifyInquiryWebhook } from "@/lib/webhooks";
-import { notifyInquiryReceived } from "@/lib/email/notify";
+import { notifyInquiryReceived, notifyReferralThanks } from "@/lib/email/notify";
+import { createAdminClient } from "@/lib/supabase/server";
 import { canEmailClient } from "@/lib/preferences";
 import { trackConversion } from "@/lib/experiments-track";
 
@@ -116,6 +117,41 @@ export async function POST(request: Request) {
       })
     );
   }
+
+  // Referral attribution: when utm_source='referral', utm_campaign carries
+  // the referring client's id (see lib/referral). Notify the referrer ONLY
+  // on the referee's first-ever inquiry — repeat inquiries don't trigger a
+  // new "first arrival" signal. We use the admin client because the referrer
+  // is a *different* user and we still want to read their email row.
+  if (utm_source === "referral" && utm_campaign && utm_campaign !== user.id) {
+    try {
+      const admin = await createAdminClient();
+      const { count: priorCount } = await admin
+        .from("projects")
+        .select("id", { count: "exact", head: true })
+        .eq("client_id", user.id)
+        .neq("id", project.id);
+      if ((priorCount ?? 0) === 0) {
+        const { data: referrer } = await admin
+          .from("clients")
+          .select("id, email, name")
+          .eq("id", utm_campaign)
+          .maybeSingle();
+        if (referrer?.email) {
+          tasks.push(
+            notifyReferralThanks(referrer.email, {
+              clientName: referrer.name ?? null,
+              refereeCompany: client.data?.company ?? null,
+              referrerId: referrer.id,
+            })
+          );
+        }
+      }
+    } catch (err) {
+      console.warn("[inquiry] referral notify lookup failed", err);
+    }
+  }
+
   const notifications = await Promise.allSettled(tasks);
 
   return NextResponse.json(

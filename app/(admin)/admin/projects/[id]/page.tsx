@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
+import InvoiceAmountEditor from "@/components/invoice-amount-editor";
 import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -105,8 +106,6 @@ export default async function AdminProjectDetailPage({
   const { project, history } = await fetchDetail(id);
   if (!project) notFound();
 
-  const KRW = new Intl.NumberFormat("ko-KR");
-
   return (
     <div className="p-8 max-w-4xl mx-auto text-zinc-100">
       <header className="mb-6 flex items-center gap-3">
@@ -188,11 +187,10 @@ export default async function AdminProjectDetailPage({
         <aside className="rounded-xl border border-zinc-800 p-5 bg-zinc-950/40 space-y-3 text-xs">
           <div>
             <p className="text-zinc-500 uppercase tracking-wider mb-1">견적</p>
-            <p className="text-zinc-100 text-sm font-medium">
-              {project.invoice_amount != null
-                ? `₩${KRW.format(project.invoice_amount)}`
-                : "미정"}
-            </p>
+            <InvoiceAmountEditor
+              projectId={project.id}
+              initial={project.invoice_amount}
+            />
           </div>
           {(project.utm_source ||
             project.utm_medium ||
