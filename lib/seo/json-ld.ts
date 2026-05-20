@@ -117,6 +117,26 @@ export function blogPostingLd(input: ArticleLdInput) {
   };
 }
 
+export interface FaqEntry {
+  question: string;
+  answer: string;
+}
+
+export function faqPageLd(entries: FaqEntry[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: entries.map((e) => ({
+      "@type": "Question",
+      name: e.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: e.answer,
+      },
+    })),
+  };
+}
+
 /** Serialize a JSON-LD object for embedding in a <script type="application/ld+json"> tag. */
 export function ldScript(obj: unknown): string {
   // Prevent </script> injection in case any string contains it.

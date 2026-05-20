@@ -153,7 +153,7 @@ export default async function sitemap(
 
     const { data: models } = await supabase
       .from("models")
-      .select("id, updated_at")
+      .select("id, updated_at, concept_image, name")
       .eq("status", "active")
       .order("updated_at", { ascending: false })
       .range(from, to);
@@ -176,6 +176,13 @@ export default async function sitemap(
 
     const modelRoutes: MetadataRoute.Sitemap = (models ?? []).map((m) => {
       const boosted = boostedSet.has(m.id);
+      // Google Image sitemap extension — passes the concept image alongside
+      // the page URL so Image Search can index the model card directly. The
+      // `images` field is part of MetadataRoute.Sitemap in Next 16.
+      const images =
+        m.concept_image && /^https?:\/\//.test(m.concept_image)
+          ? [m.concept_image]
+          : undefined;
       return {
         url: `${SITE_URL}/models/${m.id}`,
         lastModified: m.updated_at ? new Date(m.updated_at) : now,
@@ -183,6 +190,7 @@ export default async function sitemap(
         // earns the URL more attention from search engines.
         changeFrequency: boosted ? ("daily" as const) : ("weekly" as const),
         priority: boosted ? 1.0 : 0.8,
+        ...(images ? { images } : {}),
       };
     });
 
