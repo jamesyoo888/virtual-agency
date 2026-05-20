@@ -36,10 +36,14 @@ export default async function sitemap({
   id: number;
 }): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  // Next.js 16 sometimes passes `id` as a string (`"0"`) from the URL
+  // segment rather than the number that `generateSitemaps` returned.
+  // Coerce so the static-routes branch matches both shapes.
+  const shardId = Number(id);
 
   // Shard 0 includes the static landing page; later shards are model-only.
   const staticRoutes: MetadataRoute.Sitemap =
-    id === 0
+    shardId === 0
       ? [
           {
             url: SITE_URL,
@@ -132,7 +136,7 @@ export default async function sitemap({
 
   try {
     const supabase = await createClient();
-    const from = id * PAGE_SIZE;
+    const from = shardId * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
 
     const { data: models } = await supabase
