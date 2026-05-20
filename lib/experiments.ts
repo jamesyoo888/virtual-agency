@@ -22,6 +22,14 @@ import { cookies } from "next/headers";
 export const EXPERIMENT_COOKIE_PREFIX = "va_exp_";
 const COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 30; // 30 days
 
+/**
+ * Set by `/api/admin/experiments/force` when an admin pins themselves to a
+ * specific variant for testing. The tracker (`lib/experiments-track`) sees
+ * this and skips writing impression/conversion rows — admin dry-runs must
+ * not pollute the funnel data.
+ */
+export const EXPERIMENT_ADMIN_OVERRIDE_COOKIE = "va_exp_admin_override";
+
 export interface ExperimentDef<V extends string> {
   key: string;
   variants: readonly V[];

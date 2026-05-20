@@ -15,7 +15,15 @@ import { toCSV, csvFilename } from "@/lib/csv";
  * with a proper Content-Disposition for browser download.
  */
 
-const KINDS = new Set(["projects", "inquiries", "reviews", "experiments", "rfps"]);
+const KINDS = new Set([
+  "projects",
+  "inquiries",
+  "reviews",
+  "experiments",
+  "rfps",
+  "bookmarks",
+  "creators",
+]);
 
 export async function GET(
   _request: Request,
@@ -198,6 +206,130 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("rfps")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "bookmarks") {
+    const { data, error } = await supabase
+      .from("model_bookmarks")
+      .select(
+        "id, created_at, client:clients(email, company), model:models(name, slug)"
+      )
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    type BookmarkRow = {
+      id: string;
+      created_at: string;
+      client?: { email: string | null; company: string | null } | { email: string | null; company: string | null }[] | null;
+      model?: { name: string | null; slug: string | null } | { name: string | null; slug: string | null }[] | null;
+    };
+    const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
+      Array.isArray(v) ? v[0] ?? null : v ?? null;
+
+    const rows = ((data ?? []) as unknown as BookmarkRow[]).map((r) => {
+      const client = pickOne(r.client);
+      const model = pickOne(r.model);
+      return {
+        id: r.id,
+        client_company: client?.company ?? "",
+        client_email: client?.email ?? "",
+        model: model?.name ?? "",
+        model_slug: model?.slug ?? "",
+        created_at: r.created_at,
+      };
+    });
+
+    const columns = [
+      "id",
+      "client_company",
+      "client_email",
+      "model",
+      "model_slug",
+      "created_at",
+    ] as const;
+
+    const csv = toCSV(rows, columns);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("bookmarks")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "creators") {
+    const { data, error } = await supabase
+      .from("creator_applications")
+      .select(
+        "id, display_name, bio, portfolio_url, instagram_handle, notes, status, rejection_reason, created_at, reviewed_at, client:clients(email, company)"
+      )
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    type CreatorRow = {
+      id: string;
+      display_name: string;
+      bio: string | null;
+      portfolio_url: string | null;
+      instagram_handle: string | null;
+      notes: string | null;
+      status: string;
+      rejection_reason: string | null;
+      created_at: string;
+      reviewed_at: string | null;
+      client?: { email: string | null; company: string | null } | { email: string | null; company: string | null }[] | null;
+    };
+    const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
+      Array.isArray(v) ? v[0] ?? null : v ?? null;
+
+    const rows = ((data ?? []) as unknown as CreatorRow[]).map((r) => {
+      const client = pickOne(r.client);
+      return {
+        id: r.id,
+        display_name: r.display_name,
+        status: r.status,
+        client_email: client?.email ?? "",
+        client_company: client?.company ?? "",
+        portfolio_url: r.portfolio_url ?? "",
+        instagram: r.instagram_handle ?? "",
+        bio: r.bio ?? "",
+        notes: r.notes ?? "",
+        rejection_reason: r.rejection_reason ?? "",
+        created_at: r.created_at,
+        reviewed_at: r.reviewed_at ?? "",
+      };
+    });
+
+    const columns = [
+      "id",
+      "display_name",
+      "status",
+      "client_email",
+      "client_company",
+      "portfolio_url",
+      "instagram",
+      "bio",
+      "notes",
+      "rejection_reason",
+      "created_at",
+      "reviewed_at",
+    ] as const;
+
+    const csv = toCSV(rows, columns);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("creators")}"`,
         "Cache-Control": "no-store",
       },
     });

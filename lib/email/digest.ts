@@ -2,15 +2,16 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 
 /**
- * Build the per-client digest payload. One pass over projects + their
- * recent status (we don't have a status_history table yet; the digest
- * snapshot uses "updated in the last 7 days" as the change signal).
+ * Build the per-client digest payload. The "recent change" signal comes from
+ * `project_status_history` (migration 019) — one row per real status
+ * transition. When the table isn't available (e.g. migration not yet
+ * applied) we transparently fall back to the older "updated in last 7d"
+ * heuristic so the digest stays useful during rollouts.
  *
- * Why we don't persist a status-change log: most clients have a handful of
- * active projects and the dashboard shows the source of truth anyway. When
- * the platform scales past that, a `project_events` table can power a
- * proper "what changed this week" diff — the digest renderer below accepts
- * a `recent` list so the upgrade is additive.
+ * Why we prefer the dedicated table: `projects.updated_at` gets bumped by
+ * every PATCH (brief edits, invoice tweaks). A client opening a weekly
+ * digest cares about state transitions ("brief_received → in_progress"),
+ * not arbitrary timestamp churn.
  */
 
 const STATUS_KO: Record<string, string> = {
@@ -49,6 +50,12 @@ export async function buildDigestPayload(
   if (!SUPABASE_CONFIGURED) return null;
 
   const supabase = await createAdminClient();
+  const cutoff = Date.now() - DIGEST_WINDOW_MS;
+  const cutoffIso = new Date(cutoff).toISOString();
+
+  // Fetch client metadata + their projects + the projects' status history
+  // for the digest window. The history pull may fail (migration not yet
+  // applied) — we tolerate that and fall back to updated_at as the signal.
   const [client, projects] = await Promise.all([
     supabase
       .from("clients")
@@ -65,23 +72,46 @@ export async function buildDigestPayload(
 
   if (!client.data) return null;
 
-  const cutoff = Date.now() - DIGEST_WINDOW_MS;
-  const rows: DigestProjectRow[] = (
+  const projectRows =
     (projects.data as unknown as Array<{
       id: string;
       title: string;
       status: string;
       updated_at: string;
       model?: { name: string | null } | null;
-    }>) ?? []
-  ).map((p) => ({
+    }>) ?? [];
+  const projectIds = projectRows.map((p) => p.id);
+
+  // Only attempt the history join when there's at least one project — saves
+  // an empty round-trip for brand-new accounts.
+  let recentlyChangedIds = new Set<string>();
+  let historyAvailable = false;
+  if (projectIds.length > 0) {
+    const { data: historyRows, error: historyErr } = await supabase
+      .from("project_status_history")
+      .select("project_id")
+      .in("project_id", projectIds)
+      .gte("changed_at", cutoffIso);
+    if (!historyErr) {
+      historyAvailable = true;
+      recentlyChangedIds = new Set(
+        ((historyRows ?? []) as { project_id: string }[]).map((r) => r.project_id)
+      );
+    }
+    // historyErr (e.g. 42P01 relation does not exist) → silently fall back
+    // to updated_at heuristic below.
+  }
+
+  const rows: DigestProjectRow[] = projectRows.map((p) => ({
     id: p.id,
     title: p.title,
     status: p.status,
     status_ko: STATUS_KO[p.status] ?? p.status,
     modelName: p.model?.name ?? null,
     updatedAt: p.updated_at,
-    isRecent: new Date(p.updated_at).getTime() >= cutoff,
+    isRecent: historyAvailable
+      ? recentlyChangedIds.has(p.id)
+      : new Date(p.updated_at).getTime() >= cutoff,
   }));
 
   const active = rows.filter((r) => r.status !== "delivered");

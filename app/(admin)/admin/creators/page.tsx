@@ -56,14 +56,24 @@ export default async function AdminCreatorsPage({ searchParams }: PageProps) {
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <header className="flex items-center gap-3">
-        <Sparkles className="w-5 h-5 text-zinc-400" />
-        <div>
-          <h1 className="text-2xl font-bold">크리에이터 신청</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
-            외부 크리에이터의 등록 요청 — 승인 후 모델을 owner_id 로 연결하세요.
-          </p>
+      <header className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Sparkles className="w-5 h-5 text-zinc-400" />
+          <div>
+            <h1 className="text-2xl font-bold">크리에이터 신청</h1>
+            <p className="text-sm text-zinc-500 mt-0.5">
+              외부 크리에이터의 등록 요청 — 승인 후 모델을 owner_id 로 연결하세요.
+            </p>
+          </div>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Content-Disposition download */}
+        <a
+          href="/api/admin/exports/creators"
+          download
+          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+        >
+          CSV
+        </a>
       </header>
 
       <nav className="flex gap-2 text-xs">

@@ -29,6 +29,14 @@ export interface MatchBrief {
    * to the top *without* drowning out the rules-based fit. Empty by default.
    */
   personaInquiries?: Map<string, number>;
+  /**
+   * Weaker persona signal — map of model_id → number of past RFP runs where
+   * this model appeared in the top recommendations. Surfaces near-misses
+   * (models the advertiser considered but didn't inquire about). Always
+   * smaller than the inquiry bonus so a real collaboration outweighs a
+   * recurring RFP appearance.
+   */
+  personaRfps?: Map<string, number>;
 }
 
 export interface MatchScore {
@@ -41,6 +49,14 @@ export interface MatchScore {
 const PERSONA_MAX_BONUS = 12;
 /** Points granted per past inquiry (saturates at PERSONA_MAX_BONUS). */
 const PERSONA_PER_INQUIRY = 4;
+/**
+ * Per-RFP-appearance bonus. Half a point smaller than an inquiry so a real
+ * collaboration always beats "this model was recommended but never picked".
+ * Saturates at PERSONA_RFP_MAX_BONUS so a noisy advertiser tweaking RFPs
+ * doesn't pin the same model at #1.
+ */
+const PERSONA_PER_RFP = 2;
+const PERSONA_RFP_MAX_BONUS = 6;
 
 const INDUSTRY_VALUES = new Set(INDUSTRY_OPTIONS.map((o) => o.value));
 const GENRE_VALUES = new Set(GENRE_OPTIONS.map((o) => o.value));
@@ -146,6 +162,16 @@ export function scoreModel(model: Model, brief: MatchBrief): MatchScore {
     const bonus = Math.min(PERSONA_MAX_BONUS, past * PERSONA_PER_INQUIRY);
     score += bonus;
     reasons.push(`이전 협업 ${past}회 (+${bonus}pt)`);
+  }
+
+  // Weaker bonus — model appeared in past RFP top-N for this client. Encodes
+  // "they keep considering this model" without confusing it with the stronger
+  // "they actually inquired" signal.
+  const pastRfps = brief.personaRfps?.get(model.id) ?? 0;
+  if (pastRfps > 0) {
+    const bonus = Math.min(PERSONA_RFP_MAX_BONUS, pastRfps * PERSONA_PER_RFP);
+    score += bonus;
+    reasons.push(`RFP 추천 ${pastRfps}회 (+${bonus}pt)`);
   }
 
   return { model, score, reasons };

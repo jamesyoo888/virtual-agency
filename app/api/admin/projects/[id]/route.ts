@@ -67,6 +67,24 @@ export async function PATCH(
       model?: { name?: string } | null;
     };
 
+    // Record the transition for downstream digest / timeline views. We do
+    // this before the email send so even an email-provider failure doesn't
+    // hide that the change happened. Insert errors fail soft — if the table
+    // isn't migrated yet the status change should still succeed.
+    const { error: historyError } = await supabase
+      .from("project_status_history")
+      .insert({
+        project_id: id,
+        from_status: priorRecord.status,
+        to_status: parsed.data.status,
+      });
+    if (historyError) {
+      console.warn(
+        `[projects:status-history] insert failed (migration 019?):`,
+        historyError.message
+      );
+    }
+
     const { data: client } = await supabase
       .from("clients")
       .select("email, name")

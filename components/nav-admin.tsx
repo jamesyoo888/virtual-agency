@@ -17,6 +17,7 @@ import {
   FlaskConical,
   FileText,
   Sparkles,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -32,6 +33,7 @@ const links = [
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/experiments", label: "Experiments", icon: FlaskConical },
   { href: "/admin/rfps", label: "RFPs", icon: FileText },
+  { href: "/admin/bookmarks", label: "Bookmarks", icon: Heart },
   { href: "/admin/usage", label: "Usage", icon: Receipt },
   { href: "/admin/invites", label: "Invites", icon: KeyRound },
   { href: "/admin/creators", label: "Creators", icon: Sparkles },

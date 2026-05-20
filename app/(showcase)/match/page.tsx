@@ -4,7 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
 import { rankModels, extractTagsFromText } from "@/lib/matching/score";
-import { loadPersonaInquiries } from "@/lib/matching/persona";
+import { loadPersonaSignals } from "@/lib/matching/persona";
 import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import ShareLinkButton from "@/components/share-link-button";
@@ -73,9 +73,9 @@ export default async function MatchPage({ searchParams }: PageProps) {
     !!budgetPerDay ||
     needsExclusive;
 
-  const [models, personaInquiries] = hasInput
-    ? await Promise.all([fetchActiveModels(), loadPersonaInquiries()])
-    : [[] as Model[], new Map<string, number>()];
+  const [models, persona] = hasInput
+    ? await Promise.all([fetchActiveModels(), loadPersonaSignals()])
+    : [[] as Model[], { inquiries: new Map<string, number>(), rfps: new Map<string, number>() }];
 
   const mergedBrief = {
     industries: [...new Set([...industries, ...fromText.industries])],
@@ -84,7 +84,8 @@ export default async function MatchPage({ searchParams }: PageProps) {
     budgetPerDay,
     needsExclusive,
     freeText: brief,
-    personaInquiries,
+    personaInquiries: persona.inquiries,
+    personaRfps: persona.rfps,
   };
 
   const ranked = hasInput ? rankModels(models, mergedBrief).slice(0, 12) : [];

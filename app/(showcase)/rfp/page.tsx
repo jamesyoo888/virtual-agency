@@ -4,7 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
 import { rankModels, type MatchBrief } from "@/lib/matching/score";
-import { loadPersonaInquiries } from "@/lib/matching/persona";
+import { loadPersonaSignals } from "@/lib/matching/persona";
 import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import RfpFilterChips from "@/components/rfp-filter-chips";
@@ -96,9 +96,9 @@ export default async function RfpPage({ searchParams }: PageProps) {
 
   let recommended: { model: Model; score: number; reasons: string[] }[] = [];
   if (hasInput) {
-    const [models, personaInquiries] = await Promise.all([
+    const [models, persona] = await Promise.all([
       fetchActiveModels(),
-      loadPersonaInquiries(),
+      loadPersonaSignals(),
     ]);
     const brief: MatchBrief = {
       industries,
@@ -107,7 +107,8 @@ export default async function RfpPage({ searchParams }: PageProps) {
       budgetPerDay,
       needsExclusive,
       freeText: `${campaign} ${message} ${heroCopy}`,
-      personaInquiries,
+      personaInquiries: persona.inquiries,
+      personaRfps: persona.rfps,
     };
     recommended = rankModels(models, brief).slice(0, 5);
     // Persist when authed — feeds future persona weighting and the admin

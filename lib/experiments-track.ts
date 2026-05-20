@@ -3,11 +3,13 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import {
   EXPERIMENTS,
+  EXPERIMENT_ADMIN_OVERRIDE_COOKIE,
   cookieNameFor,
   resolveVariant,
   type ExperimentKey,
 } from "@/lib/experiments";
 import { VIEW_COOKIE_NAME, isBot } from "@/lib/analytics/track-view";
+import { classifyDevice, classifyVisitor } from "@/lib/analytics/classify";
 
 /**
  * Funnel tracker for cookie-bucketed experiments. Records impression rows on
@@ -59,6 +61,11 @@ async function record(
   if (isBot(ua)) return;
 
   const cookieStore = await cookies();
+
+  // Admin dry-run: a manager pinned themselves to a variant via
+  // /admin/experiments. Their session must not show up in the funnel.
+  if (cookieStore.get(EXPERIMENT_ADMIN_OVERRIDE_COOKIE)?.value === "1") return;
+
   const def = EXPERIMENTS[key];
   const raw = cookieStore.get(cookieNameFor(def.key))?.value;
   const variant = resolveVariant(def, raw);
@@ -78,6 +85,8 @@ async function record(
       viewer_cookie: viewer,
       user_id: opts.userId ?? null,
       surface: opts.surface ?? null,
+      device: classifyDevice(ua),
+      visitor_type: classifyVisitor(viewer),
     });
     // Duplicate-impression / duplicate-conversion is the expected fast path.
     // PostgREST surfaces the 23505 unique-violation in the error body.
