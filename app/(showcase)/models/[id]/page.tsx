@@ -27,6 +27,7 @@ import {
   modelOfferLd,
   modelPersonLd,
 } from "@/lib/seo/json-ld";
+import { fetchDeliveredCasesForModel } from "@/lib/analytics/model-cases";
 
 type Params = { id: string };
 
@@ -180,12 +181,13 @@ export default async function ShowcaseModelPage({
   const m = model;
   // Fire-and-forget — don't block render on the view insert.
   void trackModelView(m.id);
-  const [coViewed, tagSimilar, reviews, similarBucket, viewer] = await Promise.all([
+  const [coViewed, tagSimilar, reviews, similarBucket, viewer, deliveredCases] = await Promise.all([
     fetchCoViewedModels(m.id, 4),
     fetchSimilarModels(m, 6),
     fetchApprovedReviews(m.id),
     getBucket("similar_strategy"),
     SUPABASE_CONFIGURED ? viewerWithBookmark(m.id) : Promise.resolve({ userId: null, bookmarked: false }),
+    fetchDeliveredCasesForModel(m.id, 4),
   ]);
   // Per-bucket similar list. `collaborative` shows only co-viewed; `tag`
   // shows only tag-overlap. If the chosen bucket has no candidates we fall
@@ -393,6 +395,44 @@ export default async function ShowcaseModelPage({
             ratingValue={aggregate.rating_value}
             ratingCount={aggregate.rating_count}
           />
+        )}
+
+        {/* Delivered cases — anonymized social proof. */}
+        {deliveredCases.length > 0 && (
+          <div className="mt-16 pt-12 border-t border-zinc-900">
+            <h2 className="text-xl font-semibold mb-6">
+              이 모델로 진행된 캠페인
+            </h2>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {deliveredCases.map((c) => (
+                <li
+                  key={c.id}
+                  className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4"
+                >
+                  <div className="flex items-baseline justify-between gap-3 mb-1">
+                    <p className="text-xs text-zinc-500">
+                      {c.company_anonymized}
+                    </p>
+                    {c.turnaround_days != null && (
+                      <p className="text-[10px] text-zinc-600 tabular-nums">
+                        납기 {c.turnaround_days}일
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-sm font-medium text-zinc-100">
+                    {c.title}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-zinc-600 mt-4">
+              광고주 정보는 anonymized 처리되었습니다. 전체 사례는{" "}
+              <Link href="/cases" className="text-zinc-400 hover:text-white underline underline-offset-2">
+                /cases
+              </Link>{" "}
+              에서 볼 수 있습니다.
+            </p>
+          </div>
         )}
 
         {/* Similar models — A/B between collaborative-only and tag-only. */}

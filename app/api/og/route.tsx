@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
+import { getPostBySlug } from "@/lib/blog/posts";
 import type { Model } from "@/types";
 
 export const runtime = "nodejs";
@@ -48,7 +49,7 @@ const KRW = new Intl.NumberFormat("ko-KR");
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("model");
-  const model = await loadModel(id);
+  const blogSlug = searchParams.get("blog");
 
   const baseStyle = {
     width: "100%",
@@ -58,6 +59,53 @@ export async function GET(request: Request) {
     color: "white",
     fontFamily: "sans-serif",
   } as const;
+
+  // Blog post card — shown when ?blog=<slug>. Falls through to the generic
+  // card when the slug doesn't resolve, so a stale URL still renders.
+  if (blogSlug) {
+    const post = /^[a-z0-9-]{1,128}$/.test(blogSlug)
+      ? getPostBySlug(blogSlug)
+      : undefined;
+    if (post) {
+      return new ImageResponse(
+        (
+          <div style={{ ...baseStyle, padding: 72, flexDirection: "column", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <p style={{ fontSize: 18, letterSpacing: "0.4em", color: "#a1a1aa" }}>
+                VIRTUAL AGENCY · BLOG
+              </p>
+              <p style={{ fontSize: 60, fontWeight: 800, lineHeight: 1.1 }}>
+                {post.title}
+              </p>
+              <p style={{ fontSize: 22, color: "#a1a1aa", lineHeight: 1.4 }}>
+                {post.excerpt.slice(0, 180)}
+                {post.excerpt.length > 180 ? "…" : ""}
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {post.tags.slice(0, 4).map((t) => (
+                <span
+                  key={t}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 999,
+                    background: "rgba(255,255,255,0.08)",
+                    color: "#e4e4e7",
+                    fontSize: 18,
+                  }}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        ),
+        { width: 1200, height: 630 }
+      );
+    }
+  }
+
+  const model = await loadModel(id);
 
   if (!model) {
     return new ImageResponse(

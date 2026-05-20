@@ -21,6 +21,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) return { title: "글을 찾을 수 없습니다 — Virtual Agency" };
+  const ogImage = `${SITE_URL}/api/og?blog=${encodeURIComponent(post.slug)}`;
   return {
     title: `${post.title} — Virtual Agency`,
     description: post.excerpt,
@@ -30,6 +31,13 @@ export async function generateMetadata({
       type: "article",
       publishedTime: post.publishedAt,
       tags: post.tags,
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [ogImage],
     },
   };
 }

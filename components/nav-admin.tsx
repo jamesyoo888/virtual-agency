@@ -19,6 +19,7 @@ import {
   Sparkles,
   Heart,
   Building2,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -39,6 +40,7 @@ const links = [
   { href: "/admin/invites", label: "Invites", icon: KeyRound },
   { href: "/admin/creators", label: "Creators", icon: Sparkles },
   { href: "/admin/clients", label: "Clients", icon: Building2 },
+  { href: "/admin/health", label: "Health", icon: Activity },
 ];
 
 interface Props {
