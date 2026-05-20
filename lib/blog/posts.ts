@@ -217,3 +217,37 @@ export function listPosts(): BlogPost[] {
     b.publishedAt.localeCompare(a.publishedAt)
   );
 }
+
+/**
+ * Slug-safe key derived from a Korean (or any) tag string. We can't put
+ * Korean characters in a URL path reliably across crawlers + RSS readers,
+ * so we percent-encode at the framework boundary but key the lookup map on
+ * the raw tag for stable comparisons.
+ */
+export function tagSlug(tag: string): string {
+  return encodeURIComponent(tag);
+}
+
+export function decodeTagSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
+export function listTags(): { tag: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const post of BLOG_POSTS) {
+    for (const t of post.tags) {
+      counts.set(t, (counts.get(t) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+}
+
+export function listPostsByTag(tag: string): BlogPost[] {
+  return listPosts().filter((p) => p.tags.includes(tag));
+}

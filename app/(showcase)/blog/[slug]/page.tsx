@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { listPosts, getPostBySlug } from "@/lib/blog/posts";
+import { listPosts, getPostBySlug, tagSlug } from "@/lib/blog/posts";
 import { ArrowLeft } from "lucide-react";
 import { blogPostingLd, breadcrumbLd, ldScript } from "@/lib/seo/json-ld";
 
@@ -89,12 +89,13 @@ export default async function BlogPostPage({
         <header className="mb-10">
           <div className="flex gap-1.5 mb-3">
             {post.tags.map((t) => (
-              <span
+              <Link
                 key={t}
-                className="text-[10px] text-zinc-500 border border-zinc-800 rounded px-1.5 py-0.5"
+                href={`/blog/tag/${tagSlug(t)}`}
+                className="text-[10px] text-zinc-500 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-600 rounded px-1.5 py-0.5"
               >
-                {t}
-              </span>
+                #{t}
+              </Link>
             ))}
           </div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">

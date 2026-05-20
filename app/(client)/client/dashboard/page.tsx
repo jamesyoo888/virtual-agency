@@ -9,6 +9,7 @@ import DashboardStatusWatcher from "@/components/dashboard-status-watcher";
 import ReviewSubmit from "@/components/review-submit";
 import ReferralLinkButton from "@/components/referral-link-button";
 import { getClientPreferences } from "@/lib/preferences";
+import { loadReferralStats } from "@/lib/referral/stats";
 
 const STATUS_LABELS: Record<string, string> = {
   inquiry: "문의",
@@ -80,6 +81,7 @@ export default async function ClientDashboardPage() {
   }));
 
   const prefs = await getClientPreferences(user.id);
+  const referralStats = await loadReferralStats(user.id);
 
   return (
     <div>
@@ -97,8 +99,41 @@ export default async function ClientDashboardPage() {
         </Link>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 space-y-3">
         <ReferralLinkButton />
+        {referralStats.inquiries > 0 && (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+            <p className="text-xs uppercase tracking-wider text-zinc-500 mb-2">
+              내 추천 현황
+            </p>
+            <div className="grid grid-cols-3 gap-3 text-sm">
+              <div>
+                <p className="text-[11px] text-zinc-500">접수된 문의</p>
+                <p className="font-semibold tabular-nums">
+                  {referralStats.inquiries}건
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-zinc-500">납품 완료</p>
+                <p className="font-semibold tabular-nums">
+                  {referralStats.delivered}건
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-zinc-500">고유 광고주</p>
+                <p className="font-semibold tabular-nums">
+                  {referralStats.uniqueReferees}명
+                </p>
+              </div>
+            </div>
+            {referralStats.lastReferralAt && (
+              <p className="text-[11px] text-zinc-600 mt-3">
+                최근 추천 문의:{" "}
+                {new Date(referralStats.lastReferralAt).toLocaleDateString("ko-KR")}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {!projects || projects.length === 0 ? (

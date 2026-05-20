@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { listPosts } from "@/lib/blog/posts";
+import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
 import { INDUSTRY_OPTIONS, MOOD_OPTIONS, GENRE_OPTIONS } from "@/lib/tags";
 
 const SITE_URL =
@@ -104,6 +104,12 @@ export default async function sitemap(
             lastModified: new Date(p.publishedAt),
             changeFrequency: "monthly" as const,
             priority: 0.5,
+          })),
+          ...listTags().map((t) => ({
+            url: `${SITE_URL}/blog/tag/${tagSlug(t.tag)}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.4,
           })),
           ...INDUSTRY_OPTIONS.map((o) => ({
             url: `${SITE_URL}/explore/${o.value}`,

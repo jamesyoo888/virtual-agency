@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listPosts } from "@/lib/blog/posts";
+import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
 import { ArrowRight, Rss } from "lucide-react";
 
 export const revalidate = 3600;
@@ -12,6 +12,7 @@ export const metadata = {
 
 export default function BlogIndexPage() {
   const posts = listPosts();
+  const tags = listTags();
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -33,6 +34,20 @@ export default function BlogIndexPage() {
           >
             <Rss className="w-3 h-3" /> RSS 구독
           </a>
+          {tags.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-1.5">
+              {tags.map((t) => (
+                <Link
+                  key={t.tag}
+                  href={`/blog/tag/${tagSlug(t.tag)}`}
+                  className="text-[11px] text-zinc-400 border border-zinc-800 hover:border-zinc-600 hover:text-zinc-200 rounded-full px-2.5 py-1"
+                >
+                  #{t.tag}
+                  <span className="ml-1 text-zinc-600">{t.count}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </header>
 
         <ul className="space-y-8 border-t border-zinc-900">
