@@ -30,16 +30,22 @@ export async function generateSitemaps(): Promise<{ id: number }[]> {
   }
 }
 
-export default async function sitemap({
-  id,
-}: {
-  id: number;
-}): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap(
+  args?: { id?: number | string }
+): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  // Next.js 16 sometimes passes `id` as a string (`"0"`) from the URL
-  // segment rather than the number that `generateSitemaps` returned.
-  // Coerce so the static-routes branch matches both shapes.
-  const shardId = Number(id);
+  // Defensive: Next.js 16 has shipped a couple of param shapes here
+  // (named `id`, named `__metadata_id__`, sometimes string, sometimes
+  // undefined for a single-shard sitemap). Treat undefined / non-finite
+  // values as shard 0 so the static-routes branch always fires at least
+  // once and the sitemap is never blank.
+  const raw = (args as unknown as Record<string, unknown> | undefined) ?? {};
+  const candidate =
+    (typeof raw.id === "number" || typeof raw.id === "string")
+      ? raw.id
+      : (raw.__metadata_id__ as number | string | undefined);
+  const parsed = Number(candidate ?? 0);
+  const shardId = Number.isFinite(parsed) ? parsed : 0;
 
   // Shard 0 includes the static landing page; later shards are model-only.
   const staticRoutes: MetadataRoute.Sitemap =
