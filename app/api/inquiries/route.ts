@@ -38,7 +38,10 @@ export async function POST(request: Request) {
   const parsed = await parseBody(request, inquiryCreateSchema);
   if (!parsed.ok) return parsed.response;
 
-  const { model_id, title, brief, budget_range, purpose } = parsed.data;
+  const {
+    model_id, title, brief, budget_range, purpose,
+    utm_source, utm_medium, utm_campaign, referrer,
+  } = parsed.data;
 
   const composedBrief = [
     purpose ? `목적: ${purpose}` : null,
@@ -56,6 +59,10 @@ export async function POST(request: Request) {
       title,
       brief: composedBrief || null,
       status: "inquiry",
+      utm_source: utm_source || null,
+      utm_medium: utm_medium || null,
+      utm_campaign: utm_campaign || null,
+      referrer: referrer || null,
     })
     .select("id, title")
     .single();

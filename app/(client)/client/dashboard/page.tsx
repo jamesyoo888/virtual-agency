@@ -52,6 +52,26 @@ export default async function ClientDashboardPage() {
     (ownReviews ?? []).map((r) => [r.project_id as string, r.status as "pending" | "approved" | "rejected"])
   );
 
+  // Pull the recent status transitions for these projects in a single batch.
+  // RLS lets the client read their own project history (see migration 019).
+  // We tolerate a missing table (migration not yet applied) so the dashboard
+  // still renders during rollout.
+  const projectIds = (projects ?? []).map((p) => p.id);
+  type HistoryRow = { project_id: string; to_status: string; changed_at: string };
+  const historyByProject = new Map<string, HistoryRow[]>();
+  if (projectIds.length > 0) {
+    const { data: history } = await supabase
+      .from("project_status_history")
+      .select("project_id, to_status, changed_at")
+      .in("project_id", projectIds)
+      .order("changed_at", { ascending: false });
+    for (const row of ((history ?? []) as HistoryRow[])) {
+      const list = historyByProject.get(row.project_id) ?? [];
+      list.push(row);
+      historyByProject.set(row.project_id, list);
+    }
+  }
+
   const watcherInitial = (projects ?? []).map((p) => ({
     id: p.id,
     title: p.title,
@@ -116,6 +136,23 @@ export default async function ClientDashboardPage() {
                 </p>
               </div>
               <ProjectTimeline status={p.status} />
+              {(() => {
+                const recent = (historyByProject.get(p.id) ?? []).slice(0, 3);
+                if (recent.length === 0) return null;
+                return (
+                  <div className="text-xs text-zinc-500 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="text-zinc-600 uppercase tracking-wider">최근 변경</span>
+                    {recent.map((h, i) => (
+                      <span key={i} className="tabular-nums">
+                        {STATUS_LABELS[h.to_status] ?? h.to_status}
+                        <span className="text-zinc-600 ml-1">
+                          {new Date(h.changed_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
               {p.status === "delivered" && (
                 <ReviewSubmit
                   projectId={p.id}

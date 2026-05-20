@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import { summarizeUsage } from "@/lib/cost/store";
+import { loadFunnel, stageConversionRate } from "@/lib/analytics/funnel";
 import {
   Users,
   Inbox,
@@ -10,7 +11,16 @@ import {
   PlayCircle,
   TrendingUp,
   ArrowRight,
+  Filter,
 } from "lucide-react";
+
+const STAGE_LABELS_KO: Record<string, string> = {
+  inquiry: "문의",
+  brief_received: "브리프",
+  in_progress: "제작",
+  review: "검토",
+  delivered: "납품",
+};
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin — Virtual Agency" };
@@ -120,10 +130,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent] = await Promise.all([
+  const [kpis, usage, recent, funnel] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
     loadRecentInquiries(),
+    loadFunnel(30),
   ]);
 
   return (
@@ -217,6 +228,51 @@ export default async function AdminHomePage() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {funnel.total > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="w-4 h-4 text-zinc-400" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              30일 컨버전 funnel
+            </h2>
+            <span className="text-xs text-zinc-600 ml-auto tabular-nums">
+              {funnel.total.toLocaleString()} inquiries
+            </span>
+          </div>
+          <div className="grid grid-cols-5 gap-2">
+            {funnel.stages.map((s, i) => {
+              const next = funnel.stages[i + 1];
+              const rate = next ? stageConversionRate(s, next) : null;
+              const widthPct = funnel.total > 0 ? Math.round((s.reached / funnel.total) * 100) : 0;
+              return (
+                <div key={s.stage}>
+                  <p className="text-xs text-zinc-500 mb-1">
+                    {STAGE_LABELS_KO[s.stage] ?? s.stage}
+                  </p>
+                  <p className="text-lg font-bold tabular-nums">
+                    {s.reached.toLocaleString()}
+                  </p>
+                  <div className="mt-1.5 h-1 rounded-full bg-zinc-800 overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500"
+                      style={{ width: `${widthPct}%` }}
+                    />
+                  </div>
+                  {rate !== null && (
+                    <p className="mt-1 text-[10px] uppercase tracking-wider text-zinc-600">
+                      → {(rate * 100).toFixed(0)}%
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-zinc-600">
+            누적 (각 단계 도달 ≧). 화살표는 다음 단계 진행률.
+          </p>
         </section>
       )}
 

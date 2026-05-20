@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { readAttribution } from "@/lib/attribution";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -123,6 +124,7 @@ export default function InquiryForm({ modelId, modelName }: Props) {
     }
 
     try {
+      const attribution = readAttribution();
       const res = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -132,6 +134,7 @@ export default function InquiryForm({ modelId, modelName }: Props) {
           brief: form.brief,
           budget_range: form.budget_range,
           purpose: form.purpose,
+          ...attribution,
         }),
       });
       if (!res.ok) {

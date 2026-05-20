@@ -20,6 +20,10 @@ interface ProjectRow {
   created_at: string;
   client_id: string;
   model_id: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  referrer: string | null;
   model?: { name: string | null; concept_image: string | null } | null;
   client?: { email: string | null; company: string | null } | null;
 }
@@ -49,7 +53,7 @@ async function fetchProjects(
   let query = supabase
     .from("projects")
     .select(
-      "id, title, brief, status, created_at, client_id, model_id, model:models(name, concept_image), client:clients(email, company)"
+      "id, title, brief, status, created_at, client_id, model_id, utm_source, utm_medium, utm_campaign, referrer, model:models(name, concept_image), client:clients(email, company)"
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -231,6 +235,22 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                 {p.brief && (
                   <p className="text-xs text-zinc-400 mt-2 line-clamp-2 whitespace-pre-line">
                     {p.brief}
+                  </p>
+                )}
+                {(p.utm_source || p.utm_campaign || p.referrer) && (
+                  <p className="text-[10px] text-zinc-600 mt-1.5 truncate">
+                    {p.utm_source && (
+                      <>
+                        <span className="text-zinc-500">출처</span> {p.utm_source}
+                        {p.utm_medium && ` / ${p.utm_medium}`}
+                        {p.utm_campaign && ` · ${p.utm_campaign}`}
+                      </>
+                    )}
+                    {!p.utm_source && p.referrer && (
+                      <>
+                        <span className="text-zinc-500">referrer</span> {p.referrer.replace(/^https?:\/\//, "")}
+                      </>
+                    )}
                   </p>
                 )}
               </div>

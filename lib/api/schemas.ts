@@ -103,12 +103,18 @@ export type CapsPatchInput = z.infer<typeof capsPatchSchema>;
 
 // Client inquiry submission. `brief` already includes the pre-formatted
 // purpose/budget line from the form — keep the API permissive but capped.
+// Attribution fields are optional snapshots captured by the form (utm_* from
+// the URL, referrer from document.referrer at first landing).
 export const inquiryCreateSchema = z.object({
   model_id: z.string().min(1),
   title: z.string().trim().min(1).max(200),
   brief: z.string().max(5000).optional().nullable(),
   budget_range: z.string().max(50).optional().nullable(),
   purpose: z.string().max(50).optional().nullable(),
+  utm_source: z.string().trim().max(120).optional().nullable(),
+  utm_medium: z.string().trim().max(120).optional().nullable(),
+  utm_campaign: z.string().trim().max(200).optional().nullable(),
+  referrer: z.string().trim().max(500).optional().nullable(),
 });
 
 export type InquiryCreateInput = z.infer<typeof inquiryCreateSchema>;
