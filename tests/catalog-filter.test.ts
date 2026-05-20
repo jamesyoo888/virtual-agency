@@ -70,6 +70,17 @@ describe("filterModelsForCatalog", () => {
     expect(filterModelsForCatalog(all, { q: "LUNA" }).map((m) => m.name)).toEqual(["Luna"]);
   });
 
+  it("search also matches bio text", () => {
+    const ada = model({ name: "Ada", bio: "오로라처럼 빛나는 메이크업 모델" });
+    const ben = model({ name: "Ben", bio: "tech keynote 무대용" });
+    expect(
+      filterModelsForCatalog([ada, ben], { q: "오로라" }).map((m) => m.name)
+    ).toEqual(["Ada"]);
+    expect(
+      filterModelsForCatalog([ada, ben], { q: "keynote" }).map((m) => m.name)
+    ).toEqual(["Ben"]);
+  });
+
   it("industry filter", () => {
     expect(filterModelsForCatalog(all, { industry: "beauty" }).map((m) => m.name)).toEqual(["Aria"]);
     expect(filterModelsForCatalog(all, { industry: "tech" }).map((m) => m.name)).toEqual(["Luna"]);

@@ -119,7 +119,8 @@ export function filterModelsForCatalog(
     .filter((m) => {
       if (params.q) {
         const q = params.q.toLowerCase();
-        if (!(m.name ?? "").toLowerCase().includes(q)) return false;
+        const haystack = `${m.name ?? ""} ${m.bio ?? ""}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
       }
       if (params.industry && !m.industry_tags?.includes(params.industry as never)) {
         return false;

@@ -113,8 +113,10 @@ export default async function CatalogPage({ searchParams }: PageProps) {
       .range(from, to);
 
     if (params.q) {
-      // PostgREST ilike — % wildcards, case-insensitive
-      query = query.ilike("name", `%${params.q.replace(/[%_]/g, "\\$&")}%`);
+      // Search name + bio. PostgREST `or` strings — escape ilike wildcards so
+      // the raw query is a literal substring match against either column.
+      const term = `%${params.q.replace(/[%_]/g, "\\$&")}%`;
+      query = query.or(`name.ilike.${term},bio.ilike.${term}`);
     }
     if (params.industry) query = query.contains("industry_tags", [params.industry]);
     if (params.genre) query = query.contains("genre_tags", [params.genre]);

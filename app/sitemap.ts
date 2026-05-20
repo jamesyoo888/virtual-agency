@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { listPosts } from "@/lib/blog/posts";
-import { INDUSTRY_OPTIONS } from "@/lib/tags";
+import { INDUSTRY_OPTIONS, MOOD_OPTIONS, GENRE_OPTIONS } from "@/lib/tags";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -100,6 +100,18 @@ export default async function sitemap({
             lastModified: now,
             changeFrequency: "weekly" as const,
             priority: 0.7,
+          })),
+          ...MOOD_OPTIONS.map((o) => ({
+            url: `${SITE_URL}/explore/mood/${o.value}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.6,
+          })),
+          ...GENRE_OPTIONS.map((o) => ({
+            url: `${SITE_URL}/explore/genre/${o.value}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.6,
           })),
           {
             url: `${SITE_URL}/legal/terms`,

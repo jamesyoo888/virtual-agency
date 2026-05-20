@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import ProjectTimeline from "@/components/project-timeline";
 import DashboardStatusWatcher from "@/components/dashboard-status-watcher";
 import ReviewSubmit from "@/components/review-submit";
+import ReferralLinkButton from "@/components/referral-link-button";
 import { getClientPreferences } from "@/lib/preferences";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -86,7 +87,7 @@ export default async function ClientDashboardPage() {
         initial={watcherInitial}
         toastEnabled={prefs.toast_status_changes}
       />
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">대시보드</h1>
         <Link href="/client/projects/new">
           <Button className="bg-white text-black hover:bg-zinc-200">
@@ -94,6 +95,10 @@ export default async function ClientDashboardPage() {
             새 프로젝트
           </Button>
         </Link>
+      </div>
+
+      <div className="mb-6">
+        <ReferralLinkButton />
       </div>
 
       {!projects || projects.length === 0 ? (
