@@ -23,6 +23,7 @@ const KINDS = new Set([
   "rfps",
   "bookmarks",
   "creators",
+  "clients",
 ]);
 
 export async function GET(
@@ -330,6 +331,111 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("creators")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "clients") {
+    // Aggregate per-client lifetime stats inline. Numbers are small (one row
+    // per registered client) so we hold projects in memory once and bucket
+    // by client_id rather than running a per-client subquery.
+    const [{ data: clientRows, error: cErr }, { data: projectRows, error: pErr }] =
+      await Promise.all([
+        supabase
+          .from("clients")
+          .select("id, email, name, company, role, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5000),
+        supabase
+          .from("projects")
+          .select("client_id, status, invoice_amount, created_at"),
+      ]);
+    if (cErr) return NextResponse.json({ error: cErr.message }, { status: 500 });
+    if (pErr) return NextResponse.json({ error: pErr.message }, { status: 500 });
+
+    type ClientRow = {
+      id: string;
+      email: string | null;
+      name: string | null;
+      company: string | null;
+      role: string;
+      created_at: string;
+    };
+    type ProjectAgg = {
+      client_id: string | null;
+      status: string;
+      invoice_amount: number | null;
+      created_at: string;
+    };
+
+    const agg = new Map<
+      string,
+      {
+        projects: number;
+        inquiries: number;
+        delivered: number;
+        revenue: number;
+        lastActivityAt: string | null;
+      }
+    >();
+    for (const p of ((projectRows ?? []) as ProjectAgg[])) {
+      if (!p.client_id) continue;
+      const cur = agg.get(p.client_id) ?? {
+        projects: 0,
+        inquiries: 0,
+        delivered: 0,
+        revenue: 0,
+        lastActivityAt: null,
+      };
+      cur.projects += 1;
+      if (p.status === "inquiry") cur.inquiries += 1;
+      if (p.status === "delivered") {
+        cur.delivered += 1;
+        cur.revenue += p.invoice_amount ?? 0;
+      }
+      if (!cur.lastActivityAt || p.created_at > cur.lastActivityAt) {
+        cur.lastActivityAt = p.created_at;
+      }
+      agg.set(p.client_id, cur);
+    }
+
+    const rows = ((clientRows ?? []) as ClientRow[]).map((c) => {
+      const a = agg.get(c.id);
+      return {
+        id: c.id,
+        email: c.email ?? "",
+        name: c.name ?? "",
+        company: c.company ?? "",
+        role: c.role,
+        projects: a?.projects ?? 0,
+        inquiries: a?.inquiries ?? 0,
+        delivered: a?.delivered ?? 0,
+        revenue: a?.revenue ?? 0,
+        last_activity_at: a?.lastActivityAt ?? "",
+        created_at: c.created_at,
+      };
+    });
+
+    const columns = [
+      "id",
+      "email",
+      "name",
+      "company",
+      "role",
+      "projects",
+      "inquiries",
+      "delivered",
+      "revenue",
+      "last_activity_at",
+      "created_at",
+    ] as const;
+
+    const csv = toCSV(rows, columns);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("clients")}"`,
         "Cache-Control": "no-store",
       },
     });

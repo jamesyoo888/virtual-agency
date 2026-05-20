@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
-import { getPostBySlug } from "@/lib/blog/posts";
+import { getPostBySlug, listPostsByTag } from "@/lib/blog/posts";
 import { INDUSTRY_LABELS, MOOD_LABELS, GENRE_LABELS } from "@/lib/tags";
 import type { Model } from "@/types";
 
@@ -81,12 +81,29 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("model");
   const blogSlug = searchParams.get("blog");
+  const blogTag = searchParams.get("blog_tag");
   const isCases = searchParams.get("cases") === "1";
   const exploreIndustry = searchParams.get("explore_industry");
   const exploreMood = searchParams.get("explore_mood");
   const exploreGenre = searchParams.get("explore_genre");
 
   // Static-card surfaces first — these never need a DB read.
+  if (blogTag) {
+    // Tag string is user-controlled — cap length and skip rendering if it
+    // resolves to no posts (avoids spam-generated cards for fake tags).
+    const safeTag = blogTag.slice(0, 40);
+    const matches = listPostsByTag(safeTag);
+    if (matches.length > 0) {
+      return bigCard(
+        "VIRTUAL AGENCY · BLOG",
+        `#${safeTag}`,
+        `${matches.length}개의 글 · ${matches
+          .slice(0, 2)
+          .map((p) => p.title)
+          .join(" · ")}`
+      );
+    }
+  }
   if (isCases) {
     return bigCard(
       "VIRTUAL AGENCY · CASES",

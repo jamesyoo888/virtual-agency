@@ -119,6 +119,77 @@ const FAQ: QA[] = [
       </p>
     ),
   },
+  {
+    q: "캠페인 운영 중 모델을 추가 컷으로 확장할 수 있나요?",
+    a: (
+      <p>
+        가능합니다. 같은 모델·같은 라이선스 범위 안에서는 추가 컷이 신규 제작
+        대비 30~50% 저렴합니다. 분기 단위로 시리즈를 계속 확장하는 광고주들에게
+        가장 ROI 가 좋은 패턴이며,{" "}
+        <Link
+          href="/blog/measuring-virtual-model-campaign-roi"
+          className="underline hover:text-white"
+        >
+          ROI 측정 글
+        </Link>{" "}
+        의 Stage 4 (재구매) 항목에서 자세히 다룹니다.
+      </p>
+    ),
+  },
+  {
+    q: "여러 모델을 비교해서 한 번에 결정하고 싶어요.",
+    a: (
+      <p>
+        카탈로그에서 최대 4 명까지 컴페어 드로어에 담을 수 있고,{" "}
+        <Link href="/compare" className="underline hover:text-white">
+          /compare
+        </Link>{" "}
+        에서 가격·산업·분위기·팔로워를 나란히 볼 수 있습니다. 매칭 점수 기반의
+        자동 정렬을 원하면{" "}
+        <Link href="/match" className="underline hover:text-white">
+          AI 매칭
+        </Link>
+        을 사용하세요.
+      </p>
+    ),
+  },
+  {
+    q: "광고주가 아니라 크리에이터/모델로 합류하고 싶습니다.",
+    a: (
+      <p>
+        로그인 후{" "}
+        <Link href="/creator/onboard" className="underline hover:text-white">
+          /creator/onboard
+        </Link>{" "}
+        에서 지원할 수 있습니다. 포트폴리오 URL·SNS 핸들·간단한 소개를
+        제출하면 관리자 검토 (보통 2~3 영업일) 후 안내드립니다.
+      </p>
+    ),
+  },
+  {
+    q: "회사 결제 부서에서 부가세 포함 견적이 필요해요.",
+    a: (
+      <p>
+        모든 견적·라이선스 단가는 부가세 별도 표기이며, 정식 견적서는 부가세
+        포함 금액으로 발행됩니다. 사업자 등록증·세금계산서 발행 정보를 문의
+        시 함께 보내주시면 견적 단계에서 바로 반영합니다.
+      </p>
+    ),
+  },
+  {
+    q: "글로벌 캠페인에도 사용 가능한가요?",
+    a: (
+      <p>
+        기본 라이선스는 국내 한정입니다. 글로벌 사용권은 별도 견적이며, 지역
+        범위(아시아·북미·EU 등) 와 기간을 명시한 견적을 따로 발행합니다.
+        라이선스 조항 상세는{" "}
+        <Link href="/blog/ai-model-licensing-explained" className="underline hover:text-white">
+          라이선스 가이드 글
+        </Link>{" "}
+        을 참고하세요.
+      </p>
+    ),
+  },
 ];
 
 export default function FAQPage() {

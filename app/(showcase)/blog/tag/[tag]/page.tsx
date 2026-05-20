@@ -34,12 +34,22 @@ export async function generateMetadata({
     .slice(0, 3)
     .map((p) => p.title)
     .join(" · ")}`;
+  const siteUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-murex.vercel.app";
+  const ogImage = `${siteUrl}/api/og?blog_tag=${encodeURIComponent(tag)}`;
   return {
     title: `#${tag} — Virtual Agency 블로그`,
     description,
     openGraph: {
       title: `#${tag} — Virtual Agency 블로그`,
       description,
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `#${tag}`,
+      description,
+      images: [ogImage],
     },
   };
 }

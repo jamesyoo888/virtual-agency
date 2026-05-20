@@ -125,12 +125,20 @@ export default async function AdminClientsPage() {
     <div className="p-8 max-w-6xl mx-auto">
       <header className="mb-8 flex items-center gap-3">
         <Building2 className="w-5 h-5 text-zinc-400" />
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">Clients</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
             클라이언트별 LTV · 활동 요약. 우선순위 운영 도구.
           </p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+        <a
+          href="/api/admin/exports/clients"
+          download
+          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+        >
+          CSV
+        </a>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
