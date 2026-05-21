@@ -144,6 +144,53 @@ export default async function ForecastPage() {
             </div>
           </section>
 
+          {r.pipelineByModel.length > 0 && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+              <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+                Pipeline 기여 모델 Top {r.pipelineByModel.length}
+              </h2>
+              <ul className="space-y-2 text-sm">
+                {r.pipelineByModel.map((m) => {
+                  const sharePct =
+                    r.pipelineTotalValue > 0
+                      ? (m.value / r.pipelineTotalValue) * 100
+                      : 0;
+                  return (
+                    <li
+                      key={m.model_id}
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      <Link
+                        href={`/admin/models/${m.model_id}`}
+                        className="w-40 shrink-0 text-zinc-200 hover:text-white truncate"
+                      >
+                        {m.model_name}
+                      </Link>
+                      <span className="text-zinc-500 tabular-nums shrink-0 w-8 text-right">
+                        {m.count}
+                      </span>
+                      <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500"
+                          style={{ width: `${sharePct}%` }}
+                        />
+                      </div>
+                      <span className="tabular-nums text-zinc-200 shrink-0 w-28 text-right">
+                        ₩{KRW.format(m.value)}
+                      </span>
+                      <span className="tabular-nums text-zinc-500 shrink-0 w-14 text-right">
+                        {sharePct.toFixed(1)}%
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="mt-4 text-xs text-zinc-500">
+                견적이 비어 있는 프로젝트(₩0)는 정렬에서 뒤로 밀립니다 — invoice_amount 를 채워야 모델별 기여도가 정확히 보입니다.
+              </p>
+            </section>
+          )}
+
           <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 text-sm">
             <h2 className="text-xs uppercase tracking-wider text-amber-300 mb-2 flex items-center gap-2">
               <AlertCircle className="w-3.5 h-3.5" />

@@ -89,6 +89,8 @@ export async function GET(request: Request) {
   const isFaq = searchParams.get("faq") === "1";
   const isPress = searchParams.get("press") === "1";
   const isMatch = searchParams.get("match") === "1";
+  const isTrending = searchParams.get("trending") === "1";
+  const isAbout = searchParams.get("about") === "1";
   const exploreIndustry = searchParams.get("explore_industry");
   const exploreMood = searchParams.get("explore_mood");
   const exploreGenre = searchParams.get("explore_genre");
@@ -157,6 +159,20 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · AI MATCH",
       "광고 컨셉으로 모델 매칭",
       "브리프 한 줄이면 OK. 산업·무드·예산을 자동 추론해 어울리는 모델을 추천합니다."
+    );
+  }
+  if (isTrending) {
+    return bigCard(
+      "VIRTUAL AGENCY · TRENDING",
+      "이번 주 광고주가 가장 많이 둘러본 모델",
+      "30일 페이지 뷰 기준 카탈로그 모멘텀 상위 12명. 실시간 동향 그대로 노출."
+    );
+  }
+  if (isAbout) {
+    return bigCard(
+      "VIRTUAL AGENCY · ABOUT",
+      "AI 버추얼 모델 광고 에이전시",
+      "자체 생성 인프라 + 매칭 엔진. 4원칙으로 운영하는 한국 광고 캠페인 전용 카탈로그."
     );
   }
   if (exploreIndustry && INDUSTRY_LABELS[exploreIndustry]) {

@@ -22,11 +22,22 @@ export interface PipelineRow {
   status: string;
   invoice_amount: number | null;
   created_at: string;
+  model_id?: string | null;
+  model_name?: string | null;
+}
+
+export interface PipelineByModel {
+  model_id: string;
+  model_name: string;
+  count: number;
+  value: number;
 }
 
 export interface ForecastReport {
   pipelineByStage: Record<string, { count: number; value: number }>;
   pipelineTotalValue: number;
+  /** Top contributors to the open pipeline by invoice value. */
+  pipelineByModel: PipelineByModel[];
   delivered90dCount: number;
   delivered90dValue: number;
   inquired90dCount: number;
@@ -42,6 +53,34 @@ export interface ForecastReport {
   };
   /** Inputs the operator may want to inspect. */
   windowDays: number;
+}
+
+export function summarizePipelineByModel(
+  pipeline: PipelineRow[],
+  topN: number = 8
+): PipelineByModel[] {
+  // Group only on rows we can attribute (model_id present). Anonymous rows
+  // still count toward the stage totals but skip this rollup — exposing a
+  // "(unknown)" bucket here would mislead the operator about contribution.
+  const acc = new Map<string, PipelineByModel>();
+  for (const p of pipeline) {
+    if (!p.model_id) continue;
+    const key = p.model_id;
+    const entry =
+      acc.get(key) ??
+      {
+        model_id: key,
+        model_name: p.model_name ?? "(이름 없음)",
+        count: 0,
+        value: 0,
+      };
+    entry.count += 1;
+    entry.value += p.invoice_amount ?? 0;
+    if (!acc.has(key)) acc.set(key, entry);
+  }
+  return Array.from(acc.values())
+    .sort((a, b) => b.value - a.value || b.count - a.count)
+    .slice(0, topN);
 }
 
 export function computeForecast(
@@ -87,6 +126,7 @@ export function computeForecast(
   return {
     pipelineByStage,
     pipelineTotalValue,
+    pipelineByModel: summarizePipelineByModel(pipeline),
     delivered90dCount,
     delivered90dValue,
     inquired90dCount,
@@ -110,9 +150,14 @@ export async function loadForecast(): Promise<ForecastReport | null> {
 
   const [{ data: pipeline }, { data: delivered }, { data: inquired }] =
     await Promise.all([
+      // Join models (left) to attribute pipeline value per model. Anonymous
+      // pipeline rows (no model_id) still feed stage totals — they only drop
+      // out of the per-model rollup.
       supabase
         .from("projects")
-        .select("status, invoice_amount, created_at")
+        .select(
+          "status, invoice_amount, created_at, model_id, models:models(name)"
+        )
         .in("status", ACTIVE_STATUSES as unknown as string[])
         .limit(2000),
       supabase
@@ -128,8 +173,28 @@ export async function loadForecast(): Promise<ForecastReport | null> {
         .limit(2000),
     ]);
 
+  type JoinedRow = {
+    status: string;
+    invoice_amount: number | null;
+    created_at: string;
+    model_id: string | null;
+    models: { name: string | null } | { name: string | null }[] | null;
+  };
+  const flatPipeline = ((pipeline as JoinedRow[] | null) ?? []).map((r) => {
+    // PostgREST returns the foreign row as either an object or array
+    // depending on the relationship cardinality — accept both.
+    const m = Array.isArray(r.models) ? r.models[0] : r.models;
+    return {
+      status: r.status,
+      invoice_amount: r.invoice_amount,
+      created_at: r.created_at,
+      model_id: r.model_id,
+      model_name: m?.name ?? null,
+    } satisfies PipelineRow;
+  });
+
   return computeForecast(
-    (pipeline as PipelineRow[] | null) ?? [],
+    flatPipeline,
     (delivered as PipelineRow[] | null) ?? [],
     (inquired as PipelineRow[] | null) ?? []
   );

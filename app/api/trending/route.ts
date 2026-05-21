@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { INDUSTRY_LABELS, MOOD_LABELS } from "@/lib/tags";
 
 /**
  * Public JSON endpoint mirroring /trending — exposes the top-N active models
@@ -26,6 +27,16 @@ export async function GET(request: Request) {
       ? Math.min(MAX_LIMIT, limitParam)
       : DEFAULT_LIMIT;
 
+  // Validate filter params against the known taxonomies — unknown values
+  // would otherwise inject literals into the contains() filter and return
+  // empty sets. Drop silently so partners get the default feed instead
+  // of an error.
+  const industryParam = url.searchParams.get("industry");
+  const industry =
+    industryParam && INDUSTRY_LABELS[industryParam] ? industryParam : null;
+  const moodParam = url.searchParams.get("mood");
+  const mood = moodParam && MOOD_LABELS[moodParam] ? moodParam : null;
+
   if (!SUPABASE_CONFIGURED) {
     return NextResponse.json(
       { items: [], note: "Supabase not configured in this environment" },
@@ -35,15 +46,17 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from("models_with_popularity")
       .select(
         "id, name, base_price, concept_image, industry_tags, mood_tags, view_count_30d"
       )
       .eq("status", "active")
       .order("view_count_30d", { ascending: false })
-      .gt("view_count_30d", 0)
-      .limit(limit);
+      .gt("view_count_30d", 0);
+    if (industry) query = query.contains("industry_tags", [industry]);
+    if (mood) query = query.contains("mood_tags", [mood]);
+    const { data, error } = await query.limit(limit);
     if (error) throw error;
 
     type Row = {
@@ -66,7 +79,12 @@ export async function GET(request: Request) {
       url: `${SITE_URL}/models/${m.id}`,
     }));
     return NextResponse.json(
-      { items, count: items.length, generated_at: new Date().toISOString() },
+      {
+        items,
+        count: items.length,
+        filters: { industry, mood },
+        generated_at: new Date().toISOString(),
+      },
       {
         headers: {
           // Public + cdn-friendly. 5 minutes is short enough to feel live,

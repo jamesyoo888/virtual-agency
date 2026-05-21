@@ -15,6 +15,13 @@ export const metadata = {
     description: "AI 버추얼 모델 에이전시. 미션과 원칙.",
     url: `${SITE_URL}/about`,
     type: "website" as const,
+    images: [`${SITE_URL}/api/og?about=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "회사 소개 — Virtual Agency",
+    description: "AI 버추얼 모델 에이전시. 미션과 원칙.",
+    images: [`${SITE_URL}/api/og?about=1`],
   },
 };
 

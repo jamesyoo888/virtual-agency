@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { computeForecast } from "@/lib/analytics/forecast";
+import {
+  computeForecast,
+  summarizePipelineByModel,
+} from "@/lib/analytics/forecast";
 
 const T = "2026-04-01T00:00:00Z";
 
@@ -70,6 +73,44 @@ describe("computeForecast", () => {
     expect(r.scenarios.optimistic).toBe(4350);
   });
 
+  it("includes pipelineByModel top-N rollup", () => {
+    const r = computeForecast(
+      [
+        {
+          status: "inquiry",
+          invoice_amount: 1000,
+          created_at: T,
+          model_id: "m1",
+          model_name: "Aria",
+        },
+        {
+          status: "inquiry",
+          invoice_amount: 2000,
+          created_at: T,
+          model_id: "m1",
+          model_name: "Aria",
+        },
+        {
+          status: "brief_received",
+          invoice_amount: 500,
+          created_at: T,
+          model_id: "m2",
+          model_name: "Bori",
+        },
+        // Anonymous row — counts in stage totals but drops from per-model
+        // rollup.
+        { status: "inquiry", invoice_amount: 9999, created_at: T },
+      ],
+      [],
+      []
+    );
+    expect(r.pipelineByModel.length).toBe(2);
+    expect(r.pipelineByModel[0].model_id).toBe("m1");
+    expect(r.pipelineByModel[0].value).toBe(3000);
+    expect(r.pipelineByModel[0].count).toBe(2);
+    expect(r.pipelineByModel[1].model_id).toBe("m2");
+  });
+
   it("optimistic close-rate multiplier is capped at 100%", () => {
     const r = computeForecast(
       [{ status: "inquiry", invoice_amount: 1000, created_at: T }],
@@ -79,5 +120,66 @@ describe("computeForecast", () => {
     // closeRate = 0 — optimistic still bounded; pipeline contributes 0.
     expect(r.scenarios.optimistic).toBeGreaterThanOrEqual(0);
     expect(r.scenarios.optimistic).toBeLessThan(1000 * 2);
+  });
+});
+
+describe("summarizePipelineByModel", () => {
+  it("sorts by value desc then count desc", () => {
+    const rows = summarizePipelineByModel([
+      {
+        status: "inquiry",
+        invoice_amount: 100,
+        created_at: T,
+        model_id: "a",
+        model_name: "A",
+      },
+      {
+        status: "inquiry",
+        invoice_amount: 100,
+        created_at: T,
+        model_id: "a",
+        model_name: "A",
+      },
+      {
+        status: "inquiry",
+        invoice_amount: 500,
+        created_at: T,
+        model_id: "b",
+        model_name: "B",
+      },
+    ]);
+    expect(rows[0].model_id).toBe("b");
+    expect(rows[1].model_id).toBe("a");
+    expect(rows[1].count).toBe(2);
+  });
+
+  it("respects topN cap", () => {
+    const rows = summarizePipelineByModel(
+      Array.from({ length: 12 }, (_, i) => ({
+        status: "inquiry",
+        invoice_amount: 100 + i,
+        created_at: T,
+        model_id: `m${i}`,
+        model_name: `M${i}`,
+      })),
+      3
+    );
+    expect(rows).toHaveLength(3);
+    expect(rows[0].model_id).toBe("m11");
+  });
+
+  it("skips rows with no model_id", () => {
+    const rows = summarizePipelineByModel([
+      { status: "inquiry", invoice_amount: 100, created_at: T },
+      {
+        status: "inquiry",
+        invoice_amount: 50,
+        created_at: T,
+        model_id: "x",
+        model_name: "X",
+      },
+    ]);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].model_id).toBe("x");
   });
 });

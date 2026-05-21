@@ -6,12 +6,15 @@ import { summarizeUsage } from "@/lib/cost/store";
 import { loadFunnel, loadFunnelBySource, stageConversionRate } from "@/lib/analytics/funnel";
 import { loadSearchAnalytics } from "@/lib/analytics/search-log";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
+import { wowFromRows, type WowMetric } from "@/lib/analytics/week-over-week";
 import {
   Users,
   Inbox,
   Receipt,
   PlayCircle,
   TrendingUp,
+  TrendingDown,
+  Minus,
   ArrowRight,
   Filter,
   Search,
@@ -43,6 +46,51 @@ interface OpsSnapshot {
   newsletter7d: number;
   newsletter30d: number;
   pendingReviews: number;
+}
+
+interface WowSnapshot {
+  inquiries: WowMetric;
+  delivered: WowMetric;
+  revenue: WowMetric;
+}
+
+async function loadWowSnapshot(): Promise<WowSnapshot> {
+  if (!SUPABASE_CONFIGURED) {
+    const empty: WowMetric = { current: 0, previous: 0, delta: 0, pct: null };
+    return { inquiries: empty, delivered: empty, revenue: empty };
+  }
+  const supabase = await createClient();
+  // 14 days is enough to cover the current + previous 7-day windows. We
+  // pull both halves in a single query and bucket client-side rather than
+  // running two COUNT() queries.
+  const since14 = new Date(Date.now() - 14 * 86_400_000).toISOString();
+  const [{ data: inqRows }, { data: delRows }] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("created_at")
+      .gte("created_at", since14)
+      .limit(5000),
+    supabase
+      .from("projects")
+      .select("updated_at, invoice_amount")
+      .eq("status", "delivered")
+      .gte("updated_at", since14)
+      .limit(5000),
+  ]);
+  return {
+    inquiries: wowFromRows((inqRows ?? []) as { created_at: string }[]),
+    delivered: wowFromRows(
+      (delRows ?? []) as { updated_at: string }[],
+      { dateField: "updated_at" }
+    ),
+    revenue: wowFromRows(
+      (delRows ?? []) as {
+        updated_at: string;
+        invoice_amount: number | null;
+      }[],
+      { dateField: "updated_at", weighted: true }
+    ),
+  };
 }
 
 async function loadOpsSnapshot(): Promise<OpsSnapshot> {
@@ -173,16 +221,18 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla] = await Promise.all([
-    loadKPIs(),
-    summarizeUsage(),
-    loadRecentInquiries(),
-    loadFunnel(30),
-    loadFunnelBySource(30, 6),
-    loadSearchAnalytics({ windowDays: 7, limit: 5 }),
-    loadOpsSnapshot(),
-    loadResponseSla(30),
-  ]);
+  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla, wow] =
+    await Promise.all([
+      loadKPIs(),
+      summarizeUsage(),
+      loadRecentInquiries(),
+      loadFunnel(30),
+      loadFunnelBySource(30, 6),
+      loadSearchAnalytics({ windowDays: 7, limit: 5 }),
+      loadOpsSnapshot(),
+      loadResponseSla(30),
+      loadWowSnapshot(),
+    ]);
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
@@ -237,6 +287,24 @@ export default async function AdminHomePage() {
           desc="image-to-video (Kling/Minimax) + 립싱크"
           href="/admin/video-studio"
         />
+      </section>
+
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 mb-1">
+          주간 변화 (지난 7일 vs 그 직전 7일)
+        </h2>
+        <p className="text-xs text-zinc-500 mb-4">
+          최근 한 주가 직전 주보다 더 좋아졌는지를 본다 — 트렌드만 보는 지표라 절대값은 KPI 카드 참조.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <WowCard label="신규 문의" m={wow.inquiries} format={(v) => v.toLocaleString()} />
+          <WowCard label="납품" m={wow.delivered} format={(v) => v.toLocaleString()} />
+          <WowCard
+            label="납품 매출 (₩)"
+            m={wow.revenue}
+            format={(v) => `₩${v.toLocaleString("ko-KR")}`}
+          />
+        </div>
       </section>
 
       {recent.length > 0 && (
@@ -590,4 +658,44 @@ function fmtHours(h: number): string {
   if (h < 1) return `${Math.round(h * 60)}분`;
   if (h < 24) return `${h.toFixed(1)}h`;
   return `${(h / 24).toFixed(1)}일`;
+}
+
+function WowCard({
+  label,
+  m,
+  format,
+}: {
+  label: string;
+  m: WowMetric;
+  format: (v: number) => string;
+}) {
+  // ±1pp threshold prevents the arrow flipping back and forth on flat metrics.
+  const Trend = m.delta > 0 ? TrendingUp : m.delta < 0 ? TrendingDown : Minus;
+  const tone =
+    m.delta > 0
+      ? "text-emerald-300 bg-emerald-500/10 border-emerald-500/30"
+      : m.delta < 0
+      ? "text-rose-300 bg-rose-500/10 border-rose-500/30"
+      : "text-zinc-400 bg-zinc-800/40 border-zinc-700";
+  return (
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+      <p className="text-xs text-zinc-500">{label}</p>
+      <p className="mt-2 text-2xl font-bold tabular-nums">{format(m.current)}</p>
+      <div className="mt-2 flex items-center gap-2 text-xs">
+        <span
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border ${tone}`}
+        >
+          <Trend className="w-3 h-3" />
+          {m.pct === null
+            ? m.current > 0
+              ? "신규"
+              : "—"
+            : `${m.delta >= 0 ? "+" : ""}${m.pct.toFixed(1)}%`}
+        </span>
+        <span className="text-zinc-600 tabular-nums">
+          이전주 {format(m.previous)}
+        </span>
+      </div>
+    </div>
+  );
 }

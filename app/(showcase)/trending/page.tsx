@@ -6,6 +6,12 @@ import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
 import ModelCard from "@/components/model-card";
 import { TrendingUp, ArrowRight } from "lucide-react";
+import {
+  INDUSTRY_LABELS,
+  INDUSTRY_OPTIONS,
+  MOOD_LABELS,
+  MOOD_OPTIONS,
+} from "@/lib/tags";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -23,6 +29,13 @@ export const metadata: Metadata = {
     description: "광고주가 실시간으로 둘러보는 AI 버추얼 모델 12명.",
     url: `${SITE_URL}/trending`,
     type: "website",
+    images: [`${SITE_URL}/api/og?trending=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "이번 주 트렌딩 모델 — Virtual Agency",
+    description: "광고주가 실시간으로 둘러보는 AI 버추얼 모델 12명.",
+    images: [`${SITE_URL}/api/og?trending=1`],
   },
 };
 
@@ -31,10 +44,20 @@ type PopularRow = Model & {
   popularity_score: number;
 };
 
-async function loadTrending(limit: number): Promise<PopularRow[]> {
+async function loadTrending(
+  limit: number,
+  industry: string | null,
+  mood: string | null
+): Promise<PopularRow[]> {
   if (!SUPABASE_CONFIGURED) {
     return (devModelStore.list() as Model[])
-      .filter((m) => m.status === "active")
+      .filter((m) => {
+        if (m.status !== "active") return false;
+        if (industry && !(m.industry_tags ?? []).includes(industry as never))
+          return false;
+        if (mood && !(m.mood_tags ?? []).includes(mood as never)) return false;
+        return true;
+      })
       .slice(0, limit)
       .map((m) => ({ ...m, view_count_30d: 0, popularity_score: 0 }));
   }
@@ -42,18 +65,38 @@ async function loadTrending(limit: number): Promise<PopularRow[]> {
   // models_with_popularity is the existing view (migration 006) that blends
   // follower_count + 30d views. We want raw view momentum here, so we sort
   // by view_count_30d directly. Models with zero views fall off the page.
-  const { data } = await supabase
+  let query = supabase
     .from("models_with_popularity")
     .select("*")
     .eq("status", "active")
     .order("view_count_30d", { ascending: false })
-    .gt("view_count_30d", 0)
-    .limit(limit);
+    .gt("view_count_30d", 0);
+  if (industry) query = query.contains("industry_tags", [industry]);
+  if (mood) query = query.contains("mood_tags", [mood]);
+  const { data } = await query.limit(limit);
   return (data as PopularRow[]) ?? [];
 }
 
-export default async function TrendingPage() {
-  const models = await loadTrending(12);
+export default async function TrendingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ industry?: string; mood?: string }>;
+}) {
+  const sp = await searchParams;
+  const industry =
+    sp.industry && INDUSTRY_LABELS[sp.industry] ? sp.industry : null;
+  const mood = sp.mood && MOOD_LABELS[sp.mood] ? sp.mood : null;
+  const models = await loadTrending(12, industry, mood);
+
+  const buildHref = (next: { industry?: string | null; mood?: string | null }) => {
+    const params = new URLSearchParams();
+    const nextIndustry = "industry" in next ? next.industry : industry;
+    const nextMood = "mood" in next ? next.mood : mood;
+    if (nextIndustry) params.set("industry", nextIndustry);
+    if (nextMood) params.set("mood", nextMood);
+    const qs = params.toString();
+    return qs ? `/trending?${qs}` : "/trending";
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -91,6 +134,65 @@ export default async function TrendingPage() {
               최근 30일 페이지 뷰 기준 상위 {models.length}명. 광고주가 실시간으로 평가하고 있는 카탈로그 동향을 그대로 노출합니다.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="px-5 md:px-8 py-4 border-b border-zinc-900">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 mr-2">
+            산업
+          </span>
+          <Link
+            href={buildHref({ industry: null })}
+            className={`px-2.5 py-1 rounded-full border ${
+              !industry
+                ? "border-emerald-400/50 text-emerald-300 bg-emerald-500/10"
+                : "border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600"
+            }`}
+          >
+            전체
+          </Link>
+          {INDUSTRY_OPTIONS.map((opt) => (
+            <Link
+              key={opt.value}
+              href={buildHref({ industry: opt.value })}
+              className={`px-2.5 py-1 rounded-full border ${
+                industry === opt.value
+                  ? "border-emerald-400/50 text-emerald-300 bg-emerald-500/10"
+                  : "border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600"
+              }`}
+            >
+              {opt.label}
+            </Link>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-xs mt-3">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 mr-2">
+            무드
+          </span>
+          <Link
+            href={buildHref({ mood: null })}
+            className={`px-2.5 py-1 rounded-full border ${
+              !mood
+                ? "border-emerald-400/50 text-emerald-300 bg-emerald-500/10"
+                : "border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600"
+            }`}
+          >
+            전체
+          </Link>
+          {MOOD_OPTIONS.map((opt) => (
+            <Link
+              key={opt.value}
+              href={buildHref({ mood: opt.value })}
+              className={`px-2.5 py-1 rounded-full border ${
+                mood === opt.value
+                  ? "border-emerald-400/50 text-emerald-300 bg-emerald-500/10"
+                  : "border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600"
+              }`}
+            >
+              {opt.label}
+            </Link>
+          ))}
         </div>
       </section>
 
