@@ -23,12 +23,19 @@ export default async function ForecastPage() {
     <div className="p-8 max-w-5xl mx-auto text-zinc-100">
       <header className="mb-8 flex items-center gap-3">
         <TrendingUp className="w-5 h-5 text-zinc-400" />
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">30일 매출 Forecast</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
             90일 누적 close rate × 현재 pipeline 가치 + run-rate 기반 시나리오.
           </p>
         </div>
+        <a
+          href="/api/admin/exports/forecast"
+          download
+          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+        >
+          CSV
+        </a>
       </header>
 
       {!SUPABASE_CONFIGURED || !r ? (

@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { toCSV, csvFilename } from "@/lib/csv";
 import { loadModelPerformance } from "@/lib/analytics/model-performance";
+import { loadForecast } from "@/lib/analytics/forecast";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -27,6 +28,7 @@ const KINDS = new Set([
   "clients",
   "newsletter",
   "model-performance",
+  "forecast",
 ]);
 
 export async function GET(
@@ -570,6 +572,52 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("experiments")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "forecast") {
+    const r = await loadForecast();
+    if (!r) {
+      return NextResponse.json(
+        { error: "forecast unavailable (Supabase not configured)" },
+        { status: 503 }
+      );
+    }
+    // Forecast CSV is a flat "metric, value" two-column layout — the report
+    // is summary data, not a row list. Keeps it human-readable in Excel.
+    const rows: { metric: string; value: string }[] = [
+      { metric: "window_days", value: String(r.windowDays) },
+      { metric: "pipeline_total_value", value: String(r.pipelineTotalValue) },
+      ...Object.entries(r.pipelineByStage).map(([stage, b]) => ({
+        metric: `pipeline_${stage}_count`,
+        value: String(b.count),
+      })),
+      ...Object.entries(r.pipelineByStage).map(([stage, b]) => ({
+        metric: `pipeline_${stage}_value`,
+        value: String(b.value),
+      })),
+      { metric: "delivered_90d_count", value: String(r.delivered90dCount) },
+      { metric: "delivered_90d_value", value: String(r.delivered90dValue) },
+      { metric: "inquired_90d_count", value: String(r.inquired90dCount) },
+      { metric: "close_rate", value: r.closeRate.toFixed(4) },
+      {
+        metric: "avg_deal_value",
+        value: String(Math.round(r.avgDealValue)),
+      },
+      {
+        metric: "scenario_conservative",
+        value: String(r.scenarios.conservative),
+      },
+      { metric: "scenario_base", value: String(r.scenarios.base) },
+      { metric: "scenario_optimistic", value: String(r.scenarios.optimistic) },
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("forecast")}"`,
         "Cache-Control": "no-store",
       },
     });

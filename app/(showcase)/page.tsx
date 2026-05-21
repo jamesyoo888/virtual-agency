@@ -290,7 +290,8 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
         {(socialProof.deliveredCount > 0 ||
           socialProof.activeModels > 0 ||
-          socialProof.averageRating !== null) && (
+          socialProof.averageRating !== null ||
+          socialProof.medianResponseHours !== null) && (
           <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
             {socialProof.deliveredCount > 0 && (
               <div className="flex items-baseline gap-1.5">
@@ -315,6 +316,18 @@ export default async function CatalogPage({ searchParams }: PageProps) {
                 </span>
                 <span className="text-xs uppercase tracking-wider text-zinc-500">
                   평균 평점 ({socialProof.reviewCount}건)
+                </span>
+              </div>
+            )}
+            {socialProof.medianResponseHours !== null && (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl md:text-3xl font-bold tabular-nums text-emerald-300">
+                  {socialProof.medianResponseHours < 1
+                    ? `${Math.round(socialProof.medianResponseHours * 60)}분`
+                    : `${socialProof.medianResponseHours.toFixed(1)}h`}
+                </span>
+                <span className="text-xs uppercase tracking-wider text-zinc-500">
+                  7일 평균 응답
                 </span>
               </div>
             )}
