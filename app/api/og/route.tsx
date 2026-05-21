@@ -88,6 +88,7 @@ export async function GET(request: Request) {
   const isPricing = searchParams.get("pricing") === "1";
   const isFaq = searchParams.get("faq") === "1";
   const isPress = searchParams.get("press") === "1";
+  const isMatch = searchParams.get("match") === "1";
   const exploreIndustry = searchParams.get("explore_industry");
   const exploreMood = searchParams.get("explore_mood");
   const exploreGenre = searchParams.get("explore_genre");
@@ -149,6 +150,13 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · PRESS",
       "프레스 자료 + 미디어 키트",
       "통계·로고·미디어 문의 한 곳에서. press@aihubs.uk"
+    );
+  }
+  if (isMatch) {
+    return bigCard(
+      "VIRTUAL AGENCY · AI MATCH",
+      "광고 컨셉으로 모델 매칭",
+      "브리프 한 줄이면 OK. 산업·무드·예산을 자동 추론해 어울리는 모델을 추천합니다."
     );
   }
   if (exploreIndustry && INDUSTRY_LABELS[exploreIndustry]) {

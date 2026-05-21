@@ -10,9 +10,25 @@ import ModelCard from "@/components/model-card";
 import ShareLinkButton from "@/components/share-link-button";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
+
 export const metadata = {
   title: "AI 모델 매칭 — Virtual Agency",
   description: "광고 컨셉을 입력하면 어울리는 버추얼 모델을 자동 추천합니다.",
+  openGraph: {
+    title: "AI 모델 매칭 — Virtual Agency",
+    description: "광고 컨셉으로 모델 매칭. 브리프 한 줄이면 OK.",
+    url: `${SITE_URL}/match`,
+    type: "website" as const,
+    images: [`${SITE_URL}/api/og?match=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "AI 모델 매칭 — Virtual Agency",
+    description: "광고 컨셉으로 모델 매칭.",
+    images: [`${SITE_URL}/api/og?match=1`],
+  },
 };
 
 interface PageProps {
