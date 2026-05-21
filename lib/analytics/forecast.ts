@@ -33,6 +33,54 @@ export interface PipelineByModel {
   value: number;
 }
 
+export interface PipelineAgeBucket {
+  label: string;
+  /** Inclusive lower bound in days since created_at. */
+  minDays: number;
+  /** Exclusive upper bound; `Infinity` for the open-ended last bucket. */
+  maxDays: number;
+  count: number;
+  value: number;
+}
+
+/**
+ * Day-based age buckets the forecast page and CSV both use. Edges are tuned
+ * to surface "stuck" deals — anything past 30 days open is the operator's
+ * follow-up backlog.
+ */
+export const PIPELINE_AGE_EDGES: { label: string; minDays: number; maxDays: number }[] = [
+  { label: "≤7d", minDays: 0, maxDays: 8 },
+  { label: "8-14d", minDays: 8, maxDays: 15 },
+  { label: "15-30d", minDays: 15, maxDays: 31 },
+  { label: "31d+", minDays: 31, maxDays: Infinity },
+];
+
+export function summarizePipelineAging(
+  pipeline: PipelineRow[],
+  now: Date = new Date()
+): PipelineAgeBucket[] {
+  const buckets: PipelineAgeBucket[] = PIPELINE_AGE_EDGES.map((e) => ({
+    label: e.label,
+    minDays: e.minDays,
+    maxDays: e.maxDays,
+    count: 0,
+    value: 0,
+  }));
+  const nowMs = now.getTime();
+  for (const p of pipeline) {
+    const t = new Date(p.created_at).getTime();
+    if (!Number.isFinite(t)) continue;
+    const ageDays = Math.max(0, (nowMs - t) / 86_400_000);
+    const bucket = buckets.find(
+      (b) => ageDays >= b.minDays && ageDays < b.maxDays
+    );
+    if (!bucket) continue;
+    bucket.count += 1;
+    bucket.value += p.invoice_amount ?? 0;
+  }
+  return buckets;
+}
+
 export type ForecastConfidence = "low" | "medium" | "high";
 
 export interface ForecastReport {
@@ -40,6 +88,8 @@ export interface ForecastReport {
   pipelineTotalValue: number;
   /** Top contributors to the open pipeline by invoice value. */
   pipelineByModel: PipelineByModel[];
+  /** Open pipeline grouped by how long it's been sitting (since created_at). */
+  pipelineAging: PipelineAgeBucket[];
   delivered90dCount: number;
   delivered90dValue: number;
   inquired90dCount: number;
@@ -146,6 +196,7 @@ export function computeForecast(
     pipelineByStage,
     pipelineTotalValue,
     pipelineByModel: summarizePipelineByModel(pipeline),
+    pipelineAging: summarizePipelineAging(pipeline),
     delivered90dCount,
     delivered90dValue,
     inquired90dCount,

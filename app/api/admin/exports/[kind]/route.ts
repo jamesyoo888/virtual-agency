@@ -632,6 +632,20 @@ export async function GET(
       { metric: "scenario_base", value: String(r.scenarios.base) },
       { metric: "scenario_optimistic", value: String(r.scenarios.optimistic) },
       { metric: "confidence", value: r.confidence },
+      // Pipeline aging buckets — the "stuck deals" signal. Flatten as
+      // `pipeline_aging_<label>__<count|value>` so the two-column layout
+      // survives. Empty buckets still emit zeros to keep the schema stable
+      // for downstream spreadsheets.
+      ...r.pipelineAging.flatMap((b) => [
+        {
+          metric: `pipeline_aging_${b.label}_count`,
+          value: String(b.count),
+        },
+        {
+          metric: `pipeline_aging_${b.label}_value`,
+          value: String(b.value),
+        },
+      ]),
       // Per-model rollup. Flattens to `pipeline_by_model_<id>__<count|value>`
       // so the existing two-column shape stays intact — Excel users can
       // sort/filter without unmerging columns. Order preserves the

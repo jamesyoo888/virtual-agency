@@ -3,6 +3,8 @@ import {
   computeForecast,
   summarizePipelineByModel,
   computeConfidence,
+  summarizePipelineAging,
+  PIPELINE_AGE_EDGES,
 } from "@/lib/analytics/forecast";
 
 const T = "2026-04-01T00:00:00Z";
@@ -176,6 +178,60 @@ describe("computeForecast.pipelineByModel", () => {
       model_name: "Bori",
       value: 700,
     });
+  });
+});
+
+describe("summarizePipelineAging", () => {
+  const now = new Date("2026-05-22T12:00:00Z");
+  const daysAgo = (n: number) =>
+    new Date(now.getTime() - n * 86_400_000).toISOString();
+
+  it("buckets rows into fixed edges", () => {
+    const buckets = summarizePipelineAging(
+      [
+        { status: "inquiry", invoice_amount: 100, created_at: daysAgo(2) },
+        { status: "inquiry", invoice_amount: 200, created_at: daysAgo(10) },
+        { status: "inquiry", invoice_amount: 300, created_at: daysAgo(20) },
+        { status: "inquiry", invoice_amount: 400, created_at: daysAgo(60) },
+      ],
+      now
+    );
+    const byLabel = Object.fromEntries(buckets.map((b) => [b.label, b]));
+    expect(byLabel["≤7d"].count).toBe(1);
+    expect(byLabel["≤7d"].value).toBe(100);
+    expect(byLabel["8-14d"].count).toBe(1);
+    expect(byLabel["15-30d"].count).toBe(1);
+    expect(byLabel["31d+"].count).toBe(1);
+    expect(byLabel["31d+"].value).toBe(400);
+  });
+
+  it("always returns one bucket per edge, even when empty", () => {
+    const buckets = summarizePipelineAging([], now);
+    expect(buckets).toHaveLength(PIPELINE_AGE_EDGES.length);
+    expect(buckets.every((b) => b.count === 0 && b.value === 0)).toBe(true);
+  });
+
+  it("treats invalid created_at as a no-op rather than throwing", () => {
+    const buckets = summarizePipelineAging(
+      [
+        { status: "inquiry", invoice_amount: 100, created_at: "not-a-date" },
+        { status: "inquiry", invoice_amount: 200, created_at: daysAgo(5) },
+      ],
+      now
+    );
+    const total = buckets.reduce((s, b) => s + b.count, 0);
+    expect(total).toBe(1);
+  });
+
+  it("plugs into computeForecast output", () => {
+    const r = computeForecast(
+      [{ status: "inquiry", invoice_amount: 500, created_at: daysAgo(40) }],
+      [],
+      []
+    );
+    const stuck = r.pipelineAging.find((b) => b.label === "31d+");
+    expect(stuck?.count).toBe(1);
+    expect(stuck?.value).toBe(500);
   });
 });
 

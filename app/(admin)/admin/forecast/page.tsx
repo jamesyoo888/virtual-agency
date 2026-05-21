@@ -212,6 +212,54 @@ export default async function ForecastPage() {
             </section>
           )}
 
+          {r.pipelineAging.some((b) => b.count > 0) && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+              <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-1">
+                Pipeline 체류 시간 (created_at 기준)
+              </h2>
+              <p className="text-[11px] text-zinc-500 mb-3">
+                31일+ 버킷이 가장 두꺼우면 stuck deal — 영업이 closing 으로 push 못 하고 있다는 신호.
+              </p>
+              <ul className="space-y-2 text-sm">
+                {r.pipelineAging.map((b) => {
+                  const sharePct =
+                    r.pipelineTotalValue > 0
+                      ? (b.value / r.pipelineTotalValue) * 100
+                      : 0;
+                  const stuck = b.label === "31d+" && b.count > 0;
+                  return (
+                    <li key={b.label} className="flex items-center gap-3">
+                      <span
+                        className={`w-20 shrink-0 ${
+                          stuck ? "text-rose-300 font-medium" : "text-zinc-400"
+                        }`}
+                      >
+                        {b.label}
+                      </span>
+                      <span className="text-zinc-500 tabular-nums shrink-0 w-8 text-right">
+                        {b.count}
+                      </span>
+                      <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                        <div
+                          className={`h-full ${
+                            stuck ? "bg-rose-500" : "bg-emerald-500"
+                          }`}
+                          style={{ width: `${sharePct}%` }}
+                        />
+                      </div>
+                      <span className="tabular-nums text-zinc-200 shrink-0 w-28 text-right">
+                        ₩{KRW.format(b.value)}
+                      </span>
+                      <span className="tabular-nums text-zinc-500 shrink-0 w-14 text-right">
+                        {sharePct.toFixed(0)}%
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
           <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 text-sm">
             <h2 className="text-xs uppercase tracking-wider text-amber-300 mb-2 flex items-center gap-2">
               <AlertCircle className="w-3.5 h-3.5" />
