@@ -344,3 +344,26 @@ export function listTags(): { tag: string; count: number }[] {
 export function listPostsByTag(tag: string): BlogPost[] {
   return listPosts().filter((p) => p.tags.includes(tag));
 }
+
+/**
+ * Returns up to `limit` posts ranked by tag overlap with the source post,
+ * tie-broken by recency. The source post itself is excluded. Falls back to
+ * the most recent posts when there is no overlap so callers always have
+ * something to render.
+ */
+export function listRelatedPosts(slug: string, limit = 3): BlogPost[] {
+  const source = getPostBySlug(slug);
+  if (!source) return listPosts().slice(0, limit);
+  const others = listPosts().filter((p) => p.slug !== slug);
+  const scored = others.map((p) => {
+    const overlap = p.tags.filter((t) => source.tags.includes(t)).length;
+    return { post: p, overlap };
+  });
+  scored.sort((a, b) => {
+    if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+    return b.post.publishedAt.localeCompare(a.post.publishedAt);
+  });
+  // If nothing overlaps the source's tags, the sort above is just by date
+  // descending anyway — so we still return something useful.
+  return scored.slice(0, limit).map((s) => s.post);
+}

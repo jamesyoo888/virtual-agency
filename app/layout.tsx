@@ -8,6 +8,7 @@ import AttributionSnapshotClient from "@/components/attribution-snapshot";
 import { organizationLd, ldScript } from "@/lib/seo/json-ld";
 import { getBanner } from "@/lib/banner";
 import SiteBanner, { type BannerConfig } from "@/components/site-banner";
+import CookieConsent from "@/components/cookie-consent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -71,6 +72,7 @@ export default async function RootLayout({
         {banner && <SiteBanner banner={banner as BannerConfig} />}
         <ToastProvider>{children}</ToastProvider>
         <AttributionSnapshotClient />
+        <CookieConsent />
         <Analytics />
         <SpeedInsights />
       </body>

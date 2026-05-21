@@ -91,11 +91,15 @@ export interface ArticleLdInput {
   description: string;
   slug: string;
   publishedAt: string;
+  updatedAt?: string;
   tags?: string[];
+  /** Optional reading-time signal exposed to crawlers + assistants. */
+  readingMinutes?: number;
 }
 
 export function blogPostingLd(input: ArticleLdInput) {
   const url = `${SITE_URL}/blog/${input.slug}`;
+  const ogImage = `${SITE_URL}/api/og?blog=${encodeURIComponent(input.slug)}`;
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -103,16 +107,28 @@ export function blogPostingLd(input: ArticleLdInput) {
     headline: input.title,
     description: input.description,
     url,
+    image: [ogImage],
     datePublished: input.publishedAt,
-    dateModified: input.publishedAt,
+    dateModified: input.updatedAt ?? input.publishedAt,
     inLanguage: "ko-KR",
     keywords: input.tags?.join(", "),
+    articleSection: input.tags?.[0],
+    wordCount: input.readingMinutes ? input.readingMinutes * 250 : undefined,
+    timeRequired: input.readingMinutes ? `PT${input.readingMinutes}M` : undefined,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    author: { "@type": "Organization", name: ORG_NAME, url: SITE_URL },
+    author: {
+      "@type": "Organization",
+      name: `${ORG_NAME} Editorial`,
+      url: SITE_URL,
+    },
     publisher: {
       "@type": "Organization",
       name: ORG_NAME,
       url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/press/logo-mark.svg`,
+      },
     },
   };
 }

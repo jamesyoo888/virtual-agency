@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { listPosts, getPostBySlug, tagSlug } from "@/lib/blog/posts";
+import {
+  listPosts,
+  getPostBySlug,
+  listRelatedPosts,
+  tagSlug,
+} from "@/lib/blog/posts";
 import { ArrowLeft } from "lucide-react";
 import { blogPostingLd, breadcrumbLd, ldScript } from "@/lib/seo/json-ld";
 
@@ -51,9 +56,7 @@ export default async function BlogPostPage({
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const others = listPosts()
-    .filter((p) => p.slug !== post.slug)
-    .slice(0, 3);
+  const related = listRelatedPosts(post.slug, 3);
 
   const articleLd = blogPostingLd({
     title: post.title,
@@ -61,6 +64,7 @@ export default async function BlogPostPage({
     slug: post.slug,
     publishedAt: post.publishedAt,
     tags: post.tags,
+    readingMinutes: post.readingMinutes,
   });
   const crumbsLd = breadcrumbLd([
     { name: "Home", url: SITE_URL },
@@ -139,19 +143,24 @@ export default async function BlogPostPage({
             </div>
           </div>
 
-          {others.length > 0 && (
+          {related.length > 0 && (
             <section className="mt-12">
               <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-4">
-                다른 글
+                관련 글
               </h3>
-              <ul className="space-y-3">
-                {others.map((o) => (
+              <ul className="space-y-4">
+                {related.map((o) => (
                   <li key={o.slug}>
                     <Link
                       href={`/blog/${o.slug}`}
-                      className="text-sm text-zinc-300 hover:underline"
+                      className="group block"
                     >
-                      {o.title}
+                      <p className="text-sm text-zinc-200 group-hover:underline">
+                        {o.title}
+                      </p>
+                      <p className="text-xs text-zinc-500 mt-1 truncate">
+                        {o.excerpt}
+                      </p>
                     </Link>
                   </li>
                 ))}
