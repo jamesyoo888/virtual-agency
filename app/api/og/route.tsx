@@ -162,8 +162,41 @@ export async function GET(request: Request) {
     );
   }
   if (isTrending) {
+    // Personalize the trending card if the page passed an industry or mood.
+    // /trending?industry=beauty shares an OG card calling out "뷰티 트렌딩 모델"
+    // instead of the generic catalog headline.
+    const trIndustry = searchParams.get("industry");
+    const trMood = searchParams.get("mood");
+    const industryLabel =
+      trIndustry && INDUSTRY_LABELS[trIndustry]
+        ? INDUSTRY_LABELS[trIndustry]
+        : null;
+    const moodLabel =
+      trMood && MOOD_LABELS[trMood] ? MOOD_LABELS[trMood] : null;
+    const eyebrow = "VIRTUAL AGENCY · TRENDING";
+    if (industryLabel && moodLabel) {
+      return bigCard(
+        eyebrow,
+        `${moodLabel} ${industryLabel} 트렌딩 모델`,
+        "30일 페이지 뷰 기준 카탈로그 모멘텀. 산업·무드 필터 적용."
+      );
+    }
+    if (industryLabel) {
+      return bigCard(
+        eyebrow,
+        `${industryLabel} 트렌딩 모델`,
+        "30일 페이지 뷰 기준 카탈로그 모멘텀. 산업 필터 적용."
+      );
+    }
+    if (moodLabel) {
+      return bigCard(
+        eyebrow,
+        `${moodLabel} 무드 트렌딩 모델`,
+        "30일 페이지 뷰 기준 카탈로그 모멘텀. 무드 필터 적용."
+      );
+    }
     return bigCard(
-      "VIRTUAL AGENCY · TRENDING",
+      eyebrow,
       "이번 주 광고주가 가장 많이 둘러본 모델",
       "30일 페이지 뷰 기준 카탈로그 모멘텀 상위 12명. 실시간 동향 그대로 노출."
     );

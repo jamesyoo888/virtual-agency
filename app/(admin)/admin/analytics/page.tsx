@@ -8,6 +8,8 @@ import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics — Virtual Agency" };
 
+const WINDOWS: Record<string, number> = { "7": 7, "30": 30, "90": 90 };
+
 interface ProjectAgg {
   model_id: string | null;
   status: string;
@@ -31,13 +33,14 @@ interface IndustryStat {
   inquiries: number;
 }
 
-async function loadAnalytics(): Promise<{
+async function loadAnalytics(windowDays: number): Promise<{
   totalInquiries: number;
   totalDelivered: number;
   conversionPct: number;
   topModels: TopModel[];
   byIndustry: IndustryStat[];
-  daily30: DailyBucket[];
+  daily: DailyBucket[];
+  windowDays: number;
 }> {
   if (!SUPABASE_CONFIGURED) {
     return {
@@ -46,12 +49,15 @@ async function loadAnalytics(): Promise<{
       conversionPct: 0,
       topModels: [],
       byIndustry: [],
-      daily30: aggregateDaily([], 30),
+      daily: aggregateDaily([], windowDays),
+      windowDays,
     };
   }
   const supabase = await createClient();
   const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
-  const thirtyAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const dailyAgo = new Date(
+    Date.now() - windowDays * 24 * 60 * 60 * 1000
+  ).toISOString();
   const [{ data }, daily] = await Promise.all([
     supabase
       .from("projects")
@@ -60,12 +66,12 @@ async function loadAnalytics(): Promise<{
     supabase
       .from("projects")
       .select("created_at")
-      .gte("created_at", thirtyAgo),
+      .gte("created_at", dailyAgo),
   ]);
 
   const projects = (data as unknown as ProjectAgg[]) ?? [];
   const dailyRows = ((daily.data ?? []) as { created_at: string }[]);
-  const daily30 = aggregateDaily(dailyRows, 30);
+  const dailySeries = aggregateDaily(dailyRows, windowDays);
   const totalInquiries = projects.length;
   const totalDelivered = projects.filter((p) => p.status === "delivered").length;
   const conversionPct =
@@ -99,11 +105,25 @@ async function loadAnalytics(): Promise<{
     .map(([industry, inquiries]) => ({ industry, inquiries }))
     .sort((a, b) => b.inquiries - a.inquiries);
 
-  return { totalInquiries, totalDelivered, conversionPct, topModels, byIndustry, daily30 };
+  return {
+    totalInquiries,
+    totalDelivered,
+    conversionPct,
+    topModels,
+    byIndustry,
+    daily: dailySeries,
+    windowDays,
+  };
 }
 
-export default async function AnalyticsPage() {
-  const a = await loadAnalytics();
+export default async function AnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ window?: string }>;
+}) {
+  const sp = await searchParams;
+  const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
+  const a = await loadAnalytics(windowDays);
   const maxModelInquiries = Math.max(1, ...a.topModels.map((m) => m.inquiries));
   const maxIndustry = Math.max(1, ...a.byIndustry.map((i) => i.inquiries));
 
@@ -129,17 +149,36 @@ export default async function AnalyticsPage() {
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-4 h-4 text-zinc-400" />
           <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
-            30일 일별 문의 추세
+            {a.windowDays}일 일별 문의 추세
           </h2>
-          <span className="ml-auto text-[10px] text-zinc-600 tabular-nums">
-            {a.daily30.reduce((sum, d) => sum + d.count, 0)} 건 누적 · KST
-          </span>
+          <div className="ml-auto flex items-center gap-1 text-[11px]">
+            {(["7", "30", "90"] as const).map((w) => {
+              const active = a.windowDays === Number(w);
+              const href = w === "30" ? "/admin/analytics" : `/admin/analytics?window=${w}`;
+              return (
+                <Link
+                  key={w}
+                  href={href}
+                  className={`px-2 py-0.5 rounded border ${
+                    active
+                      ? "bg-zinc-100 text-black border-zinc-100"
+                      : "text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                  }`}
+                >
+                  {w}d
+                </Link>
+              );
+            })}
+            <span className="ml-2 text-zinc-600 tabular-nums">
+              {a.daily.reduce((sum, d) => sum + d.count, 0)} 건 · KST
+            </span>
+          </div>
         </div>
         {(() => {
-          const peak = Math.max(1, ...a.daily30.map((d) => d.count));
+          const peak = Math.max(1, ...a.daily.map((d) => d.count));
           return (
             <div className="flex items-end gap-px h-32">
-              {a.daily30.map((d) => {
+              {a.daily.map((d) => {
                 const heightPct = (d.count / peak) * 100;
                 const isWeekStart = d.date.endsWith("-01") || d.date.endsWith("01");
                 return (
@@ -168,7 +207,7 @@ export default async function AnalyticsPage() {
           );
         })()}
         <p className="mt-6 text-[10px] text-zinc-600">
-          가장 왼쪽 = 30일 전, 가장 오른쪽 = 오늘. 마우스 오버 시 일자·건수 표시.
+          가장 왼쪽 = {a.windowDays}일 전, 가장 오른쪽 = 오늘. 마우스 오버 시 일자·건수 표시.
         </p>
       </section>
 

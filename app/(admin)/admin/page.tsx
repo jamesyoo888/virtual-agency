@@ -48,6 +48,27 @@ interface OpsSnapshot {
   pendingReviews: number;
 }
 
+interface TrendingNowRow {
+  id: string;
+  name: string;
+  view_count_30d: number;
+}
+
+async function loadTrendingNow(): Promise<TrendingNowRow[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  const supabase = await createClient();
+  // Cheap secondary signal — popularity view already exists. Top-5 by 30d
+  // views surfaces what the operator should be staffing this week.
+  const { data } = await supabase
+    .from("models_with_popularity")
+    .select("id, name, view_count_30d")
+    .eq("status", "active")
+    .order("view_count_30d", { ascending: false })
+    .gt("view_count_30d", 0)
+    .limit(5);
+  return (data as TrendingNowRow[] | null) ?? [];
+}
+
 interface WowSnapshot {
   inquiries: WowMetric;
   delivered: WowMetric;
@@ -221,7 +242,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla, wow] =
+  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla, wow, trendingNow] =
     await Promise.all([
       loadKPIs(),
       summarizeUsage(),
@@ -232,6 +253,7 @@ export default async function AdminHomePage() {
       loadOpsSnapshot(),
       loadResponseSla(30),
       loadWowSnapshot(),
+      loadTrendingNow(),
     ]);
 
   return (
@@ -288,6 +310,41 @@ export default async function AdminHomePage() {
           href="/admin/video-studio"
         />
       </section>
+
+      {trendingNow.length > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+              지금 트렌딩 (30d 노출)
+            </h2>
+            <Link
+              href="/trending"
+              className="text-xs text-zinc-400 hover:text-white inline-flex items-center gap-1"
+            >
+              공개 페이지 <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <ul className="grid grid-cols-1 md:grid-cols-5 gap-2">
+            {trendingNow.map((m, i) => (
+              <li key={m.id}>
+                <Link
+                  href={`/admin/models/${m.id}`}
+                  className="block rounded-lg border border-zinc-800 bg-zinc-950/50 p-3 hover:border-zinc-600 transition-colors"
+                >
+                  <p className="text-[10px] text-zinc-500 tabular-nums">
+                    #{i + 1}
+                  </p>
+                  <p className="font-medium text-sm truncate mt-0.5">{m.name}</p>
+                  <p className="text-[11px] text-emerald-400 mt-1 tabular-nums">
+                    {m.view_count_30d.toLocaleString()} views · 30d
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 mb-1">

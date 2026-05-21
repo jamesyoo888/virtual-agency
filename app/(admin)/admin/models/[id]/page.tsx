@@ -16,6 +16,7 @@ import {
   MOOD_LABELS,
 } from "@/lib/tags";
 import { ageInYears } from "@/lib/utils";
+import AdminModelPerfCard from "@/components/admin-model-perf-card";
 
 // ── EditForm type ─────────────────────────────────────────────────────────────
 
@@ -258,7 +259,7 @@ export default function AdminModelDetailPage() {
 
       <div className="grid grid-cols-3 gap-8">
         {/* Concept image */}
-        <div className="col-span-1">
+        <div className="col-span-1 space-y-4">
           {m.concept_image ? (
             <div className="aspect-[3/4] relative rounded-lg overflow-hidden bg-zinc-900">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -273,6 +274,7 @@ export default function AdminModelDetailPage() {
               No image
             </div>
           )}
+          <AdminModelPerfCard modelId={m.id} />
         </div>
 
         {/* Details */}
