@@ -5,10 +5,26 @@ import { Download, Mail, ArrowRight } from "lucide-react";
 
 export const revalidate = 3600;
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
+
 export const metadata = {
   title: "프레스 — Virtual Agency",
   description:
     "Virtual Agency 보도자료, 회사 소개, 로고 자산, 미디어 문의 창구.",
+  openGraph: {
+    title: "프레스 — Virtual Agency",
+    description: "통계·로고·미디어 문의 한 곳에서.",
+    url: `${SITE_URL}/press`,
+    type: "website" as const,
+    images: [`${SITE_URL}/api/og?press=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "프레스 — Virtual Agency",
+    description: "통계·로고·미디어 문의.",
+    images: [`${SITE_URL}/api/og?press=1`],
+  },
 };
 
 interface PressStats {

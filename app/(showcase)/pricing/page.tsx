@@ -6,10 +6,27 @@ import type { Model } from "@/types";
 import { ArrowRight, Check } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
+
 export const metadata = {
   title: "가격 — Virtual Agency",
   description:
     "프로젝트 단위 견적. 일수, 독점 여부, 매체 사용 범위에 따라 즉시 산출됩니다.",
+  openGraph: {
+    title: "가격 — Virtual Agency",
+    description: "투명한 가격대, 즉시 견적. 분기 단위 묶음 할인.",
+    url: `${SITE_URL}/pricing`,
+    type: "website" as const,
+    images: [`${SITE_URL}/api/og?pricing=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "가격 — Virtual Agency",
+    description: "투명한 가격대, 즉시 견적.",
+    images: [`${SITE_URL}/api/og?pricing=1`],
+  },
 };
 
 interface PriceStats {

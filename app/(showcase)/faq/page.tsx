@@ -3,9 +3,25 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { faqPageLd, ldScript } from "@/lib/seo/json-ld";
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
+
 export const metadata: Metadata = {
   title: "FAQ — Virtual Agency",
   description: "라이선스·가격·제작 기간·사용 범위·환불에 대한 자주 묻는 질문",
+  openGraph: {
+    title: "FAQ — Virtual Agency",
+    description: "AI 버추얼 모델·라이선스·납기·결제에 대한 답변.",
+    url: `${SITE_URL}/faq`,
+    type: "website" as const,
+    images: [`${SITE_URL}/api/og?faq=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "FAQ — Virtual Agency",
+    description: "AI 버추얼 모델·라이선스·납기·결제에 대한 답변.",
+    images: [`${SITE_URL}/api/og?faq=1`],
+  },
 };
 
 interface QA {

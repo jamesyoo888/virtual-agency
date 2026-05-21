@@ -85,6 +85,9 @@ export async function GET(request: Request) {
   const isCases = searchParams.get("cases") === "1";
   const isCareers = searchParams.get("careers") === "1";
   const isServices = searchParams.get("services") === "1";
+  const isPricing = searchParams.get("pricing") === "1";
+  const isFaq = searchParams.get("faq") === "1";
+  const isPress = searchParams.get("press") === "1";
   const exploreIndustry = searchParams.get("explore_industry");
   const exploreMood = searchParams.get("explore_mood");
   const exploreGenre = searchParams.get("explore_genre");
@@ -125,6 +128,27 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · SERVICES",
       "5가지 핵심 서비스",
       "이미지 · 영상 · 룩북 · 픽업 데이 · 브랜드 키트, 한 곳에서."
+    );
+  }
+  if (isPricing) {
+    return bigCard(
+      "VIRTUAL AGENCY · PRICING",
+      "투명한 가격대, 즉시 견적",
+      "일수·독점·매체 범위에 따라 카탈로그에서 자동 산출. 분기 단위 묶음 할인."
+    );
+  }
+  if (isFaq) {
+    return bigCard(
+      "VIRTUAL AGENCY · FAQ",
+      "자주 묻는 질문",
+      "AI 버추얼 모델·라이선스·납기·결제·확장 컷에 대한 답변."
+    );
+  }
+  if (isPress) {
+    return bigCard(
+      "VIRTUAL AGENCY · PRESS",
+      "프레스 자료 + 미디어 키트",
+      "통계·로고·미디어 문의 한 곳에서. press@aihubs.uk"
     );
   }
   if (exploreIndustry && INDUSTRY_LABELS[exploreIndustry]) {

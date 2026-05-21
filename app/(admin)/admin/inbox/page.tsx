@@ -46,7 +46,8 @@ const STATUS_TONE: Record<string, string> = {
 
 async function fetchProjects(
   statusFilter?: string,
-  q?: string
+  q?: string,
+  source?: string
 ): Promise<ProjectRow[]> {
   if (!SUPABASE_CONFIGURED) return [];
   const supabase = await createClient();
@@ -58,6 +59,15 @@ async function fetchProjects(
     .order("created_at", { ascending: false })
     .limit(200);
   if (statusFilter && statusFilter !== "all") query = query.eq("status", statusFilter);
+  if (source && source !== "all") {
+    if (source === "(direct)") {
+      // "(direct)" pseudo-source = no utm_source AND no referrer host. Surfaces
+      // visitors who came in without any attribution signal.
+      query = query.is("utm_source", null).is("referrer", null);
+    } else {
+      query = query.eq("utm_source", source);
+    }
+  }
   if (q && q.trim()) {
     // Escape ilike wildcards (% _) — Supabase escape token is backslash.
     const term = `%${q.trim().replace(/[%_]/g, "\\$&")}%`;
@@ -101,12 +111,31 @@ async function fetchProjects(
 }
 
 interface Props {
-  searchParams: Promise<{ status?: string; q?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; source?: string }>;
+}
+
+async function loadSourceOptions(): Promise<string[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  const supabase = await createClient();
+  const since = new Date(Date.now() - 90 * 86_400_000).toISOString();
+  const { data } = await supabase
+    .from("projects")
+    .select("utm_source")
+    .gte("created_at", since)
+    .not("utm_source", "is", null)
+    .limit(2000);
+  const rows = ((data ?? []) as { utm_source: string | null }[])
+    .map((r) => r.utm_source!)
+    .filter(Boolean);
+  return Array.from(new Set(rows)).sort();
 }
 
 export default async function AdminInboxPage({ searchParams }: Props) {
-  const { status, q } = await searchParams;
-  const projects = await fetchProjects(status, q);
+  const { status, q, source } = await searchParams;
+  const [projects, sourceOptions] = await Promise.all([
+    fetchProjects(status, q, source),
+    loadSourceOptions(),
+  ]);
 
   const counts: Record<string, number> = { all: 0 };
   for (const p of projects) counts[p.status] = (counts[p.status] ?? 0) + 1;
@@ -151,6 +180,7 @@ export default async function AdminInboxPage({ searchParams }: Props) {
             const params = new URLSearchParams();
             if (tab.value !== "all") params.set("status", tab.value);
             if (q) params.set("q", q);
+            if (source) params.set("source", source);
             const qs = params.toString();
             const href = qs ? `/admin/inbox?${qs}` : "/admin/inbox";
             return (
@@ -173,6 +203,34 @@ export default async function AdminInboxPage({ searchParams }: Props) {
         </nav>
         <InboxSearch />
       </div>
+
+      {sourceOptions.length > 0 && (
+        <div className="mb-6 flex flex-wrap items-center gap-1.5 text-[11px]">
+          <span className="text-zinc-500 mr-1">출처:</span>
+          {[{ value: "all", label: "전체" }, { value: "(direct)", label: "(direct)" }, ...sourceOptions.map((s) => ({ value: s, label: s }))].map((opt) => {
+            const active = (source ?? "all") === opt.value;
+            const params = new URLSearchParams();
+            if (opt.value !== "all") params.set("source", opt.value);
+            if (status && status !== "all") params.set("status", status);
+            if (q) params.set("q", q);
+            const qs = params.toString();
+            const href = qs ? `/admin/inbox?${qs}` : "/admin/inbox";
+            return (
+              <Link
+                key={opt.value}
+                href={href}
+                className={`px-2 py-1 rounded border transition-colors ${
+                  active
+                    ? "bg-zinc-100 text-black border-zinc-100"
+                    : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                {opt.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
 
       {!SUPABASE_CONFIGURED ? (
         <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
