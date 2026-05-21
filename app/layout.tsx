@@ -5,7 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ToastProvider } from "@/components/toast";
 import AttributionSnapshotClient from "@/components/attribution-snapshot";
-import { organizationLd, ldScript } from "@/lib/seo/json-ld";
+import { organizationLd, siteNavigationLd, ldScript } from "@/lib/seo/json-ld";
 import { getBanner } from "@/lib/banner";
 import SiteBanner, { type BannerConfig } from "@/components/site-banner";
 import CookieConsent from "@/components/cookie-consent";
@@ -59,6 +59,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const banner = await getBanner();
+  const navLd = siteNavigationLd([
+    { name: "카탈로그", url: `${SITE_URL}/` },
+    { name: "AI 매칭", url: `${SITE_URL}/match` },
+    { name: "서비스", url: `${SITE_URL}/services` },
+    { name: "가격", url: `${SITE_URL}/pricing` },
+    { name: "사례", url: `${SITE_URL}/cases` },
+    { name: "블로그", url: `${SITE_URL}/blog` },
+    { name: "FAQ", url: `${SITE_URL}/faq` },
+    { name: "프레스", url: `${SITE_URL}/press` },
+    { name: "크리에이터 합류", url: `${SITE_URL}/careers` },
+    { name: "회사 소개", url: `${SITE_URL}/about` },
+  ]);
   return (
     <html
       lang="ko"
@@ -68,6 +80,10 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: ldScript(organizationLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ldScript(navLd) }}
         />
         {banner && <SiteBanner banner={banner as BannerConfig} />}
         <ToastProvider>{children}</ToastProvider>

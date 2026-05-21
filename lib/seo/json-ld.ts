@@ -189,6 +189,30 @@ export function itemListLd(name: string, entries: ItemListEntry[]) {
   };
 }
 
+export interface SiteNavEntry {
+  name: string;
+  url: string;
+}
+
+/**
+ * SiteNavigationElement is Google's recommended hint for sitelink eligibility
+ * — emit it on the root layout so the public nav is discoverable in one shot.
+ * Per schema.org we wrap the elements in an ItemList for consumer clarity.
+ */
+export function siteNavigationLd(entries: SiteNavEntry[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${ORG_NAME} site navigation`,
+    itemListElement: entries.map((e, i) => ({
+      "@type": "SiteNavigationElement",
+      position: i + 1,
+      name: e.name,
+      url: e.url,
+    })),
+  };
+}
+
 export interface HowToStepInput {
   name: string;
   text: string;
