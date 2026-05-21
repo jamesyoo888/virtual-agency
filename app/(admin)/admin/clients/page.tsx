@@ -34,6 +34,8 @@ interface ClientSummary {
   campaignCount: number;
   deliveredCount: number;
   totalRevenue: number;
+  /** Revenue from delivered projects updated within the last 90 days. */
+  revenue90d: number;
   lastActivityAt: string | null;
   conversionRate: number | null;
 }
@@ -41,8 +43,10 @@ interface ClientSummary {
 async function loadSummaries(): Promise<{
   clients: ClientSummary[];
   totalRevenue: number;
+  totalRevenue90d: number;
 }> {
-  if (!SUPABASE_CONFIGURED) return { clients: [], totalRevenue: 0 };
+  if (!SUPABASE_CONFIGURED)
+    return { clients: [], totalRevenue: 0, totalRevenue90d: 0 };
   const supabase = await createClient();
 
   const [{ data: clientsRaw }, { data: projectsRaw }] = await Promise.all([
@@ -69,6 +73,8 @@ async function loadSummaries(): Promise<{
   }
 
   let totalRevenue = 0;
+  let totalRevenue90d = 0;
+  const ninetyAgo = Date.now() - 90 * 86_400_000;
   const summaries: ClientSummary[] = clients.map((c) => {
     const own = byClient.get(c.id) ?? [];
     const delivered = own.filter((p) => p.status === "delivered");
@@ -76,7 +82,13 @@ async function loadSummaries(): Promise<{
       (sum, p) => sum + (p.invoice_amount ?? 0),
       0
     );
+    const revenue90d = delivered.reduce((sum, p) => {
+      const t = new Date(p.updated_at).getTime();
+      if (Number.isFinite(t) && t >= ninetyAgo) return sum + (p.invoice_amount ?? 0);
+      return sum;
+    }, 0);
     totalRevenue += revenue;
+    totalRevenue90d += revenue90d;
     const lastTs = own
       .map((p) => new Date(p.updated_at).getTime())
       .sort((a, b) => b - a)[0];
@@ -89,6 +101,7 @@ async function loadSummaries(): Promise<{
       campaignCount: own.length,
       deliveredCount: delivered.length,
       totalRevenue: revenue,
+      revenue90d,
       lastActivityAt:
         lastTs && Number.isFinite(lastTs) ? new Date(lastTs).toISOString() : null,
       conversionRate:
@@ -97,7 +110,7 @@ async function loadSummaries(): Promise<{
   });
 
   summaries.sort((a, b) => b.totalRevenue - a.totalRevenue);
-  return { clients: summaries, totalRevenue };
+  return { clients: summaries, totalRevenue, totalRevenue90d };
 }
 
 const KRW = new Intl.NumberFormat("ko-KR");
@@ -105,9 +118,11 @@ const KRW = new Intl.NumberFormat("ko-KR");
 function ConcentrationCard({
   clients,
   totalRevenue,
+  totalRevenue90d,
 }: {
   clients: ClientSummary[];
   totalRevenue: number;
+  totalRevenue90d: number;
 }) {
   // Concentration risk — share of revenue earned by the top-5 paying clients.
   // > 60% is a yellow flag for a single-vendor agency, > 80% is red.
@@ -118,6 +133,16 @@ function ConcentrationCard({
   const top5 = paying.slice(0, 5);
   const top5Sum = top5.reduce((s, c) => s + c.totalRevenue, 0);
   const top5Share = top5Sum / totalRevenue;
+  // Same calculation but only on the trailing 90-day window. Lifetime
+  // concentration can mask a recent diversification (or vice versa). When
+  // the two values diverge sharply, the operator should investigate the
+  // delta rather than just the lifetime number.
+  const paying90 = clients
+    .filter((c) => c.revenue90d > 0)
+    .sort((a, b) => b.revenue90d - a.revenue90d);
+  const top5_90 = paying90.slice(0, 5);
+  const top5_90Sum = top5_90.reduce((s, c) => s + c.revenue90d, 0);
+  const top5_90Share = totalRevenue90d > 0 ? top5_90Sum / totalRevenue90d : 0;
   // Repeat-customer revenue share — what % of total revenue comes from
   // clients with 2+ campaigns. Healthy agencies trend > 50%.
   const repeatRevenue = clients
@@ -130,6 +155,12 @@ function ConcentrationCard({
       : top5Share > 0.6
       ? "text-amber-400"
       : "text-emerald-400";
+  const tone90 =
+    top5_90Share > 0.8
+      ? "text-red-400"
+      : top5_90Share > 0.6
+      ? "text-amber-400"
+      : "text-emerald-400";
   return (
     <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
       <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-4 flex items-center gap-2">
@@ -138,16 +169,29 @@ function ConcentrationCard({
         )}
         매출 집중도 분석
       </h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         <div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-500">
-            Top-5 광고주 매출 비중
+            Top-5 비중 (Lifetime)
           </p>
           <p className={`text-2xl font-bold tabular-nums mt-1 ${tone}`}>
             {(top5Share * 100).toFixed(0)}%
           </p>
           <p className="text-[10px] text-zinc-600 mt-1">
             ₩{KRW.format(top5Sum)} / 총 ₩{KRW.format(totalRevenue)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+            Top-5 비중 (90d)
+          </p>
+          <p className={`text-2xl font-bold tabular-nums mt-1 ${tone90}`}>
+            {totalRevenue90d > 0
+              ? `${(top5_90Share * 100).toFixed(0)}%`
+              : "—"}
+          </p>
+          <p className="text-[10px] text-zinc-600 mt-1">
+            ₩{KRW.format(top5_90Sum)} / ₩{KRW.format(totalRevenue90d)}
           </p>
         </div>
         <div>
@@ -190,7 +234,7 @@ function ConcentrationCard({
         </div>
       </div>
       <p className="mt-4 text-[11px] text-zinc-600 leading-relaxed">
-        Top-5 비중이 60% 초과면 단일 광고주 의존 리스크. 재구매 매출이 50% 미만이면 신규 유입 채널의 LTV 가 부족한 신호로 해석합니다.
+        Top-5 비중이 60% 초과면 단일 광고주 의존 리스크. 재구매 매출이 50% 미만이면 신규 유입 채널의 LTV 가 부족한 신호. Lifetime 과 90d 비중이 크게 다르면(±15pp 이상) 최근 분기에 구조 변화가 있다는 신호로, 신규 광고주 유입 또는 핵심 광고주 이탈을 확인하세요.
       </p>
     </section>
   );
@@ -209,7 +253,7 @@ function relativeLabel(iso: string | null): string {
 }
 
 export default async function AdminClientsPage() {
-  const { clients, totalRevenue } = await loadSummaries();
+  const { clients, totalRevenue, totalRevenue90d } = await loadSummaries();
 
   const activeClients = clients.filter((c) => c.campaignCount > 0);
   const repeatClients = clients.filter((c) => c.campaignCount >= 2);
@@ -264,7 +308,11 @@ export default async function AdminClientsPage() {
         </div>
       </section>
 
-      <ConcentrationCard clients={clients} totalRevenue={totalRevenue} />
+      <ConcentrationCard
+        clients={clients}
+        totalRevenue={totalRevenue}
+        totalRevenue90d={totalRevenue90d}
+      />
 
 
       {!SUPABASE_CONFIGURED ? (

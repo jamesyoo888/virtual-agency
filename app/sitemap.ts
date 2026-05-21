@@ -190,22 +190,40 @@ export default async function sitemap(
 
     const ids = (models ?? []).map((m) => m.id);
 
-    // Models with approved reviews carry social proof → boost priority and
-    // changefreq. Single round-trip, no per-row lookup. We pull only the
-    // distinct model_ids in the current shard's slice; the count itself
-    // isn't needed — presence is enough to lift the bucket.
-    let boostedSet = new Set<string>();
+    // Two boost signals applied in parallel:
+    //   - Models with approved reviews carry social proof.
+    //   - Models in the 30d trending top contribute fresh momentum.
+    // Both are inspected once via the popularity view and the reviews table.
+    // Fall through cleanly if either query fails — sitemap should never block
+    // on a missing signal.
+    let reviewedSet = new Set<string>();
+    let trendingSet = new Set<string>();
     if (ids.length > 0) {
-      const { data: reviewed } = await supabase
-        .from("reviews")
-        .select("model_id")
-        .in("model_id", ids)
-        .eq("status", "approved");
-      boostedSet = new Set((reviewed ?? []).map((r) => r.model_id as string));
+      const [reviewedRes, trendingRes] = await Promise.all([
+        supabase
+          .from("reviews")
+          .select("model_id")
+          .in("model_id", ids)
+          .eq("status", "approved"),
+        supabase
+          .from("models_with_popularity")
+          .select("id")
+          .in("id", ids)
+          .order("view_count_30d", { ascending: false })
+          .gt("view_count_30d", 0)
+          .limit(24),
+      ]);
+      reviewedSet = new Set(
+        (reviewedRes.data ?? []).map((r) => r.model_id as string)
+      );
+      trendingSet = new Set(
+        (trendingRes.data ?? []).map((r) => r.id as string)
+      );
     }
 
     const modelRoutes: MetadataRoute.Sitemap = (models ?? []).map((m) => {
-      const boosted = boostedSet.has(m.id);
+      const reviewed = reviewedSet.has(m.id);
+      const trending = trendingSet.has(m.id);
       // Google Image sitemap extension — passes the concept image alongside
       // the page URL so Image Search can index the model card directly. The
       // `images` field is part of MetadataRoute.Sitemap in Next 16.
@@ -213,13 +231,19 @@ export default async function sitemap(
         m.concept_image && /^https?:\/\//.test(m.concept_image)
           ? [m.concept_image]
           : undefined;
+      // Trending overrides reviewed when both apply — hourly crawls capture
+      // momentum better than daily for a feed that genuinely changes.
+      const changeFrequency = trending
+        ? ("hourly" as const)
+        : reviewed
+        ? ("daily" as const)
+        : ("weekly" as const);
+      const priority = reviewed || trending ? 1.0 : 0.8;
       return {
         url: `${SITE_URL}/models/${m.id}`,
         lastModified: m.updated_at ? new Date(m.updated_at) : now,
-        // Reviewed models are crawled more aggressively — fresh social proof
-        // earns the URL more attention from search engines.
-        changeFrequency: boosted ? ("daily" as const) : ("weekly" as const),
-        priority: boosted ? 1.0 : 0.8,
+        changeFrequency,
+        priority,
         ...(images ? { images } : {}),
       };
     });

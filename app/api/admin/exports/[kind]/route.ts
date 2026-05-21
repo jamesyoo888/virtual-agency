@@ -612,6 +612,28 @@ export async function GET(
       },
       { metric: "scenario_base", value: String(r.scenarios.base) },
       { metric: "scenario_optimistic", value: String(r.scenarios.optimistic) },
+      // Per-model rollup. Flattens to `pipeline_by_model_<id>__<count|value>`
+      // so the existing two-column shape stays intact — Excel users can
+      // sort/filter without unmerging columns. Order preserves the
+      // value-desc ranking from summarizePipelineByModel.
+      ...r.pipelineByModel.flatMap((m, i) => [
+        {
+          metric: `pipeline_by_model_${i + 1}_id`,
+          value: m.model_id,
+        },
+        {
+          metric: `pipeline_by_model_${i + 1}_name`,
+          value: m.model_name,
+        },
+        {
+          metric: `pipeline_by_model_${i + 1}_count`,
+          value: String(m.count),
+        },
+        {
+          metric: `pipeline_by_model_${i + 1}_value`,
+          value: String(m.value),
+        },
+      ]),
     ];
     const csv = toCSV(rows, ["metric", "value"] as const);
     return new NextResponse(csv, {

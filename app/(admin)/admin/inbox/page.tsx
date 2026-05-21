@@ -48,7 +48,8 @@ const STATUS_TONE: Record<string, string> = {
 async function fetchProjects(
   statusFilter?: string,
   q?: string,
-  source?: string
+  source?: string,
+  stale?: boolean
 ): Promise<ProjectRow[]> {
   if (!SUPABASE_CONFIGURED) return [];
   const supabase = await createClient();
@@ -59,7 +60,13 @@ async function fetchProjects(
     )
     .order("created_at", { ascending: false })
     .limit(200);
-  if (statusFilter && statusFilter !== "all") query = query.eq("status", statusFilter);
+  // Stale = still in `inquiry` status and older than 24h. We force the status
+  // to `inquiry` here so the chip is self-contained — the operator doesn't
+  // also have to set status=inquiry.
+  if (stale) {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    query = query.eq("status", "inquiry").lt("created_at", cutoff);
+  } else if (statusFilter && statusFilter !== "all") query = query.eq("status", statusFilter);
   if (source && source !== "all") {
     if (source === "(direct)") {
       // "(direct)" pseudo-source = no utm_source AND no referrer host. Surfaces
@@ -117,6 +124,7 @@ interface Props {
     q?: string;
     source?: string;
     sort?: string;
+    stale?: string;
   }>;
 }
 
@@ -152,9 +160,10 @@ async function loadPriorDeliveredByClient(clientIds: string[]): Promise<Map<stri
 }
 
 export default async function AdminInboxPage({ searchParams }: Props) {
-  const { status, q, source, sort } = await searchParams;
+  const { status, q, source, sort, stale: staleParam } = await searchParams;
+  const stale = staleParam === "1";
   const [projectsRaw, sourceOptions] = await Promise.all([
-    fetchProjects(status, q, source),
+    fetchProjects(status, q, source, stale),
     loadSourceOptions(),
   ]);
   const priorByClient = await loadPriorDeliveredByClient(
@@ -239,7 +248,7 @@ export default async function AdminInboxPage({ searchParams }: Props) {
             { value: "review", label: "검토" },
             { value: "delivered", label: "완료" },
           ].map((tab) => {
-            const active = (status ?? "all") === tab.value;
+            const active = !stale && (status ?? "all") === tab.value;
             const params = new URLSearchParams();
             if (tab.value !== "all") params.set("status", tab.value);
             if (q) params.set("q", q);
@@ -264,6 +273,28 @@ export default async function AdminInboxPage({ searchParams }: Props) {
               </Link>
             );
           })}
+          {/* Stale = 24h+ unanswered inquiries. SLA breach view. */}
+          {(() => {
+            const params = new URLSearchParams();
+            params.set("stale", "1");
+            if (q) params.set("q", q);
+            if (source) params.set("source", source);
+            if (sort) params.set("sort", sort);
+            const href = `/admin/inbox?${params.toString()}`;
+            return (
+              <Link
+                href={href}
+                className={`ml-1 px-3 py-1.5 rounded-md border transition-colors inline-flex items-center gap-1 ${
+                  stale
+                    ? "bg-red-500/20 text-red-200 border-red-500/50"
+                    : "bg-transparent text-red-400 border-red-500/30 hover:border-red-400 hover:text-red-200"
+                }`}
+              >
+                <Flame className="w-3 h-3" />
+                24h+ Stale
+              </Link>
+            );
+          })()}
         </nav>
         <InboxSearch />
       </div>
