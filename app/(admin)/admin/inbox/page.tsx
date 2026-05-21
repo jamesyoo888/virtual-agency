@@ -2,11 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Inbox, Download } from "lucide-react";
+import { Inbox, Download, Flame } from "lucide-react";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
 import InboxSearch from "@/components/inbox-search";
 import InboxBulkBar from "@/components/inbox-bulk-bar";
+import { computeLeadScore, TIER_LABEL_KO, TIER_TONE } from "@/lib/analytics/lead-score";
 
 export const dynamic = "force-dynamic";
 
@@ -130,12 +131,30 @@ async function loadSourceOptions(): Promise<string[]> {
   return Array.from(new Set(rows)).sort();
 }
 
+async function loadPriorDeliveredByClient(clientIds: string[]): Promise<Map<string, number>> {
+  if (!SUPABASE_CONFIGURED || clientIds.length === 0) return new Map();
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("projects")
+    .select("client_id")
+    .in("client_id", clientIds)
+    .eq("status", "delivered");
+  const counts = new Map<string, number>();
+  for (const r of ((data ?? []) as { client_id: string }[])) {
+    counts.set(r.client_id, (counts.get(r.client_id) ?? 0) + 1);
+  }
+  return counts;
+}
+
 export default async function AdminInboxPage({ searchParams }: Props) {
   const { status, q, source } = await searchParams;
   const [projects, sourceOptions] = await Promise.all([
     fetchProjects(status, q, source),
     loadSourceOptions(),
   ]);
+  const priorByClient = await loadPriorDeliveredByClient(
+    Array.from(new Set(projects.map((p) => p.client_id)))
+  );
 
   const counts: Record<string, number> = { all: 0 };
   for (const p of projects) counts[p.status] = (counts[p.status] ?? 0) + 1;
@@ -263,20 +282,41 @@ export default async function AdminInboxPage({ searchParams }: Props) {
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-baseline justify-between gap-3">
+                <div className="flex items-baseline justify-between gap-3 flex-wrap">
                   <Link
                     href={`/admin/projects/${p.id}`}
                     className="font-medium truncate hover:underline"
                   >
                     {p.title}
                   </Link>
-                  <span
-                    className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${
-                      STATUS_TONE[p.status] ?? "bg-zinc-800 text-zinc-400 border-zinc-700"
-                    }`}
-                  >
-                    {STATUS_LABEL[p.status] ?? p.status}
-                  </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {p.status === "inquiry" && (() => {
+                      const lead = computeLeadScore({
+                        utmSource: p.utm_source,
+                        utmCampaign: p.utm_campaign,
+                        referrer: p.referrer,
+                        brief: p.brief,
+                        createdAt: p.created_at,
+                        priorDeliveredCount: priorByClient.get(p.client_id) ?? 0,
+                      });
+                      return (
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${TIER_TONE[lead.tier]}`}
+                          title={`score ${lead.score} · ${lead.reasons.join(", ")}`}
+                        >
+                          {lead.tier === "hot" && <Flame className="w-3 h-3" />}
+                          {TIER_LABEL_KO[lead.tier]}
+                        </span>
+                      );
+                    })()}
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${
+                        STATUS_TONE[p.status] ?? "bg-zinc-800 text-zinc-400 border-zinc-700"
+                      }`}
+                    >
+                      {STATUS_LABEL[p.status] ?? p.status}
+                    </span>
+                  </div>
                 </div>
                 <p className="text-xs text-zinc-500 mt-0.5">
                   {p.model?.name ?? "모델 미선택"}
