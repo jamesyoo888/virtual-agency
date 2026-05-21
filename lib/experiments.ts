@@ -52,6 +52,13 @@ export const EXPERIMENTS = {
     key: "similar_strategy",
     variants: ["collaborative", "tag"],
   } satisfies ExperimentDef<"collaborative" | "tag">,
+  // Hero subtitle copy test. Three angles — speed-first, cost-first, and the
+  // existing benefit-bundle (control). Conversion event is the same
+  // `inquiry_submit` so we can compare lift to hero_cta directly.
+  hero_subtitle: {
+    key: "hero_subtitle",
+    variants: ["bundle", "speed", "cost"],
+  } satisfies ExperimentDef<"bundle" | "speed" | "cost">,
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;
@@ -68,6 +75,9 @@ export const VARIANT_LABELS: Record<string, string> = {
   "hero_cta.browse": "카탈로그 둘러보기",
   "similar_strategy.collaborative": "함께 본 모델",
   "similar_strategy.tag": "태그 유사 모델",
+  "hero_subtitle.bundle": "혜택 묶음 (control)",
+  "hero_subtitle.speed": "속도 중심 — 24~72시간",
+  "hero_subtitle.cost": "비용 중심 — 1/10 가격",
 };
 
 export function labelFor(experimentKey: string, variant: string): string {

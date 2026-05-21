@@ -6,6 +6,8 @@ import "./globals.css";
 import { ToastProvider } from "@/components/toast";
 import AttributionSnapshotClient from "@/components/attribution-snapshot";
 import { organizationLd, ldScript } from "@/lib/seo/json-ld";
+import { getBanner } from "@/lib/banner";
+import SiteBanner, { type BannerConfig } from "@/components/site-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,11 +52,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const banner = await getBanner();
   return (
     <html
       lang="ko"
@@ -65,6 +68,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: ldScript(organizationLd()) }}
         />
+        {banner && <SiteBanner banner={banner as BannerConfig} />}
         <ToastProvider>{children}</ToastProvider>
         <AttributionSnapshotClient />
         <Analytics />

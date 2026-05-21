@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NewsletterSignup from "@/components/newsletter-signup";
 
 const YEAR = new Date().getFullYear();
 
@@ -12,6 +13,7 @@ export default function SiteFooter() {
           </p>
           <p>실제보다 완벽한 AI 버추얼 모델.</p>
           <p className="mt-2">© {YEAR} Virtual Agency. All rights reserved.</p>
+          <NewsletterSignup />
         </div>
 
         <div>

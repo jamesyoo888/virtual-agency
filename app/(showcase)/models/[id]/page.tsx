@@ -30,6 +30,7 @@ import {
   modelPersonLd,
 } from "@/lib/seo/json-ld";
 import { fetchDeliveredCasesForModel, anonymize } from "@/lib/analytics/model-cases";
+import RecentlyViewedTracker from "@/components/recently-viewed-tracker";
 
 type Params = { id: string };
 
@@ -251,6 +252,7 @@ export default async function ShowcaseModelPage({
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <RecentlyViewedTracker id={m.id} name={m.name} image={m.concept_image} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldScript({ "@graph": ldGraph }) }}

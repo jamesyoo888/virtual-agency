@@ -8,9 +8,11 @@ import {
 } from "@/lib/cost/store";
 import { getCapConfig } from "@/lib/cost/cap";
 import CapsEditor from "@/components/caps-editor";
+import BannerEditor from "@/components/banner-editor";
 import Sparkline from "@/components/sparkline";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { getBanner } from "@/lib/banner";
 
 export const dynamic = "force-dynamic";
 
@@ -119,13 +121,14 @@ async function emailsForUserIds(ids: string[]): Promise<Map<string, string>> {
 }
 
 export default async function AdminUsagePage() {
-  const [totals, recent, caps, breakdown, history, perUser] = await Promise.all([
+  const [totals, recent, caps, breakdown, history, perUser, banner] = await Promise.all([
     summarizeUsage(),
     recentUsage(50),
     getCapConfig(),
     breakdownUsage(WINDOW_MS.monthly),
     dailyHistory(7),
     spendByUser(WINDOW_MS.monthly),
+    getBanner(),
   ]);
   const userEmails = await emailsForUserIds(
     perUser.map((u) => u.user_id).filter((id) => id !== "(unknown)")
@@ -147,6 +150,7 @@ export default async function AdminUsagePage() {
       </section>
 
       <CapsEditor initial={caps} />
+      <BannerEditor initial={banner} />
 
       {/* 7-day daily trend */}
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-3">

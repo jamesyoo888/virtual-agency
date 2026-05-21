@@ -51,7 +51,7 @@ export async function GET(
     let query = supabase
       .from("projects")
       .select(
-        "id, title, brief, status, invoice_amount, created_at, updated_at, model:models(name), client:clients(email, company, name)"
+        "id, title, brief, status, invoice_amount, created_at, updated_at, utm_source, utm_medium, utm_campaign, referrer, model:models(name), client:clients(email, company, name)"
       )
       .order("created_at", { ascending: false })
       .limit(5000);
@@ -70,6 +70,10 @@ export async function GET(
       invoice_amount: number | null;
       created_at: string;
       updated_at: string;
+      utm_source: string | null;
+      utm_medium: string | null;
+      utm_campaign: string | null;
+      referrer: string | null;
       model?: { name: string | null } | { name: string | null }[] | null;
       client?:
         | { email: string | null; company: string | null; name: string | null }
@@ -79,9 +83,22 @@ export async function GET(
     const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
       Array.isArray(v) ? v[0] ?? null : v ?? null;
 
+    // Days in pipeline: for inquiries we still want to see "how long has it
+    // been sitting open" (now − created_at). For delivered/cancelled rows
+    // updated_at is the terminal state, so (updated_at − created_at) reads
+    // as the realized cycle time. Open intermediate statuses fall back to
+    // updated_at as the last meaningful touch.
+    const nowMs = Date.now();
+    const daysBetween = (a: string, b: string): number => {
+      const diff = new Date(b).getTime() - new Date(a).getTime();
+      return Math.max(0, Math.round(diff / (1000 * 60 * 60 * 24)));
+    };
+
     const rows = ((data ?? []) as unknown as ProjectExportRow[]).map((p) => {
       const model = pickOne(p.model);
       const client = pickOne(p.client);
+      const endIso =
+        p.status === "inquiry" ? new Date(nowMs).toISOString() : p.updated_at;
       return {
         id: p.id,
         title: p.title,
@@ -91,6 +108,11 @@ export async function GET(
         client_name: client?.name ?? "",
         client_email: client?.email ?? "",
         invoice_amount: p.invoice_amount ?? "",
+        utm_source: p.utm_source ?? "",
+        utm_medium: p.utm_medium ?? "",
+        utm_campaign: p.utm_campaign ?? "",
+        referrer: p.referrer ?? "",
+        days_in_pipeline: daysBetween(p.created_at, endIso),
         brief: p.brief ?? "",
         created_at: p.created_at,
         updated_at: p.updated_at,
@@ -106,6 +128,11 @@ export async function GET(
       "client_name",
       "client_email",
       "invoice_amount",
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "referrer",
+      "days_in_pipeline",
       "brief",
       "created_at",
       "updated_at",

@@ -8,6 +8,7 @@ import CatalogSearch from "@/components/catalog-search";
 import CompareDrawer from "@/components/compare-drawer";
 import CatalogPagination from "@/components/catalog-pagination";
 import CatalogViewToggle, { type CatalogView } from "@/components/catalog-view-toggle";
+import RecentlyViewedStrip from "@/components/recently-viewed-strip";
 import { devModelStore } from "@/lib/dev-store";
 import {
   CATALOG_PAGE_SIZE,
@@ -46,11 +47,20 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
   const requestedPage = normalizePage(params.page);
   const view: CatalogView = params.view === "list" ? "list" : "grid";
-  const [heroCtaVariant, socialProof] = await Promise.all([
+  const [heroCtaVariant, heroSubtitleVariant, socialProof] = await Promise.all([
     getBucket("hero_cta"),
+    getBucket("hero_subtitle"),
     loadSocialProof(),
   ]);
   void trackImpression("hero_cta", { surface: "catalog_hero" });
+  void trackImpression("hero_subtitle", { surface: "catalog_hero" });
+
+  const heroSubtitle: string =
+    heroSubtitleVariant === "speed"
+      ? "컨셉 컨펌부터 1차 컷까지 24~72시간. 광고 캠페인 일정에 모델 일정이 끌려다니지 않습니다."
+      : heroSubtitleVariant === "cost"
+      ? "전통 모델 캠페인의 1/10 가격으로 같은 컨셉 5컷 — 같은 예산으로 A/B 테스트 횟수를 10배 늘리세요."
+      : "일관된 외모, 다양한 산업·분위기, 즉시 견적. 광고·SNS·영상 콘텐츠에 필요한 모델을 카탈로그에서 찾거나 컨셉으로 매칭하세요.";
 
   let userRole: "admin" | "client" | null = null;
   let userId: string | null = null;
@@ -198,9 +208,11 @@ export default async function CatalogPage({ searchParams }: PageProps) {
             실제보다 완벽한 모델, <br />
             <span className="text-zinc-400">24시간 가용.</span>
           </h2>
-          <p className="text-zinc-400 text-lg leading-relaxed">
-            일관된 외모, 다양한 산업·분위기, 즉시 견적. 광고·SNS·영상 콘텐츠에
-            필요한 모델을 카탈로그에서 찾거나 컨셉으로 매칭하세요.
+          <p
+            className="text-zinc-400 text-lg leading-relaxed"
+            data-exp-hero-subtitle={heroSubtitleVariant}
+          >
+            {heroSubtitle}
           </p>
         </div>
         <div className="flex flex-wrap gap-3 mt-6" data-exp-hero-cta={heroCtaVariant}>
@@ -310,6 +322,7 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
         {/* Grid */}
         <main id="catalog" className="flex-1 px-5 py-6 md:p-8">
+          <RecentlyViewedStrip />
           <div className="mb-6">
             <CatalogSearch />
           </div>

@@ -101,6 +101,26 @@ export const capsPatchSchema = z.object({
 
 export type CapsPatchInput = z.infer<typeof capsPatchSchema>;
 
+// Settings — site banner. POST with `text` clears nothing if it's empty,
+// the API treats empty text as a removal so admins can hide the banner.
+export const bannerPatchSchema = z.object({
+  text: z.string().trim().max(280),
+  href: z.string().trim().max(500).optional().or(z.literal("")),
+  tone: z.enum(["info", "warn", "promo"]).optional(),
+});
+export type BannerPatchInput = z.infer<typeof bannerPatchSchema>;
+
+// Newsletter signup — footer form. UTM fields are best-effort snapshots from
+// the visitor's URL at submit time.
+export const newsletterSignupSchema = z.object({
+  email: z.string().trim().email().max(254),
+  source: z.string().trim().max(60).optional().nullable(),
+  utm_source: z.string().trim().max(120).optional().nullable(),
+  utm_medium: z.string().trim().max(120).optional().nullable(),
+  utm_campaign: z.string().trim().max(200).optional().nullable(),
+});
+export type NewsletterSignupInput = z.infer<typeof newsletterSignupSchema>;
+
 // Client inquiry submission. `brief` already includes the pre-formatted
 // purpose/budget line from the form — keep the API permissive but capped.
 // Attribution fields are optional snapshots captured by the form (utm_* from

@@ -8,6 +8,13 @@ import { notifyInquiryReceived, notifyReferralThanks } from "@/lib/email/notify"
 import { createAdminClient } from "@/lib/supabase/server";
 import { canEmailClient } from "@/lib/preferences";
 import { trackConversion } from "@/lib/experiments-track";
+import { enforceRateLimit } from "@/lib/api/rate-limit";
+
+function clientIpFrom(request: Request): string {
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0]!.trim();
+  return request.headers.get("x-real-ip") ?? "0.0.0.0";
+}
 
 /**
  * Client-initiated inquiry creation. Replaces the previous browser-only
@@ -35,6 +42,27 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Throttle authenticated abuse. Two cheap layers: per-user (catches
+  // accidental double-submits + key-mashing) and per-IP (catches multiple
+  // compromised accounts behind the same NAT/VPN). Note that serverless
+  // instances each have their own counter, so the effective ceiling scales
+  // with fanout — fine for incidental defense, not for hostile actors.
+  const ip = clientIpFrom(request);
+  const userDenied = enforceRateLimit({
+    key: "inquiry:user",
+    subject: user.id,
+    limit: 5,
+    windowMs: 60_000,
+  });
+  if (userDenied) return userDenied;
+  const ipDenied = enforceRateLimit({
+    key: "inquiry:ip",
+    subject: ip,
+    limit: 20,
+    windowMs: 60_000,
+  });
+  if (ipDenied) return ipDenied;
 
   const parsed = await parseBody(request, inquiryCreateSchema);
   if (!parsed.ok) return parsed.response;
@@ -88,10 +116,11 @@ export async function POST(request: Request) {
       .single(),
   ]);
 
-  // Conversion event for the hero CTA experiment. The visitor's bucket was
+  // Conversion event for the hero experiments. The visitor's bucket was
   // assigned by the proxy and is read inside trackConversion via cookies, so
   // we don't need to pass the variant explicitly. Fire-and-forget.
   void trackConversion("hero_cta", { surface: "inquiry_submit", userId: user.id });
+  void trackConversion("hero_subtitle", { surface: "inquiry_submit", userId: user.id });
 
   // Webhook always fires (admin-side awareness); the receipt email respects
   // the client's opt-out preference.
