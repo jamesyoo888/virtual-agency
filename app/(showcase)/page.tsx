@@ -21,6 +21,8 @@ import {
 import { getBucket } from "@/lib/experiments";
 import { trackImpression } from "@/lib/experiments-track";
 import { loadSocialProof } from "@/lib/social-proof";
+import { loadTopTestimonials } from "@/lib/testimonials";
+import HomeTestimonials from "@/components/home-testimonials";
 
 function Value({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
@@ -47,10 +49,11 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
   const requestedPage = normalizePage(params.page);
   const view: CatalogView = params.view === "list" ? "list" : "grid";
-  const [heroCtaVariant, heroSubtitleVariant, socialProof] = await Promise.all([
+  const [heroCtaVariant, heroSubtitleVariant, socialProof, testimonials] = await Promise.all([
     getBucket("hero_cta"),
     getBucket("hero_subtitle"),
     loadSocialProof(),
+    loadTopTestimonials(3),
   ]);
   void trackImpression("hero_cta", { surface: "catalog_hero" });
   void trackImpression("hero_subtitle", { surface: "catalog_hero" });
@@ -303,6 +306,8 @@ export default async function CatalogPage({ searchParams }: PageProps) {
           />
         </div>
       </div>
+
+      <HomeTestimonials testimonials={testimonials} />
 
       <div className="flex flex-col md:flex-row">
         {/* Filters sidebar — collapses to top accordion on mobile */}

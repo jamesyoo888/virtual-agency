@@ -133,6 +133,30 @@ export function blogPostingLd(input: ArticleLdInput) {
   };
 }
 
+export interface ItemListEntry {
+  name: string;
+  url: string;
+  /** Optional thumbnail; falls through to the page's OG image if omitted. */
+  image?: string;
+}
+
+export function itemListLd(name: string, entries: ItemListEntry[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    itemListOrder: "https://schema.org/ItemListOrderAscending",
+    numberOfItems: entries.length,
+    itemListElement: entries.map((e, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: e.url,
+      name: e.name,
+      ...(e.image ? { image: e.image } : {}),
+    })),
+  };
+}
+
 export interface FaqEntry {
   question: string;
   answer: string;

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { INDUSTRY_LABELS } from "@/lib/tags";
 import type { IndustryTag } from "@/types";
+import { itemListLd, ldScript } from "@/lib/seo/json-ld";
 import { ArrowRight } from "lucide-react";
 
 export const revalidate = 3600;
@@ -127,8 +128,23 @@ function turnaroundLabel(createdAt: string, updatedAt: string): string {
 export default async function CasesPage() {
   const { cases, summary } = await loadCases();
 
+  // Cases ItemList: anonymized titles + cases-page anchor (no canonical detail
+  // page yet, but Google still picks up the ordered list signal).
+  const ld = itemListLd(
+    "Virtual Agency 납품 사례",
+    cases.map((c) => ({
+      name: c.title,
+      url: `${SITE_URL}/cases#${c.id}`,
+      image: c.model?.concept_image ?? undefined,
+    }))
+  );
+
   return (
     <div className="min-h-screen bg-black text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(ld) }}
+      />
       <main className="max-w-5xl mx-auto px-6 py-16 md:py-24">
         <header className="mb-12">
           <p className="text-xs tracking-[0.3em] text-zinc-500 uppercase mb-3">
@@ -190,7 +206,8 @@ export default async function CasesPage() {
             {cases.map((c) => (
               <li
                 key={c.id}
-                className="rounded-xl border border-zinc-800 bg-zinc-950/40 overflow-hidden"
+                id={c.id}
+                className="rounded-xl border border-zinc-800 bg-zinc-950/40 overflow-hidden scroll-mt-24"
               >
                 <div className="aspect-[4/3] bg-zinc-900 relative">
                   {c.model?.concept_image ? (

@@ -30,6 +30,11 @@ export default function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/services" className="hover:text-white">
+                서비스
+              </Link>
+            </li>
+            <li>
               <Link href="/compare" className="hover:text-white">
                 모델 비교
               </Link>
@@ -52,6 +57,11 @@ export default function SiteFooter() {
             <li>
               <Link href="/press" className="hover:text-white">
                 프레스
+              </Link>
+            </li>
+            <li>
+              <Link href="/careers" className="hover:text-white">
+                크리에이터 합류
               </Link>
             </li>
           </ul>

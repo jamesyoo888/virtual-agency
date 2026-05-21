@@ -88,6 +88,18 @@ export default async function sitemap(
             priority: 0.3,
           },
           {
+            url: `${SITE_URL}/careers`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.5,
+          },
+          {
+            url: `${SITE_URL}/services`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.7,
+          },
+          {
             url: `${SITE_URL}/cases`,
             lastModified: now,
             changeFrequency: "weekly",

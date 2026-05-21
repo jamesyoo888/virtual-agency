@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
+import { itemListLd, ldScript } from "@/lib/seo/json-ld";
 import { ArrowRight, Rss } from "lucide-react";
 
 export const revalidate = 3600;
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata = {
   title: "블로그 — Virtual Agency",
@@ -14,8 +18,21 @@ export default function BlogIndexPage() {
   const posts = listPosts();
   const tags = listTags();
 
+  const ld = itemListLd(
+    "Virtual Agency 블로그",
+    posts.map((p) => ({
+      name: p.title,
+      url: `${SITE_URL}/blog/${p.slug}`,
+      image: `${SITE_URL}/api/og?blog=${encodeURIComponent(p.slug)}`,
+    }))
+  );
+
   return (
     <div className="min-h-screen bg-black text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(ld) }}
+      />
       <main className="max-w-3xl mx-auto px-6 py-16 md:py-24">
         <header className="mb-12">
           <p className="text-xs tracking-[0.3em] text-zinc-500 uppercase mb-3">
