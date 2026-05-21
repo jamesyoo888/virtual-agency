@@ -8,6 +8,7 @@ import { loadSearchAnalytics } from "@/lib/analytics/search-log";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { wowFromRows, type WowMetric } from "@/lib/analytics/week-over-week";
 import { computeMtdRevenue, type MtdRevenue } from "@/lib/analytics/mtd-revenue";
+import AdminCopySummary from "@/components/admin-copy-summary";
 import {
   Users,
   Inbox,
@@ -293,11 +294,39 @@ export default async function AdminHomePage() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
-      <header>
-        <h1 className="text-2xl font-bold">대시보드</h1>
-        <p className="text-sm text-zinc-500 mt-1">
-          오늘의 핵심 지표와 빠른 이동.
-        </p>
+      <header className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">대시보드</h1>
+          <p className="text-sm text-zinc-500 mt-1">
+            오늘의 핵심 지표와 빠른 이동.
+          </p>
+        </div>
+        {(() => {
+          // Plain-text summary — paste-ready for chat / standup notes.
+          // Numbers come straight from the same loaders the cards render,
+          // so the copy never drifts from what the operator sees on screen.
+          const fmt = (m: WowMetric, label: string) => {
+            if (m.pct === null) {
+              return m.current > 0 ? `${label} ${m.current}` : `${label} 0`;
+            }
+            const sign = m.delta >= 0 ? "+" : "";
+            return `${label} ${m.current} (${sign}${m.pct.toFixed(0)}%)`;
+          };
+          const today = new Date().toLocaleDateString("ko-KR");
+          const text = [
+            `[Virtual Agency · ${today}]`,
+            `신규 문의 24h: ${kpis.newInquiries24h} (어제 ${kpis.newInquiriesPrev24h})`,
+            `진행 중 프로젝트: ${kpis.activeProjects}`,
+            `활성 모델: ${kpis.activeModels}/${kpis.totalModels}`,
+            mtd.mtdRevenue > 0
+              ? `MTD 매출: ₩${mtd.mtdRevenue.toLocaleString("ko-KR")} (월말 예상 ₩${mtd.projectedMonthEnd.toLocaleString("ko-KR")})`
+              : null,
+            `WoW: ${fmt(wow.inquiries, "문의")} / ${fmt(wow.delivered, "납품")} / ${fmt(wow.revenue, "매출")}`,
+          ]
+            .filter(Boolean)
+            .join("\n");
+          return <AdminCopySummary text={text} />;
+        })()}
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">

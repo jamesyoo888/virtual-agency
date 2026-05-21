@@ -628,6 +628,7 @@ export async function GET(
       },
       { metric: "scenario_base", value: String(r.scenarios.base) },
       { metric: "scenario_optimistic", value: String(r.scenarios.optimistic) },
+      { metric: "confidence", value: r.confidence },
       // Per-model rollup. Flattens to `pipeline_by_model_<id>__<count|value>`
       // so the existing two-column shape stays intact — Excel users can
       // sort/filter without unmerging columns. Order preserves the
