@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Building2 } from "lucide-react";
+import { Building2, AlertTriangle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +102,100 @@ async function loadSummaries(): Promise<{
 
 const KRW = new Intl.NumberFormat("ko-KR");
 
+function ConcentrationCard({
+  clients,
+  totalRevenue,
+}: {
+  clients: ClientSummary[];
+  totalRevenue: number;
+}) {
+  // Concentration risk — share of revenue earned by the top-5 paying clients.
+  // > 60% is a yellow flag for a single-vendor agency, > 80% is red.
+  const paying = clients
+    .filter((c) => c.totalRevenue > 0)
+    .sort((a, b) => b.totalRevenue - a.totalRevenue);
+  if (paying.length === 0 || totalRevenue === 0) return null;
+  const top5 = paying.slice(0, 5);
+  const top5Sum = top5.reduce((s, c) => s + c.totalRevenue, 0);
+  const top5Share = top5Sum / totalRevenue;
+  // Repeat-customer revenue share — what % of total revenue comes from
+  // clients with 2+ campaigns. Healthy agencies trend > 50%.
+  const repeatRevenue = clients
+    .filter((c) => c.campaignCount >= 2)
+    .reduce((s, c) => s + c.totalRevenue, 0);
+  const repeatShare = repeatRevenue / totalRevenue;
+  const tone =
+    top5Share > 0.8
+      ? "text-red-400"
+      : top5Share > 0.6
+      ? "text-amber-400"
+      : "text-emerald-400";
+  return (
+    <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+      <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-4 flex items-center gap-2">
+        {top5Share > 0.6 && (
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+        )}
+        매출 집중도 분석
+      </h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+            Top-5 광고주 매출 비중
+          </p>
+          <p className={`text-2xl font-bold tabular-nums mt-1 ${tone}`}>
+            {(top5Share * 100).toFixed(0)}%
+          </p>
+          <p className="text-[10px] text-zinc-600 mt-1">
+            ₩{KRW.format(top5Sum)} / 총 ₩{KRW.format(totalRevenue)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+            재구매 광고주 매출
+          </p>
+          <p
+            className={`text-2xl font-bold tabular-nums mt-1 ${
+              repeatShare >= 0.5 ? "text-emerald-400" : "text-zinc-300"
+            }`}
+          >
+            {(repeatShare * 100).toFixed(0)}%
+          </p>
+          <p className="text-[10px] text-zinc-600 mt-1">
+            ₩{KRW.format(repeatRevenue)} (2+ 캠페인)
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+            Top-5 분포
+          </p>
+          <ul className="space-y-1">
+            {top5.map((c) => {
+              const share = c.totalRevenue / totalRevenue;
+              return (
+                <li
+                  key={c.id}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span className="text-zinc-300 truncate mr-2">
+                    {c.company ?? c.name ?? c.email ?? "—"}
+                  </span>
+                  <span className="text-zinc-500 tabular-nums shrink-0">
+                    {(share * 100).toFixed(0)}%
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+      <p className="mt-4 text-[11px] text-zinc-600 leading-relaxed">
+        Top-5 비중이 60% 초과면 단일 광고주 의존 리스크. 재구매 매출이 50% 미만이면 신규 유입 채널의 LTV 가 부족한 신호로 해석합니다.
+      </p>
+    </section>
+  );
+}
+
 function relativeLabel(iso: string | null): string {
   if (!iso) return "—";
   const now = Date.now();
@@ -169,6 +263,9 @@ export default async function AdminClientsPage() {
           </p>
         </div>
       </section>
+
+      <ConcentrationCard clients={clients} totalRevenue={totalRevenue} />
+
 
       {!SUPABASE_CONFIGURED ? (
         <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">

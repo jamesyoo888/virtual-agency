@@ -6,6 +6,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
 import InvoiceAmountEditor from "@/components/invoice-amount-editor";
+import ProjectNotes, { type ProjectNoteRow } from "@/components/project-notes";
 import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -57,8 +58,9 @@ interface ProjectDetail {
 async function fetchDetail(id: string): Promise<{
   project: ProjectDetail | null;
   history: HistoryRow[];
+  notes: ProjectNoteRow[];
 }> {
-  if (!SUPABASE_CONFIGURED) return { project: null, history: [] };
+  if (!SUPABASE_CONFIGURED) return { project: null, history: [], notes: [] };
   const supabase = await createClient();
   const { data: project } = await supabase
     .from("projects")
@@ -68,17 +70,49 @@ async function fetchDetail(id: string): Promise<{
     .eq("id", id)
     .single();
 
-  if (!project) return { project: null, history: [] };
+  if (!project) return { project: null, history: [], notes: [] };
 
-  const { data: history } = await supabase
-    .from("project_status_history")
-    .select("id, from_status, to_status, changed_at")
-    .eq("project_id", id)
-    .order("changed_at", { ascending: false });
+  const [historyRes, notesRes] = await Promise.all([
+    supabase
+      .from("project_status_history")
+      .select("id, from_status, to_status, changed_at")
+      .eq("project_id", id)
+      .order("changed_at", { ascending: false }),
+    // Notes are admin-only — RLS in migration 025 enforces this. The query
+    // is also defensive: if the table doesn't exist yet, the error path
+    // below returns an empty list so the page still renders.
+    supabase
+      .from("project_notes")
+      // Single FK from project_notes.author_id → clients.id, so Supabase
+      // resolves the join automatically without naming the constraint.
+      .select("id, body, created_at, author:clients(email)")
+      .eq("project_id", id)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  type RawNote = {
+    id: string;
+    body: string;
+    created_at: string;
+    author?: { email: string | null } | null;
+  };
+  const notes: ProjectNoteRow[] = ((notesRes.data as unknown as RawNote[]) ?? []).map((r) => ({
+    id: r.id,
+    body: r.body,
+    created_at: r.created_at,
+    author_email: r.author?.email ?? null,
+  }));
+  if (notesRes.error) {
+    console.warn(
+      "[project-notes] load failed (migration 025?):",
+      notesRes.error.message
+    );
+  }
 
   return {
     project: project as unknown as ProjectDetail,
-    history: ((history ?? []) as HistoryRow[]),
+    history: ((historyRes.data ?? []) as HistoryRow[]),
+    notes,
   };
 }
 
@@ -103,7 +137,7 @@ export default async function AdminProjectDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { project, history } = await fetchDetail(id);
+  const { project, history, notes } = await fetchDetail(id);
   if (!project) notFound();
 
   return (
@@ -223,6 +257,10 @@ export default async function AdminProjectDetailPage({
             </div>
           )}
         </aside>
+      </div>
+
+      <div className="mb-6">
+        <ProjectNotes projectId={project.id} notes={notes} />
       </div>
 
       <section className="rounded-xl border border-zinc-800 p-5 bg-zinc-950/40">

@@ -216,6 +216,87 @@ export default async function PricingPage() {
           </p>
         </div>
       </section>
+
+      <section className="px-5 md:px-8 py-16 border-t border-zinc-900">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-zinc-500 mb-3">
+            Comparison
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">
+            전통 광고 에이전시 vs Virtual Agency
+          </h2>
+          <p className="text-zinc-400 mb-8 leading-relaxed max-w-2xl">
+            동일한 캠페인 산출물을 기준으로 비용·납기·통제권을 비교합니다. 실제 광고주 데이터로 추정한 일반적인 범위입니다.
+          </p>
+
+          <div className="rounded-2xl border border-zinc-800 overflow-x-auto">
+            <table className="w-full text-sm min-w-[640px]">
+              <thead className="bg-zinc-900/50 text-zinc-400 text-xs uppercase tracking-wider">
+                <tr>
+                  <th className="text-left px-5 py-3 w-1/3">항목</th>
+                  <th className="text-left px-5 py-3">전통 에이전시</th>
+                  <th className="text-left px-5 py-3 text-zinc-200">Virtual Agency</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800">
+                {COMPARISON.map((r) => (
+                  <tr key={r.label}>
+                    <td className="px-5 py-3.5 font-medium text-zinc-300">
+                      {r.label}
+                    </td>
+                    <td className="px-5 py-3.5 text-zinc-500">
+                      {r.traditional}
+                    </td>
+                    <td className="px-5 py-3.5 text-zinc-100">{r.virtual}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-6 text-xs text-zinc-600 leading-relaxed max-w-3xl">
+            *전통 에이전시 수치는 식음료·뷰티·패션 카테고리의 일반적인 캠페인 견적 범위로, Virtual Agency 광고주가 직전 견적과 비교 제공한 데이터에 기반합니다. 캠페인 규모·매체에 따라 차이가 발생합니다.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
+
+const COMPARISON: { label: string; traditional: string; virtual: string }[] = [
+  {
+    label: "1 캠페인 평균 비용",
+    traditional: "₩1,200만 ~ 3,000만",
+    virtual: "₩120만 ~ 600만 (5~20% 수준)",
+  },
+  {
+    label: "최종 시안 회신",
+    traditional: "10 ~ 21 일 (촬영·후반 포함)",
+    virtual: "24 ~ 72 시간",
+  },
+  {
+    label: "컨셉 변형 비용",
+    traditional: "재촬영 비용 비대칭적으로 큼",
+    virtual: "동일 모델 · 다른 컨셉 = 컴퓨트 비용만",
+  },
+  {
+    label: "동일 모델 분기 재활용",
+    traditional: "스케줄 조율 + 재계약",
+    virtual: "동일 모델 락업 · 즉시 재투입",
+  },
+  {
+    label: "초상권 분쟁 리스크",
+    traditional: "계약별 별도 점검",
+    virtual: "클리어런스 라이선스에 포함",
+  },
+  {
+    label: "다국어 / 다지역 변형",
+    traditional: "별도 촬영 · 모델 추가",
+    virtual: "음성 더빙 + 텍스트 인서트만",
+  },
+  {
+    label: "결제 구조",
+    traditional: "기획료 + 모델료 + 제작비 분리",
+    virtual: "프로젝트 단위 50/50 (시작/납품)",
+  },
+];
