@@ -223,16 +223,29 @@ export default async function AdminInboxPage({ searchParams }: Props) {
             클라이언트 문의 + 진행 중 프로젝트 통합 보기
           </p>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
-        <a
-          href="/api/admin/exports/projects"
-          download
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 rounded-md px-2.5 py-1.5"
-          title="모든 프로젝트 CSV 다운로드"
-        >
-          <Download className="w-3 h-3" />
-          CSV
-        </a>
+        <div className="flex items-center gap-2">
+          {stale && (
+            <a
+              href="/api/admin/exports/inquiries?stale=1"
+              download
+              className="inline-flex items-center gap-1.5 text-xs text-red-300 hover:text-red-200 border border-red-500/40 hover:border-red-400 rounded-md px-2.5 py-1.5"
+              title="24h+ 지연 문의만 CSV"
+            >
+              <Download className="w-3 h-3" />
+              Stale CSV
+            </a>
+          )}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+          <a
+            href="/api/admin/exports/projects"
+            download
+            className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 rounded-md px-2.5 py-1.5"
+            title="모든 프로젝트 CSV 다운로드"
+          >
+            <Download className="w-3 h-3" />
+            CSV
+          </a>
+        </div>
       </header>
 
       <div className="mb-3">

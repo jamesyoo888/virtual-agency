@@ -44,7 +44,7 @@ export default async function ForecastPage() {
         </div>
       ) : (
         <>
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
             <ScenarioCard
               label="Conservative"
               value={r.scenarios.conservative}
@@ -65,6 +65,27 @@ export default async function ForecastPage() {
               tone="border-emerald-500/30 text-emerald-300"
             />
           </section>
+
+          <div
+            className={`mb-8 text-xs px-3 py-2 rounded-md border ${
+              r.confidence === "high"
+                ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-200"
+                : r.confidence === "medium"
+                ? "border-amber-500/30 bg-amber-500/5 text-amber-200"
+                : "border-rose-500/40 bg-rose-500/5 text-rose-200"
+            }`}
+          >
+            <span className="font-semibold">
+              신뢰도 {r.confidence === "high" ? "높음" : r.confidence === "medium" ? "보통" : "낮음"}
+            </span>
+            <span className="ml-2 text-zinc-400">
+              {r.confidence === "low"
+                ? `납품 ${r.delivered90dCount}건 / 인콰이어 ${r.inquired90dCount}건 — 표본이 작아 시나리오 폭이 넓습니다. 방향성 참고용으로만 사용하세요.`
+                : r.confidence === "medium"
+                ? `납품 ${r.delivered90dCount}건 / 인콰이어 ${r.inquired90dCount}건 — 시즌·캠페인 영향 보정 필요.`
+                : `납품 ${r.delivered90dCount}건 / 인콰이어 ${r.inquired90dCount}건 — 비교 가능한 표본.`}
+            </span>
+          </div>
 
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">

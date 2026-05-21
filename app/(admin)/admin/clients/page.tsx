@@ -259,6 +259,16 @@ export default async function AdminClientsPage() {
   const repeatClients = clients.filter((c) => c.campaignCount >= 2);
   const payingClients = clients.filter((c) => c.totalRevenue > 0);
 
+  // Compute top-5 paying clients up front so the table can badge them inline
+  // without re-sorting per row. Used purely for badge rendering.
+  const top5Ids = new Set(
+    [...clients]
+      .filter((c) => c.totalRevenue > 0)
+      .sort((a, b) => b.totalRevenue - a.totalRevenue)
+      .slice(0, 5)
+      .map((c) => c.id)
+  );
+
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <header className="mb-8 flex items-center gap-3">
@@ -345,6 +355,21 @@ export default async function AdminClientsPage() {
                       {c.role === "admin" && (
                         <span className="ml-2 text-[10px] text-amber-400 border border-amber-500/30 rounded px-1.5 py-0.5">
                           admin
+                        </span>
+                      )}
+                      {top5Ids.has(c.id) && (
+                        <span className="ml-1.5 text-[10px] text-yellow-300 border border-yellow-500/40 rounded px-1.5 py-0.5 bg-yellow-500/10">
+                          Top-5
+                        </span>
+                      )}
+                      {!top5Ids.has(c.id) && c.campaignCount >= 2 && (
+                        <span className="ml-1.5 text-[10px] text-zinc-300 border border-zinc-500/40 rounded px-1.5 py-0.5 bg-zinc-500/10">
+                          Repeat
+                        </span>
+                      )}
+                      {c.campaignCount === 1 && (
+                        <span className="ml-1.5 text-[10px] text-emerald-300 border border-emerald-500/30 rounded px-1.5 py-0.5">
+                          신규
                         </span>
                       )}
                     </p>

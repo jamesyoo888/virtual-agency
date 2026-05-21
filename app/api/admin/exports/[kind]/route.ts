@@ -34,7 +34,7 @@ const KINDS = new Set([
 ]);
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ kind: string }> }
 ) {
   const denied = await requireAdmin();
@@ -44,6 +44,8 @@ export async function GET(
   if (!KINDS.has(kind)) {
     return NextResponse.json({ error: "Unknown export kind" }, { status: 404 });
   }
+  const url = new URL(request.url);
+  const staleOnly = url.searchParams.get("stale") === "1";
 
   if (!SUPABASE_CONFIGURED) {
     return NextResponse.json(
@@ -64,6 +66,11 @@ export async function GET(
       .limit(5000);
 
     if (kind === "inquiries") query = query.eq("status", "inquiry");
+    // /api/admin/exports/inquiries?stale=1 → only 24h+ untouched inquiries
+    if (kind === "inquiries" && staleOnly) {
+      const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      query = query.lt("created_at", cutoff);
+    }
     const { data, error } = await query;
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -146,10 +153,14 @@ export async function GET(
     ] as const;
 
     const csv = toCSV(rows, columns);
+    const downloadName =
+      kind === "inquiries" && staleOnly
+        ? csvFilename("inquiries-stale")
+        : csvFilename(kind);
     return new NextResponse(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${csvFilename(kind)}"`,
+        "Content-Disposition": `attachment; filename="${downloadName}"`,
         "Cache-Control": "no-store",
       },
     });

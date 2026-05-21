@@ -33,6 +33,8 @@ export interface PipelineByModel {
   value: number;
 }
 
+export type ForecastConfidence = "low" | "medium" | "high";
+
 export interface ForecastReport {
   pipelineByStage: Record<string, { count: number; value: number }>;
   pipelineTotalValue: number;
@@ -51,8 +53,25 @@ export interface ForecastReport {
     base: number;
     optimistic: number;
   };
+  /**
+   * Sample-size confidence. <10 delivered → low (wide error bars), 10-30 →
+   * medium, 30+ → high. Operator should treat low-confidence runs as
+   * directional only.
+   */
+  confidence: ForecastConfidence;
   /** Inputs the operator may want to inspect. */
   windowDays: number;
+}
+
+export function computeConfidence(
+  deliveredCount: number,
+  inquiredCount: number
+): ForecastConfidence {
+  // Combined floor: any single number being tiny tanks confidence. We've seen
+  // the close-rate metric swing wildly in the early data with <10 delivered.
+  if (deliveredCount < 10 || inquiredCount < 30) return "low";
+  if (deliveredCount < 30 || inquiredCount < 100) return "medium";
+  return "high";
 }
 
 export function summarizePipelineByModel(
@@ -137,6 +156,7 @@ export function computeForecast(
       base: Math.round(base),
       optimistic: Math.round(optimistic),
     },
+    confidence: computeConfidence(delivered90dCount, inquired90dCount),
     windowDays,
   };
 }

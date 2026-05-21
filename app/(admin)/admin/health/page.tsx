@@ -163,7 +163,12 @@ export default async function AdminHealthPage() {
     .filter((r) => r.views >= 500 && r.inquiryRate < catalogAvgRate / 2)
     .slice(0, 5);
 
-  const checks: { label: string; ok: boolean; detail: string }[] = [
+  const checks: {
+    label: string;
+    ok: boolean;
+    detail: string;
+    runbook?: string;
+  }[] = [
     {
       label: "Supabase 연결",
       ok: SUPABASE_CONFIGURED && pulse !== null,
@@ -172,6 +177,8 @@ export default async function AdminHealthPage() {
           ? "쿼리 성공"
           : "쿼리 실패 — 로그 확인"
         : "미설정",
+      runbook:
+        "Supabase env vars 확인 (SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY). office-pc-1 의 supabase-db 컨테이너 헬스 확인: ssh inner@100.120.179.63 \"docker ps | grep supabase\"",
     },
     {
       label: "A/B 트래킹",
@@ -179,16 +186,21 @@ export default async function AdminHealthPage() {
       detail: pulse
         ? `24h ${pulse.experimentEvents24h} 이벤트`
         : "데이터 없음",
+      runbook:
+        "트래픽이 낮으면 정상. 트래픽 있는데 0 이면 /api/experiments/conversion 핸들러와 hero impression tracker 위치 확인",
     },
     {
       label: "비용 추적",
       ok: cost.daily >= 0,
       detail: `오늘 $${cost.daily.toFixed(2)}`,
+      runbook: "음수면 usage_log INSERT 충돌 가능성 — usage_log_view 정합성 확인",
     },
     {
       label: "사이트 배너",
       ok: !!banner,
       detail: banner ? `노출 중 (${banner.tone ?? "info"})` : "비활성",
+      runbook:
+        "필요할 때만 OK. 공지가 없으면 비활성이 정상. /admin/usage 페이지에서 활성화",
     },
     {
       label: "뉴스레터",
@@ -196,6 +208,8 @@ export default async function AdminHealthPage() {
       detail: pulse
         ? `${pulse.newsletterActive} 구독 / 7d +${pulse.newsletter7d}`
         : "데이터 없음",
+      runbook:
+        "0 구독은 정상 (런칭 초기). footer signup form, robots.txt 의 /api/newsletter Disallow 확인",
     },
     {
       // SLA "OK" rule: no inquiries → vacuously OK; otherwise stale count
@@ -214,6 +228,8 @@ export default async function AdminHealthPage() {
                   : `${sla.medianHours.toFixed(1)}h`
                 : "—"
             }${sla.staleOpenCount > 0 ? ` · ${sla.staleOpenCount} 지연` : ""}`,
+      runbook:
+        "/admin/inbox?stale=1 에서 24h+ 인콰이어 즉시 처리. 중앙값 12h 초과면 운영 회의에서 1순위 안건",
     },
     {
       // Trending feed health: need at least ~30% of active models to have
@@ -228,6 +244,8 @@ export default async function AdminHealthPage() {
           ? "활성 모델 없음"
           : `${trending.modelsWithViews}/${trending.totalActive} 모델이 30d 노출 보유`
         : "popularity view 미생성 또는 쿼리 실패",
+      runbook:
+        "30% 미만이면 카탈로그 노출이 부족. /admin 의 funnel + bySource 확인. popularity view 자체가 없으면 마이그레이션 006 재적용",
     },
   ];
 
@@ -247,7 +265,11 @@ export default async function AdminHealthPage() {
         {checks.map((c) => (
           <div
             key={c.label}
-            className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 flex items-start gap-3"
+            className={`rounded-xl border p-4 flex items-start gap-3 ${
+              c.ok
+                ? "border-zinc-800 bg-zinc-900/30"
+                : "border-amber-500/30 bg-amber-500/5"
+            }`}
           >
             {c.ok ? (
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
@@ -257,6 +279,12 @@ export default async function AdminHealthPage() {
             <div className="min-w-0">
               <p className="text-sm font-medium">{c.label}</p>
               <p className="text-xs text-zinc-500 mt-0.5">{c.detail}</p>
+              {!c.ok && c.runbook && (
+                <p className="text-[11px] text-amber-200 mt-2 leading-relaxed">
+                  <span className="text-amber-400 font-medium">대응 →</span>{" "}
+                  {c.runbook}
+                </p>
+              )}
             </div>
           </div>
         ))}

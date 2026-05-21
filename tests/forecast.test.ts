@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   computeForecast,
   summarizePipelineByModel,
+  computeConfidence,
 } from "@/lib/analytics/forecast";
 
 const T = "2026-04-01T00:00:00Z";
@@ -120,6 +121,22 @@ describe("computeForecast", () => {
     // closeRate = 0 — optimistic still bounded; pipeline contributes 0.
     expect(r.scenarios.optimistic).toBeGreaterThanOrEqual(0);
     expect(r.scenarios.optimistic).toBeLessThan(1000 * 2);
+  });
+});
+
+describe("computeConfidence", () => {
+  it("low when delivered < 10 or inquired < 30", () => {
+    expect(computeConfidence(5, 100)).toBe("low");
+    expect(computeConfidence(50, 20)).toBe("low");
+    expect(computeConfidence(0, 0)).toBe("low");
+  });
+  it("medium when at least 10 delivered and 30 inquired but below 30/100", () => {
+    expect(computeConfidence(10, 30)).toBe("medium");
+    expect(computeConfidence(20, 80)).toBe("medium");
+  });
+  it("high when both thresholds met", () => {
+    expect(computeConfidence(30, 100)).toBe("high");
+    expect(computeConfidence(100, 500)).toBe("high");
   });
 });
 
