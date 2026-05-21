@@ -74,6 +74,11 @@ export default function SiteFooter() {
                 브리프 템플릿
               </Link>
             </li>
+            <li>
+              <Link href="/trending" className="hover:text-white">
+                트렌딩 모델
+              </Link>
+            </li>
           </ul>
         </div>
 

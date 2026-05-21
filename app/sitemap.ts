@@ -118,6 +118,12 @@ export default async function sitemap(
             priority: 0.5,
           },
           {
+            url: `${SITE_URL}/trending`,
+            lastModified: now,
+            changeFrequency: "daily",
+            priority: 0.7,
+          },
+          {
             url: `${SITE_URL}/blog`,
             lastModified: now,
             changeFrequency: "weekly",

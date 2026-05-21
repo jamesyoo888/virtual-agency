@@ -3,7 +3,9 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { summarizeUsage, recentUsage } from "@/lib/cost/store";
 import { getBanner } from "@/lib/banner";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
+import { loadModelPerformance } from "@/lib/analytics/model-performance";
 import { Activity, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -114,13 +116,24 @@ function trendBadge(today: number, avg7d: number): {
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner, sla] = await Promise.all([
+  const [pulse, cost, recent, banner, sla, perf] = await Promise.all([
     loadPulse(),
     summarizeUsage(),
     recentUsage(10),
     getBanner(),
     loadResponseSla(30),
+    loadModelPerformance(30),
   ]);
+
+  // Underperformers — models with at least 500 views in the window AND an
+  // inquiry rate below half of the catalog average. Surfaces models that are
+  // collecting attention but not converting — the cheapest catalog hygiene
+  // win available.
+  const catalogAvgRate =
+    perf.totalViews > 0 ? perf.totalInquiries / perf.totalViews : 0;
+  const underperformers = perf.rows
+    .filter((r) => r.views >= 500 && r.inquiryRate < catalogAvgRate / 2)
+    .slice(0, 5);
 
   const checks: { label: string; ok: boolean; detail: string }[] = [
     {
@@ -238,6 +251,45 @@ export default async function AdminHealthPage() {
           </div>
         )}
       </section>
+
+      {underperformers.length > 0 && (
+        <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 mb-6">
+          <h2 className="text-xs uppercase tracking-wider text-amber-300 mb-3 flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5" />
+            카탈로그 hygiene — 저전환 모델 {underperformers.length}개
+          </h2>
+          <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
+            500+ view 인데 inquiry rate 가 카탈로그 평균의 절반 미만. 페르소나 재정의 또는 카탈로그에서 내릴 후보.
+          </p>
+          <ul className="space-y-1.5">
+            {underperformers.map((r) => (
+              <li
+                key={r.modelId}
+                className="flex items-center justify-between text-sm"
+              >
+                <Link
+                  href={`/admin/models/${r.modelId}`}
+                  className="text-zinc-200 hover:text-white truncate mr-3"
+                >
+                  {r.name}
+                </Link>
+                <span className="text-xs text-zinc-500 tabular-nums shrink-0">
+                  view {r.views} · inq {r.inquiries} ·{" "}
+                  <span className="text-amber-300">
+                    {(r.inquiryRate * 100).toFixed(1)}%
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/admin/models/performance"
+            className="mt-3 inline-block text-xs text-zinc-300 hover:text-white"
+          >
+            전체 성과 보기 →
+          </Link>
+        </section>
+      )}
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-xl border border-zinc-800 p-5 bg-zinc-900/30">

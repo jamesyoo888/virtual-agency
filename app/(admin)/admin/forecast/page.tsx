@@ -1,0 +1,205 @@
+import Link from "next/link";
+import { TrendingUp, AlertCircle } from "lucide-react";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { loadForecast } from "@/lib/analytics/forecast";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = { title: "Forecast — Virtual Agency Admin" };
+
+const KRW = new Intl.NumberFormat("ko-KR");
+
+const STAGE_LABEL: Record<string, string> = {
+  inquiry: "문의",
+  brief_received: "브리프",
+  in_progress: "제작 중",
+  review: "검토",
+};
+
+export default async function ForecastPage() {
+  const r = await loadForecast();
+
+  return (
+    <div className="p-8 max-w-5xl mx-auto text-zinc-100">
+      <header className="mb-8 flex items-center gap-3">
+        <TrendingUp className="w-5 h-5 text-zinc-400" />
+        <div>
+          <h1 className="text-2xl font-bold">30일 매출 Forecast</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">
+            90일 누적 close rate × 현재 pipeline 가치 + run-rate 기반 시나리오.
+          </p>
+        </div>
+      </header>
+
+      {!SUPABASE_CONFIGURED || !r ? (
+        <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
+          Supabase 미설정 — production 에서만 동작합니다.
+        </div>
+      ) : (
+        <>
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <ScenarioCard
+              label="Conservative"
+              value={r.scenarios.conservative}
+              hint="base × 0.7 (지연 시나리오)"
+              tone="border-zinc-700 text-zinc-300"
+            />
+            <ScenarioCard
+              label="Base"
+              value={r.scenarios.base}
+              hint="run-rate + pipeline × close rate"
+              tone="border-white/30 text-white"
+              highlight
+            />
+            <ScenarioCard
+              label="Optimistic"
+              value={r.scenarios.optimistic}
+              hint="run-rate × 1.2 + pipeline × close × 1.5 (cap 100%)"
+              tone="border-emerald-500/30 text-emerald-300"
+            />
+          </section>
+
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+              <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+                Pipeline (열린 프로젝트)
+              </h2>
+              {r.pipelineTotalValue === 0 ? (
+                <p className="text-sm text-zinc-500">
+                  현재 견적 금액이 입력된 열린 프로젝트가 없습니다.
+                </p>
+              ) : (
+                <ul className="space-y-2 text-sm">
+                  {Object.entries(r.pipelineByStage).map(([stage, b]) => {
+                    const sharePct =
+                      r.pipelineTotalValue > 0
+                        ? (b.value / r.pipelineTotalValue) * 100
+                        : 0;
+                    return (
+                      <li
+                        key={stage}
+                        className="flex items-center gap-3 text-sm"
+                      >
+                        <span className="w-20 shrink-0 text-zinc-400">
+                          {STAGE_LABEL[stage] ?? stage}
+                        </span>
+                        <span className="text-zinc-500 tabular-nums shrink-0 w-8 text-right">
+                          {b.count}
+                        </span>
+                        <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-500"
+                            style={{ width: `${sharePct}%` }}
+                          />
+                        </div>
+                        <span className="tabular-nums text-zinc-200 shrink-0 w-28 text-right">
+                          ₩{KRW.format(b.value)}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <p className="mt-4 text-xs text-zinc-500">
+                Pipeline 총합:{" "}
+                <span className="text-zinc-200 font-medium tabular-nums">
+                  ₩{KRW.format(r.pipelineTotalValue)}
+                </span>
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+              <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+                90일 reference window
+              </h2>
+              <ul className="space-y-2 text-sm">
+                <Row
+                  label="신규 inquiry"
+                  value={r.inquired90dCount.toLocaleString()}
+                />
+                <Row
+                  label="납품 (delivered)"
+                  value={r.delivered90dCount.toLocaleString()}
+                />
+                <Row
+                  label="Close rate"
+                  value={`${(r.closeRate * 100).toFixed(1)}%`}
+                />
+                <Row
+                  label="평균 deal size"
+                  value={`₩${KRW.format(Math.round(r.avgDealValue))}`}
+                />
+                <Row
+                  label="90일 누적 매출"
+                  value={`₩${KRW.format(r.delivered90dValue)}`}
+                />
+              </ul>
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 text-sm">
+            <h2 className="text-xs uppercase tracking-wider text-amber-300 mb-2 flex items-center gap-2">
+              <AlertCircle className="w-3.5 h-3.5" />
+              해석 가이드
+            </h2>
+            <ul className="text-zinc-300 list-disc list-inside space-y-1.5 leading-relaxed">
+              <li>
+                Pipeline 의 invoice_amount 가 비어 있으면 시나리오에서 제외됩니다 — 들어온 inquiry 에 견적을 빠르게 책정할수록 forecast 정확도가 올라갑니다.
+              </li>
+              <li>
+                Close rate 가 30% 미만이면 매칭 부정확 또는 응답 SLA 지연. 두 지표를 같이 점검하세요 (
+                <Link
+                  href="/admin/health"
+                  className="underline underline-offset-2 hover:text-white"
+                >
+                  Health
+                </Link>
+                ).
+              </li>
+              <li>
+                Base 시나리오는 같은 close rate 가 유지된다는 가정. 신규 캠페인 출시나 시즌성 효과가 있다면 별도 보정 필요.
+              </li>
+            </ul>
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ScenarioCard({
+  label,
+  value,
+  hint,
+  tone,
+  highlight = false,
+}: {
+  label: string;
+  value: number;
+  hint: string;
+  tone: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-xl border p-5 ${tone} ${
+        highlight ? "bg-zinc-950" : "bg-zinc-900/30"
+      }`}
+    >
+      <p className="text-xs uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="mt-2 text-3xl font-bold tabular-nums">
+        ₩{KRW.format(value)}
+      </p>
+      <p className="mt-2 text-[11px] text-zinc-500 leading-relaxed">{hint}</p>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <li className="flex items-center justify-between">
+      <span className="text-zinc-400">{label}</span>
+      <span className="tabular-nums font-medium text-zinc-100">{value}</span>
+    </li>
+  );
+}

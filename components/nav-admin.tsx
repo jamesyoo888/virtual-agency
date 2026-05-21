@@ -38,6 +38,7 @@ const links = [
   { href: "/admin/image-studio", label: "Image Studio", icon: Image },
   { href: "/admin/video-studio", label: "Video Studio", icon: Video },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/admin/forecast", label: "Forecast", icon: TrendingUp },
   { href: "/admin/experiments", label: "Experiments", icon: FlaskConical },
   { href: "/admin/rfps", label: "RFPs", icon: FileText },
   { href: "/admin/bookmarks", label: "Bookmarks", icon: Heart },
