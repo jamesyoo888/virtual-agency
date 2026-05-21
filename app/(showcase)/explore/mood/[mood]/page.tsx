@@ -8,6 +8,7 @@ import { MOOD_OPTIONS, MOOD_LABELS, INDUSTRY_LABELS } from "@/lib/tags";
 import { MOOD_COPY } from "@/lib/explore/copy";
 import type { MoodTag, Model } from "@/types";
 import { ArrowRight } from "lucide-react";
+import { relatedPostsForMood } from "@/lib/blog/industry-map";
 
 export const revalidate = 3600;
 
@@ -82,6 +83,7 @@ export default async function ExploreMoodPage({
   const tag = mood as MoodTag;
   const copy = MOOD_COPY[tag];
   const models = await loadModels(tag);
+  const related = relatedPostsForMood(tag, 3);
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -162,6 +164,34 @@ export default async function ExploreMoodPage({
               </li>
             ))}
           </ul>
+        )}
+
+        {related.length > 0 && (
+          <section className="mt-16 pt-8 border-t border-zinc-900">
+            <h2 className="text-sm uppercase tracking-wider text-zinc-500 mb-4">
+              {MOOD_LABELS[tag]} 무드 캠페인 인사이트
+            </h2>
+            <ul className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {related.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/blog/${p.slug}`}
+                    className="group block rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 hover:border-zinc-600"
+                  >
+                    <p className="text-[10px] tabular-nums text-zinc-600">
+                      {p.publishedAt} · {p.readingMinutes}분 읽기
+                    </p>
+                    <p className="text-sm font-medium mt-1 text-zinc-100 group-hover:underline">
+                      {p.title}
+                    </p>
+                    <p className="text-xs text-zinc-500 mt-2 line-clamp-2">
+                      {p.excerpt}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
         <section className="mt-16 pt-8 border-t border-zinc-900">

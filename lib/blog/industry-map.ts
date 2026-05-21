@@ -17,10 +17,28 @@ const INDUSTRY_TAGS: Record<string, string[]> = {
   lifestyle: ["가이드", "브리프", "매칭", "캠페인"],
 };
 
-export function relatedPostsForIndustry(industry: string, limit = 3): BlogPost[] {
-  const tags = INDUSTRY_TAGS[industry] ?? [];
-  if (tags.length === 0) return listPosts().slice(0, limit);
-  const tagSet = new Set(tags);
+const MOOD_TAGS: Record<string, string[]> = {
+  cold: ["전략", "독점", "라이선스"],
+  warm: ["가이드", "브리프", "캠페인"],
+  neutral: ["가이드", "산업", "측정"],
+  edgy: ["전략", "독점", "브랜드 안전성"],
+};
+
+const GENRE_TAGS: Record<string, string[]> = {
+  ad: ["전략", "캠페인", "측정"],
+  film: ["전략", "캠페인", "측정"],
+  drama: ["산업", "플레이북", "캠페인"],
+  noir: ["독점", "라이선스", "전략"],
+  romance: ["가이드", "산업", "브리프"],
+  "sci-fi": ["측정", "데이터", "캠페인"],
+  historical: ["독점", "라이선스"],
+  indie: ["가이드", "브리프"],
+  horror: ["브랜드 안전성", "전략"],
+};
+
+function rankByTags(targetTags: string[], limit: number): BlogPost[] {
+  if (targetTags.length === 0) return listPosts().slice(0, limit);
+  const tagSet = new Set(targetTags);
   const scored = listPosts().map((p) => {
     const overlap = p.tags.filter((t) => tagSet.has(t)).length;
     return { post: p, overlap };
@@ -30,4 +48,16 @@ export function relatedPostsForIndustry(industry: string, limit = 3): BlogPost[]
     return b.post.publishedAt.localeCompare(a.post.publishedAt);
   });
   return scored.slice(0, limit).map((s) => s.post);
+}
+
+export function relatedPostsForIndustry(industry: string, limit = 3): BlogPost[] {
+  return rankByTags(INDUSTRY_TAGS[industry] ?? [], limit);
+}
+
+export function relatedPostsForMood(mood: string, limit = 3): BlogPost[] {
+  return rankByTags(MOOD_TAGS[mood] ?? [], limit);
+}
+
+export function relatedPostsForGenre(genre: string, limit = 3): BlogPost[] {
+  return rankByTags(GENRE_TAGS[genre] ?? [], limit);
 }
