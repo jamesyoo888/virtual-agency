@@ -122,6 +122,29 @@ async function loadModels(tag: IndustryTag): Promise<Model[]> {
   return (data as Model[]) ?? [];
 }
 
+interface TrendingRow {
+  id: string;
+  name: string;
+  concept_image: string | null;
+  view_count_30d: number;
+}
+
+async function loadTrendingInIndustry(
+  tag: IndustryTag
+): Promise<TrendingRow[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("models_with_popularity")
+    .select("id, name, concept_image, view_count_30d")
+    .eq("status", "active")
+    .contains("industry_tags", [tag])
+    .order("view_count_30d", { ascending: false })
+    .gt("view_count_30d", 0)
+    .limit(6);
+  return (data as TrendingRow[]) ?? [];
+}
+
 const KRW = new Intl.NumberFormat("ko-KR");
 
 export default async function ExploreIndustryPage({
@@ -134,7 +157,10 @@ export default async function ExploreIndustryPage({
 
   const tag = industry as IndustryTag;
   const copy = INDUSTRY_COPY[tag];
-  const models = await loadModels(tag);
+  const [models, trending] = await Promise.all([
+    loadModels(tag),
+    loadTrendingInIndustry(tag),
+  ]);
   const related = relatedPostsForIndustry(tag, 3);
 
   return (
@@ -169,6 +195,54 @@ export default async function ExploreIndustryPage({
             </Link>
           </div>
         </header>
+
+        {trending.length > 0 && (
+          <section className="mb-10">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-emerald-400">
+                Trending
+              </span>
+              <span className="text-xs text-zinc-500">
+                · 최근 30일 {INDUSTRY_LABELS[tag]} 카테고리 모멘텀 상위
+              </span>
+              <Link
+                href={`/trending?industry=${tag}`}
+                className="ml-auto text-xs text-zinc-500 hover:text-white"
+              >
+                전체 →
+              </Link>
+            </div>
+            <ul className="grid grid-cols-3 md:grid-cols-6 gap-2">
+              {trending.map((t) => (
+                <li key={t.id}>
+                  <Link
+                    href={`/models/${t.id}`}
+                    className="block rounded-md overflow-hidden border border-zinc-800 hover:border-emerald-500/50 transition-colors"
+                  >
+                    <div className="aspect-square bg-zinc-900 relative">
+                      {t.concept_image && (
+                        <Image
+                          src={t.concept_image}
+                          alt={t.name}
+                          fill
+                          className="object-cover"
+                          sizes="(min-width: 768px) 16vw, 33vw"
+                          unoptimized
+                        />
+                      )}
+                    </div>
+                    <div className="px-1.5 py-1.5 text-center">
+                      <p className="text-[11px] font-medium truncate">{t.name}</p>
+                      <p className="text-[9px] text-emerald-400 tabular-nums">
+                        {t.view_count_30d.toLocaleString()} views
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {models.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">

@@ -5,6 +5,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { toCSV, csvFilename } from "@/lib/csv";
 import { loadModelPerformance } from "@/lib/analytics/model-performance";
 import { loadForecast } from "@/lib/analytics/forecast";
+import { wowFromRows } from "@/lib/analytics/week-over-week";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -29,6 +30,7 @@ const KINDS = new Set([
   "newsletter",
   "model-performance",
   "forecast",
+  "wow",
 ]);
 
 export async function GET(
@@ -674,6 +676,63 @@ export async function GET(
         "Content-Disposition": `attachment; filename="${csvFilename(
           "model-performance"
         )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "wow") {
+    // 14d window covers both the current-week and previous-week buckets
+    // wowFromRows expects.
+    const since14 = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    const [{ data: inqRows }, { data: delRows }] = await Promise.all([
+      supabase
+        .from("projects")
+        .select("created_at")
+        .gte("created_at", since14)
+        .limit(5000),
+      supabase
+        .from("projects")
+        .select("updated_at, invoice_amount")
+        .eq("status", "delivered")
+        .gte("updated_at", since14)
+        .limit(5000),
+    ]);
+    const inquiriesWow = wowFromRows(
+      (inqRows ?? []) as { created_at: string }[]
+    );
+    const deliveredWow = wowFromRows(
+      (delRows ?? []) as { updated_at: string }[],
+      { dateField: "updated_at" }
+    );
+    const revenueWow = wowFromRows(
+      (delRows ?? []) as {
+        updated_at: string;
+        invoice_amount: number | null;
+      }[],
+      { dateField: "updated_at", weighted: true }
+    );
+    const fmtPct = (m: ReturnType<typeof wowFromRows>) =>
+      m.pct === null ? "" : m.pct.toFixed(2);
+    const rows = [
+      { metric: "inquiries_current", value: String(inquiriesWow.current) },
+      { metric: "inquiries_previous", value: String(inquiriesWow.previous) },
+      { metric: "inquiries_delta", value: String(inquiriesWow.delta) },
+      { metric: "inquiries_pct", value: fmtPct(inquiriesWow) },
+      { metric: "delivered_current", value: String(deliveredWow.current) },
+      { metric: "delivered_previous", value: String(deliveredWow.previous) },
+      { metric: "delivered_delta", value: String(deliveredWow.delta) },
+      { metric: "delivered_pct", value: fmtPct(deliveredWow) },
+      { metric: "revenue_current", value: String(revenueWow.current) },
+      { metric: "revenue_previous", value: String(revenueWow.previous) },
+      { metric: "revenue_delta", value: String(revenueWow.delta) },
+      { metric: "revenue_pct", value: fmtPct(revenueWow) },
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("wow")}"`,
         "Cache-Control": "no-store",
       },
     });

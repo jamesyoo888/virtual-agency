@@ -347,9 +347,18 @@ export default async function AdminHomePage() {
       )}
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 mb-1">
-          주간 변화 (지난 7일 vs 그 직전 7일)
-        </h2>
+        <div className="flex items-start justify-between mb-1">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+            주간 변화 (지난 7일 vs 그 직전 7일)
+          </h2>
+          <a
+            href="/api/admin/exports/wow"
+            download
+            className="text-[11px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
+          >
+            CSV
+          </a>
+        </div>
         <p className="text-xs text-zinc-500 mb-4">
           최근 한 주가 직전 주보다 더 좋아졌는지를 본다 — 트렌드만 보는 지표라 절대값은 KPI 카드 참조.
         </p>

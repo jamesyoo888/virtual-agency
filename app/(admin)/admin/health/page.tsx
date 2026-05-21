@@ -115,14 +115,42 @@ function trendBadge(today: number, avg7d: number): {
   return { label: "▼ 평소보다 조용", tone: "text-amber-400" };
 }
 
+async function loadTrendingEngine(): Promise<{
+  modelsWithViews: number;
+  totalActive: number;
+} | null> {
+  if (!SUPABASE_CONFIGURED) return null;
+  try {
+    const supabase = await createClient();
+    const [{ count: withViews }, { count: totalActive }] = await Promise.all([
+      supabase
+        .from("models_with_popularity")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active")
+        .gt("view_count_30d", 0),
+      supabase
+        .from("models")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active"),
+    ]);
+    return {
+      modelsWithViews: withViews ?? 0,
+      totalActive: totalActive ?? 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner, sla, perf] = await Promise.all([
+  const [pulse, cost, recent, banner, sla, perf, trending] = await Promise.all([
     loadPulse(),
     summarizeUsage(),
     recentUsage(10),
     getBanner(),
     loadResponseSla(30),
     loadModelPerformance(30),
+    loadTrendingEngine(),
   ]);
 
   // Underperformers — models with at least 500 views in the window AND an
@@ -186,6 +214,20 @@ export default async function AdminHealthPage() {
                   : `${sla.medianHours.toFixed(1)}h`
                 : "—"
             }${sla.staleOpenCount > 0 ? ` · ${sla.staleOpenCount} 지연` : ""}`,
+    },
+    {
+      // Trending feed health: need at least ~30% of active models to have
+      // 30d view data, otherwise /trending is too sparse to be useful.
+      label: "트렌딩 엔진",
+      ok:
+        trending !== null &&
+        trending.totalActive > 0 &&
+        trending.modelsWithViews / trending.totalActive >= 0.3,
+      detail: trending
+        ? trending.totalActive === 0
+          ? "활성 모델 없음"
+          : `${trending.modelsWithViews}/${trending.totalActive} 모델이 30d 노출 보유`
+        : "popularity view 미생성 또는 쿼리 실패",
     },
   ];
 

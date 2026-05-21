@@ -6,19 +6,27 @@ import AdminModelsGrid from "@/components/admin-models-grid";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { loadModelPerformance } from "@/lib/analytics/model-performance";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminModelsPage() {
   let models: Model[] = [];
+  let perfByModel: Record<string, { views: number; inquiries: number }> = {};
 
   if (SUPABASE_CONFIGURED) {
     const supabase = await createClient();
-    const { data } = await supabase
-      .from("models")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const [{ data }, perf] = await Promise.all([
+      supabase
+        .from("models")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      loadModelPerformance(30),
+    ]);
     models = (data as Model[]) ?? [];
+    perfByModel = Object.fromEntries(
+      perf.rows.map((r) => [r.modelId, { views: r.views, inquiries: r.inquiries }])
+    );
   } else {
     models = devModelStore.list() as Model[];
   }
@@ -51,7 +59,7 @@ export default async function AdminModelsPage() {
           <p className="text-sm mt-2">New Model 버튼을 눌러 첫 모델을 생성하세요.</p>
         </div>
       ) : (
-        <AdminModelsGrid models={models} />
+        <AdminModelsGrid models={models} perfByModel={perfByModel} />
       )}
     </div>
   );

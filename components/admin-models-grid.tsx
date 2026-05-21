@@ -13,11 +13,22 @@ const STATUS_FILTERS: { value: "all" | ModelStatus; label: string }[] = [
   { value: "inactive", label: "Inactive" },
 ];
 
-interface Props {
-  models: Model[];
+interface PerfBadge {
+  views: number;
+  inquiries: number;
 }
 
-export default function AdminModelsGrid({ models }: Props) {
+interface Props {
+  models: Model[];
+  /**
+   * Optional 30d perf data keyed by model_id. When present each card gets
+   * a small overlay chip with views/inquiries — admin can scan ranking
+   * without clicking through.
+   */
+  perfByModel?: Record<string, PerfBadge>;
+}
+
+export default function AdminModelsGrid({ models, perfByModel }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"all" | ModelStatus>("all");
@@ -234,6 +245,18 @@ export default function AdminModelsGrid({ models }: Props) {
                 >
                   <ModelCard model={model} variant="admin" />
                 </div>
+                {perfByModel?.[model.id] && (
+                  <div className="absolute top-2 right-2 z-20 flex flex-col gap-1 items-end">
+                    <span className="px-1.5 py-0.5 rounded bg-black/70 backdrop-blur text-[10px] tabular-nums text-zinc-200 border border-zinc-700">
+                      30d {perfByModel[model.id].views.toLocaleString()}v
+                    </span>
+                    {perfByModel[model.id].inquiries > 0 && (
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/80 text-black text-[10px] tabular-nums font-medium">
+                        {perfByModel[model.id].inquiries} 문의
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
