@@ -29,6 +29,7 @@ const LINKS: { href: string; label: string }[] = [
   { href: "/faq", label: "FAQ" },
   { href: "/press", label: "프레스" },
   { href: "/careers", label: "크리에이터 합류" },
+  { href: "/about", label: "회사 소개" },
 ];
 
 const SECONDARY: { href: string; label: string }[] = [

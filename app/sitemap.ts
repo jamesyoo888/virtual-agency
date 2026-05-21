@@ -100,6 +100,12 @@ export default async function sitemap(
             priority: 0.7,
           },
           {
+            url: `${SITE_URL}/about`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.4,
+          },
+          {
             url: `${SITE_URL}/cases`,
             lastModified: now,
             changeFrequency: "weekly",

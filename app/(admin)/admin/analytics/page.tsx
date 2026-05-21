@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, TrendingUp } from "lucide-react";
 import { INDUSTRY_LABELS } from "@/lib/tags";
+import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics — Virtual Agency" };
@@ -36,6 +37,7 @@ async function loadAnalytics(): Promise<{
   conversionPct: number;
   topModels: TopModel[];
   byIndustry: IndustryStat[];
+  daily30: DailyBucket[];
 }> {
   if (!SUPABASE_CONFIGURED) {
     return {
@@ -44,18 +46,26 @@ async function loadAnalytics(): Promise<{
       conversionPct: 0,
       topModels: [],
       byIndustry: [],
+      daily30: aggregateDaily([], 30),
     };
   }
   const supabase = await createClient();
   const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
-  const { data } = await supabase
-    .from("projects")
-    .select(
-      "model_id, status, model:models(name, concept_image, industry_tags)"
-    )
-    .gte("created_at", since);
+  const thirtyAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const [{ data }, daily] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("model_id, status, model:models(name, concept_image, industry_tags)")
+      .gte("created_at", since),
+    supabase
+      .from("projects")
+      .select("created_at")
+      .gte("created_at", thirtyAgo),
+  ]);
 
   const projects = (data as unknown as ProjectAgg[]) ?? [];
+  const dailyRows = ((daily.data ?? []) as { created_at: string }[]);
+  const daily30 = aggregateDaily(dailyRows, 30);
   const totalInquiries = projects.length;
   const totalDelivered = projects.filter((p) => p.status === "delivered").length;
   const conversionPct =
@@ -89,7 +99,7 @@ async function loadAnalytics(): Promise<{
     .map(([industry, inquiries]) => ({ industry, inquiries }))
     .sort((a, b) => b.inquiries - a.inquiries);
 
-  return { totalInquiries, totalDelivered, conversionPct, topModels, byIndustry };
+  return { totalInquiries, totalDelivered, conversionPct, topModels, byIndustry, daily30 };
 }
 
 export default async function AnalyticsPage() {
@@ -113,6 +123,53 @@ export default async function AnalyticsPage() {
         <Card label="총 문의" value={a.totalInquiries.toLocaleString()} />
         <Card label="납품 완료" value={a.totalDelivered.toLocaleString()} />
         <Card label="전환율" value={`${a.conversionPct}%`} />
+      </section>
+
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="w-4 h-4 text-zinc-400" />
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+            30일 일별 문의 추세
+          </h2>
+          <span className="ml-auto text-[10px] text-zinc-600 tabular-nums">
+            {a.daily30.reduce((sum, d) => sum + d.count, 0)} 건 누적 · KST
+          </span>
+        </div>
+        {(() => {
+          const peak = Math.max(1, ...a.daily30.map((d) => d.count));
+          return (
+            <div className="flex items-end gap-px h-32">
+              {a.daily30.map((d) => {
+                const heightPct = (d.count / peak) * 100;
+                const isWeekStart = d.date.endsWith("-01") || d.date.endsWith("01");
+                return (
+                  <div
+                    key={d.date}
+                    className="flex-1 flex flex-col justify-end group relative"
+                    title={`${d.date} — ${d.count}건`}
+                  >
+                    <div
+                      className={`w-full rounded-sm transition-colors ${
+                        d.count > 0
+                          ? "bg-zinc-500 group-hover:bg-emerald-400"
+                          : "bg-zinc-900"
+                      }`}
+                      style={{ height: `${Math.max(2, heightPct)}%` }}
+                    />
+                    {isWeekStart && (
+                      <span className="absolute -bottom-4 left-0 text-[9px] text-zinc-700 tabular-nums">
+                        {d.date.slice(5)}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+        <p className="mt-6 text-[10px] text-zinc-600">
+          가장 왼쪽 = 30일 전, 가장 오른쪽 = 오늘. 마우스 오버 시 일자·건수 표시.
+        </p>
       </section>
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">

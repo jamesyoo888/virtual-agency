@@ -64,6 +64,11 @@ export default function SiteFooter() {
                 크리에이터 합류
               </Link>
             </li>
+            <li>
+              <Link href="/about" className="hover:text-white">
+                회사 소개
+              </Link>
+            </li>
           </ul>
         </div>
 
