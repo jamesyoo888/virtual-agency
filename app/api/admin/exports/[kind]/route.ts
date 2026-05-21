@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { toCSV, csvFilename } from "@/lib/csv";
+import { loadModelPerformance } from "@/lib/analytics/model-performance";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -25,6 +26,7 @@ const KINDS = new Set([
   "creators",
   "clients",
   "newsletter",
+  "model-performance",
 ]);
 
 export async function GET(
@@ -568,6 +570,40 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("experiments")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "model-performance") {
+    const report = await loadModelPerformance(30);
+    const rows = report.rows.map((r) => ({
+      model_id: r.modelId,
+      name: r.name,
+      status: r.status,
+      views_30d: r.views,
+      inquiries_30d: r.inquiries,
+      delivered_30d: r.delivered,
+      inquiry_rate: r.inquiryRate.toFixed(4),
+      close_rate: r.closeRate != null ? r.closeRate.toFixed(4) : "",
+    }));
+    const columns = [
+      "model_id",
+      "name",
+      "status",
+      "views_30d",
+      "inquiries_30d",
+      "delivered_30d",
+      "inquiry_rate",
+      "close_rate",
+    ] as const;
+    const csv = toCSV(rows, columns);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "model-performance"
+        )}"`,
         "Cache-Control": "no-store",
       },
     });

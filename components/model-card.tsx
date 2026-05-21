@@ -6,7 +6,7 @@ import { Model } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { ageInYears } from "@/lib/utils";
 import { useCompareState } from "@/components/compare-drawer";
-import { GitCompareArrows, Bookmark, BookmarkCheck } from "lucide-react";
+import { GitCompareArrows, Bookmark, BookmarkCheck, Flame } from "lucide-react";
 import ModelQuickView from "@/components/model-quick-view";
 import { INDUSTRY_LABELS, GENRE_LABELS } from "@/lib/tags";
 
@@ -56,6 +56,12 @@ interface Props {
    */
   bookmarked?: boolean;
   bookmarkUnauthenticated?: boolean;
+  /**
+   * When true, render a small 🔥 badge — used by the catalog page to surface
+   * the top-N models by recent view momentum. Only effective on the
+   * showcase variant (admin grids already have their own status badges).
+   */
+  trending?: boolean;
 }
 
 function BookmarkHeart({
@@ -130,7 +136,9 @@ export default function ModelCard({
   layout = "card",
   bookmarked = false,
   bookmarkUnauthenticated = false,
+  trending = false,
 }: Props) {
+  const showTrending = trending && variant === "showcase";
   const href =
     variant === "admin"
       ? `/admin/models/${model.id}`
@@ -207,8 +215,17 @@ export default function ModelCard({
               No image
             </div>
           )}
+          {showTrending && (
+            <Badge className="absolute top-1.5 left-1.5 bg-orange-500/90 text-black border-orange-300 text-[10px] px-1.5 py-0 inline-flex items-center gap-0.5">
+              <Flame className="w-2.5 h-2.5" /> 트렌딩
+            </Badge>
+          )}
           {model.is_exclusive_available && (
-            <Badge className="absolute top-1.5 left-1.5 bg-white/10 text-white border-white/20 text-[10px] px-1.5 py-0">
+            <Badge
+              className={`absolute ${
+                showTrending ? "top-6" : "top-1.5"
+              } left-1.5 bg-white/10 text-white border-white/20 text-[10px] px-1.5 py-0`}
+            >
               독점
             </Badge>
           )}
@@ -337,8 +354,15 @@ export default function ModelCard({
               unauthenticated={bookmarkUnauthenticated}
             />
           )}
+          {showTrending && (
+            <div className="absolute top-2 left-2">
+              <Badge className="bg-orange-500/90 text-black border-orange-300 text-xs inline-flex items-center gap-1">
+                <Flame className="w-3 h-3" /> 트렌딩
+              </Badge>
+            </div>
+          )}
           {variant === "showcase" && model.is_exclusive_available && (
-            <div className="absolute top-11 left-2">
+            <div className={`absolute ${showTrending ? "top-11" : "top-2"} left-2`}>
               <Badge className="bg-white/10 text-white border-white/20 text-xs">
                 독점가능
               </Badge>

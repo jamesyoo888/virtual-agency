@@ -28,6 +28,14 @@ export default async function ModelPerformancePage() {
             30일 카탈로그 View → Inquiry → Delivered 전환. 스무딩 적용된 inquiry rate 로 정렬 (신규 모델 페널티 방지).
           </p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
+        <a
+          href="/api/admin/exports/model-performance"
+          download
+          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+        >
+          CSV
+        </a>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">

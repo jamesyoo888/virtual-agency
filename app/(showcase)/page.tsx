@@ -69,6 +69,7 @@ export default async function CatalogPage({ searchParams }: PageProps) {
   let userRole: "admin" | "client" | null = null;
   let userId: string | null = null;
   let bookmarkedIds = new Set<string>();
+  let trendingIds = new Set<string>();
   let models: Model[] = [];
   let totalCount = 0;
   let totalPages = 1;
@@ -76,6 +77,25 @@ export default async function CatalogPage({ searchParams }: PageProps) {
 
   if (SUPABASE_CONFIGURED) {
     const supabase = await createClient();
+
+    // Top-6 30-day view leaders — surfaced as a 🔥 badge on the matching
+    // cards. Pulled once per request from the existing popularity view so the
+    // catalog page makes one extra small query.
+    try {
+      const { data: trending } = await supabase
+        .from("models_with_popularity")
+        .select("id, view_count_30d")
+        .eq("status", "active")
+        .order("view_count_30d", { ascending: false })
+        .gt("view_count_30d", 0)
+        .limit(6);
+      trendingIds = new Set(
+        ((trending ?? []) as { id: string }[]).map((m) => m.id)
+      );
+    } catch {
+      // models_with_popularity view may be missing in a partially-migrated
+      // env — fall through with an empty set so badges just don't render.
+    }
 
     const {
       data: { user },
@@ -414,6 +434,7 @@ export default async function CatalogPage({ searchParams }: PageProps) {
                       layout="list"
                       bookmarked={bookmarkedIds.has(model.id)}
                       bookmarkUnauthenticated={!userId}
+                      trending={trendingIds.has(model.id)}
                     />
                   ))}
                 </div>
@@ -427,6 +448,7 @@ export default async function CatalogPage({ searchParams }: PageProps) {
                       layout="card"
                       bookmarked={bookmarkedIds.has(model.id)}
                       bookmarkUnauthenticated={!userId}
+                      trending={trendingIds.has(model.id)}
                     />
                   ))}
                 </div>
