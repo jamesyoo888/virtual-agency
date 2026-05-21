@@ -7,6 +7,7 @@ import { loadFunnel, loadFunnelBySource, stageConversionRate } from "@/lib/analy
 import { loadSearchAnalytics } from "@/lib/analytics/search-log";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { wowFromRows, type WowMetric } from "@/lib/analytics/week-over-week";
+import { computeMtdRevenue, type MtdRevenue } from "@/lib/analytics/mtd-revenue";
 import {
   Users,
   Inbox,
@@ -46,6 +47,25 @@ interface OpsSnapshot {
   newsletter7d: number;
   newsletter30d: number;
   pendingReviews: number;
+}
+
+async function loadMtdRevenue(): Promise<MtdRevenue> {
+  if (!SUPABASE_CONFIGURED) {
+    return computeMtdRevenue([]);
+  }
+  const supabase = await createClient();
+  // 60 days covers both current and prior calendar months for any day of
+  // the year — a single query feeds both buckets.
+  const since60 = new Date(Date.now() - 60 * 86_400_000).toISOString();
+  const { data } = await supabase
+    .from("projects")
+    .select("updated_at, invoice_amount")
+    .eq("status", "delivered")
+    .gte("updated_at", since60)
+    .limit(5000);
+  return computeMtdRevenue(
+    (data ?? []) as { updated_at: string; invoice_amount: number | null }[]
+  );
 }
 
 interface TrendingNowRow {
@@ -242,7 +262,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla, wow, trendingNow] =
+  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla, wow, trendingNow, mtd] =
     await Promise.all([
       loadKPIs(),
       summarizeUsage(),
@@ -254,6 +274,7 @@ export default async function AdminHomePage() {
       loadResponseSla(30),
       loadWowSnapshot(),
       loadTrendingNow(),
+      loadMtdRevenue(),
     ]);
 
   return (
@@ -293,6 +314,68 @@ export default async function AdminHomePage() {
         />
       </section>
 
+      {mtd.mtdRevenue > 0 || mtd.priorMonthTotal > 0 ? (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-baseline justify-between mb-3">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+                Month-to-Date 매출
+              </h2>
+              <p className="text-xs text-zinc-500 mt-0.5 tabular-nums">
+                {mtd.daysElapsed}/{mtd.daysInMonth}일 경과
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold tabular-nums">
+                ₩{mtd.mtdRevenue.toLocaleString("ko-KR")}
+              </p>
+              <p className="text-[11px] text-zinc-500 tabular-nums">
+                월말 예상 ₩{mtd.projectedMonthEnd.toLocaleString("ko-KR")}
+              </p>
+            </div>
+          </div>
+          {mtd.priorMonthTotal > 0 ? (
+            (() => {
+              const projPct = Math.min(
+                100,
+                (mtd.projectedMonthEnd / mtd.priorMonthTotal) * 100
+              );
+              const beating = mtd.projectedMonthEnd >= mtd.priorMonthTotal;
+              return (
+                <>
+                  <div className="h-2 rounded-full bg-zinc-800 overflow-hidden relative">
+                    <div
+                      className={`h-full transition-all ${
+                        beating ? "bg-emerald-500" : "bg-amber-500"
+                      }`}
+                      style={{ width: `${projPct}%` }}
+                    />
+                    {/* Last-month total marker */}
+                    <div className="absolute top-0 bottom-0 left-full -ml-px w-0.5 bg-zinc-300/30" />
+                  </div>
+                  <p className="mt-2 text-[11px] text-zinc-500 tabular-nums">
+                    이전월 총 ₩{mtd.priorMonthTotal.toLocaleString("ko-KR")}{" "}
+                    {beating ? (
+                      <span className="text-emerald-400">
+                        · 페이스 +{(projPct - 100).toFixed(0)}%
+                      </span>
+                    ) : (
+                      <span className="text-amber-400">
+                        · 페이스 -{(100 - projPct).toFixed(0)}%
+                      </span>
+                    )}
+                  </p>
+                </>
+              );
+            })()
+          ) : (
+            <p className="text-[11px] text-zinc-500">
+              이전월 매출 데이터 없음 — 비교 기준선이 다음 달부터 형성됩니다.
+            </p>
+          )}
+        </section>
+      ) : null}
+
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
         <ShortcutCard
           title="새 모델 생성"
@@ -318,12 +401,21 @@ export default async function AdminHomePage() {
               <TrendingUp className="w-4 h-4 text-emerald-400" />
               지금 트렌딩 (30d 노출)
             </h2>
-            <Link
-              href="/trending"
-              className="text-xs text-zinc-400 hover:text-white inline-flex items-center gap-1"
-            >
-              공개 페이지 <ArrowRight className="w-3 h-3" />
-            </Link>
+            <div className="flex items-center gap-3">
+              <a
+                href="/api/admin/exports/trending"
+                download
+                className="text-[11px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
+              >
+                CSV
+              </a>
+              <Link
+                href="/trending"
+                className="text-xs text-zinc-400 hover:text-white inline-flex items-center gap-1"
+              >
+                공개 페이지 <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
           </div>
           <ul className="grid grid-cols-1 md:grid-cols-5 gap-2">
             {trendingNow.map((m, i) => (

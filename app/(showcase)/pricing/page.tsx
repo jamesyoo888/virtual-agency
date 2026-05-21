@@ -220,6 +220,48 @@ export default async function PricingPage() {
       <section className="px-5 md:px-8 py-16 border-t border-zinc-900">
         <div className="max-w-5xl mx-auto">
           <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-zinc-500 mb-3">
+            예시 견적
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">
+            대표 캠페인 시나리오 3가지
+          </h2>
+          <p className="text-zinc-400 mb-8 leading-relaxed max-w-2xl">
+            모델 단가는 카탈로그 평균 기준입니다. 실제 견적은 모델 선택, 컨셉 변형 횟수, 매체에 따라 달라집니다 — 인콰이어리에서 즉시 산출됩니다.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+            {EXAMPLE_SCENARIOS.map((s) => (
+              <article
+                key={s.label}
+                className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6"
+              >
+                <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">
+                  {s.useCase}
+                </p>
+                <h3 className="text-base font-semibold mt-1 mb-4">{s.label}</h3>
+                <p className="text-2xl font-bold tabular-nums mb-1">
+                  ₩{s.totalKrw.toLocaleString("ko-KR")}
+                </p>
+                <p className="text-[11px] text-zinc-500 mb-4">+VAT</p>
+                <ul className="space-y-1.5 text-xs text-zinc-400">
+                  {s.lineItems.map((li) => (
+                    <li key={li.label} className="flex justify-between">
+                      <span>{li.label}</span>
+                      <span className="tabular-nums">
+                        ₩{li.priceKrw.toLocaleString("ko-KR")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-4 pt-3 border-t border-zinc-800 text-[11px] text-zinc-500 leading-relaxed">
+                  {s.note}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto">
+          <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-zinc-500 mb-3">
             Comparison
           </p>
           <h2 className="text-2xl md:text-3xl font-bold mb-3">
@@ -262,6 +304,55 @@ export default async function PricingPage() {
     </div>
   );
 }
+
+interface ExampleScenario {
+  label: string;
+  useCase: string;
+  lineItems: { label: string; priceKrw: number }[];
+  totalKrw: number;
+  note: string;
+}
+
+// Approximate KRW pricing used for the /pricing examples. These match the
+// catalog median and the discount tiers (5d/10d/30d), so the totals stay
+// honest if pricing shifts modestly. Replace numbers if catalog drifts > 15%.
+const EXAMPLE_SCENARIOS: ExampleScenario[] = [
+  {
+    useCase: "SNS 단발 캠페인",
+    label: "이미지 캠페인 (3일, 비독점)",
+    lineItems: [
+      { label: "모델 라이선스 3일", priceKrw: 1_350_000 },
+      { label: "컨셉 변형 (×3컷)", priceKrw: 450_000 },
+      { label: "후반작업 (보정·리사이즈)", priceKrw: 200_000 },
+    ],
+    totalKrw: 2_000_000,
+    note: "SNS 피드용 1차 캠페인. 4컷 이상이면 5일 할인 적용으로 단가가 추가로 떨어집니다.",
+  },
+  {
+    useCase: "분기 단위 룩북",
+    label: "시즌 룩북 (10일, 비독점, 영상 포함)",
+    lineItems: [
+      { label: "모델 라이선스 10일 (10% 할인 적용)", priceKrw: 4_050_000 },
+      { label: "이미지 컨셉 8컷", priceKrw: 1_200_000 },
+      { label: "영상 5초 × 2개", priceKrw: 1_400_000 },
+      { label: "후반작업 + 출력 리사이즈", priceKrw: 850_000 },
+    ],
+    totalKrw: 7_500_000,
+    note: "이커머스·카탈로그·SNS 풀세트. 같은 모델로 분기 4번 반복 시 추가 5% 묶음 할인.",
+  },
+  {
+    useCase: "런칭 캠페인",
+    label: "독점 캠페인 (4주, 단일 산업)",
+    lineItems: [
+      { label: "독점 라이선스 30일 (15% 할인)", priceKrw: 18_000_000 },
+      { label: "히어로 컷 + 라인업 12컷", priceKrw: 3_200_000 },
+      { label: "영상 15초 × 3개 (TVC 변형)", priceKrw: 4_500_000 },
+      { label: "후반작업 · 매체별 출력", priceKrw: 1_800_000 },
+    ],
+    totalKrw: 27_500_000,
+    note: "런칭 캠페인 표준. 매체 범위가 글로벌이면 별도 견적 (국내 한정 기본).",
+  },
+];
 
 const COMPARISON: { label: string; traditional: string; virtual: string }[] = [
   {

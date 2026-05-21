@@ -31,6 +31,7 @@ const KINDS = new Set([
   "model-performance",
   "forecast",
   "wow",
+  "trending",
 ]);
 
 export async function GET(
@@ -689,6 +690,61 @@ export async function GET(
         "Content-Disposition": `attachment; filename="${csvFilename(
           "model-performance"
         )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "trending") {
+    // Pull the same set as /api/trending (popularity view, view-count desc,
+    // active models only). Larger limit for analysis — 100 covers the long
+    // tail without flooding.
+    const { data, error } = await supabase
+      .from("models_with_popularity")
+      .select(
+        "id, name, status, base_price, view_count_30d, follower_count, industry_tags, mood_tags"
+      )
+      .eq("status", "active")
+      .order("view_count_30d", { ascending: false })
+      .gt("view_count_30d", 0)
+      .limit(100);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    type Row = {
+      id: string;
+      name: string;
+      status: string;
+      base_price: number | null;
+      view_count_30d: number;
+      follower_count: number | null;
+      industry_tags: string[] | null;
+      mood_tags: string[] | null;
+    };
+    const rows = ((data ?? []) as Row[]).map((r, i) => ({
+      rank: i + 1,
+      model_id: r.id,
+      name: r.name,
+      base_price: r.base_price ?? "",
+      view_count_30d: r.view_count_30d,
+      follower_count: r.follower_count ?? "",
+      industry_tags: (r.industry_tags ?? []).join("|"),
+      mood_tags: (r.mood_tags ?? []).join("|"),
+    }));
+    const csv = toCSV(rows, [
+      "rank",
+      "model_id",
+      "name",
+      "base_price",
+      "view_count_30d",
+      "follower_count",
+      "industry_tags",
+      "mood_tags",
+    ] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("trending")}"`,
         "Cache-Control": "no-store",
       },
     });

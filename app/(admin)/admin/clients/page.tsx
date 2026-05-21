@@ -44,9 +44,16 @@ async function loadSummaries(): Promise<{
   clients: ClientSummary[];
   totalRevenue: number;
   totalRevenue90d: number;
+  /** Set of client_ids with no activity in 90+ days (and at least 1 campaign). */
+  neglectedIds: Set<string>;
 }> {
   if (!SUPABASE_CONFIGURED)
-    return { clients: [], totalRevenue: 0, totalRevenue90d: 0 };
+    return {
+      clients: [],
+      totalRevenue: 0,
+      totalRevenue90d: 0,
+      neglectedIds: new Set(),
+    };
   const supabase = await createClient();
 
   const [{ data: clientsRaw }, { data: projectsRaw }] = await Promise.all([
@@ -110,7 +117,24 @@ async function loadSummaries(): Promise<{
   });
 
   summaries.sort((a, b) => b.totalRevenue - a.totalRevenue);
-  return { clients: summaries, totalRevenue, totalRevenue90d };
+  // Neglected = at least 1 campaign + last activity older than 90 days (or
+  // no recorded activity at all). Computed inside the loader so the page
+  // component stays pure.
+  const neglectedIds = new Set(
+    summaries
+      .filter((c) => {
+        if (c.campaignCount === 0) return false;
+        if (!c.lastActivityAt) return true;
+        return new Date(c.lastActivityAt).getTime() < ninetyAgo;
+      })
+      .map((c) => c.id)
+  );
+  return {
+    clients: summaries,
+    totalRevenue,
+    totalRevenue90d,
+    neglectedIds,
+  };
 }
 
 const KRW = new Intl.NumberFormat("ko-KR");
@@ -252,17 +276,30 @@ function relativeLabel(iso: string | null): string {
   return `${Math.floor(days / 365)}년 전`;
 }
 
-export default async function AdminClientsPage() {
-  const { clients, totalRevenue, totalRevenue90d } = await loadSummaries();
+export default async function AdminClientsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>;
+}) {
+  const { filter } = await searchParams;
+  const showNeglected = filter === "neglected";
+  const { clients: allClients, totalRevenue, totalRevenue90d, neglectedIds } =
+    await loadSummaries();
+  const clients = showNeglected
+    ? allClients.filter((c) => neglectedIds.has(c.id))
+    : allClients;
+  const neglectedCount = neglectedIds.size;
 
-  const activeClients = clients.filter((c) => c.campaignCount > 0);
-  const repeatClients = clients.filter((c) => c.campaignCount >= 2);
-  const payingClients = clients.filter((c) => c.totalRevenue > 0);
+  const activeClients = allClients.filter((c) => c.campaignCount > 0);
+  const repeatClients = allClients.filter((c) => c.campaignCount >= 2);
+  const payingClients = allClients.filter((c) => c.totalRevenue > 0);
 
   // Compute top-5 paying clients up front so the table can badge them inline
-  // without re-sorting per row. Used purely for badge rendering.
+  // without re-sorting per row. Used purely for badge rendering. We compute
+  // off the full `allClients` set so the badge meaning doesn't change when
+  // the user filters to "neglected".
   const top5Ids = new Set(
-    [...clients]
+    [...allClients]
       .filter((c) => c.totalRevenue > 0)
       .sort((a, b) => b.totalRevenue - a.totalRevenue)
       .slice(0, 5)
@@ -271,7 +308,7 @@ export default async function AdminClientsPage() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <header className="mb-8 flex items-center gap-3">
+      <header className="mb-6 flex items-center gap-3">
         <Building2 className="w-5 h-5 text-zinc-400" />
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Clients</h1>
@@ -288,6 +325,34 @@ export default async function AdminClientsPage() {
           CSV
         </a>
       </header>
+
+      <nav className="mb-6 flex flex-wrap items-center gap-1 text-xs">
+        <Link
+          href="/admin/clients"
+          className={`px-3 py-1.5 rounded-md border transition-colors ${
+            !showNeglected
+              ? "bg-white text-black border-white"
+              : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+          }`}
+        >
+          전체
+          <span className="ml-1.5 opacity-60 tabular-nums">{allClients.length}</span>
+        </Link>
+        <Link
+          href="/admin/clients?filter=neglected"
+          className={`px-3 py-1.5 rounded-md border transition-colors inline-flex items-center gap-1 ${
+            showNeglected
+              ? "bg-amber-500/20 text-amber-200 border-amber-500/50"
+              : "bg-transparent text-amber-400 border-amber-500/30 hover:border-amber-400 hover:text-amber-200"
+          }`}
+          title="90일 이상 활동 없는 캠페인 1건+ 광고주 — 리액티베이션 대상"
+        >
+          90일+ Neglected
+          {neglectedCount > 0 && (
+            <span className="opacity-90 tabular-nums">{neglectedCount}</span>
+          )}
+        </Link>
+      </nav>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         <div className="rounded-xl border border-zinc-800 p-4 bg-zinc-900/30">
