@@ -24,6 +24,7 @@ const KINDS = new Set([
   "bookmarks",
   "creators",
   "clients",
+  "newsletter",
 ]);
 
 export async function GET(
@@ -463,6 +464,58 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("clients")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "newsletter") {
+    const { data, error } = await supabase
+      .from("newsletter_signups")
+      .select("id, email, source, utm_source, utm_medium, utm_campaign, unsubscribed_at, created_at")
+      .order("created_at", { ascending: false })
+      .limit(20000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    type NewsletterRow = {
+      id: string;
+      email: string;
+      source: string | null;
+      utm_source: string | null;
+      utm_medium: string | null;
+      utm_campaign: string | null;
+      unsubscribed_at: string | null;
+      created_at: string;
+    };
+    const rows = ((data ?? []) as NewsletterRow[]).map((r) => ({
+      id: r.id,
+      email: r.email,
+      source: r.source ?? "",
+      utm_source: r.utm_source ?? "",
+      utm_medium: r.utm_medium ?? "",
+      utm_campaign: r.utm_campaign ?? "",
+      unsubscribed_at: r.unsubscribed_at ?? "",
+      created_at: r.created_at,
+    }));
+
+    const columns = [
+      "id",
+      "email",
+      "source",
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "unsubscribed_at",
+      "created_at",
+    ] as const;
+
+    const csv = toCSV(rows, columns);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("newsletter")}"`,
         "Cache-Control": "no-store",
       },
     });

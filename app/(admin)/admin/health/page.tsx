@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { summarizeUsage, recentUsage } from "@/lib/cost/store";
+import { getBanner } from "@/lib/banner";
 import { Activity, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,8 @@ interface Pulse {
   experimentEvents24h: number;
   inquiries7d: number;
   delivered7d: number;
+  newsletterActive: number;
+  newsletter7d: number;
 }
 
 async function loadPulse(): Promise<Pulse | null> {
@@ -31,6 +34,8 @@ async function loadPulse(): Promise<Pulse | null> {
     expEvents24h,
     inquiries7d,
     delivered7d,
+    newsletterActive,
+    newsletter7d,
   ] = await Promise.all([
     supabase
       .from("projects")
@@ -65,6 +70,14 @@ async function loadPulse(): Promise<Pulse | null> {
       .select("id", { count: "exact", head: true })
       .eq("to_status", "delivered")
       .gte("changed_at", since7d),
+    supabase
+      .from("newsletter_signups")
+      .select("id", { count: "exact", head: true })
+      .is("unsubscribed_at", null),
+    supabase
+      .from("newsletter_signups")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", since7d),
   ]);
 
   const revenue24h = ((revenueRows.data ?? []) as Array<{
@@ -79,6 +92,8 @@ async function loadPulse(): Promise<Pulse | null> {
     experimentEvents24h: expEvents24h.count ?? 0,
     inquiries7d: inquiries7d.count ?? 0,
     delivered7d: delivered7d.count ?? 0,
+    newsletterActive: newsletterActive.count ?? 0,
+    newsletter7d: newsletter7d.count ?? 0,
   };
 }
 
@@ -98,10 +113,11 @@ function trendBadge(today: number, avg7d: number): {
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent] = await Promise.all([
+  const [pulse, cost, recent, banner] = await Promise.all([
     loadPulse(),
     summarizeUsage(),
     recentUsage(10),
+    getBanner(),
   ]);
 
   const checks: { label: string; ok: boolean; detail: string }[] = [
@@ -125,6 +141,18 @@ export default async function AdminHealthPage() {
       label: "비용 추적",
       ok: cost.daily >= 0,
       detail: `오늘 $${cost.daily.toFixed(2)}`,
+    },
+    {
+      label: "사이트 배너",
+      ok: !!banner,
+      detail: banner ? `노출 중 (${banner.tone ?? "info"})` : "비활성",
+    },
+    {
+      label: "뉴스레터",
+      ok: (pulse?.newsletterActive ?? 0) > 0,
+      detail: pulse
+        ? `${pulse.newsletterActive} 구독 / 7d +${pulse.newsletter7d}`
+        : "데이터 없음",
     },
   ];
 

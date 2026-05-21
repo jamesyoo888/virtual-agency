@@ -20,6 +20,8 @@ import {
   Heart,
   Building2,
   Activity,
+  Mail,
+  ScrollText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -41,6 +43,8 @@ const links = [
   { href: "/admin/creators", label: "Creators", icon: Sparkles },
   { href: "/admin/clients", label: "Clients", icon: Building2 },
   { href: "/admin/referrals", label: "Referrals", icon: Users },
+  { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
+  { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
   { href: "/admin/health", label: "Health", icon: Activity },
 ];
 
