@@ -1,4 +1,5 @@
 import SiteFooter from "@/components/site-footer";
+import MobileNav from "@/components/mobile-nav";
 
 export default function ShowcaseLayout({
   children,
@@ -7,6 +8,7 @@ export default function ShowcaseLayout({
 }) {
   return (
     <>
+      <MobileNav />
       {children}
       <SiteFooter />
     </>
