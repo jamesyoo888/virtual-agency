@@ -38,6 +38,7 @@ export const metadata = { title: "Admin — Virtual Agency" };
 
 interface KPIs {
   newInquiries24h: number;
+  newInquiriesPrev24h: number;
   activeProjects: number;
   totalModels: number;
   activeModels: number;
@@ -207,6 +208,7 @@ async function loadKPIs(): Promise<KPIs> {
     const list = devModelStore.list();
     return {
       newInquiries24h: 0,
+      newInquiriesPrev24h: 0,
       activeProjects: 0,
       totalModels: list.length,
       activeModels: list.filter((m) => m.status === "active").length,
@@ -214,9 +216,14 @@ async function loadKPIs(): Promise<KPIs> {
   }
   const supabase = await createClient();
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  // Previous 24h window: [48h ago, 24h ago) — same width, contiguous past.
+  // Used purely as a directional chip; absolute numbers stay in the KPI card.
+  const prevStart = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  const prevEnd = since;
 
   const [
     { count: newInquiries24h },
+    { count: newInquiriesPrev24h },
     { count: activeProjects },
     { count: totalModels },
     { count: activeModels },
@@ -226,6 +233,12 @@ async function loadKPIs(): Promise<KPIs> {
       .select("id", { count: "exact", head: true })
       .eq("status", "inquiry")
       .gte("created_at", since),
+    supabase
+      .from("projects")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "inquiry")
+      .gte("created_at", prevStart)
+      .lt("created_at", prevEnd),
     supabase
       .from("projects")
       .select("id", { count: "exact", head: true })
@@ -239,6 +252,7 @@ async function loadKPIs(): Promise<KPIs> {
 
   return {
     newInquiries24h: newInquiries24h ?? 0,
+    newInquiriesPrev24h: newInquiriesPrev24h ?? 0,
     activeProjects: activeProjects ?? 0,
     totalModels: totalModels ?? 0,
     activeModels: activeModels ?? 0,
@@ -287,13 +301,40 @@ export default async function AdminHomePage() {
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI
-          icon={Inbox}
-          label="신규 문의 (24h)"
-          value={kpis.newInquiries24h.toLocaleString()}
-          href="/admin/inbox?status=inquiry"
-          accent={kpis.newInquiries24h > 0 ? "bg-yellow-500/15 text-yellow-300" : ""}
-        />
+        {(() => {
+          // Today-vs-yesterday chip. Show "신규" when prev was zero so the
+          // user gets a positive signal even without a comparison anchor.
+          const cur = kpis.newInquiries24h;
+          const prev = kpis.newInquiriesPrev24h;
+          const delta = cur - prev;
+          const pct = prev > 0 ? (delta / prev) * 100 : null;
+          const text =
+            pct === null
+              ? cur > 0
+                ? "어제는 0건"
+                : "어제도 0건"
+              : `어제 대비 ${delta >= 0 ? "+" : ""}${pct.toFixed(0)}% (${
+                  prev
+                }건)`;
+          const tone =
+            pct === null
+              ? "text-zinc-500"
+              : delta > 0
+              ? "text-emerald-400"
+              : delta < 0
+              ? "text-rose-400"
+              : "text-zinc-500";
+          return (
+            <KPI
+              icon={Inbox}
+              label="신규 문의 (24h)"
+              value={cur.toLocaleString()}
+              href="/admin/inbox?status=inquiry"
+              accent={cur > 0 ? "bg-yellow-500/15 text-yellow-300" : ""}
+              chip={{ text, tone }}
+            />
+          );
+        })()}
         <KPI
           icon={PlayCircle}
           label="진행 중 프로젝트"
@@ -741,12 +782,14 @@ function KPI({
   value,
   href,
   accent = "",
+  chip,
 }: {
   icon: typeof Inbox;
   label: string;
   value: string;
   href: string;
   accent?: string;
+  chip?: { text: string; tone: string };
 }) {
   return (
     <Link
@@ -762,6 +805,11 @@ function KPI({
       >
         {value}
       </p>
+      {chip && (
+        <p className={`mt-1.5 text-[11px] tabular-nums ${chip.tone}`}>
+          {chip.text}
+        </p>
+      )}
     </Link>
   );
 }

@@ -529,6 +529,28 @@ export default async function AdminInboxPage({ searchParams }: Props) {
               </div>
 
               <div className="shrink-0 self-center flex items-center gap-2">
+                {p.status === "inquiry" && p.client?.email && (() => {
+                  // Pre-fill reply with the brief snippet so admin doesn't
+                  // have to bounce between tabs to remember context. URL-
+                  // encode aggressively — mailto trips on raw \n, <, etc.
+                  const subj = `[Virtual Agency] ${p.title} 회신`;
+                  const briefSnippet = (p.brief ?? "").slice(0, 280);
+                  const greeting = `안녕하세요${
+                    p.client?.company ? `, ${p.client.company}` : ""
+                  } 님.\n\nVirtual Agency 입니다. 보내주신 인콰이어리 잘 받았습니다.\n\n— 받은 브리프 ——\n${briefSnippet}\n———————————\n\n`;
+                  const href = `mailto:${p.client.email}?subject=${encodeURIComponent(
+                    subj
+                  )}&body=${encodeURIComponent(greeting)}`;
+                  return (
+                    <a
+                      href={href}
+                      className="text-[11px] px-2.5 py-1.5 rounded-md border border-emerald-500/30 text-emerald-300 hover:border-emerald-400 hover:text-emerald-200"
+                      title="회신 메일 (브리프 자동 prefill)"
+                    >
+                      ✉ 회신
+                    </a>
+                  );
+                })()}
                 {p.status === "inquiry" && (
                   <InquiryAcceptButton projectId={p.id} />
                 )}
