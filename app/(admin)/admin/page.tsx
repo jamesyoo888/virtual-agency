@@ -8,6 +8,11 @@ import { loadSearchAnalytics } from "@/lib/analytics/search-log";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { wowFromRows, type WowMetric } from "@/lib/analytics/week-over-week";
 import { computeMtdRevenue, type MtdRevenue } from "@/lib/analytics/mtd-revenue";
+import {
+  aggregateTopClients,
+  type DeliveredProjectRow,
+  type TopClientAggregate,
+} from "@/lib/analytics/top-clients";
 import AdminCopySummary from "@/components/admin-copy-summary";
 import {
   Users,
@@ -68,6 +73,24 @@ async function loadMtdRevenue(): Promise<MtdRevenue> {
   return computeMtdRevenue(
     (data ?? []) as { updated_at: string; invoice_amount: number | null }[]
   );
+}
+
+async function loadTopClients(): Promise<TopClientAggregate[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  const supabase = await createClient();
+  // 90 days of delivered revenue rolled up by client. Cap rows so one
+  // runaway month still returns in a single query — the aggregation itself
+  // lives in lib/analytics/top-clients for testability.
+  const since90 = new Date(Date.now() - 90 * 86_400_000).toISOString();
+  const { data } = await supabase
+    .from("projects")
+    .select(
+      "client_id, invoice_amount, client:clients(company, email)"
+    )
+    .eq("status", "delivered")
+    .gte("updated_at", since90)
+    .limit(5000);
+  return aggregateTopClients((data ?? []) as DeliveredProjectRow[], 5);
 }
 
 interface TrendingNowRow {
@@ -277,20 +300,33 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla, wow, trendingNow, mtd] =
-    await Promise.all([
-      loadKPIs(),
-      summarizeUsage(),
-      loadRecentInquiries(),
-      loadFunnel(30),
-      loadFunnelBySource(30, 6),
-      loadSearchAnalytics({ windowDays: 7, limit: 5 }),
-      loadOpsSnapshot(),
-      loadResponseSla(30),
-      loadWowSnapshot(),
-      loadTrendingNow(),
-      loadMtdRevenue(),
-    ]);
+  const [
+    kpis,
+    usage,
+    recent,
+    funnel,
+    bySource,
+    search7d,
+    ops,
+    sla,
+    wow,
+    trendingNow,
+    mtd,
+    topClients,
+  ] = await Promise.all([
+    loadKPIs(),
+    summarizeUsage(),
+    loadRecentInquiries(),
+    loadFunnel(30),
+    loadFunnelBySource(30, 6),
+    loadSearchAnalytics({ windowDays: 7, limit: 5 }),
+    loadOpsSnapshot(),
+    loadResponseSla(30),
+    loadWowSnapshot(),
+    loadTrendingNow(),
+    loadMtdRevenue(),
+    loadTopClients(),
+  ]);
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
@@ -541,6 +577,64 @@ export default async function AdminHomePage() {
           />
         </div>
       </section>
+
+      {topClients.length > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Receipt className="w-4 h-4 text-zinc-400" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              매출 기여 광고주 Top {topClients.length} (90일)
+            </h2>
+            <Link
+              href="/admin/clients"
+              className="text-xs text-zinc-400 hover:text-white inline-flex items-center gap-1 ml-auto"
+            >
+              전체 <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          {(() => {
+            const total = topClients.reduce((s, c) => s + c.revenue, 0);
+            return (
+              <ul className="space-y-2 text-sm">
+                {topClients.map((c) => {
+                  const sharePct = total > 0 ? (c.revenue / total) * 100 : 0;
+                  return (
+                    <li
+                      key={c.id}
+                      className="flex items-center gap-3"
+                    >
+                      <span
+                        className="w-40 shrink-0 text-zinc-200 truncate"
+                        title={c.email ?? undefined}
+                      >
+                        {c.company}
+                      </span>
+                      <span className="text-zinc-500 tabular-nums shrink-0 w-10 text-right">
+                        {c.delivered}
+                      </span>
+                      <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500"
+                          style={{ width: `${sharePct}%` }}
+                        />
+                      </div>
+                      <span className="tabular-nums text-zinc-200 shrink-0 w-32 text-right">
+                        ₩{c.revenue.toLocaleString("ko-KR")}
+                      </span>
+                      <span className="tabular-nums text-zinc-500 shrink-0 w-14 text-right">
+                        {sharePct.toFixed(0)}%
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()}
+          <p className="mt-3 text-[11px] text-zinc-600">
+            상위 5 광고주의 90일 누적 매출 — 집중도가 너무 높으면 재구매 외 신규 lead 다각화 필요.
+          </p>
+        </section>
+      )}
 
       {recent.length > 0 && (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">

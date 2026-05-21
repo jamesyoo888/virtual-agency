@@ -97,25 +97,34 @@ export default async function AdminAuditLogPage({
             관리자 설정 변경 이력. usage_log 의 <code>audit.*</code> 라우트 최근 {limit}건.
           </p>
         </div>
-        <div className="flex items-center gap-1 text-[11px]">
-          {LIMITS.map((l) => {
-            const active = l === limit;
-            const href =
-              l === DEFAULT_LIMIT ? "/admin/audit-log" : `/admin/audit-log?n=${l}`;
-            return (
-              <Link
-                key={l}
-                href={href}
-                className={`px-2 py-0.5 rounded border ${
-                  active
-                    ? "bg-zinc-100 text-black border-zinc-100"
-                    : "text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
-                }`}
-              >
-                {l}
-              </Link>
-            );
-          })}
+        <div className="flex items-center gap-2 text-[11px]">
+          <div className="flex items-center gap-1">
+            {LIMITS.map((l) => {
+              const active = l === limit;
+              const href =
+                l === DEFAULT_LIMIT ? "/admin/audit-log" : `/admin/audit-log?n=${l}`;
+              return (
+                <Link
+                  key={l}
+                  href={href}
+                  className={`px-2 py-0.5 rounded border ${
+                    active
+                      ? "bg-zinc-100 text-black border-zinc-100"
+                      : "text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                  }`}
+                >
+                  {l}
+                </Link>
+              );
+            })}
+          </div>
+          <a
+            href="/api/admin/exports/audit"
+            download
+            className="px-2 py-0.5 rounded border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+          >
+            CSV
+          </a>
         </div>
       </header>
 

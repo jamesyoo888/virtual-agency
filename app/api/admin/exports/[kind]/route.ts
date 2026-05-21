@@ -7,6 +7,7 @@ import { loadModelPerformance } from "@/lib/analytics/model-performance";
 import { loadForecast } from "@/lib/analytics/forecast";
 import { wowFromRows } from "@/lib/analytics/week-over-week";
 import { computeMtdRevenue } from "@/lib/analytics/mtd-revenue";
+import { aggregateSearchRows } from "@/lib/analytics/search-log";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -34,6 +35,8 @@ const KINDS = new Set([
   "wow",
   "trending",
   "mtd",
+  "audit",
+  "search",
 ]);
 
 export async function GET(
@@ -841,6 +844,176 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("wow")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "audit") {
+    // Same shape as /admin/audit-log: usage_log rows where route LIKE
+    // 'audit.%'. We materialize the actor (email/company) here so the CSV is
+    // self-contained — Excel users shouldn't need a join.
+    const { data, error } = await supabase
+      .from("usage_log")
+      .select("id, route, user_id, metadata, created_at")
+      .like("route", "audit.%")
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    type AuditRow = {
+      id: string;
+      route: string;
+      user_id: string | null;
+      metadata: Record<string, unknown> | null;
+      created_at: string;
+    };
+    const auditRows = (data ?? []) as AuditRow[];
+    const userIds = Array.from(
+      new Set(
+        auditRows
+          .map((r) => r.user_id)
+          .filter((id): id is string => !!id)
+      )
+    );
+    const actors = new Map<string, { email: string | null; company: string | null }>();
+    if (userIds.length > 0) {
+      const { data: clients } = await supabase
+        .from("clients")
+        .select("id, email, company")
+        .in("id", userIds);
+      for (const c of (clients ?? []) as {
+        id: string;
+        email: string | null;
+        company: string | null;
+      }[]) {
+        actors.set(c.id, { email: c.email, company: c.company });
+      }
+    }
+    const rows = auditRows.map((r) => {
+      const actor = r.user_id ? actors.get(r.user_id) : null;
+      // Stringify metadata so the column stays a single CSV cell. Excel users
+      // who need to drill in can paste into a JSON viewer.
+      let metaJson = "";
+      try {
+        metaJson = r.metadata ? JSON.stringify(r.metadata) : "";
+      } catch {
+        metaJson = "[unserializable]";
+      }
+      return {
+        id: r.id,
+        event: r.route.replace(/^audit\./, ""),
+        actor_email: actor?.email ?? "",
+        actor_company: actor?.company ?? "",
+        actor_id: r.user_id ?? "",
+        metadata: metaJson,
+        created_at: r.created_at,
+      };
+    });
+    const csv = toCSV(rows, [
+      "id",
+      "event",
+      "actor_email",
+      "actor_company",
+      "actor_id",
+      "metadata",
+      "created_at",
+    ] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("audit")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "search") {
+    // Aggregated top + zero-result queries for the requested window. Default
+    // 30d matches the on-screen "콘텐츠 갭" view. Limit is intentionally
+    // generous (200) so a spreadsheet can re-sort by zero-rate or count
+    // without losing tail entries.
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 30;
+    const since = new Date(
+      Date.now() - windowDays * 86_400_000
+    ).toISOString();
+    const { data, error } = await supabase
+      .from("usage_log")
+      .select("metadata")
+      .eq("route", "search.catalog")
+      .gte("created_at", since)
+      .limit(20000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    type LogRow = { metadata: { q?: string; results?: number } | null };
+    const rows = ((data ?? []) as LogRow[]).map((r) => ({
+      q: r.metadata?.q ?? "",
+      results:
+        typeof r.metadata?.results === "number" ? r.metadata.results : 0,
+    }));
+    const agg = aggregateSearchRows(rows, 200);
+    // Merge top + zero into one set keyed by q, then write a "kind" column so
+    // spreadsheet users can filter top-vs-gap without two files.
+    const merged = new Map<
+      string,
+      {
+        q: string;
+        count: number;
+        zero_result_count: number;
+        avg_results: number;
+        zero_rate_pct: string;
+        flag: string;
+      }
+    >();
+    for (const a of agg.top) {
+      merged.set(a.q, {
+        q: a.q,
+        count: a.count,
+        zero_result_count: a.zeroResultCount,
+        avg_results: a.avgResults,
+        zero_rate_pct:
+          a.count > 0
+            ? ((a.zeroResultCount / a.count) * 100).toFixed(1)
+            : "",
+        flag: "top",
+      });
+    }
+    for (const a of agg.zero) {
+      const cur = merged.get(a.q);
+      if (cur) {
+        cur.flag = "top+gap";
+      } else {
+        merged.set(a.q, {
+          q: a.q,
+          count: a.count,
+          zero_result_count: a.zeroResultCount,
+          avg_results: a.avgResults,
+          zero_rate_pct:
+            a.count > 0
+              ? ((a.zeroResultCount / a.count) * 100).toFixed(1)
+              : "",
+          flag: "gap",
+        });
+      }
+    }
+    const csvRows = Array.from(merged.values()).sort(
+      (a, b) => b.count - a.count
+    );
+    const csv = toCSV(csvRows, [
+      "q",
+      "count",
+      "avg_results",
+      "zero_result_count",
+      "zero_rate_pct",
+      "flag",
+    ] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("search")}"`,
         "Cache-Control": "no-store",
       },
     });

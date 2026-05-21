@@ -51,12 +51,19 @@ export default async function AdminSearchAnalyticsPage() {
     <div className="p-8 max-w-6xl mx-auto">
       <header className="mb-8 flex items-center gap-3">
         <Search className="w-5 h-5 text-zinc-400" />
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">Search Analytics</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
             카탈로그 검색어 집계. <code>route=&apos;search.catalog&apos;</code> from usage_log.
           </p>
         </div>
+        <a
+          href="/api/admin/exports/search?window=30"
+          download
+          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+        >
+          CSV (30일)
+        </a>
       </header>
 
       <section className="grid grid-cols-2 gap-4 mb-8 max-w-md">
