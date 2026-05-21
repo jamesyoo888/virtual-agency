@@ -99,6 +99,87 @@ export default async function ClientDashboardPage() {
         </Link>
       </div>
 
+      {/*
+        Next-step CTAs — derived from the client's actual project state.
+        Order: matters most → least urgent.
+        - No projects: encourage AI matching (most likely to convert).
+        - Has pending inquiry: surface FAQ + share contact info so client
+          doesn't re-ask common questions.
+        - Has delivered + no review yet: nudge for testimonial.
+      */}
+      {(() => {
+        const list = (projects ?? []) as { status: string; id: string }[];
+        const hasAny = list.length > 0;
+        const hasPendingInquiry = list.some(
+          (p) =>
+            p.status === "inquiry" ||
+            p.status === "brief_received" ||
+            p.status === "in_progress"
+        );
+        const deliveredWithoutReview = list.find(
+          (p) => p.status === "delivered" && !reviewByProject.has(p.id)
+        );
+        const ctas: { href: string; label: string; sub: string }[] = [];
+        if (!hasAny) {
+          ctas.push({
+            href: "/match",
+            label: "AI 매칭 받기",
+            sub: "1줄 브리프로 어울리는 모델 3~5명 추천",
+          });
+          ctas.push({
+            href: "/pricing",
+            label: "가격 확인",
+            sub: "3가지 시나리오 + 즉시 견적 계산기",
+          });
+        } else if (hasPendingInquiry) {
+          ctas.push({
+            href: "/faq",
+            label: "자주 묻는 질문",
+            sub: "응답 SLA·납기·라이선스 답변 모음",
+          });
+          ctas.push({
+            href: "/brief-template",
+            label: "브리프 보강",
+            sub: "9 섹션 가이드 — 매칭 정확도 향상",
+          });
+        } else if (deliveredWithoutReview) {
+          ctas.push({
+            href: `/client/quote/${deliveredWithoutReview.id}`,
+            label: "후기 작성",
+            sub: "성과를 익명 사례로 — 향후 캠페인 단가 협상력",
+          });
+          ctas.push({
+            href: "/match",
+            label: "다음 캠페인 매칭",
+            sub: "이전 캠페인 데이터 기반 personalized 추천",
+          });
+        } else {
+          ctas.push({
+            href: "/trending",
+            label: "트렌딩 모델",
+            sub: "최근 30일 가장 많이 본 모델 12명",
+          });
+        }
+        return ctas.length > 0 ? (
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {ctas.map((c) => (
+              <Link
+                key={c.href}
+                href={c.href}
+                className="block rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 hover:border-zinc-600 transition-colors group"
+              >
+                <p className="text-sm font-medium group-hover:underline">
+                  {c.label} →
+                </p>
+                <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                  {c.sub}
+                </p>
+              </Link>
+            ))}
+          </div>
+        ) : null;
+      })()}
+
       <div className="mb-6 space-y-3">
         <ReferralLinkButton />
         {referralStats.inquiries > 0 && (

@@ -13,6 +13,7 @@ const WINDOWS: Record<string, number> = { "7": 7, "30": 30, "90": 90 };
 interface ProjectAgg {
   model_id: string | null;
   status: string;
+  utm_source?: string | null;
   model?: {
     name: string | null;
     concept_image: string | null;
@@ -33,12 +34,19 @@ interface IndustryStat {
   inquiries: number;
 }
 
+interface SourceStat {
+  source: string;
+  inquiries: number;
+  delivered: number;
+}
+
 async function loadAnalytics(windowDays: number): Promise<{
   totalInquiries: number;
   totalDelivered: number;
   conversionPct: number;
   topModels: TopModel[];
   byIndustry: IndustryStat[];
+  bySource: SourceStat[];
   daily: DailyBucket[];
   windowDays: number;
 }> {
@@ -49,6 +57,7 @@ async function loadAnalytics(windowDays: number): Promise<{
       conversionPct: 0,
       topModels: [],
       byIndustry: [],
+      bySource: [],
       daily: aggregateDaily([], windowDays),
       windowDays,
     };
@@ -61,7 +70,9 @@ async function loadAnalytics(windowDays: number): Promise<{
   const [{ data }, daily] = await Promise.all([
     supabase
       .from("projects")
-      .select("model_id, status, model:models(name, concept_image, industry_tags)")
+      .select(
+        "model_id, status, utm_source, model:models(name, concept_image, industry_tags)"
+      )
       .gte("created_at", since),
     supabase
       .from("projects")
@@ -105,12 +116,29 @@ async function loadAnalytics(windowDays: number): Promise<{
     .map(([industry, inquiries]) => ({ industry, inquiries }))
     .sort((a, b) => b.inquiries - a.inquiries);
 
+  // Source breakdown — buckets unknown/missing as "(direct)" so the row
+  // is never lost. Same shape as funnel-by-source on the admin home but
+  // includes delivered counts here for conversion comparison.
+  const sourceMap = new Map<string, { inquiries: number; delivered: number }>();
+  for (const p of projects) {
+    const src = p.utm_source ?? "(direct)";
+    const bucket = sourceMap.get(src) ?? { inquiries: 0, delivered: 0 };
+    bucket.inquiries += 1;
+    if (p.status === "delivered") bucket.delivered += 1;
+    sourceMap.set(src, bucket);
+  }
+  const bySource: SourceStat[] = [...sourceMap.entries()]
+    .map(([source, b]) => ({ source, ...b }))
+    .sort((a, b) => b.inquiries - a.inquiries)
+    .slice(0, 8);
+
   return {
     totalInquiries,
     totalDelivered,
     conversionPct,
     topModels,
     byIndustry,
+    bySource,
     daily: dailySeries,
     windowDays,
   };
@@ -269,6 +297,57 @@ export default async function AnalyticsPage({
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 mb-4">
+          유입 채널 (utm_source · 90d)
+        </h2>
+        {a.bySource.length === 0 ? (
+          <p className="text-sm text-zinc-600">데이터 없음</p>
+        ) : (
+          (() => {
+            const maxSource = Math.max(1, ...a.bySource.map((s) => s.inquiries));
+            return (
+              <ul className="space-y-2">
+                {a.bySource.map((s) => {
+                  const convPct =
+                    s.inquiries > 0
+                      ? Math.round((s.delivered / s.inquiries) * 100)
+                      : 0;
+                  return (
+                    <li
+                      key={s.source}
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      <span className="w-28 text-zinc-300 truncate" title={s.source}>
+                        {s.source}
+                      </span>
+                      <div className="flex-1 h-2 rounded-full bg-zinc-800 overflow-hidden">
+                        <div
+                          className="h-full bg-zinc-400"
+                          style={{
+                            width: `${(s.inquiries / maxSource) * 100}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs text-zinc-400 tabular-nums w-32 text-right">
+                        {s.inquiries} 문의 ·{" "}
+                        <span
+                          className={
+                            convPct >= 30 ? "text-emerald-400" : "text-zinc-500"
+                          }
+                        >
+                          {convPct}%
+                        </span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()
         )}
       </section>
     </div>

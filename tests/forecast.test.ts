@@ -140,6 +140,45 @@ describe("computeConfidence", () => {
   });
 });
 
+describe("computeForecast.pipelineByModel", () => {
+  it("plugs into computeForecast output for CSV export", () => {
+    const r = computeForecast(
+      [
+        {
+          status: "inquiry",
+          invoice_amount: 1500,
+          created_at: T,
+          model_id: "m1",
+          model_name: "Aria",
+        },
+        {
+          status: "brief_received",
+          invoice_amount: 700,
+          created_at: T,
+          model_id: "m2",
+          model_name: "Bori",
+        },
+      ],
+      [],
+      []
+    );
+    // The CSV writer at app/api/admin/exports/[kind]/route.ts flattens
+    // these rows into pipeline_by_model_<i>_<field>. Test the shape stays
+    // consistent so the CSV column labels don't drift.
+    expect(r.pipelineByModel).toHaveLength(2);
+    expect(r.pipelineByModel[0]).toMatchObject({
+      model_id: "m1",
+      model_name: "Aria",
+      value: 1500,
+    });
+    expect(r.pipelineByModel[1]).toMatchObject({
+      model_id: "m2",
+      model_name: "Bori",
+      value: 700,
+    });
+  });
+});
+
 describe("summarizePipelineByModel", () => {
   it("sorts by value desc then count desc", () => {
     const rows = summarizePipelineByModel([

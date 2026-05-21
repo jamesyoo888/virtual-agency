@@ -8,7 +8,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/api/og"],
+        // Explicitly allow the public trending JSON + page so crawlers find
+        // them; /api/trending is the partner-embeddable feed and benefits
+        // from search engine surface. /trending itself is allowed by the
+        // catch-all "/" but listing it keeps intent obvious to operators.
+        allow: ["/", "/api/og", "/api/trending", "/trending"],
         disallow: [
           "/admin/",
           "/client/",
