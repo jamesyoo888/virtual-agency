@@ -497,6 +497,68 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "model-performance-conversion-metrics",
+    title: "AI 버추얼 모델 성과 지표 — view·inquiry·delivered 의 함정",
+    excerpt:
+      "광고주가 모델을 선택할 때 view 수만 보면 안 되는 이유. inquiry rate · close rate 로 진짜 신호 읽기.",
+    publishedAt: "2026-05-21",
+    readingMinutes: 5,
+    tags: ["가이드", "데이터", "성과"],
+    sections: [
+      {
+        heading: "왜 view 만 보면 위험한가",
+        body: "View 수는 카탈로그 노출 빈도·SEO 위치·썸네일 매력의 합입니다. 광고 성과와 직접 상관이 없는 모델이 view 만 누적되어 상위에 노출되는 일이 잦습니다. 광고주가 실제 캠페인을 의뢰한 비율, 즉 inquiry-per-view 가 신호다움(signal-to-noise) 이 훨씬 높습니다.",
+      },
+      {
+        heading: "Inquiry rate — 적정 기준선",
+        body: "카탈로그 평균은 캠페인 운영 6개월 차 기준 약 2~4% (100 view 당 2~4 inquiry). 5% 를 넘으면 강한 후보, 1% 미만이 1,000 view 누적이면 카탈로그 culling 대상으로 분류합니다.",
+      },
+      {
+        heading: "스무딩 (smoothing) — 신규 모델 패널티 방지",
+        body: "View 가 10 회뿐인 신규 모델은 단순 비율로 평가하면 들쭉날쭉합니다. (inquiries + prior) / (views + prior_n) 형태로 카탈로그 평균을 사전 가중치로 줘서, 표본이 작을 때는 평균 근처로 끌어당기고 표본이 쌓이면 실제 성과가 드러나게 만듭니다.",
+      },
+      {
+        heading: "Close rate — 다음 레이어",
+        body: "Inquiry → delivered 비율은 모델보다 운영팀의 응답 속도·견적 협상력이 더 크게 결정합니다. 모델 평가용으로는 inquiry rate 를 1차 지표로 두고, close rate 는 운영 SLA 측정용으로 분리하는 게 맞습니다.",
+      },
+      {
+        heading: "광고주에게 의미",
+        body: "(1) 카탈로그 상단에 있다는 이유만으로 inquiry 내지 마세요. (2) 동일 산업·무드 안에서 inquiry rate 상위 3개를 비교군으로 두면 매칭 정확도가 올라갑니다. (3) 신규 모델이라도 스무딩된 점수가 평균 이상이면 합리적인 후보입니다.",
+      },
+    ],
+  },
+  {
+    slug: "inquiry-response-sla-why-it-matters",
+    title: "광고주는 24시간을 기다리지 않습니다 — Inquiry 응답 SLA 의 비즈니스 영향",
+    excerpt:
+      "Inquiry 가 들어온 후 첫 응답까지 걸리는 시간이 전환율에 미치는 영향과, AI 에이전시가 이를 어떻게 추적해야 하는지.",
+    publishedAt: "2026-05-21",
+    readingMinutes: 4,
+    tags: ["운영", "SLA", "전환"],
+    sections: [
+      {
+        heading: "왜 응답 시간이 중요한가",
+        body: "B2B 광고주는 캠페인 일정에 묶여 있고, 보통 inquiry 를 보낸 시점에 이미 2~3 곳에 같은 브리프를 보냅니다. 24시간을 넘기면 이미 다른 곳과 합의에 도달했을 가능성이 높고, 48시간 후 응답은 사실상 0% 의 close rate 를 보입니다.",
+      },
+      {
+        heading: "측정 방법",
+        body: "각 inquiry 의 created_at 과 status가 inquiry → brief_received 로 처음 전환된 시각의 차이를 응답 시간으로 정의합니다. 중앙값과 p90 을 함께 보면 평균이 가리는 outlier 가 드러납니다.",
+      },
+      {
+        heading: "AI 에이전시 운영 기준",
+        body: "Virtual Agency 내부 SLA: 중앙값 4시간, p90 12시간, 24시간 초과 inquiry 는 자동 follow-up 이메일 + 운영 dashboard 의 stale 카운터에 노출. 이 기준은 단순한 운영 효율 KPI 가 아니라 close rate 의 직접 변수입니다.",
+      },
+      {
+        heading: "광고주가 느끼는 신호",
+        body: "빠른 응답은 그 자체로 가격 협상력을 만듭니다. 30분 안에 1차 응답을 받은 광고주는 동일 견적이라도 신뢰도가 높고, 가격 협상 폭이 평균 10~15% 작아집니다.",
+      },
+      {
+        heading: "도구 추천",
+        body: "(1) inquiry 테이블에 created_at + status_history. (2) admin dashboard 에 median / p90 / stale count 위젯. (3) Slack/Discord 알림은 inquiry 도착 후 5분 안에. (4) 주간 운영 회의에 SLA 추세를 1순위로.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string): BlogPost | undefined {

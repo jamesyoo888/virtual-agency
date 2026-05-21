@@ -5,6 +5,7 @@ import { devModelStore } from "@/lib/dev-store";
 import { summarizeUsage } from "@/lib/cost/store";
 import { loadFunnel, loadFunnelBySource, stageConversionRate } from "@/lib/analytics/funnel";
 import { loadSearchAnalytics } from "@/lib/analytics/search-log";
+import { loadResponseSla } from "@/lib/analytics/response-sla";
 import {
   Users,
   Inbox,
@@ -17,6 +18,7 @@ import {
   Mail,
   Star,
   AlertTriangle,
+  Timer,
 } from "lucide-react";
 
 const STAGE_LABELS_KO: Record<string, string> = {
@@ -171,7 +173,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent, funnel, bySource, search7d, ops] = await Promise.all([
+  const [kpis, usage, recent, funnel, bySource, search7d, ops, sla] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
     loadRecentInquiries(),
@@ -179,6 +181,7 @@ export default async function AdminHomePage() {
     loadFunnelBySource(30, 6),
     loadSearchAnalytics({ windowDays: 7, limit: 5 }),
     loadOpsSnapshot(),
+    loadResponseSla(30),
   ]);
 
   return (
@@ -442,6 +445,47 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
+      {sla.totalInquiries > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Timer className="w-4 h-4 text-zinc-400" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              인콰이어 응답 SLA (30일)
+            </h2>
+            <span className="text-xs text-zinc-600 ml-auto tabular-nums">
+              응답 {sla.respondedCount} / 총 {sla.totalInquiries}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <SlaStat
+              label="중앙값"
+              value={sla.medianHours != null ? fmtHours(sla.medianHours) : "—"}
+            />
+            <SlaStat
+              label="p90"
+              value={sla.p90Hours != null ? fmtHours(sla.p90Hours) : "—"}
+            />
+            <SlaStat
+              label="열린 inquiry"
+              value={sla.openCount.toLocaleString()}
+            />
+            <SlaStat
+              label="24h+ 지연"
+              value={sla.staleOpenCount.toLocaleString()}
+              accent={sla.staleOpenCount > 0 ? "text-red-300" : ""}
+            />
+          </div>
+          {sla.staleOpenCount > 0 && (
+            <Link
+              href="/admin/inbox?status=inquiry"
+              className="mt-3 inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white"
+            >
+              지연 인콰이어 보기 <ArrowRight className="w-3 h-3" />
+            </Link>
+          )}
+        </section>
+      )}
+
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="w-4 h-4 text-zinc-400" />
@@ -523,4 +567,27 @@ function Stat({ label, value }: { label: string; value: string }) {
       <p className="text-xl font-bold tabular-nums mt-0.5">{value}</p>
     </div>
   );
+}
+
+function SlaStat({
+  label,
+  value,
+  accent = "",
+}: {
+  label: string;
+  value: string;
+  accent?: string;
+}) {
+  return (
+    <div>
+      <p className="text-xs text-zinc-500">{label}</p>
+      <p className={`text-xl font-bold tabular-nums mt-0.5 ${accent}`}>{value}</p>
+    </div>
+  );
+}
+
+function fmtHours(h: number): string {
+  if (h < 1) return `${Math.round(h * 60)}분`;
+  if (h < 24) return `${h.toFixed(1)}h`;
+  return `${(h / 24).toFixed(1)}일`;
 }

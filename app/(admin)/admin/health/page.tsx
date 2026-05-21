@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { summarizeUsage, recentUsage } from "@/lib/cost/store";
 import { getBanner } from "@/lib/banner";
+import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { Activity, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -113,11 +114,12 @@ function trendBadge(today: number, avg7d: number): {
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner] = await Promise.all([
+  const [pulse, cost, recent, banner, sla] = await Promise.all([
     loadPulse(),
     summarizeUsage(),
     recentUsage(10),
     getBanner(),
+    loadResponseSla(30),
   ]);
 
   const checks: { label: string; ok: boolean; detail: string }[] = [
@@ -153,6 +155,24 @@ export default async function AdminHealthPage() {
       detail: pulse
         ? `${pulse.newsletterActive} 구독 / 7d +${pulse.newsletter7d}`
         : "데이터 없음",
+    },
+    {
+      // SLA "OK" rule: no inquiries → vacuously OK; otherwise stale count
+      // must be 0 AND median must be under 12h (our internal target).
+      label: "응답 SLA (30d)",
+      ok:
+        sla.totalInquiries === 0 ||
+        (sla.staleOpenCount === 0 && (sla.medianHours ?? 0) <= 12),
+      detail:
+        sla.totalInquiries === 0
+          ? "데이터 없음"
+          : `${sla.respondedCount}/${sla.totalInquiries} 응답 · 중앙값 ${
+              sla.medianHours != null
+                ? sla.medianHours < 1
+                  ? `${Math.round(sla.medianHours * 60)}분`
+                  : `${sla.medianHours.toFixed(1)}h`
+                : "—"
+            }${sla.staleOpenCount > 0 ? ` · ${sla.staleOpenCount} 지연` : ""}`,
     },
   ];
 

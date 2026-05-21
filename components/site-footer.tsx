@@ -69,6 +69,11 @@ export default function SiteFooter() {
                 회사 소개
               </Link>
             </li>
+            <li>
+              <Link href="/brief-template" className="hover:text-white">
+                브리프 템플릿
+              </Link>
+            </li>
           </ul>
         </div>
 

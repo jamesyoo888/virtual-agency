@@ -112,6 +112,12 @@ export default async function sitemap(
             priority: 0.6,
           },
           {
+            url: `${SITE_URL}/brief-template`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.5,
+          },
+          {
             url: `${SITE_URL}/blog`,
             lastModified: now,
             changeFrequency: "weekly",

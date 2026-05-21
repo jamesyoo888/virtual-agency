@@ -40,10 +40,14 @@ const SECONDARY: { href: string; label: string }[] = [
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Close on navigation. Using a deferred derived-state pattern instead of
+  // an effect that sets state — the latter trips the new
+  // react-hooks/set-state-in-effect lint rule.
+  const [lastPath, setLastPath] = useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    if (open) setOpen(false);
+  }
 
   useEffect(() => {
     if (!open) return;
