@@ -7,7 +7,7 @@ import {
   tagSlug,
 } from "@/lib/blog/posts";
 import { ArrowLeft } from "lucide-react";
-import { blogPostingLd, breadcrumbLd, ldScript } from "@/lib/seo/json-ld";
+import { blogPostingLd, breadcrumbLd, howToLd, ldScript } from "@/lib/seo/json-ld";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -72,6 +72,24 @@ export default async function BlogPostPage({
     { name: post.title, url: `${SITE_URL}/blog/${post.slug}` },
   ]);
 
+  // HowTo JSON-LD is opt-in based on tag: only guide-style posts with
+  // sequential sections (heading = step name, body = step text) emit it.
+  // Skip when sections is sparse — Google flags short/generic HowTos.
+  const isHowTo =
+    post.tags.includes("가이드") && post.sections.length >= 3;
+  const howTo = isHowTo
+    ? howToLd({
+        name: post.title,
+        description: post.excerpt,
+        url: `${SITE_URL}/blog/${post.slug}`,
+        totalTime: `PT${post.readingMinutes}M`,
+        steps: post.sections.map((s) => ({
+          name: s.heading,
+          text: s.body.slice(0, 500),
+        })),
+      })
+    : null;
+
   return (
     <div className="min-h-screen bg-black text-zinc-100">
       <script
@@ -82,6 +100,12 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldScript(crumbsLd) }}
       />
+      {howTo && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ldScript(howTo) }}
+        />
+      )}
       <article className="max-w-2xl mx-auto px-6 py-16 md:py-24">
         <Link
           href="/blog"
@@ -112,8 +136,12 @@ export default async function BlogPostPage({
         </header>
 
         <div className="space-y-10 prose-invert">
-          {post.sections.map((section) => (
-            <section key={section.heading}>
+          {post.sections.map((section, idx) => (
+            <section
+              key={section.heading}
+              id={isHowTo ? `step-${idx + 1}` : undefined}
+              className={isHowTo ? "scroll-mt-24" : undefined}
+            >
               <h2 className="text-lg font-semibold mb-3">{section.heading}</h2>
               <p className="text-sm md:text-base text-zinc-300 leading-relaxed whitespace-pre-wrap">
                 {section.body}

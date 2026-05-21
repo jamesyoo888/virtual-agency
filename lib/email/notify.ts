@@ -112,3 +112,24 @@ export async function notifyWeeklyDigest(
     client: vars.clientId,
   });
 }
+
+export interface AdminSummaryEmailVars {
+  subject: string;
+  html: string;
+  text: string;
+}
+
+/**
+ * Internal ops summary — sent to admin users, not clients. The cron handler
+ * pre-renders subject/html/text so this helper is a thin pass-through.
+ */
+export async function notifyAdminWeeklySummary(
+  to: string | null | undefined,
+  vars: AdminSummaryEmailVars
+) {
+  return safeSend(
+    to,
+    { subject: vars.subject, html: vars.html, text: vars.text },
+    { kind: "admin_weekly_summary" }
+  );
+}

@@ -16,6 +16,10 @@
     {
       "path": "/api/cron/inquiry-followup",
       "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/admin-weekly-summary",
+      "schedule": "30 0 * * 1"
     }
   ]
 }

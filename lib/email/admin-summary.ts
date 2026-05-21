@@ -1,0 +1,224 @@
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { aggregateSearchRows } from "@/lib/analytics/search-log";
+
+/**
+ * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
+ * Aggregates the data points operators check first thing on Monday so the inbox
+ * itself becomes the dashboard for low-friction ops review.
+ */
+export interface AdminWeeklySummary {
+  windowStart: string;
+  windowEnd: string;
+  inquiriesCount: number;
+  inquiriesNoFollowup: number;
+  deliveredCount: number;
+  inFlightCount: number;
+  newsletterSignups: number;
+  pendingReviews: number;
+  topSearches: { q: string; count: number; avgResults: number }[];
+  zeroResultSearches: { q: string; count: number }[];
+  revenue30dKrw: number;
+}
+
+interface SearchLogRow {
+  metadata: { q?: string; results?: number } | null;
+}
+
+function isoDaysAgo(days: number): string {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+}
+
+export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | null> {
+  if (!SUPABASE_CONFIGURED) return null;
+  try {
+    const supabase = await createClient();
+    const sevenAgo = isoDaysAgo(7);
+    const thirtyAgo = isoDaysAgo(30);
+    const nowIso = new Date().toISOString();
+
+    const [
+      inquiries,
+      inquiriesNoFollowup,
+      delivered,
+      inFlight,
+      signups,
+      pendingReviews,
+      searchRows,
+      revenueRows,
+    ] = await Promise.all([
+      supabase
+        .from("projects")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "inquiry")
+        .gte("created_at", sevenAgo),
+      // Stale inquiry candidates: 7+ days in inquiry status without followup
+      supabase
+        .from("projects")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "inquiry")
+        .lt("created_at", sevenAgo)
+        .is("inquiry_followup_sent_at", null),
+      supabase
+        .from("projects")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "delivered")
+        .gte("updated_at", sevenAgo),
+      supabase
+        .from("projects")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["brief_received", "in_progress", "review"]),
+      supabase
+        .from("newsletter_signups")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", sevenAgo),
+      supabase
+        .from("reviews")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending"),
+      supabase
+        .from("usage_log")
+        .select("metadata")
+        .eq("route", "search.catalog")
+        .gte("created_at", sevenAgo)
+        .limit(5000),
+      supabase
+        .from("projects")
+        .select("invoice_amount, status, updated_at")
+        .eq("status", "delivered")
+        .gte("updated_at", thirtyAgo)
+        .limit(1000),
+    ]);
+
+    const searchAgg = aggregateSearchRows(
+      ((searchRows.data ?? []) as SearchLogRow[]).map((r) => ({
+        q: r.metadata?.q ?? "",
+        results: typeof r.metadata?.results === "number" ? r.metadata.results : 0,
+      })),
+      5
+    );
+
+    const revenue30dKrw = ((revenueRows.data ?? []) as { invoice_amount: number | null }[])
+      .reduce((sum, r) => sum + (typeof r.invoice_amount === "number" ? r.invoice_amount : 0), 0);
+
+    return {
+      windowStart: sevenAgo,
+      windowEnd: nowIso,
+      inquiriesCount: inquiries.count ?? 0,
+      inquiriesNoFollowup: inquiriesNoFollowup.count ?? 0,
+      deliveredCount: delivered.count ?? 0,
+      inFlightCount: inFlight.count ?? 0,
+      newsletterSignups: signups.count ?? 0,
+      pendingReviews: pendingReviews.count ?? 0,
+      topSearches: searchAgg.top.slice(0, 5).map((t) => ({
+        q: t.q,
+        count: t.count,
+        avgResults: t.avgResults,
+      })),
+      zeroResultSearches: searchAgg.zero.slice(0, 5).map((t) => ({
+        q: t.q,
+        count: t.zeroResultCount,
+      })),
+      revenue30dKrw,
+    };
+  } catch (err) {
+    console.warn("[admin-summary] build failed:", err);
+    return null;
+  }
+}
+
+export async function loadAdminEmails(): Promise<string[]> {
+  if (!SUPABASE_CONFIGURED) return [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("clients")
+      .select("email")
+      .eq("role", "admin")
+      .not("email", "is", null);
+    return ((data ?? []) as { email: string | null }[])
+      .map((c) => c.email!)
+      .filter((e) => /.+@.+\..+/.test(e));
+  } catch (err) {
+    console.warn("[admin-summary] admin email lookup failed:", err);
+    return [];
+  }
+}
+
+/**
+ * Pure formatter — broken out so tests can verify the rendering without a DB.
+ */
+export function formatAdminSummaryText(s: AdminWeeklySummary): string {
+  const lines: string[] = [];
+  lines.push("Virtual Agency — 주간 운영 요약 (지난 7일)");
+  lines.push("");
+  lines.push(`신규 문의: ${s.inquiriesCount}`);
+  lines.push(`팔로업 필요 (7일 이상 stale): ${s.inquiriesNoFollowup}`);
+  lines.push(`납품 완료: ${s.deliveredCount}`);
+  lines.push(`진행 중 (브리프~검토): ${s.inFlightCount}`);
+  lines.push(`뉴스레터 신규 구독: ${s.newsletterSignups}`);
+  lines.push(`대기 중인 리뷰 모더레이션: ${s.pendingReviews}`);
+  lines.push(`30일 매출 (납품 견적 합): ₩${s.revenue30dKrw.toLocaleString("ko-KR")}`);
+  lines.push("");
+  if (s.topSearches.length > 0) {
+    lines.push("인기 검색어 (7일):");
+    for (const t of s.topSearches) {
+      lines.push(`  - ${t.q} (${t.count}회, 평균 결과 ${t.avgResults})`);
+    }
+    lines.push("");
+  }
+  if (s.zeroResultSearches.length > 0) {
+    lines.push("0결과 검색어 (콘텐츠 갭):");
+    for (const t of s.zeroResultSearches) {
+      lines.push(`  - ${t.q} (${t.count}회)`);
+    }
+    lines.push("");
+  }
+  lines.push("관리자 페이지: /admin");
+  return lines.join("\n");
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): string {
+  const stat = (label: string, value: string | number) =>
+    `<div style="display:inline-block;min-width:160px;margin:0 16px 12px 0"><div style="color:#71717a;font-size:11px;letter-spacing:.1em;text-transform:uppercase">${escapeHtml(label)}</div><div style="color:#fafafa;font-size:22px;font-weight:600;margin-top:2px">${escapeHtml(String(value))}</div></div>`;
+  const list = (items: { q: string; n: number | string }[]) =>
+    items.length === 0
+      ? `<p style="color:#71717a;font-size:13px">없음</p>`
+      : `<ul style="padding-left:18px;margin:0;color:#d4d4d8">${items
+          .map(
+            (i) =>
+              `<li style="font-size:13px;margin:4px 0"><span style="color:#fafafa">${escapeHtml(i.q)}</span> <span style="color:#71717a">— ${escapeHtml(String(i.n))}</span></li>`
+          )
+          .join("")}</ul>`;
+  return `<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>Virtual Agency 주간 요약</title></head>
+<body style="margin:0;padding:24px;background:#0a0a0a;color:#e4e4e7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:640px;margin:0 auto;background:#18181b;border:1px solid #27272a;border-radius:12px;padding:28px;">
+    <h2 style="margin:0 0 4px;color:#fafafa">주간 운영 요약</h2>
+    <p style="margin:0 0 20px;color:#a1a1aa;font-size:13px">지난 7일 핵심 지표</p>
+    <div style="margin-bottom:20px">
+      ${stat("신규 문의", s.inquiriesCount)}
+      ${stat("팔로업 필요", s.inquiriesNoFollowup)}
+      ${stat("납품 완료", s.deliveredCount)}
+      ${stat("진행 중", s.inFlightCount)}
+      ${stat("뉴스레터", s.newsletterSignups)}
+      ${stat("대기 리뷰", s.pendingReviews)}
+      ${stat("30일 매출", `₩${s.revenue30dKrw.toLocaleString("ko-KR")}`)}
+    </div>
+    <h3 style="margin:24px 0 8px;font-size:14px;color:#fafafa">인기 검색어</h3>
+    ${list(s.topSearches.map((t) => ({ q: t.q, n: `${t.count}회 · 평균 ${t.avgResults}` })))}
+    <h3 style="margin:24px 0 8px;font-size:14px;color:#fafafa">0결과 검색어 (콘텐츠 갭)</h3>
+    ${list(s.zeroResultSearches.map((t) => ({ q: t.q, n: `${t.count}회` })))}
+    <hr style="border:0;border-top:1px solid #27272a;margin:24px 0">
+    <p style="margin:0"><a href="${escapeHtml(baseUrl)}/admin" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">Admin 대시보드 열기</a></p>
+  </div>
+</body></html>`;
+}

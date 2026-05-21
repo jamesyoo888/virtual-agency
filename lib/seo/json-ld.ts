@@ -189,6 +189,38 @@ export function itemListLd(name: string, entries: ItemListEntry[]) {
   };
 }
 
+export interface HowToStepInput {
+  name: string;
+  text: string;
+}
+
+export interface HowToLdInput {
+  name: string;
+  description: string;
+  url: string;
+  /** Optional total time, e.g. "PT15M". */
+  totalTime?: string;
+  steps: HowToStepInput[];
+}
+
+export function howToLd(input: HowToLdInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: input.name,
+    description: input.description,
+    inLanguage: "ko-KR",
+    ...(input.totalTime ? { totalTime: input.totalTime } : {}),
+    step: input.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+      url: `${input.url}#step-${i + 1}`,
+    })),
+  };
+}
+
 export interface FaqEntry {
   question: string;
   answer: string;
