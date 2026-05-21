@@ -373,6 +373,13 @@ export default async function AdminHomePage() {
               <p className="text-[11px] text-zinc-500 tabular-nums">
                 월말 예상 ₩{mtd.projectedMonthEnd.toLocaleString("ko-KR")}
               </p>
+              <a
+                href="/api/admin/exports/mtd"
+                download
+                className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
+              >
+                CSV
+              </a>
             </div>
           </div>
           {mtd.priorMonthTotal > 0 ? (

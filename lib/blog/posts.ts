@@ -944,6 +944,76 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "model-retention-metrics-2026",
+    title: "버추얼 모델 리텐션 4가지 지표 — 광고주가 보는 신호",
+    excerpt:
+      "출시한 모델이 카탈로그에서 살아남는 4가지 지표. 신규 모델 출시 3개월 안에 끝나는 모델 vs 분기 단위 운영되는 모델의 차이.",
+    publishedAt: "2026-05-22",
+    readingMinutes: 5,
+    tags: ["전략", "리텐션", "분석", "라이프사이클"],
+    sections: [
+      {
+        heading: "왜 리텐션인가",
+        body: "버추얼 모델은 라이프사이클이 짧으면 IP 자산이 되기 어렵습니다. 분기 단위 캠페인이 누적되어야 광고주 인지·재구매가 형성되는데, 90일을 못 넘기는 모델은 IP 가치가 거의 안 쌓입니다.",
+      },
+      {
+        heading: "지표 1 — 30d view rate",
+        body: "출시 후 30일 동안 카탈로그 페이지 뷰가 평균(현재 ~150 views/모델) 의 50% 이상이면 1단계 통과. 50% 미만이면 카탈로그 노출 채널(/trending, /explore, 뉴스레터)이 작동하지 않는다는 신호.",
+      },
+      {
+        heading: "지표 2 — 60d inquiry rate",
+        body: "60일 시점 인콰이어리 1건 이상이 의미 있는 신호. 0건이면 컨셉 이미지·태그·바이오가 광고주 의도와 매칭되지 않는다는 뜻. /admin/models/performance 의 smoothed rate 가 평균선 미만이면 컨셉 변형이 필요.",
+      },
+      {
+        heading: "지표 3 — 90d delivered",
+        body: "90일 시점 납품 1건 이상이면 분기 단위 운영 진입. 0건이면 광고주가 매칭은 받았지만 견적·납기·라이선스 어딘가에서 떨어진 것 — 이 단계에서 sla·견적·계약 조건 점검.",
+      },
+      {
+        heading: "지표 4 — 180d 재구매",
+        body: "180일 시점 동일 광고주 재구매 1건 이상이면 IP 자산화 시작. 재구매 없으면 1회성 신선함 모델로 카탈로그 비중을 낮추거나 컨셉 리뉴얼 진행.",
+      },
+      {
+        heading: "운영 대시보드 매핑",
+        body: "/admin/models/performance ?window=30|90 토글로 1·2 지표, /admin/clients 의 재구매 share 로 4 지표, /admin/health 카탈로그 hygiene 카드로 자동 알림. 4개 지표 전부 통과한 모델은 분기 단위 광고 캠페인에 우선 배치.",
+      },
+    ],
+  },
+  {
+    slug: "admin-operations-rhythm-weekly-2026",
+    title: "AI 버추얼 모델 에이전시의 주간 운영 리듬",
+    excerpt:
+      "월요일 아침 트렌딩 요약부터 금요일 SLA 점검까지. 한 주 5일 운영 표준 루틴.",
+    publishedAt: "2026-05-22",
+    readingMinutes: 4,
+    tags: ["운영", "프로세스", "주간"],
+    sections: [
+      {
+        heading: "왜 리듬이 중요한가",
+        body: "AI 버추얼 모델 에이전시는 인콰이어리·납기·SLA·캐스팅이 동시에 흐릅니다. 명시적인 주간 리듬이 없으면 긴급한 일에 끌려다니며 IP 자산화·콘텐츠 마케팅이 뒷전이 됩니다.",
+      },
+      {
+        heading: "월요일 — 트렌딩 + 주간 변화 점검",
+        body: "월요일 09:00 KST 자동 발송되는 주간 트렌딩 메일 (api/cron/weekly-trending) 확인. /admin home 의 WoW 카드로 전주 vs 직전주 변화 점검. 변화가 -10% 미만이면 그 주 운영 회의에서 1순위.",
+      },
+      {
+        heading: "화·수 — 인콰이어리 처리 + 캐스팅",
+        body: "/admin/inbox 의 stale 카운트 = 0 유지가 목표. 24h+ 인콰이어리는 자동으로 빨간색으로 노출 + ✉ 회신 버튼으로 빠르게 응답. 점심 전에 stale 0 만들기.",
+      },
+      {
+        heading: "목 — 카탈로그 hygiene + 컨셉 변형",
+        body: "/admin/health 의 'catalog hygiene' 카드에 표시된 저전환 모델 (500+ view 이면서 inquiry rate 평균의 절반 미만) 5개에 대해 컨셉 변형·태그 재할당. 신규 컨셉 컷 발주.",
+      },
+      {
+        heading: "금 — 리뷰 모더레이션 + 다음주 캠페인 계획",
+        body: "/admin/reviews 의 pending 리뷰 처리. /admin/forecast 의 base 시나리오 확인 후 다음주 캠페인 우선순위 정렬. 분기 단위 광고주의 다음 시즌 룩북 미팅 스케줄.",
+      },
+      {
+        heading: "주말 자동화",
+        body: "Sun 03:00 UTC storage cleanup (orphan 이미지 삭제), Mon 00:00/00:30/02:00 UTC weekly digest·admin summary·trending email 자동 발송. 사람은 월요일 아침 메일만 확인.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string): BlogPost | undefined {

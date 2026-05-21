@@ -211,6 +211,13 @@ export default async function AdminInboxPage({ searchParams }: Props) {
           if (b.row.status === "inquiry") return 1;
           return b.row.created_at.localeCompare(a.row.created_at);
         })
+      : stale
+      ? // When the stale chip is active, the operator's mental model is "show
+        // me the most urgent first" → oldest first wins over score. Score
+        // overrides this if the user picked it explicitly.
+        [...projectsWithScore].sort((a, b) =>
+          a.row.created_at.localeCompare(b.row.created_at)
+        )
       : projectsWithScore;
 
   // Tier counts: only across visible inquiry rows. Skip when zero.

@@ -6,6 +6,7 @@ import { toCSV, csvFilename } from "@/lib/csv";
 import { loadModelPerformance } from "@/lib/analytics/model-performance";
 import { loadForecast } from "@/lib/analytics/forecast";
 import { wowFromRows } from "@/lib/analytics/week-over-week";
+import { computeMtdRevenue } from "@/lib/analytics/mtd-revenue";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -32,6 +33,7 @@ const KINDS = new Set([
   "forecast",
   "wow",
   "trending",
+  "mtd",
 ]);
 
 export async function GET(
@@ -745,6 +747,42 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("trending")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "mtd") {
+    // 60 days = current + prior calendar month for any day-of-year.
+    const since60 = new Date(Date.now() - 60 * 86_400_000).toISOString();
+    const { data } = await supabase
+      .from("projects")
+      .select("updated_at, invoice_amount")
+      .eq("status", "delivered")
+      .gte("updated_at", since60)
+      .limit(5000);
+    const r = computeMtdRevenue(
+      (data ?? []) as { updated_at: string; invoice_amount: number | null }[]
+    );
+    const rows = [
+      { metric: "mtd_revenue", value: String(r.mtdRevenue) },
+      { metric: "projected_month_end", value: String(r.projectedMonthEnd) },
+      { metric: "prior_month_total", value: String(r.priorMonthTotal) },
+      { metric: "days_elapsed", value: String(r.daysElapsed) },
+      { metric: "days_in_month", value: String(r.daysInMonth) },
+      {
+        metric: "pace_vs_prior_pct",
+        value:
+          r.priorMonthTotal > 0
+            ? ((r.projectedMonthEnd / r.priorMonthTotal) * 100).toFixed(2)
+            : "",
+      },
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename("mtd")}"`,
         "Cache-Control": "no-store",
       },
     });
