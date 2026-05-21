@@ -7,12 +7,20 @@ export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Model Performance — Virtual Agency Admin" };
 
+const WINDOWS: Record<string, number> = { "7": 7, "30": 30, "90": 90 };
+
 function pct(n: number): string {
   return `${(n * 100).toFixed(1)}%`;
 }
 
-export default async function ModelPerformancePage() {
-  const report = await loadModelPerformance(30);
+export default async function ModelPerformancePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ window?: string }>;
+}) {
+  const sp = await searchParams;
+  const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
+  const report = await loadModelPerformance(windowDays);
   // Top half of the list (by smoothed rate) is what operations actually act
   // on — the long tail is mostly "no signal yet" and would otherwise crowd
   // the page. Capped at 50 so the page stays scroll-friendly.
@@ -25,12 +33,38 @@ export default async function ModelPerformancePage() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Model Performance</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
-            30일 카탈로그 View → Inquiry → Delivered 전환. 스무딩 적용된 inquiry rate 로 정렬 (신규 모델 페널티 방지).
+            {windowDays}일 카탈로그 View → Inquiry → Delivered 전환. 스무딩 적용된 inquiry rate 로 정렬 (신규 모델 페널티 방지).
           </p>
+        </div>
+        <div className="flex items-center gap-1 mr-2 text-[11px]">
+          {(["7", "30", "90"] as const).map((w) => {
+            const active = windowDays === Number(w);
+            const href =
+              w === "30"
+                ? "/admin/models/performance"
+                : `/admin/models/performance?window=${w}`;
+            return (
+              <Link
+                key={w}
+                href={href}
+                className={`px-2 py-0.5 rounded border ${
+                  active
+                    ? "bg-zinc-100 text-black border-zinc-100"
+                    : "text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                {w}d
+              </Link>
+            );
+          })}
         </div>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
         <a
-          href="/api/admin/exports/model-performance"
+          href={
+            windowDays === 30
+              ? "/api/admin/exports/model-performance"
+              : `/api/admin/exports/model-performance?window=${windowDays}`
+          }
           download
           className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
         >

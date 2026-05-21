@@ -659,7 +659,9 @@ export async function GET(
   }
 
   if (kind === "model-performance") {
-    const report = await loadModelPerformance(30);
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 30;
+    const report = await loadModelPerformance(windowDays);
     const rows = report.rows.map((r) => ({
       model_id: r.modelId,
       name: r.name,

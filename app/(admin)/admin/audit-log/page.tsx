@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { ScrollText } from "lucide-react";
@@ -5,6 +6,9 @@ import { ScrollText } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Audit Log — Virtual Agency Admin" };
+
+const LIMITS = [50, 100, 200, 500] as const;
+const DEFAULT_LIMIT = 100;
 
 interface AuditRow {
   id: string;
@@ -20,7 +24,7 @@ interface ActorRow {
   company: string | null;
 }
 
-async function load(): Promise<{ rows: AuditRow[]; actors: Map<string, ActorRow> }> {
+async function load(limit: number): Promise<{ rows: AuditRow[]; actors: Map<string, ActorRow> }> {
   if (!SUPABASE_CONFIGURED) return { rows: [], actors: new Map() };
   const supabase = await createClient();
 
@@ -33,7 +37,7 @@ async function load(): Promise<{ rows: AuditRow[]; actors: Map<string, ActorRow>
     .select("id, route, user_id, metadata, created_at")
     .like("route", "audit.%")
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(limit);
   const rows = (data ?? []) as AuditRow[];
 
   const userIds = Array.from(new Set(rows.map((r) => r.user_id).filter((id): id is string => !!id)));
@@ -73,18 +77,45 @@ function formatDiff(meta: Record<string, unknown> | null): string {
   }
 }
 
-export default async function AdminAuditLogPage() {
-  const { rows, actors } = await load();
+export default async function AdminAuditLogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ n?: string }>;
+}) {
+  const sp = await searchParams;
+  const n = Number.parseInt(sp.n ?? "", 10);
+  const limit = (LIMITS as readonly number[]).includes(n) ? n : DEFAULT_LIMIT;
+  const { rows, actors } = await load(limit);
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <header className="mb-8 flex items-center gap-3">
         <ScrollText className="w-5 h-5 text-zinc-400" />
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">Audit Log</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
-            관리자 설정 변경 이력. usage_log 의 <code>audit.*</code> 라우트 200건.
+            관리자 설정 변경 이력. usage_log 의 <code>audit.*</code> 라우트 최근 {limit}건.
           </p>
+        </div>
+        <div className="flex items-center gap-1 text-[11px]">
+          {LIMITS.map((l) => {
+            const active = l === limit;
+            const href =
+              l === DEFAULT_LIMIT ? "/admin/audit-log" : `/admin/audit-log?n=${l}`;
+            return (
+              <Link
+                key={l}
+                href={href}
+                className={`px-2 py-0.5 rounded border ${
+                  active
+                    ? "bg-zinc-100 text-black border-zinc-100"
+                    : "text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                {l}
+              </Link>
+            );
+          })}
         </div>
       </header>
 

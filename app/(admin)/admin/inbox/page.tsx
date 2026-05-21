@@ -144,6 +144,18 @@ async function loadSourceOptions(): Promise<string[]> {
   return Array.from(new Set(rows)).sort();
 }
 
+async function loadStaleInquiryCount(): Promise<number> {
+  if (!SUPABASE_CONFIGURED) return 0;
+  const supabase = await createClient();
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count } = await supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "inquiry")
+    .lt("created_at", cutoff);
+  return count ?? 0;
+}
+
 async function loadPriorDeliveredByClient(clientIds: string[]): Promise<Map<string, number>> {
   if (!SUPABASE_CONFIGURED || clientIds.length === 0) return new Map();
   const supabase = await createClient();
@@ -162,9 +174,10 @@ async function loadPriorDeliveredByClient(clientIds: string[]): Promise<Map<stri
 export default async function AdminInboxPage({ searchParams }: Props) {
   const { status, q, source, sort, stale: staleParam } = await searchParams;
   const stale = staleParam === "1";
-  const [projectsRaw, sourceOptions] = await Promise.all([
+  const [projectsRaw, sourceOptions, staleCount] = await Promise.all([
     fetchProjects(status, q, source, stale),
     loadSourceOptions(),
+    loadStaleInquiryCount(),
   ]);
   const priorByClient = await loadPriorDeliveredByClient(
     Array.from(new Set(projectsRaw.map((p) => p.client_id)))
@@ -305,6 +318,11 @@ export default async function AdminInboxPage({ searchParams }: Props) {
               >
                 <Flame className="w-3 h-3" />
                 24h+ Stale
+                {staleCount > 0 && (
+                  <span className="ml-1 opacity-90 tabular-nums">
+                    {staleCount}
+                  </span>
+                )}
               </Link>
             );
           })()}
