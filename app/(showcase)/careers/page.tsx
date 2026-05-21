@@ -18,6 +18,14 @@ export const metadata = {
       "자체 제작한 AI 버추얼 모델을 Virtual Agency 카탈로그에 등록하고 광고주 캠페인 수익을 분배받으세요.",
     url: `${SITE_URL}/careers`,
     type: "website" as const,
+    images: [`${SITE_URL}/api/og?careers=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "크리에이터 합류 — Virtual Agency",
+    description:
+      "자체 제작한 AI 버추얼 모델을 광고 캠페인 자산으로. 정산 70%.",
+    images: [`${SITE_URL}/api/og?careers=1`],
   },
 };
 

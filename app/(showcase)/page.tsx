@@ -23,6 +23,7 @@ import { trackImpression } from "@/lib/experiments-track";
 import { loadSocialProof } from "@/lib/social-proof";
 import { loadTopTestimonials } from "@/lib/testimonials";
 import HomeTestimonials from "@/components/home-testimonials";
+import { logCatalogSearch } from "@/lib/analytics/search-log";
 
 function Value({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
@@ -158,6 +159,19 @@ export default async function CatalogPage({ searchParams }: PageProps) {
     totalCount = count ?? models.length;
     totalPages = Math.max(1, Math.ceil(totalCount / CATALOG_PAGE_SIZE));
     page = Math.min(requestedPage, totalPages);
+
+    // Search analytics: log only when there's a user query (avoids one row per
+    // catalog page-view) and only on shard 1 of the result set so refreshing
+    // the same query through pagination doesn't double-count it.
+    if (params.q && requestedPage === 1) {
+      void logCatalogSearch({
+        q: params.q,
+        results: totalCount,
+        industry: params.industry ?? null,
+        mood: params.mood ?? null,
+        genre: params.genre ?? null,
+      });
+    }
   } else {
     // Dev fallback — no Supabase configured.
     const filtered = filterModelsForCatalog(devModelStore.list() as Model[], params);

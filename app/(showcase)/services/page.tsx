@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Image as ImageIcon, Video, Layers, Calendar, Palette } from "lucide-react";
+import { serviceLd, itemListLd, ldScript } from "@/lib/seo/json-ld";
 
 export const revalidate = 86400;
 
@@ -16,6 +17,13 @@ export const metadata = {
       "이미지 캠페인, 영상 콘텐츠, 룩북, 브랜드 키트, 모델 픽업.",
     url: `${SITE_URL}/services`,
     type: "website" as const,
+    images: [`${SITE_URL}/api/og?services=1`],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "서비스 — Virtual Agency",
+    description: "5가지 핵심 서비스. 이미지 · 영상 · 룩북 · 픽업 · 브랜드 키트.",
+    images: [`${SITE_URL}/api/og?services=1`],
   },
 };
 
@@ -115,8 +123,37 @@ const SERVICES: Service[] = [
 ];
 
 export default function ServicesPage() {
+  // One Service node per offering, plus an ItemList wrapping them so Google
+  // can show both an aggregated catalog entry and richer per-service cards.
+  const serviceNodes = SERVICES.map((s) =>
+    serviceLd({
+      name: s.title,
+      description: s.tagline,
+      url: `${SITE_URL}/services#${s.key}`,
+      priceRange: s.priceBand,
+      deliveryTime: s.turnaround,
+    })
+  );
+  const ld = {
+    "@context": "https://schema.org",
+    "@graph": [
+      itemListLd(
+        "Virtual Agency 서비스",
+        SERVICES.map((s) => ({
+          name: s.title,
+          url: `${SITE_URL}/services#${s.key}`,
+        }))
+      ),
+      ...serviceNodes,
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-black text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(ld) }}
+      />
       <main className="max-w-5xl mx-auto px-6 py-16 md:py-24">
         <header className="mb-14">
           <p className="text-xs tracking-[0.3em] text-zinc-500 uppercase mb-3">
@@ -137,7 +174,8 @@ export default function ServicesPage() {
           {SERVICES.map((s) => (
             <article
               key={s.key}
-              className="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-7 flex flex-col"
+              id={s.key}
+              className="rounded-2xl border border-zinc-800 bg-zinc-950/40 p-7 flex flex-col scroll-mt-24"
             >
               <div className="flex items-center gap-3 mb-4">
                 <span className="w-10 h-10 rounded-lg border border-zinc-800 grid place-items-center text-zinc-300">

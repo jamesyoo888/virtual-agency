@@ -133,6 +133,38 @@ export function blogPostingLd(input: ArticleLdInput) {
   };
 }
 
+export interface ServiceLdInput {
+  name: string;
+  description: string;
+  url: string;
+  /** Optional price range as a free-form string ("₩200만~₩800만"). */
+  priceRange?: string;
+  /** Estimated delivery window as schema-friendly duration text. */
+  deliveryTime?: string;
+}
+
+export function serviceLd(input: ServiceLdInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": input.url,
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    serviceType: input.name,
+    provider: {
+      "@type": "Organization",
+      name: ORG_NAME,
+      url: SITE_URL,
+    },
+    areaServed: { "@type": "Country", name: "Republic of Korea" },
+    ...(input.priceRange
+      ? { offers: { "@type": "Offer", priceCurrency: "KRW", priceSpecification: { "@type": "PriceSpecification", priceCurrency: "KRW", description: input.priceRange } } }
+      : {}),
+    ...(input.deliveryTime ? { hoursAvailable: input.deliveryTime } : {}),
+  };
+}
+
 export interface ItemListEntry {
   name: string;
   url: string;

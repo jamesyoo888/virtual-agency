@@ -22,6 +22,7 @@ import {
   Activity,
   Mail,
   ScrollText,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -45,6 +46,7 @@ const links = [
   { href: "/admin/referrals", label: "Referrals", icon: Users },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
+  { href: "/admin/search-analytics", label: "Search", icon: Search },
   { href: "/admin/health", label: "Health", icon: Activity },
 ];
 

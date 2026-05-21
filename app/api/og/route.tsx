@@ -83,6 +83,8 @@ export async function GET(request: Request) {
   const blogSlug = searchParams.get("blog");
   const blogTag = searchParams.get("blog_tag");
   const isCases = searchParams.get("cases") === "1";
+  const isCareers = searchParams.get("careers") === "1";
+  const isServices = searchParams.get("services") === "1";
   const exploreIndustry = searchParams.get("explore_industry");
   const exploreMood = searchParams.get("explore_mood");
   const exploreGenre = searchParams.get("explore_genre");
@@ -109,6 +111,20 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · CASES",
       "실제 납품 사례",
       "광고주 사명은 anonymized. 산업·납기·모델은 실제 데이터입니다."
+    );
+  }
+  if (isCareers) {
+    return bigCard(
+      "VIRTUAL AGENCY · CAREERS",
+      "크리에이터로 합류",
+      "자체 제작한 AI 버추얼 모델을 광고 캠페인 자산으로. 정산 70%."
+    );
+  }
+  if (isServices) {
+    return bigCard(
+      "VIRTUAL AGENCY · SERVICES",
+      "5가지 핵심 서비스",
+      "이미지 · 영상 · 룩북 · 픽업 데이 · 브랜드 키트, 한 곳에서."
     );
   }
   if (exploreIndustry && INDUSTRY_LABELS[exploreIndustry]) {
