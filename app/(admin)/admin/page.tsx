@@ -4,6 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import { summarizeUsage } from "@/lib/cost/store";
 import { loadFunnel, loadFunnelBySource, stageConversionRate } from "@/lib/analytics/funnel";
+import { loadSearchAnalytics } from "@/lib/analytics/search-log";
 import {
   Users,
   Inbox,
@@ -12,6 +13,10 @@ import {
   TrendingUp,
   ArrowRight,
   Filter,
+  Search,
+  Mail,
+  Star,
+  AlertTriangle,
 } from "lucide-react";
 
 const STAGE_LABELS_KO: Record<string, string> = {
@@ -30,6 +35,42 @@ interface KPIs {
   activeProjects: number;
   totalModels: number;
   activeModels: number;
+}
+
+interface OpsSnapshot {
+  newsletter7d: number;
+  newsletter30d: number;
+  pendingReviews: number;
+}
+
+async function loadOpsSnapshot(): Promise<OpsSnapshot> {
+  if (!SUPABASE_CONFIGURED) {
+    return { newsletter7d: 0, newsletter30d: 0, pendingReviews: 0 };
+  }
+  const supabase = await createClient();
+  const sevenAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const thirtyAgo = new Date(Date.now() - 30 * 86_400_000).toISOString();
+
+  const [{ count: n7 }, { count: n30 }, { count: pending }] = await Promise.all([
+    supabase
+      .from("newsletter_signups")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", sevenAgo),
+    supabase
+      .from("newsletter_signups")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", thirtyAgo),
+    supabase
+      .from("reviews")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending"),
+  ]);
+
+  return {
+    newsletter7d: n7 ?? 0,
+    newsletter30d: n30 ?? 0,
+    pendingReviews: pending ?? 0,
+  };
 }
 
 interface RecentInquiry {
@@ -130,12 +171,14 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default async function AdminHomePage() {
-  const [kpis, usage, recent, funnel, bySource] = await Promise.all([
+  const [kpis, usage, recent, funnel, bySource, search7d, ops] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
     loadRecentInquiries(),
     loadFunnel(30),
     loadFunnelBySource(30, 6),
+    loadSearchAnalytics({ windowDays: 7, limit: 5 }),
+    loadOpsSnapshot(),
   ]);
 
   return (
@@ -297,6 +340,107 @@ export default async function AdminHomePage() {
           )}
         </section>
       )}
+
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Search className="w-4 h-4 text-zinc-400" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              인기 검색어 (7일)
+            </h2>
+            <Link
+              href="/admin/search-analytics"
+              className="text-xs text-zinc-400 hover:text-white inline-flex items-center gap-1 ml-auto"
+            >
+              상세 <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          {search7d.top.length === 0 ? (
+            <p className="text-xs text-zinc-500">아직 검색어가 수집되지 않았습니다.</p>
+          ) : (
+            <ul className="space-y-1.5 text-sm">
+              {search7d.top.map((s) => (
+                <li key={s.q} className="flex items-center justify-between gap-3">
+                  <span className="text-zinc-200 truncate">{s.q}</span>
+                  <span className="text-xs text-zinc-500 tabular-nums shrink-0">
+                    {s.count}회 · 결과 {s.avgResults}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {search7d.zero.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-zinc-800">
+              <p className="text-xs uppercase tracking-wider text-zinc-500 mb-2 flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3 text-yellow-400" />
+                0결과 (콘텐츠 갭)
+              </p>
+              <ul className="text-xs text-zinc-400 space-y-1">
+                {search7d.zero.slice(0, 3).map((s) => (
+                  <li key={s.q} className="flex items-center justify-between">
+                    <span className="truncate">{s.q}</span>
+                    <span className="text-zinc-500 tabular-nums shrink-0 ml-2">
+                      {s.zeroResultCount}회
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Mail className="w-4 h-4 text-zinc-400" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              운영 스냅샷
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <p className="text-xs text-zinc-500">뉴스레터 (7일)</p>
+              <p className="text-xl font-bold tabular-nums mt-0.5">
+                {ops.newsletter7d.toLocaleString()}
+              </p>
+              <p className="text-[10px] text-zinc-600 mt-0.5">
+                30일: {ops.newsletter30d.toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500 flex items-center gap-1">
+                <Star className="w-3 h-3" /> 대기 리뷰
+              </p>
+              <p
+                className={`text-xl font-bold tabular-nums mt-0.5 ${
+                  ops.pendingReviews > 0 ? "text-yellow-300" : "text-zinc-200"
+                }`}
+              >
+                {ops.pendingReviews.toLocaleString()}
+              </p>
+              <Link
+                href="/admin/reviews?status=pending"
+                className="text-[10px] text-zinc-500 hover:text-zinc-300 mt-0.5 inline-block"
+              >
+                모더레이션 →
+              </Link>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2 pt-3 border-t border-zinc-800">
+            <Link
+              href="/admin/newsletter"
+              className="text-xs text-zinc-300 hover:text-white inline-flex items-center gap-1"
+            >
+              뉴스레터 명단 <ArrowRight className="w-3 h-3" />
+            </Link>
+            <Link
+              href="/admin/audit-log"
+              className="text-xs text-zinc-300 hover:text-white inline-flex items-center gap-1 ml-3"
+            >
+              Audit Log <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
         <div className="flex items-center gap-2 mb-3">
