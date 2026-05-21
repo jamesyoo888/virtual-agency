@@ -112,7 +112,12 @@ async function fetchProjects(
 }
 
 interface Props {
-  searchParams: Promise<{ status?: string; q?: string; source?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    q?: string;
+    source?: string;
+    sort?: string;
+  }>;
 }
 
 async function loadSourceOptions(): Promise<string[]> {
@@ -147,17 +152,56 @@ async function loadPriorDeliveredByClient(clientIds: string[]): Promise<Map<stri
 }
 
 export default async function AdminInboxPage({ searchParams }: Props) {
-  const { status, q, source } = await searchParams;
-  const [projects, sourceOptions] = await Promise.all([
+  const { status, q, source, sort } = await searchParams;
+  const [projectsRaw, sourceOptions] = await Promise.all([
     fetchProjects(status, q, source),
     loadSourceOptions(),
   ]);
   const priorByClient = await loadPriorDeliveredByClient(
-    Array.from(new Set(projects.map((p) => p.client_id)))
+    Array.from(new Set(projectsRaw.map((p) => p.client_id)))
+  );
+
+  // Lead scores computed once for inquiry rows. Sort=score reorders inquiries
+  // by lead score desc; non-inquiry rows keep their date order regardless so
+  // the operator's "in_progress" tab isn't shuffled.
+  const projectsWithScore = projectsRaw.map((p) => {
+    if (p.status !== "inquiry") return { row: p, leadScore: null, leadTier: null };
+    const lead = computeLeadScore({
+      utmSource: p.utm_source,
+      utmCampaign: p.utm_campaign,
+      referrer: p.referrer,
+      brief: p.brief,
+      createdAt: p.created_at,
+      priorDeliveredCount: priorByClient.get(p.client_id) ?? 0,
+    });
+    return { row: p, leadScore: lead.score, leadTier: lead.tier };
+  });
+
+  const projects =
+    sort === "score"
+      ? [...projectsWithScore].sort((a, b) => {
+          // Inquiry rows sorted by score desc; non-inquiries pushed to bottom
+          // by date desc.
+          if (a.row.status === "inquiry" && b.row.status === "inquiry") {
+            return (b.leadScore ?? 0) - (a.leadScore ?? 0);
+          }
+          if (a.row.status === "inquiry") return -1;
+          if (b.row.status === "inquiry") return 1;
+          return b.row.created_at.localeCompare(a.row.created_at);
+        })
+      : projectsWithScore;
+
+  // Tier counts: only across visible inquiry rows. Skip when zero.
+  const tierCounts = projectsWithScore.reduce(
+    (acc, p) => {
+      if (p.leadTier) acc[p.leadTier] = (acc[p.leadTier] ?? 0) + 1;
+      return acc;
+    },
+    { hot: 0, warm: 0, cold: 0 } as Record<"hot" | "warm" | "cold", number>
   );
 
   const counts: Record<string, number> = { all: 0 };
-  for (const p of projects) counts[p.status] = (counts[p.status] ?? 0) + 1;
+  for (const p of projects) counts[p.row.status] = (counts[p.row.status] ?? 0) + 1;
   counts.all = projects.length;
 
   return (
@@ -183,7 +227,7 @@ export default async function AdminInboxPage({ searchParams }: Props) {
       </header>
 
       <div className="mb-3">
-        <InboxBulkBar projectIds={projects.map((p) => p.id)} />
+        <InboxBulkBar projectIds={projects.map((p) => p.row.id)} />
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
@@ -200,6 +244,7 @@ export default async function AdminInboxPage({ searchParams }: Props) {
             if (tab.value !== "all") params.set("status", tab.value);
             if (q) params.set("q", q);
             if (source) params.set("source", source);
+            if (sort) params.set("sort", sort);
             const qs = params.toString();
             const href = qs ? `/admin/inbox?${qs}` : "/admin/inbox";
             return (
@@ -223,6 +268,51 @@ export default async function AdminInboxPage({ searchParams }: Props) {
         <InboxSearch />
       </div>
 
+      {(tierCounts.hot + tierCounts.warm + tierCounts.cold > 0 || true) && (
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-[11px]">
+          <span className="text-zinc-500">Lead 분포:</span>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-red-500/15 text-red-300 border-red-500/30">
+            <Flame className="w-3 h-3" /> Hot {tierCounts.hot}
+          </span>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-yellow-500/15 text-yellow-300 border-yellow-500/30">
+            Warm {tierCounts.warm}
+          </span>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-zinc-700/30 text-zinc-400 border-zinc-700">
+            Cold {tierCounts.cold}
+          </span>
+          <span className="ml-2 text-zinc-500">정렬:</span>
+          {(() => {
+            const options = [
+              { value: "recent", label: "최신순" },
+              { value: "score", label: "스코어순" },
+            ];
+            return options.map((opt) => {
+              const active = (sort ?? "recent") === opt.value;
+              const params = new URLSearchParams();
+              if (opt.value !== "recent") params.set("sort", opt.value);
+              if (status && status !== "all") params.set("status", status);
+              if (q) params.set("q", q);
+              if (source) params.set("source", source);
+              const qs = params.toString();
+              const href = qs ? `/admin/inbox?${qs}` : "/admin/inbox";
+              return (
+                <Link
+                  key={opt.value}
+                  href={href}
+                  className={`px-2 py-0.5 rounded border ${
+                    active
+                      ? "bg-zinc-100 text-black border-zinc-100"
+                      : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                  }`}
+                >
+                  {opt.label}
+                </Link>
+              );
+            });
+          })()}
+        </div>
+      )}
+
       {sourceOptions.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-1.5 text-[11px]">
           <span className="text-zinc-500 mr-1">출처:</span>
@@ -232,6 +322,7 @@ export default async function AdminInboxPage({ searchParams }: Props) {
             if (opt.value !== "all") params.set("source", opt.value);
             if (status && status !== "all") params.set("status", status);
             if (q) params.set("q", q);
+            if (sort) params.set("sort", sort);
             const qs = params.toString();
             const href = qs ? `/admin/inbox?${qs}` : "/admin/inbox";
             return (
@@ -261,7 +352,7 @@ export default async function AdminInboxPage({ searchParams }: Props) {
         </div>
       ) : (
         <div className="rounded-xl border border-zinc-800 overflow-hidden divide-y divide-zinc-800">
-          {projects.map((p) => (
+          {projects.map(({ row: p, leadTier, leadScore }) => (
             <div
               key={p.id}
               data-bulk-id={p.id}
@@ -290,25 +381,15 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                     {p.title}
                   </Link>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    {p.status === "inquiry" && (() => {
-                      const lead = computeLeadScore({
-                        utmSource: p.utm_source,
-                        utmCampaign: p.utm_campaign,
-                        referrer: p.referrer,
-                        brief: p.brief,
-                        createdAt: p.created_at,
-                        priorDeliveredCount: priorByClient.get(p.client_id) ?? 0,
-                      });
-                      return (
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${TIER_TONE[lead.tier]}`}
-                          title={`score ${lead.score} · ${lead.reasons.join(", ")}`}
-                        >
-                          {lead.tier === "hot" && <Flame className="w-3 h-3" />}
-                          {TIER_LABEL_KO[lead.tier]}
-                        </span>
-                      );
-                    })()}
+                    {p.status === "inquiry" && leadTier && (
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${TIER_TONE[leadTier]}`}
+                        title={`score ${leadScore}`}
+                      >
+                        {leadTier === "hot" && <Flame className="w-3 h-3" />}
+                        {TIER_LABEL_KO[leadTier]}
+                      </span>
+                    )}
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${
                         STATUS_TONE[p.status] ?? "bg-zinc-800 text-zinc-400 border-zinc-700"
