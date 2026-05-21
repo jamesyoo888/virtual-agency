@@ -381,6 +381,33 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                     {p.title}
                   </Link>
                   <div className="flex items-center gap-1.5 shrink-0">
+                    {p.status === "inquiry" && (() => {
+                      // SLA age chip: time since this inquiry was created.
+                      // > 24h → red, > 8h → amber, otherwise zinc/silent.
+                      // Lets the operator scan stale-leads at a glance.
+                      const ageMs = Date.now() - new Date(p.created_at).getTime();
+                      const ageH = ageMs / 3_600_000;
+                      const label =
+                        ageH < 1
+                          ? `${Math.round(ageH * 60)}분`
+                          : ageH < 24
+                          ? `${Math.round(ageH)}h`
+                          : `${Math.round(ageH / 24)}d`;
+                      const tone =
+                        ageH > 24
+                          ? "bg-red-500/15 text-red-300 border-red-500/30"
+                          : ageH > 8
+                          ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                          : "bg-zinc-800 text-zinc-400 border-zinc-700";
+                      return (
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${tone}`}
+                          title="응답 대기 시간"
+                        >
+                          {label}
+                        </span>
+                      );
+                    })()}
                     {p.status === "inquiry" && leadTier && (
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${TIER_TONE[leadTier]}`}
