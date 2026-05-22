@@ -213,7 +213,10 @@ export default async function ForecastPage() {
           )}
 
           {r.pipelineAging.some((b) => b.count > 0) && (
-            <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+            <section
+              id="aging"
+              className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8 scroll-mt-20"
+            >
               <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-1">
                 Pipeline 체류 시간 (created_at 기준)
               </h2>

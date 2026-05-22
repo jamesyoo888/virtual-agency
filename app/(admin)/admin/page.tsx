@@ -75,6 +75,32 @@ async function loadMtdRevenue(): Promise<MtdRevenue> {
   );
 }
 
+interface StuckPipeline {
+  count: number;
+  value: number;
+}
+
+async function loadStuckPipeline(): Promise<StuckPipeline> {
+  if (!SUPABASE_CONFIGURED) return { count: 0, value: 0 };
+  const supabase = await createClient();
+  // 31d+ stuck: open project (any non-terminal stage) whose created_at is
+  // more than 31 days ago. We pull invoice_amount so the alert can quote
+  // the at-risk pipeline value, not just the count. Keep the query bounded.
+  const cutoff = new Date(Date.now() - 31 * 86_400_000).toISOString();
+  const { data } = await supabase
+    .from("projects")
+    .select("invoice_amount")
+    .in("status", ["inquiry", "brief_received", "in_progress", "review"])
+    .lt("created_at", cutoff)
+    .limit(2000);
+  type Row = { invoice_amount: number | null };
+  const rows = (data ?? []) as Row[];
+  return {
+    count: rows.length,
+    value: rows.reduce((s, r) => s + (r.invoice_amount ?? 0), 0),
+  };
+}
+
 async function loadTopClients(): Promise<TopClientAggregate[]> {
   if (!SUPABASE_CONFIGURED) return [];
   const supabase = await createClient();
@@ -313,6 +339,7 @@ export default async function AdminHomePage() {
     trendingNow,
     mtd,
     topClients,
+    stuck,
   ] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
@@ -326,6 +353,7 @@ export default async function AdminHomePage() {
     loadTrendingNow(),
     loadMtdRevenue(),
     loadTopClients(),
+    loadStuckPipeline(),
   ]);
 
   return (
@@ -419,6 +447,26 @@ export default async function AdminHomePage() {
           href="/admin/usage"
         />
       </section>
+
+      {stuck.count > 0 && (
+        <Link
+          href="/admin/forecast#aging"
+          className="block rounded-xl border border-rose-500/40 bg-rose-500/5 p-4 hover:bg-rose-500/10 transition-colors"
+        >
+          <div className="flex items-center gap-3 text-sm">
+            <AlertTriangle className="w-4 h-4 text-rose-300 shrink-0" />
+            <p className="flex-1 text-rose-100">
+              <span className="font-semibold">{stuck.count}건</span> 의
+              프로젝트가 31일+ 정체 중 (
+              <span className="tabular-nums">
+                ₩{stuck.value.toLocaleString("ko-KR")}
+              </span>
+              {" "}at risk). Forecast 의 체류 시간 섹션에서 확인 →
+            </p>
+            <ArrowRight className="w-4 h-4 text-rose-300 shrink-0" />
+          </div>
+        </Link>
+      )}
 
       {mtd.mtdRevenue > 0 || mtd.priorMonthTotal > 0 ? (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">

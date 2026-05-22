@@ -10,6 +10,18 @@ export const metadata = { title: "Audit Log — Virtual Agency Admin" };
 const LIMITS = [50, 100, 200, 500] as const;
 const DEFAULT_LIMIT = 100;
 
+// Prefix tabs map to the `audit.<prefix>.*` patterns the writers emit.
+// `all` is a catch-all (route LIKE 'audit.%'). Order shown left-to-right.
+const PREFIXES = [
+  { value: "all", label: "전체" },
+  { value: "caps", label: "Cost cap" },
+  { value: "banner", label: "Banner" },
+  { value: "settings", label: "Settings" },
+] as const;
+type PrefixValue = (typeof PREFIXES)[number]["value"];
+const isPrefix = (v: string): v is PrefixValue =>
+  (PREFIXES as readonly { value: string }[]).some((p) => p.value === v);
+
 interface AuditRow {
   id: string;
   route: string;
@@ -24,7 +36,10 @@ interface ActorRow {
   company: string | null;
 }
 
-async function load(limit: number): Promise<{ rows: AuditRow[]; actors: Map<string, ActorRow> }> {
+async function load(
+  limit: number,
+  prefix: PrefixValue
+): Promise<{ rows: AuditRow[]; actors: Map<string, ActorRow> }> {
   if (!SUPABASE_CONFIGURED) return { rows: [], actors: new Map() };
   const supabase = await createClient();
 
@@ -32,10 +47,12 @@ async function load(limit: number): Promise<{ rows: AuditRow[]; actors: Map<stri
   // /api/admin/settings/{caps,banner}). That avoids a dedicated table for
   // a low-volume feature, but means rows aren't normalized — surface the
   // raw metadata so operators can spot anomalies.
+  // Prefix filter narrows to audit.<prefix>.* — `all` keeps the full set.
+  const pattern = prefix === "all" ? "audit.%" : `audit.${prefix}.%`;
   const { data } = await supabase
     .from("usage_log")
     .select("id, route, user_id, metadata, created_at")
-    .like("route", "audit.%")
+    .like("route", pattern)
     .order("created_at", { ascending: false })
     .limit(limit);
   const rows = (data ?? []) as AuditRow[];
@@ -80,12 +97,24 @@ function formatDiff(meta: Record<string, unknown> | null): string {
 export default async function AdminAuditLogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ n?: string }>;
+  searchParams: Promise<{ n?: string; prefix?: string }>;
 }) {
   const sp = await searchParams;
   const n = Number.parseInt(sp.n ?? "", 10);
   const limit = (LIMITS as readonly number[]).includes(n) ? n : DEFAULT_LIMIT;
-  const { rows, actors } = await load(limit);
+  const prefix: PrefixValue =
+    sp.prefix && isPrefix(sp.prefix) ? sp.prefix : "all";
+  const { rows, actors } = await load(limit, prefix);
+  // Preserve current limit when switching prefix tabs and vice versa.
+  const buildHref = (next: { n?: number; prefix?: PrefixValue }) => {
+    const params = new URLSearchParams();
+    const nVal = next.n ?? limit;
+    if (nVal !== DEFAULT_LIMIT) params.set("n", String(nVal));
+    const pVal = next.prefix ?? prefix;
+    if (pVal !== "all") params.set("prefix", pVal);
+    const qs = params.toString();
+    return qs ? `/admin/audit-log?${qs}` : "/admin/audit-log";
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -101,12 +130,10 @@ export default async function AdminAuditLogPage({
           <div className="flex items-center gap-1">
             {LIMITS.map((l) => {
               const active = l === limit;
-              const href =
-                l === DEFAULT_LIMIT ? "/admin/audit-log" : `/admin/audit-log?n=${l}`;
               return (
                 <Link
                   key={l}
-                  href={href}
+                  href={buildHref({ n: l })}
                   className={`px-2 py-0.5 rounded border ${
                     active
                       ? "bg-zinc-100 text-black border-zinc-100"
@@ -127,6 +154,25 @@ export default async function AdminAuditLogPage({
           </a>
         </div>
       </header>
+
+      <div className="flex items-center gap-1 mb-4 text-xs">
+        {PREFIXES.map((p) => {
+          const active = p.value === prefix;
+          return (
+            <Link
+              key={p.value}
+              href={buildHref({ prefix: p.value })}
+              className={`px-2.5 py-1 rounded border ${
+                active
+                  ? "bg-zinc-100 text-black border-zinc-100"
+                  : "text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+              }`}
+            >
+              {p.label}
+            </Link>
+          );
+        })}
+      </div>
 
       {rows.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
