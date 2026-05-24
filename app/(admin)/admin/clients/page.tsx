@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Building2, AlertTriangle } from "lucide-react";
+import { Building2, AlertTriangle, Repeat, Flame } from "lucide-react";
+import {
+  computeAtRiskClients,
+  computeCohortRetention,
+  cohortWindowMature,
+  type AtRiskClient,
+  type CohortBucket,
+  type ClientRetentionProjectRow,
+} from "@/lib/analytics/client-retention";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +54,11 @@ async function loadSummaries(): Promise<{
   totalRevenue90d: number;
   /** Set of client_ids with no activity in 90+ days (and at least 1 campaign). */
   neglectedIds: Set<string>;
+  /** At-risk = ≥2 delivered + silent ≥60d. Materialized from project rows
+   *  joined to the same clients fetch so the order matches the table. */
+  atRiskClients: AtRiskClient[];
+  /** Trailing 6 monthly cohorts × 60/90/180d repeat windows. */
+  cohorts: CohortBucket[];
 }> {
   if (!SUPABASE_CONFIGURED)
     return {
@@ -53,6 +66,8 @@ async function loadSummaries(): Promise<{
       totalRevenue: 0,
       totalRevenue90d: 0,
       neglectedIds: new Set(),
+      atRiskClients: [],
+      cohorts: [],
     };
   const supabase = await createClient();
 
@@ -71,6 +86,28 @@ async function loadSummaries(): Promise<{
 
   const clients = (clientsRaw as ClientRow[]) ?? [];
   const projects = (projectsRaw as ProjectAgg[]) ?? [];
+
+  // Build a lookup so the retention helpers can decorate aggregates with
+  // company/email for display without a second join.
+  const clientMeta = new Map<
+    string,
+    { company: string | null; email: string | null }
+  >();
+  for (const c of clients) {
+    clientMeta.set(c.id, { company: c.company, email: c.email });
+  }
+  // Retention helpers want one row per delivered project with delivered_at +
+  // client_id + invoice + client meta. We use updated_at as the delivery
+  // timestamp (status_history would be more authoritative but updated_at is
+  // already kept in sync on the transition and avoids another query).
+  const deliveredRows: ClientRetentionProjectRow[] = projects
+    .filter((p) => p.status === "delivered" && p.client_id)
+    .map((p) => ({
+      client_id: p.client_id,
+      invoice_amount: p.invoice_amount,
+      delivered_at: p.updated_at,
+      client: clientMeta.get(p.client_id) ?? null,
+    }));
 
   const byClient = new Map<string, ProjectAgg[]>();
   for (const p of projects) {
@@ -129,11 +166,20 @@ async function loadSummaries(): Promise<{
       })
       .map((c) => c.id)
   );
+  const atRiskClients = computeAtRiskClients(deliveredRows, {
+    minDelivered: 2,
+    silentDays: 60,
+    limit: 20,
+  });
+  const cohorts = computeCohortRetention(deliveredRows, { months: 6 });
+
   return {
     clients: summaries,
     totalRevenue,
     totalRevenue90d,
     neglectedIds,
+    atRiskClients,
+    cohorts,
   };
 }
 
@@ -283,12 +329,23 @@ export default async function AdminClientsPage({
 }) {
   const { filter } = await searchParams;
   const showNeglected = filter === "neglected";
-  const { clients: allClients, totalRevenue, totalRevenue90d, neglectedIds } =
-    await loadSummaries();
+  const showAtRisk = filter === "at-risk";
+  const {
+    clients: allClients,
+    totalRevenue,
+    totalRevenue90d,
+    neglectedIds,
+    atRiskClients,
+    cohorts,
+  } = await loadSummaries();
+  const atRiskIds = new Set(atRiskClients.map((c) => c.id));
   const clients = showNeglected
     ? allClients.filter((c) => neglectedIds.has(c.id))
+    : showAtRisk
+    ? allClients.filter((c) => atRiskIds.has(c.id))
     : allClients;
   const neglectedCount = neglectedIds.size;
+  const atRiskCount = atRiskClients.length;
 
   const activeClients = allClients.filter((c) => c.campaignCount > 0);
   const repeatClients = allClients.filter((c) => c.campaignCount >= 2);
@@ -316,27 +373,51 @@ export default async function AdminClientsPage({
             클라이언트별 LTV · 활동 요약. 우선순위 운영 도구.
           </p>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
-        <a
-          href="/api/admin/exports/clients"
-          download
-          className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
-        >
-          CSV
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="/api/admin/exports/clients"
+            download
+            className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+          >
+            Clients CSV
+          </a>
+          <a
+            href="/api/admin/exports/client-retention"
+            download
+            className="text-xs px-3 py-1.5 rounded-md border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white"
+            title="월별 코호트 × 60/90/180d 재구매 CSV (12개월)"
+          >
+            Retention CSV
+          </a>
+        </div>
       </header>
 
       <nav className="mb-6 flex flex-wrap items-center gap-1 text-xs">
         <Link
           href="/admin/clients"
           className={`px-3 py-1.5 rounded-md border transition-colors ${
-            !showNeglected
+            !showNeglected && !showAtRisk
               ? "bg-white text-black border-white"
               : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
           }`}
         >
           전체
           <span className="ml-1.5 opacity-60 tabular-nums">{allClients.length}</span>
+        </Link>
+        <Link
+          href="/admin/clients?filter=at-risk"
+          className={`px-3 py-1.5 rounded-md border transition-colors inline-flex items-center gap-1 ${
+            showAtRisk
+              ? "bg-rose-500/20 text-rose-200 border-rose-500/50"
+              : "bg-transparent text-rose-400 border-rose-500/30 hover:border-rose-400 hover:text-rose-200"
+          }`}
+          title="2건 이상 납품한 적이 있는 광고주가 60일 이상 활동 없음 — 가장 가치 높은 재활성화 타깃"
+        >
+          <Flame className="w-3 h-3" />
+          LTV at-risk (2건+ / 60d 침묵)
+          {atRiskCount > 0 && (
+            <span className="opacity-90 tabular-nums">{atRiskCount}</span>
+          )}
         </Link>
         <Link
           href="/admin/clients?filter=neglected"
@@ -389,6 +470,7 @@ export default async function AdminClientsPage({
         totalRevenue90d={totalRevenue90d}
       />
 
+      <CohortRetentionCard cohorts={cohorts} />
 
       {!SUPABASE_CONFIGURED ? (
         <div className="rounded-xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
@@ -485,5 +567,115 @@ export default async function AdminClientsPage({
         </div>
       )}
     </div>
+  );
+}
+
+function CohortRetentionCard({ cohorts }: { cohorts: CohortBucket[] }) {
+  // Show oldest-first so the trend reads left→right naturally (older cohorts
+  // have mature windows, newer ones are still ripening).
+  const ordered = [...cohorts].reverse();
+  const totalSize = ordered.reduce((s, c) => s + c.size, 0);
+  if (totalSize === 0) {
+    // Don't render an empty card — there's no signal to show until we land
+    // at least one delivered project.
+    return null;
+  }
+  return (
+    <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+      <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-4 flex items-center gap-2">
+        <Repeat className="w-3.5 h-3.5 text-zinc-400" />
+        코호트 리텐션 (월별 첫 납품 → 2번째 납품까지 N일 이내)
+      </h2>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-[10px] uppercase text-zinc-500">
+            <tr>
+              <th className="text-left py-1.5 pr-3">코호트</th>
+              <th className="text-right py-1.5 pr-3">신규 클라이언트</th>
+              <th className="text-right py-1.5 pr-3">60d 재구매</th>
+              <th className="text-right py-1.5 pr-3">90d 재구매</th>
+              <th className="text-right py-1.5">180d 재구매</th>
+            </tr>
+          </thead>
+          <tbody className="text-zinc-300">
+            {ordered.map((c) => {
+              const mature60 = cohortWindowMature(c.cohortMonth, 60);
+              const mature90 = cohortWindowMature(c.cohortMonth, 90);
+              const mature180 = cohortWindowMature(c.cohortMonth, 180);
+              return (
+                <tr
+                  key={c.cohortMonth}
+                  className="border-t border-zinc-800/60"
+                >
+                  <td className="py-1.5 pr-3 tabular-nums text-zinc-400">
+                    {c.cohortMonth}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                    {c.size}
+                  </td>
+                  <CohortRateCell
+                    rate={c.repeat60dRate}
+                    count={c.repeat60d}
+                    mature={mature60}
+                  />
+                  <CohortRateCell
+                    rate={c.repeat90dRate}
+                    count={c.repeat90d}
+                    mature={mature90}
+                  />
+                  <CohortRateCell
+                    rate={c.repeat180dRate}
+                    count={c.repeat180d}
+                    mature={mature180}
+                  />
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-[11px] text-zinc-600 leading-relaxed">
+        흐린 셀은 측정 윈도우가 아직 미성숙 — 시간이 더 지나야 의미 있는 비율이 됩니다. 90일 재구매율이 ≥30% 면 건강한 LTV 채널, 미만이면 단발성 거래가 많다는 신호.
+      </p>
+    </section>
+  );
+}
+
+function CohortRateCell({
+  rate,
+  count,
+  mature,
+}: {
+  rate: number | null;
+  count: number;
+  mature: boolean;
+}) {
+  // Empty cohort or no data yet → em-dash. Immature windows render faded so
+  // the operator doesn't draw conclusions from partial signal.
+  if (rate === null) {
+    return <td className="py-1.5 text-right tabular-nums text-zinc-700">—</td>;
+  }
+  const pct = (rate * 100).toFixed(0);
+  const tone =
+    !mature
+      ? "text-zinc-500"
+      : rate >= 0.3
+      ? "text-emerald-300"
+      : rate > 0
+      ? "text-zinc-200"
+      : "text-zinc-500";
+  return (
+    <td
+      className={`py-1.5 text-right tabular-nums ${tone} ${
+        !mature ? "opacity-60" : ""
+      }`}
+      title={
+        !mature
+          ? "측정 윈도우 미성숙 — 더 지나봐야 정확한 비율이 나옴"
+          : `${count} / cohort`
+      }
+    >
+      {pct}%
+    </td>
   );
 }

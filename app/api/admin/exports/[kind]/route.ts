@@ -8,6 +8,11 @@ import { loadForecast } from "@/lib/analytics/forecast";
 import { wowFromRows } from "@/lib/analytics/week-over-week";
 import { computeMtdRevenue } from "@/lib/analytics/mtd-revenue";
 import { aggregateSearchRows } from "@/lib/analytics/search-log";
+import {
+  computeCohortRetention,
+  cohortWindowMature,
+  type ClientRetentionProjectRow,
+} from "@/lib/analytics/client-retention";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -37,6 +42,7 @@ const KINDS = new Set([
   "mtd",
   "audit",
   "search",
+  "client-retention",
 ]);
 
 export async function GET(
@@ -1028,6 +1034,73 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("search")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "client-retention") {
+    // Cohort table over the trailing N months. We pull a generous 18-month
+    // window so the helper has enough history to detect repeat deliveries
+    // for the oldest cohort it will report on (default = last 6 months,
+    // each cohort needs +180d of trailing data for the longest window).
+    const since18mo = new Date(
+      Date.now() - 18 * 30 * 86_400_000
+    ).toISOString();
+    const { data, error } = await supabase
+      .from("projects")
+      .select("client_id, invoice_amount, updated_at")
+      .eq("status", "delivered")
+      .gte("updated_at", since18mo)
+      .limit(10_000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    const rows = ((data ?? []) as {
+      client_id: string | null;
+      invoice_amount: number | null;
+      updated_at: string;
+    }[]).map<ClientRetentionProjectRow>((r) => ({
+      client_id: r.client_id,
+      invoice_amount: r.invoice_amount,
+      delivered_at: r.updated_at,
+    }));
+    const cohorts = computeCohortRetention(rows, { months: 12 });
+    const csvRows = cohorts.map((c) => ({
+      cohort_month: c.cohortMonth,
+      cohort_size: c.size,
+      repeat_60d_count: c.repeat60d,
+      repeat_90d_count: c.repeat90d,
+      repeat_180d_count: c.repeat180d,
+      repeat_60d_pct:
+        c.repeat60dRate !== null ? (c.repeat60dRate * 100).toFixed(2) : "",
+      repeat_90d_pct:
+        c.repeat90dRate !== null ? (c.repeat90dRate * 100).toFixed(2) : "",
+      repeat_180d_pct:
+        c.repeat180dRate !== null ? (c.repeat180dRate * 100).toFixed(2) : "",
+      mature_60d: cohortWindowMature(c.cohortMonth, 60) ? "yes" : "no",
+      mature_90d: cohortWindowMature(c.cohortMonth, 90) ? "yes" : "no",
+      mature_180d: cohortWindowMature(c.cohortMonth, 180) ? "yes" : "no",
+    }));
+    const csv = toCSV(csvRows, [
+      "cohort_month",
+      "cohort_size",
+      "repeat_60d_count",
+      "repeat_60d_pct",
+      "mature_60d",
+      "repeat_90d_count",
+      "repeat_90d_pct",
+      "mature_90d",
+      "repeat_180d_count",
+      "repeat_180d_pct",
+      "mature_180d",
+    ] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "client-retention"
+        )}"`,
         "Cache-Control": "no-store",
       },
     });
