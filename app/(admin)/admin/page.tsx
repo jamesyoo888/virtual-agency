@@ -17,6 +17,14 @@ import {
   aggregateDailyRevenue,
   type DailyRevenueBucket,
 } from "@/lib/analytics/daily";
+import {
+  computeAtRiskClients,
+  computeCohortRetention,
+  cohortWindowMature,
+  type AtRiskClient,
+  type CohortBucket,
+  type ClientRetentionProjectRow,
+} from "@/lib/analytics/client-retention";
 import AdminCopySummary from "@/components/admin-copy-summary";
 import DailyRevenueSparkline from "@/components/daily-revenue-sparkline";
 import {
@@ -106,22 +114,77 @@ async function loadStuckPipeline(): Promise<StuckPipeline> {
   };
 }
 
-async function loadTopClients(): Promise<TopClientAggregate[]> {
-  if (!SUPABASE_CONFIGURED) return [];
+interface ClientAnalyticsSnapshot {
+  topClients: TopClientAggregate[];
+  atRiskClients: AtRiskClient[];
+  /** Trailing 6 monthly cohorts × 60/90/180d windows. */
+  cohorts: CohortBucket[];
+}
+
+async function loadClientAnalytics(): Promise<ClientAnalyticsSnapshot> {
+  if (!SUPABASE_CONFIGURED) {
+    return { topClients: [], atRiskClients: [], cohorts: [] };
+  }
   const supabase = await createClient();
-  // 90 days of delivered revenue rolled up by client. Cap rows so one
-  // runaway month still returns in a single query — the aggregation itself
-  // lives in lib/analytics/top-clients for testability.
-  const since90 = new Date(Date.now() - 90 * 86_400_000).toISOString();
+  // Single delivered-projects fetch feeds top contributors, at-risk LTV, and
+  // cohort retention. 18 months covers both at-risk lookback and the longest
+  // cohort window so we don't issue separate queries.
+  const since18mo = new Date(
+    Date.now() - 18 * 30 * 86_400_000
+  ).toISOString();
   const { data } = await supabase
     .from("projects")
     .select(
-      "client_id, invoice_amount, client:clients(company, email)"
+      "client_id, invoice_amount, updated_at, client:clients(company, email)"
     )
     .eq("status", "delivered")
-    .gte("updated_at", since90)
-    .limit(5000);
-  return aggregateTopClients((data ?? []) as DeliveredProjectRow[], 5);
+    .gte("updated_at", since18mo)
+    .limit(10_000);
+
+  type Row = {
+    client_id: string | null;
+    invoice_amount: number | null;
+    updated_at: string;
+    client?:
+      | { company: string | null; email: string | null }
+      | { company: string | null; email: string | null }[]
+      | null;
+  };
+  const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
+    Array.isArray(v) ? v[0] ?? null : v ?? null;
+  const rows = ((data ?? []) as Row[]).map((r) => ({
+    client_id: r.client_id,
+    invoice_amount: r.invoice_amount,
+    updated_at: r.updated_at,
+    client: pickOne(r.client),
+  }));
+
+  // Top contributors stay scoped to the original 90d window for parity with
+  // the existing card. The other two helpers want the full 18-month dataset.
+  const ninetyAgoMs = Date.now() - 90 * 86_400_000;
+  const top90dRows: DeliveredProjectRow[] = rows
+    .filter((r) => new Date(r.updated_at).getTime() >= ninetyAgoMs)
+    .map((r) => ({
+      client_id: r.client_id,
+      invoice_amount: r.invoice_amount,
+      client: r.client,
+    }));
+  const retentionRows: ClientRetentionProjectRow[] = rows.map((r) => ({
+    client_id: r.client_id,
+    invoice_amount: r.invoice_amount,
+    delivered_at: r.updated_at,
+    client: r.client,
+  }));
+
+  return {
+    topClients: aggregateTopClients(top90dRows, 5),
+    atRiskClients: computeAtRiskClients(retentionRows, {
+      minDelivered: 2,
+      silentDays: 60,
+      limit: 20,
+    }),
+    cohorts: computeCohortRetention(retentionRows, { months: 6 }),
+  };
 }
 
 interface TrendingNowRow {
@@ -349,7 +412,7 @@ export default async function AdminHomePage() {
     wowDaily,
     trendingNow,
     mtd,
-    topClients,
+    clientAnalytics,
     stuck,
   ] = await Promise.all([
     loadKPIs(),
@@ -363,11 +426,12 @@ export default async function AdminHomePage() {
     loadWowAndDailyRevenue(),
     loadTrendingNow(),
     loadMtdRevenue(),
-    loadTopClients(),
+    loadClientAnalytics(),
     loadStuckPipeline(),
   ]);
   const wow = wowDaily.wow;
   const dailyRevenue = wowDaily.daily;
+  const { topClients, atRiskClients, cohorts } = clientAnalytics;
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
@@ -480,6 +544,80 @@ export default async function AdminHomePage() {
           </div>
         </Link>
       )}
+
+      {(atRiskClients.length > 0 || cohorts.some((c) => c.size > 0)) && (() => {
+        // Retention summary = avg 90d repeat rate across MATURE cohorts only.
+        // Immature cohorts would drag the number down because their window
+        // hasn't fully elapsed yet, distorting the trend signal.
+        const mature90 = cohorts.filter(
+          (c) => c.size > 0 && cohortWindowMature(c.cohortMonth, 90)
+        );
+        const avg90 =
+          mature90.length > 0
+            ? mature90.reduce((s, c) => s + (c.repeat90dRate ?? 0), 0) /
+              mature90.length
+            : null;
+        const atRiskLtv = atRiskClients.reduce(
+          (s, c) => s + c.totalRevenue,
+          0
+        );
+        return (
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link
+              href="/admin/clients?filter=at-risk"
+              className={`block rounded-xl border p-5 transition-colors ${
+                atRiskClients.length > 0
+                  ? "border-rose-500/40 bg-rose-500/5 hover:bg-rose-500/10"
+                  : "border-zinc-800 bg-zinc-900/40 hover:bg-zinc-900"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
+                  LTV at-risk 광고주
+                </p>
+                <Users className="w-4 h-4 text-zinc-500" />
+              </div>
+              <p
+                className={`mt-3 text-2xl font-bold tabular-nums ${
+                  atRiskClients.length > 0 ? "text-rose-200" : "text-zinc-300"
+                }`}
+              >
+                {atRiskClients.length}
+              </p>
+              <p className="mt-1 text-[11px] text-zinc-500 tabular-nums">
+                ₩{atRiskLtv.toLocaleString("ko-KR")} 누적 LTV · 재활성화 타깃 →
+              </p>
+            </Link>
+            <Link
+              href="/admin/clients"
+              className="block rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 hover:bg-zinc-900 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
+                  90일 재구매율 (mature cohorts)
+                </p>
+                <TrendingUp className="w-4 h-4 text-zinc-500" />
+              </div>
+              <p
+                className={`mt-3 text-2xl font-bold tabular-nums ${
+                  avg90 === null
+                    ? "text-zinc-500"
+                    : avg90 >= 0.3
+                    ? "text-emerald-300"
+                    : "text-zinc-200"
+                }`}
+              >
+                {avg90 === null ? "—" : `${(avg90 * 100).toFixed(0)}%`}
+              </p>
+              <p className="mt-1 text-[11px] text-zinc-500">
+                {mature90.length > 0
+                  ? `${mature90.length}개 코호트 평균 · 30% 이상이 건강한 LTV 채널`
+                  : "코호트 데이터 축적 중 — 90일 더 지나야 의미 있는 값"}
+              </p>
+            </Link>
+          </section>
+        );
+      })()}
 
       {mtd.mtdRevenue > 0 || mtd.priorMonthTotal > 0 ? (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
