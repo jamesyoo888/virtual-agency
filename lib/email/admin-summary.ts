@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { aggregateSearchRows } from "@/lib/analytics/search-log";
+import {
+  computeAtRiskClients,
+  computeCohortRetention,
+  cohortWindowMature,
+  type ClientRetentionProjectRow,
+} from "@/lib/analytics/client-retention";
 
 /**
  * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
@@ -19,6 +25,17 @@ export interface AdminWeeklySummary {
   topSearches: { q: string; count: number; avgResults: number }[];
   zeroResultSearches: { q: string; count: number }[];
   revenue30dKrw: number;
+  /** Count of clients with ≥2 delivered projects, silent ≥60d. */
+  atRiskCount: number;
+  /** Lifetime revenue of those at-risk clients — represents the LTV in jeopardy. */
+  atRiskLtvKrw: number;
+  /**
+   * Average 90d repeat-delivery rate across MATURE cohorts only (windows
+   * whose 90-day clock has fully elapsed). null when no mature cohorts.
+   */
+  retention90dPct: number | null;
+  /** Number of mature cohorts the retention pct was computed over. */
+  retention90dCohortCount: number;
 }
 
 interface SearchLogRow {
@@ -37,6 +54,10 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
     const thirtyAgo = isoDaysAgo(30);
     const nowIso = new Date().toISOString();
 
+    // 18 months covers both at-risk silence detection (60d) and the longest
+    // cohort window (180d) without a second query.
+    const since18mo = isoDaysAgo(18 * 30);
+
     const [
       inquiries,
       inquiriesNoFollowup,
@@ -46,6 +67,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       pendingReviews,
       searchRows,
       revenueRows,
+      retentionRows,
     ] = await Promise.all([
       supabase
         .from("projects")
@@ -88,6 +110,12 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
         .eq("status", "delivered")
         .gte("updated_at", thirtyAgo)
         .limit(1000),
+      supabase
+        .from("projects")
+        .select("client_id, invoice_amount, updated_at")
+        .eq("status", "delivered")
+        .gte("updated_at", since18mo)
+        .limit(10_000),
     ]);
 
     const searchAgg = aggregateSearchRows(
@@ -100,6 +128,32 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
 
     const revenue30dKrw = ((revenueRows.data ?? []) as { invoice_amount: number | null }[])
       .reduce((sum, r) => sum + (typeof r.invoice_amount === "number" ? r.invoice_amount : 0), 0);
+
+    const retentionFlat: ClientRetentionProjectRow[] = (
+      (retentionRows.data ?? []) as {
+        client_id: string | null;
+        invoice_amount: number | null;
+        updated_at: string;
+      }[]
+    ).map((r) => ({
+      client_id: r.client_id,
+      invoice_amount: r.invoice_amount,
+      delivered_at: r.updated_at,
+    }));
+    const atRiskList = computeAtRiskClients(retentionFlat, {
+      minDelivered: 2,
+      silentDays: 60,
+      limit: 100, // upper bound for digest counting; UI cap is separate
+    });
+    const cohortList = computeCohortRetention(retentionFlat, { months: 6 });
+    const matureCohorts = cohortList.filter(
+      (c) => c.size > 0 && cohortWindowMature(c.cohortMonth, 90)
+    );
+    const retention90dPct =
+      matureCohorts.length > 0
+        ? matureCohorts.reduce((s, c) => s + (c.repeat90dRate ?? 0), 0) /
+          matureCohorts.length
+        : null;
 
     return {
       windowStart: sevenAgo,
@@ -120,6 +174,10 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
         count: t.zeroResultCount,
       })),
       revenue30dKrw,
+      atRiskCount: atRiskList.length,
+      atRiskLtvKrw: atRiskList.reduce((s, c) => s + c.totalRevenue, 0),
+      retention90dPct,
+      retention90dCohortCount: matureCohorts.length,
     };
   } catch (err) {
     console.warn("[admin-summary] build failed:", err);
@@ -159,6 +217,16 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
   lines.push(`뉴스레터 신규 구독: ${s.newsletterSignups}`);
   lines.push(`대기 중인 리뷰 모더레이션: ${s.pendingReviews}`);
   lines.push(`30일 매출 (납품 견적 합): ₩${s.revenue30dKrw.toLocaleString("ko-KR")}`);
+  if (s.atRiskCount > 0) {
+    lines.push(
+      `LTV at-risk 광고주: ${s.atRiskCount}건 / 누적 ₩${s.atRiskLtvKrw.toLocaleString("ko-KR")} (2건+ 납품, 60일+ 침묵)`
+    );
+  }
+  if (s.retention90dPct !== null) {
+    lines.push(
+      `90일 재구매율 (mature ${s.retention90dCohortCount}개 코호트 평균): ${(s.retention90dPct * 100).toFixed(0)}%`
+    );
+  }
   lines.push("");
   if (s.topSearches.length > 0) {
     lines.push("인기 검색어 (7일):");
@@ -212,6 +280,12 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
       ${stat("뉴스레터", s.newsletterSignups)}
       ${stat("대기 리뷰", s.pendingReviews)}
       ${stat("30일 매출", `₩${s.revenue30dKrw.toLocaleString("ko-KR")}`)}
+      ${s.atRiskCount > 0 ? stat("LTV at-risk", `${s.atRiskCount}건`) : ""}
+      ${
+        s.retention90dPct !== null
+          ? stat("90일 재구매율", `${(s.retention90dPct * 100).toFixed(0)}%`)
+          : ""
+      }
     </div>
     <h3 style="margin:24px 0 8px;font-size:14px;color:#fafafa">인기 검색어</h3>
     ${list(s.topSearches.map((t) => ({ q: t.q, n: `${t.count}회 · 평균 ${t.avgResults}` })))}

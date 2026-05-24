@@ -23,6 +23,10 @@ const fixture: AdminWeeklySummary = {
     { q: "wedding", count: 2 },
   ],
   revenue30dKrw: 23_500_000,
+  atRiskCount: 3,
+  atRiskLtvKrw: 18_000_000,
+  retention90dPct: 0.42,
+  retention90dCohortCount: 4,
 };
 
 describe("formatAdminSummaryText", () => {
@@ -53,6 +57,26 @@ describe("formatAdminSummaryText", () => {
     expect(out).not.toMatch(/인기 검색어/);
     expect(out).not.toMatch(/0결과 검색어/);
   });
+
+  it("includes at-risk and retention lines when present", () => {
+    const out = formatAdminSummaryText(fixture);
+    expect(out).toMatch(/LTV at-risk 광고주: 3건/);
+    expect(out).toMatch(/누적 ₩18,000,000/);
+    expect(out).toMatch(/90일 재구매율 .* 42%/);
+  });
+
+  it("hides at-risk and retention lines when no signal", () => {
+    const quiet: AdminWeeklySummary = {
+      ...fixture,
+      atRiskCount: 0,
+      atRiskLtvKrw: 0,
+      retention90dPct: null,
+      retention90dCohortCount: 0,
+    };
+    const out = formatAdminSummaryText(quiet);
+    expect(out).not.toMatch(/LTV at-risk/);
+    expect(out).not.toMatch(/90일 재구매율/);
+  });
 });
 
 describe("formatAdminSummaryHtml", () => {
@@ -76,5 +100,26 @@ describe("formatAdminSummaryHtml", () => {
     expect(html).toContain("신규 문의");
     expect(html).toContain("팔로업 필요");
     expect(html).toContain("30일 매출");
+  });
+
+  it("renders at-risk and retention stat blocks when populated", () => {
+    const html = formatAdminSummaryHtml(fixture, "https://example.com");
+    expect(html).toContain("LTV at-risk");
+    expect(html).toContain("3건");
+    expect(html).toContain("90일 재구매율");
+    expect(html).toContain("42%");
+  });
+
+  it("hides at-risk and retention blocks when signal absent", () => {
+    const quiet: AdminWeeklySummary = {
+      ...fixture,
+      atRiskCount: 0,
+      atRiskLtvKrw: 0,
+      retention90dPct: null,
+      retention90dCohortCount: 0,
+    };
+    const html = formatAdminSummaryHtml(quiet, "https://example.com");
+    expect(html).not.toContain("LTV at-risk");
+    expect(html).not.toContain("90일 재구매율");
   });
 });
