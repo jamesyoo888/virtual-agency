@@ -4,6 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { loadForecast } from "@/lib/analytics/forecast";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
+import { loadSlowOpenProjects } from "@/lib/analytics/slow-open-projects";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +20,11 @@ const STAGE_LABEL: Record<string, string> = {
 };
 
 export default async function ForecastPage() {
-  const [r, velocity, stageTiming] = await Promise.all([
+  const [r, velocity, stageTiming, slowOpen] = await Promise.all([
     loadForecast(),
     loadPipelineVelocity(90),
     loadStageTiming(90),
+    loadSlowOpenProjects(5),
   ]);
 
   return (
@@ -467,6 +469,57 @@ export default async function ForecastPage() {
               <p className="mt-3 text-[11px] text-zinc-500">
                 컬럼: 표본수 · 중앙값 · p90 · 전체 lead time 점유율. 점유율 막대는 stage 가 calendar 의 어느 비중을 먹는지 — 중앙값과 같이 봐야 함 (드물지만 길거나, 매번 적당히 긴 차이).
               </p>
+            </section>
+          )}
+
+          {slowOpen.length > 0 && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+              <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-1">
+                지금 가장 오래 멈춰있는 열린 프로젝트 Top {slowOpen.length}
+              </h2>
+              <p className="text-[11px] text-zinc-500 mb-3">
+                in_progress / review 단계만 — 영업 follow-up 1순위. 클릭 → 내부 노트·견적 편집·전이.
+              </p>
+              <ul className="space-y-1.5">
+                {slowOpen.map((p) => {
+                  const tone =
+                    p.daysInStage >= 14
+                      ? "text-rose-300"
+                      : p.daysInStage >= 7
+                      ? "text-amber-300"
+                      : "text-zinc-300";
+                  return (
+                    <li
+                      key={p.id}
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      <span className="w-20 shrink-0 text-zinc-500 tabular-nums text-xs uppercase">
+                        {STAGE_LABEL[p.status] ?? p.status}
+                      </span>
+                      <Link
+                        href={`/admin/projects/${p.id}`}
+                        className="flex-1 truncate text-zinc-200 hover:text-white"
+                        title={p.title}
+                      >
+                        {p.title}
+                      </Link>
+                      <span className="shrink-0 text-xs text-zinc-500 truncate max-w-[12rem]">
+                        {p.modelName ?? "—"}
+                      </span>
+                      <span className="shrink-0 text-xs text-zinc-500 tabular-nums w-24 text-right">
+                        {p.invoiceAmount
+                          ? `₩${KRW.format(p.invoiceAmount)}`
+                          : "—"}
+                      </span>
+                      <span
+                        className={`shrink-0 text-sm font-medium tabular-nums w-16 text-right ${tone}`}
+                      >
+                        {p.daysInStage}d
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </section>
           )}
 
