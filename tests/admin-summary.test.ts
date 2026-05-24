@@ -27,6 +27,9 @@ const fixture: AdminWeeklySummary = {
   atRiskLtvKrw: 18_000_000,
   retention90dPct: 0.42,
   retention90dCohortCount: 4,
+  velocityMedianDays: 5.4,
+  velocityP90Days: 12.1,
+  velocityCount: 8,
 };
 
 describe("formatAdminSummaryText", () => {
@@ -77,6 +80,33 @@ describe("formatAdminSummaryText", () => {
     expect(out).not.toMatch(/LTV at-risk/);
     expect(out).not.toMatch(/90일 재구매율/);
   });
+
+  it("includes velocity line with median + p90 + count when present", () => {
+    const out = formatAdminSummaryText(fixture);
+    expect(out).toMatch(/납품 lead time .* 중앙값 5\.4d.*p90 12\.1d.*8건/);
+  });
+
+  it("hides velocity line when count is zero", () => {
+    const noVelocity: AdminWeeklySummary = {
+      ...fixture,
+      velocityMedianDays: null,
+      velocityP90Days: null,
+      velocityCount: 0,
+    };
+    expect(formatAdminSummaryText(noVelocity)).not.toMatch(/납품 lead time/);
+  });
+
+  it("omits p90 from velocity line when null (n<5)", () => {
+    const small: AdminWeeklySummary = {
+      ...fixture,
+      velocityMedianDays: 6.2,
+      velocityP90Days: null,
+      velocityCount: 3,
+    };
+    const out = formatAdminSummaryText(small);
+    expect(out).toMatch(/납품 lead time .* 중앙값 6\.2d · 3건/);
+    expect(out).not.toMatch(/p90/);
+  });
 });
 
 describe("formatAdminSummaryHtml", () => {
@@ -121,5 +151,24 @@ describe("formatAdminSummaryHtml", () => {
     const html = formatAdminSummaryHtml(quiet, "https://example.com");
     expect(html).not.toContain("LTV at-risk");
     expect(html).not.toContain("90일 재구매율");
+  });
+
+  it("renders velocity stat block when populated", () => {
+    const html = formatAdminSummaryHtml(fixture, "https://example.com");
+    expect(html).toContain("납품 lead time");
+    expect(html).toContain("5.4d");
+  });
+
+  it("hides velocity stat when count is zero", () => {
+    const html = formatAdminSummaryHtml(
+      {
+        ...fixture,
+        velocityMedianDays: null,
+        velocityP90Days: null,
+        velocityCount: 0,
+      },
+      "https://example.com"
+    );
+    expect(html).not.toContain("납품 lead time");
   });
 });

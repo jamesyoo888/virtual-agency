@@ -27,6 +27,7 @@ import {
   type CohortBucket,
   type ClientRetentionProjectRow,
 } from "@/lib/analytics/client-retention";
+import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import AdminCopySummary from "@/components/admin-copy-summary";
 import DailyRevenueSparkline, {
   DailyCountSparkline,
@@ -425,6 +426,7 @@ export default async function AdminHomePage() {
     mtd,
     clientAnalytics,
     stuck,
+    velocity,
   ] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
@@ -439,6 +441,7 @@ export default async function AdminHomePage() {
     loadMtdRevenue(),
     loadClientAnalytics(),
     loadStuckPipeline(),
+    loadPipelineVelocity(90),
   ]);
   const wow = wowDaily.wow;
   const dailyRevenue = wowDaily.daily;
@@ -496,6 +499,13 @@ export default async function AdminHomePage() {
               : null,
             retentionAvg !== null
               ? `90일 재구매율 (mature ${matureCohorts90.length}개 평균): ${(retentionAvg * 100).toFixed(0)}%`
+              : null,
+            velocity.n > 0 && velocity.medianDays !== null
+              ? `납품 lead time (90d 중앙값): ${velocity.medianDays.toFixed(1)}d${
+                  velocity.p90Days !== null
+                    ? ` · p90 ${velocity.p90Days.toFixed(1)}d`
+                    : ""
+                } · ${velocity.n}건`
               : null,
           ]
             .filter(Boolean)
@@ -579,7 +589,9 @@ export default async function AdminHomePage() {
         </Link>
       )}
 
-      {(atRiskClients.length > 0 || cohorts.some((c) => c.size > 0)) && (() => {
+      {(atRiskClients.length > 0 ||
+        cohorts.some((c) => c.size > 0) ||
+        velocity.n > 0) && (() => {
         // Retention summary = avg 90d repeat rate across MATURE cohorts only.
         // Immature cohorts would drag the number down because their window
         // hasn't fully elapsed yet, distorting the trend signal.
@@ -595,8 +607,12 @@ export default async function AdminHomePage() {
           (s, c) => s + c.totalRevenue,
           0
         );
+        const gridCols =
+          velocity.n > 0
+            ? "grid-cols-1 md:grid-cols-3"
+            : "grid-cols-1 md:grid-cols-2";
         return (
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <section className={`grid ${gridCols} gap-4`}>
             <Link
               href="/admin/clients?filter=at-risk"
               className={`block rounded-xl border p-5 transition-colors ${
@@ -649,6 +665,39 @@ export default async function AdminHomePage() {
                   : "코호트 데이터 축적 중 — 90일 더 지나야 의미 있는 값"}
               </p>
             </Link>
+            {velocity.n > 0 && (
+              <Link
+                href="/admin/forecast"
+                className="block rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 hover:bg-zinc-900 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-xs uppercase tracking-wider text-zinc-500">
+                    납품 lead time (90일 중앙값)
+                  </p>
+                  <Timer className="w-4 h-4 text-zinc-500" />
+                </div>
+                <p
+                  className={`mt-3 text-2xl font-bold tabular-nums ${
+                    velocity.medianDays === null
+                      ? "text-zinc-500"
+                      : velocity.medianDays <= 7
+                      ? "text-emerald-300"
+                      : velocity.medianDays >= 21
+                      ? "text-rose-300"
+                      : "text-zinc-200"
+                  }`}
+                >
+                  {velocity.medianDays === null
+                    ? "—"
+                    : `${velocity.medianDays.toFixed(1)}d`}
+                </p>
+                <p className="mt-1 text-[11px] text-zinc-500 tabular-nums">
+                  {velocity.p90Days !== null
+                    ? `${velocity.n}건 · p90 ${velocity.p90Days.toFixed(1)}d`
+                    : `${velocity.n}건 측정`}
+                </p>
+              </Link>
+            )}
           </section>
         );
       })()}

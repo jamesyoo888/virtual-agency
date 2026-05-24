@@ -7,6 +7,7 @@ import {
   cohortWindowMature,
   type ClientRetentionProjectRow,
 } from "@/lib/analytics/client-retention";
+import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 
 /**
  * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
@@ -36,6 +37,14 @@ export interface AdminWeeklySummary {
   retention90dPct: number | null;
   /** Number of mature cohorts the retention pct was computed over. */
   retention90dCohortCount: number;
+  /**
+   * 90-day inquiry→delivered lead-time stats. Median + p90 (in days) + the
+   * number of deliveries in the window. Nulls when the window is empty or
+   * too small to publish p90 (n<5).
+   */
+  velocityMedianDays: number | null;
+  velocityP90Days: number | null;
+  velocityCount: number;
 }
 
 interface SearchLogRow {
@@ -68,6 +77,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       searchRows,
       revenueRows,
       retentionRows,
+      velocity,
     ] = await Promise.all([
       supabase
         .from("projects")
@@ -116,6 +126,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
         .eq("status", "delivered")
         .gte("updated_at", since18mo)
         .limit(10_000),
+      loadPipelineVelocity(90),
     ]);
 
     const searchAgg = aggregateSearchRows(
@@ -178,6 +189,9 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       atRiskLtvKrw: atRiskList.reduce((s, c) => s + c.totalRevenue, 0),
       retention90dPct,
       retention90dCohortCount: matureCohorts.length,
+      velocityMedianDays: velocity.medianDays,
+      velocityP90Days: velocity.p90Days,
+      velocityCount: velocity.n,
     };
   } catch (err) {
     console.warn("[admin-summary] build failed:", err);
@@ -225,6 +239,15 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
   if (s.retention90dPct !== null) {
     lines.push(
       `90일 재구매율 (mature ${s.retention90dCohortCount}개 코호트 평균): ${(s.retention90dPct * 100).toFixed(0)}%`
+    );
+  }
+  if (s.velocityCount > 0 && s.velocityMedianDays !== null) {
+    const p90 =
+      s.velocityP90Days !== null
+        ? ` · p90 ${s.velocityP90Days.toFixed(1)}d`
+        : "";
+    lines.push(
+      `납품 lead time (90d, inquiry→delivered): 중앙값 ${s.velocityMedianDays.toFixed(1)}d${p90} · ${s.velocityCount}건`
     );
   }
   lines.push("");
@@ -284,6 +307,14 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
       ${
         s.retention90dPct !== null
           ? stat("90일 재구매율", `${(s.retention90dPct * 100).toFixed(0)}%`)
+          : ""
+      }
+      ${
+        s.velocityCount > 0 && s.velocityMedianDays !== null
+          ? stat(
+              "납품 lead time (중앙값)",
+              `${s.velocityMedianDays.toFixed(1)}d`
+            )
           : ""
       }
     </div>
