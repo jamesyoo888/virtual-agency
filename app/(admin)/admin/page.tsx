@@ -14,7 +14,9 @@ import {
   type TopClientAggregate,
 } from "@/lib/analytics/top-clients";
 import {
+  aggregateDaily,
   aggregateDailyRevenue,
+  type DailyBucket,
   type DailyRevenueBucket,
 } from "@/lib/analytics/daily";
 import {
@@ -26,7 +28,9 @@ import {
   type ClientRetentionProjectRow,
 } from "@/lib/analytics/client-retention";
 import AdminCopySummary from "@/components/admin-copy-summary";
-import DailyRevenueSparkline from "@/components/daily-revenue-sparkline";
+import DailyRevenueSparkline, {
+  DailyCountSparkline,
+} from "@/components/daily-revenue-sparkline";
 import {
   Users,
   Inbox,
@@ -217,17 +221,20 @@ interface WowSnapshot {
 async function loadWowAndDailyRevenue(): Promise<{
   wow: WowSnapshot;
   daily: DailyRevenueBucket[];
+  dailyInquiries: DailyBucket[];
 }> {
   if (!SUPABASE_CONFIGURED) {
     const empty: WowMetric = { current: 0, previous: 0, delta: 0, pct: null };
     return {
       wow: { inquiries: empty, delivered: empty, revenue: empty },
       daily: aggregateDailyRevenue([], 14),
+      dailyInquiries: aggregateDaily([], 14),
     };
   }
   const supabase = await createClient();
   // 14 days is enough to cover both the WoW current+previous buckets and
-  // the daily-revenue sparkline window — one delivered fetch feeds both.
+  // the two sparkline windows — one delivered fetch + one inquiry fetch
+  // power all four widgets.
   const since14 = new Date(Date.now() - 14 * 86_400_000).toISOString();
   const [{ data: inqRows }, { data: delRows }] = await Promise.all([
     supabase
@@ -242,13 +249,16 @@ async function loadWowAndDailyRevenue(): Promise<{
       .gte("updated_at", since14)
       .limit(5000),
   ]);
+  // Same rows feed both the WoW chip (current vs prior 7d) and the daily
+  // sparkline — keeps the two views from disagreeing on the lead count.
+  const inquiriesAll = (inqRows ?? []) as { created_at: string }[];
   const delivered = (delRows ?? []) as {
     updated_at: string;
     invoice_amount: number | null;
   }[];
   return {
     wow: {
-      inquiries: wowFromRows((inqRows ?? []) as { created_at: string }[]),
+      inquiries: wowFromRows(inquiriesAll),
       delivered: wowFromRows(delivered, { dateField: "updated_at" }),
       revenue: wowFromRows(delivered, {
         dateField: "updated_at",
@@ -256,6 +266,7 @@ async function loadWowAndDailyRevenue(): Promise<{
       }),
     },
     daily: aggregateDailyRevenue(delivered, 14),
+    dailyInquiries: aggregateDaily(inquiriesAll, 14),
   };
 }
 
@@ -431,6 +442,7 @@ export default async function AdminHomePage() {
   ]);
   const wow = wowDaily.wow;
   const dailyRevenue = wowDaily.daily;
+  const dailyInquiries = wowDaily.dailyInquiries;
   const { topClients, atRiskClients, cohorts } = clientAnalytics;
 
   return (
@@ -772,38 +784,88 @@ export default async function AdminHomePage() {
         </section>
       )}
 
-      {dailyRevenue.some((b) => b.revenue > 0) && (() => {
+      {(dailyRevenue.some((b) => b.revenue > 0) ||
+        dailyInquiries.some((b) => b.count > 0)) && (() => {
         // Summary stats from the same dense series so the chart, the headline
         // total, and the "high day" caption can never disagree.
         const total = dailyRevenue.reduce((s, b) => s + b.revenue, 0);
         const totalCount = dailyRevenue.reduce((s, b) => s + b.count, 0);
         const activeDays = dailyRevenue.filter((b) => b.revenue > 0).length;
-        const peak = dailyRevenue.reduce((best, b) =>
-          b.revenue > best.revenue ? b : best
+        const peak = dailyRevenue.reduce(
+          (best, b) => (b.revenue > best.revenue ? b : best),
+          dailyRevenue[0] ?? { date: "", revenue: 0, count: 0 }
+        );
+        const inqTotal = dailyInquiries.reduce((s, b) => s + b.count, 0);
+        const inqActiveDays = dailyInquiries.filter((b) => b.count > 0).length;
+        const inqPeak = dailyInquiries.reduce(
+          (best, b) => (b.count > best.count ? b : best),
+          dailyInquiries[0] ?? { date: "", count: 0 }
         );
         return (
           <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-            <div className="flex items-start justify-between mb-3 gap-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 mb-4">
+              지난 14일 추세
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
-                  일별 매출 (지난 14일)
-                </h2>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  총 ₩{new Intl.NumberFormat("ko-KR").format(total)} · {totalCount}건 납품 · {activeDays}일 활성
-                </p>
+                <div className="flex items-start justify-between mb-3 gap-4">
+                  <div>
+                    <h3 className="text-xs uppercase tracking-wider text-zinc-400">
+                      일별 매출
+                    </h3>
+                    <p className="text-xs text-zinc-500 mt-0.5">
+                      총 ₩{new Intl.NumberFormat("ko-KR").format(total)} · {totalCount}건 · {activeDays}일 활성
+                    </p>
+                  </div>
+                  {peak.revenue > 0 && (
+                    <div className="text-right shrink-0">
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                        최고일
+                      </p>
+                      <p className="text-[11px] text-zinc-300 tabular-nums">
+                        {peak.date}
+                      </p>
+                      <p className="text-[11px] text-zinc-300 tabular-nums">
+                        ₩{new Intl.NumberFormat("ko-KR").format(peak.revenue)}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <DailyRevenueSparkline buckets={dailyRevenue} width={420} />
               </div>
-              <div className="text-right shrink-0">
-                <p className="text-[11px] text-zinc-500 uppercase tracking-wider">
-                  최고일
-                </p>
-                <p className="text-xs text-zinc-300 tabular-nums">
-                  {peak.date} · ₩{new Intl.NumberFormat("ko-KR").format(peak.revenue)}
-                </p>
+              <div>
+                <div className="flex items-start justify-between mb-3 gap-4">
+                  <div>
+                    <h3 className="text-xs uppercase tracking-wider text-zinc-400">
+                      일별 신규 문의
+                    </h3>
+                    <p className="text-xs text-zinc-500 mt-0.5">
+                      총 {inqTotal}건 · {inqActiveDays}일 활성
+                    </p>
+                  </div>
+                  {inqPeak.count > 0 && (
+                    <div className="text-right shrink-0">
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                        최고일
+                      </p>
+                      <p className="text-[11px] text-zinc-300 tabular-nums">
+                        {inqPeak.date}
+                      </p>
+                      <p className="text-[11px] text-zinc-300 tabular-nums">
+                        {inqPeak.count}건
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <DailyCountSparkline
+                  buckets={dailyInquiries}
+                  width={420}
+                  ariaLabel="지난 14일 신규 문의"
+                />
               </div>
             </div>
-            <DailyRevenueSparkline buckets={dailyRevenue} width={720} />
-            <p className="mt-2 text-[11px] text-zinc-600">
-              막대에 마우스를 올리면 일별 금액·건수가 표시됩니다. 회색은 0원 (납품 없음).
+            <p className="mt-3 text-[11px] text-zinc-600">
+              막대에 마우스를 올리면 일별 값이 표시됩니다. 회색은 0건/0원 (해당일 활동 없음).
             </p>
           </section>
         );

@@ -73,3 +73,79 @@ export default function DailyRevenueSparkline({
     </svg>
   );
 }
+
+interface CountProps {
+  buckets: { date: string; count: number }[];
+  width?: number;
+  highlightLast?: boolean;
+  /** Tooltip suffix — e.g. "건" or "회". Defaults to "건". */
+  unit?: string;
+  /** Aria label override (defaults to a generic Korean label). */
+  ariaLabel?: string;
+  /** Bar colors. Defaults to amber for inquiry-style metrics. */
+  fillActive?: string;
+  fillLast?: string;
+}
+
+/**
+ * Same visual contract as `DailyRevenueSparkline` but for plain count series
+ * (inquiries, signups, etc.). Kept as a sibling component so the typings stay
+ * exact — generalizing both into one generic over a value-extractor would
+ * obscure the contract for the 80% case.
+ */
+export function DailyCountSparkline({
+  buckets,
+  width = 360,
+  highlightLast = true,
+  unit = "건",
+  ariaLabel,
+  fillActive = "#f59e0b" /* amber-500 */,
+  fillLast = "#fbbf24" /* amber-400 */,
+}: CountProps) {
+  if (buckets.length === 0) return null;
+  const height = Math.round(width / 6);
+  const paddingY = 2;
+  const usableH = height - paddingY * 2;
+  const max = Math.max(...buckets.map((b) => b.count), 1);
+  const barGap = 2;
+  const barW = Math.max(
+    1,
+    Math.floor((width - barGap * (buckets.length - 1)) / buckets.length)
+  );
+  return (
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      width={width}
+      height={height}
+      role="img"
+      aria-label={ariaLabel ?? `${buckets.length}일 일별 trend`}
+      className="block"
+    >
+      {buckets.map((b, i) => {
+        const h = max > 0 ? Math.round((b.count / max) * usableH) : 0;
+        const x = i * (barW + barGap);
+        const y = height - paddingY - h;
+        const isLast = i === buckets.length - 1;
+        const isZero = b.count === 0;
+        const fill = isZero
+          ? "#27272a"
+          : isLast && highlightLast
+          ? fillLast
+          : fillActive;
+        return (
+          <rect
+            key={b.date}
+            x={x}
+            y={isZero ? height - paddingY - 1 : y}
+            width={barW}
+            height={isZero ? 1 : h}
+            fill={fill}
+            rx={1}
+          >
+            <title>{`${b.date} · ${b.count}${unit}`}</title>
+          </rect>
+        );
+      })}
+    </svg>
+  );
+}
