@@ -674,6 +674,32 @@ export async function GET(
           value: String(m.value),
         },
       ]),
+      // Per-source rollup (delivered revenue + close rate per utm_source).
+      // Index-prefixed to preserve the value-desc ordering and avoid hash-style
+      // column ambiguity when "(direct)" or symbols are in the source label.
+      ...r.revenueBySource.flatMap((s, i) => [
+        { metric: `revenue_by_source_${i + 1}_source`, value: s.source },
+        {
+          metric: `revenue_by_source_${i + 1}_delivered`,
+          value: String(s.delivered),
+        },
+        {
+          metric: `revenue_by_source_${i + 1}_inquired`,
+          value: String(s.inquired),
+        },
+        {
+          metric: `revenue_by_source_${i + 1}_revenue`,
+          value: String(s.revenue),
+        },
+        {
+          metric: `revenue_by_source_${i + 1}_close_rate`,
+          value: s.closeRate.toFixed(4),
+        },
+        {
+          metric: `revenue_by_source_${i + 1}_share_pct`,
+          value: (s.revenueShare * 100).toFixed(2),
+        },
+      ]),
     ];
     const csv = toCSV(rows, ["metric", "value"] as const);
     return new NextResponse(csv, {

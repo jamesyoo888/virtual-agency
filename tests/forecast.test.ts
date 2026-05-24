@@ -4,6 +4,7 @@ import {
   summarizePipelineByModel,
   computeConfidence,
   summarizePipelineAging,
+  summarizeRevenueBySource,
   PIPELINE_AGE_EDGES,
 } from "@/lib/analytics/forecast";
 
@@ -293,5 +294,108 @@ describe("summarizePipelineByModel", () => {
     ]);
     expect(rows).toHaveLength(1);
     expect(rows[0].model_id).toBe("x");
+  });
+});
+
+describe("summarizeRevenueBySource", () => {
+  it("aggregates delivered revenue and close-rate per source, sorted by revenue desc", () => {
+    const delivered = [
+      {
+        status: "delivered",
+        invoice_amount: 5_000_000,
+        created_at: T,
+        utm_source: "google",
+      },
+      {
+        status: "delivered",
+        invoice_amount: 1_000_000,
+        created_at: T,
+        utm_source: "google",
+      },
+      {
+        status: "delivered",
+        invoice_amount: 8_000_000,
+        created_at: T,
+        utm_source: "naver",
+      },
+    ];
+    const inquired = [
+      ...Array.from({ length: 30 }, () => ({
+        status: "inquiry",
+        invoice_amount: null,
+        created_at: T,
+        utm_source: "google",
+      })),
+      ...Array.from({ length: 10 }, () => ({
+        status: "inquiry",
+        invoice_amount: null,
+        created_at: T,
+        utm_source: "naver",
+      })),
+    ];
+    const r = summarizeRevenueBySource(delivered, inquired);
+    expect(r[0].source).toBe("naver"); // higher revenue
+    expect(r[0].revenue).toBe(8_000_000);
+    expect(r[0].closeRate).toBeCloseTo(0.1); // 1/10
+    expect(r[1].source).toBe("google");
+    expect(r[1].delivered).toBe(2);
+    expect(r[1].closeRate).toBeCloseTo(2 / 30);
+    expect(r[0].revenueShare + r[1].revenueShare).toBeCloseTo(1.0);
+  });
+
+  it("collapses empty/null sources into (direct)", () => {
+    const r = summarizeRevenueBySource(
+      [
+        { status: "delivered", invoice_amount: 100, created_at: T, utm_source: null },
+        { status: "delivered", invoice_amount: 200, created_at: T, utm_source: "" },
+        { status: "delivered", invoice_amount: 50, created_at: T, utm_source: "  " },
+      ],
+      [
+        { status: "inquiry", invoice_amount: null, created_at: T, utm_source: null },
+      ]
+    );
+    expect(r).toHaveLength(1);
+    expect(r[0].source).toBe("(direct)");
+    expect(r[0].delivered).toBe(3);
+    expect(r[0].revenue).toBe(350);
+  });
+
+  it("emits a source with closeRate=0 when inquired rows exist but no deliveries", () => {
+    const r = summarizeRevenueBySource(
+      [],
+      [
+        { status: "inquiry", invoice_amount: null, created_at: T, utm_source: "tiktok" },
+      ]
+    );
+    expect(r).toHaveLength(1);
+    expect(r[0].source).toBe("tiktok");
+    expect(r[0].delivered).toBe(0);
+    expect(r[0].closeRate).toBe(0);
+  });
+
+  it("respects topN cap", () => {
+    const delivered = Array.from({ length: 12 }, (_, i) => ({
+      status: "delivered",
+      invoice_amount: 1000 * (i + 1),
+      created_at: T,
+      utm_source: `src${i}`,
+    }));
+    const r = summarizeRevenueBySource(delivered, [], 3);
+    expect(r).toHaveLength(3);
+    expect(r[0].source).toBe("src11"); // highest revenue
+  });
+
+  it("plugs into ForecastReport so the page can read revenueBySource directly", () => {
+    const r = computeForecast(
+      [],
+      [
+        { status: "delivered", invoice_amount: 1000, created_at: T, utm_source: "ig" },
+      ],
+      [
+        { status: "inquiry", invoice_amount: null, created_at: T, utm_source: "ig" },
+      ]
+    );
+    expect(r.revenueBySource).toHaveLength(1);
+    expect(r.revenueBySource[0].source).toBe("ig");
   });
 });

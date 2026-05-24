@@ -212,6 +212,66 @@ export default async function ForecastPage() {
             </section>
           )}
 
+          {r.revenueBySource.length > 0 && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+              <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-1">
+                채널별 매출 기여 (지난 90일)
+              </h2>
+              <p className="text-[11px] text-zinc-500 mb-3">
+                채널 = utm_source (인콰이어 캡처 시점 기준). close rate 가 평균(
+                {(r.closeRate * 100).toFixed(0)}%)보다 낮으면 inquiry 가 와도 안 닫히는 채널, 높으면 LTV 좋은 채널.
+              </p>
+              <ul className="space-y-2 text-sm">
+                {r.revenueBySource.map((s) => {
+                  const sharePct = s.revenueShare * 100;
+                  const closeVsAvg =
+                    r.closeRate > 0 ? s.closeRate / r.closeRate : 1;
+                  // ±20% threshold to avoid coloring on noise.
+                  const closeTone =
+                    closeVsAvg >= 1.2
+                      ? "text-emerald-300"
+                      : closeVsAvg <= 0.8 && s.inquired > 0
+                      ? "text-rose-300"
+                      : "text-zinc-300";
+                  return (
+                    <li
+                      key={s.source}
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      <span
+                        className="w-28 shrink-0 text-zinc-200 truncate"
+                        title={s.source}
+                      >
+                        {s.source}
+                      </span>
+                      <span className="text-zinc-500 tabular-nums shrink-0 w-14 text-right">
+                        {s.delivered}/{s.inquired}
+                      </span>
+                      <span
+                        className={`tabular-nums shrink-0 w-14 text-right ${closeTone}`}
+                        title="close rate (delivered / inquired)"
+                      >
+                        {(s.closeRate * 100).toFixed(0)}%
+                      </span>
+                      <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500"
+                          style={{ width: `${sharePct}%` }}
+                        />
+                      </div>
+                      <span className="tabular-nums text-zinc-200 shrink-0 w-28 text-right">
+                        ₩{KRW.format(s.revenue)}
+                      </span>
+                      <span className="tabular-nums text-zinc-500 shrink-0 w-12 text-right">
+                        {sharePct.toFixed(0)}%
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
           {r.pipelineAging.some((b) => b.count > 0) && (
             <section
               id="aging"

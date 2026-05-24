@@ -24,6 +24,22 @@ export interface PipelineRow {
   created_at: string;
   model_id?: string | null;
   model_name?: string | null;
+  utm_source?: string | null;
+}
+
+export interface RevenueBySource {
+  /** Canonicalized — empty/null mapped to "(direct)" so the bucket exists. */
+  source: string;
+  /** Delivered count in window. */
+  delivered: number;
+  /** Sum of delivered invoice_amount. */
+  revenue: number;
+  /** Inquired count in window (denominator for closeRate). */
+  inquired: number;
+  /** delivered / inquired, 0 when inquired is 0. */
+  closeRate: number;
+  /** Share of total delivered revenue across all sources (0..1). */
+  revenueShare: number;
 }
 
 export interface PipelineByModel {
@@ -90,6 +106,8 @@ export interface ForecastReport {
   pipelineByModel: PipelineByModel[];
   /** Open pipeline grouped by how long it's been sitting (since created_at). */
   pipelineAging: PipelineAgeBucket[];
+  /** Delivered revenue and close-rate per utm_source over the 90d window. */
+  revenueBySource: RevenueBySource[];
   delivered90dCount: number;
   delivered90dValue: number;
   inquired90dCount: number;
@@ -122,6 +140,59 @@ export function computeConfidence(
   if (deliveredCount < 10 || inquiredCount < 30) return "low";
   if (deliveredCount < 30 || inquiredCount < 100) return "medium";
   return "high";
+}
+
+/**
+ * Per-utm_source delivered revenue + close-rate. Empty/null sources collapse
+ * to "(direct)" so the bucket is always present. Sorted by revenue desc with
+ * delivered count as tiebreak.
+ */
+export function summarizeRevenueBySource(
+  delivered: PipelineRow[],
+  inquired: PipelineRow[],
+  topN: number = 8
+): RevenueBySource[] {
+  const norm = (s: string | null | undefined): string => {
+    const t = (s ?? "").trim();
+    return t.length === 0 ? "(direct)" : t;
+  };
+  const agg = new Map<
+    string,
+    { delivered: number; revenue: number; inquired: number }
+  >();
+  for (const r of delivered) {
+    const key = norm(r.utm_source);
+    const cur = agg.get(key) ?? { delivered: 0, revenue: 0, inquired: 0 };
+    cur.delivered += 1;
+    cur.revenue += r.invoice_amount ?? 0;
+    agg.set(key, cur);
+  }
+  for (const r of inquired) {
+    const key = norm(r.utm_source);
+    const cur = agg.get(key) ?? { delivered: 0, revenue: 0, inquired: 0 };
+    cur.inquired += 1;
+    agg.set(key, cur);
+  }
+  const totalRevenue = Array.from(agg.values()).reduce(
+    (s, a) => s + a.revenue,
+    0
+  );
+  return Array.from(agg.entries())
+    .map(([source, a]) => ({
+      source,
+      delivered: a.delivered,
+      revenue: a.revenue,
+      inquired: a.inquired,
+      closeRate: a.inquired > 0 ? a.delivered / a.inquired : 0,
+      revenueShare: totalRevenue > 0 ? a.revenue / totalRevenue : 0,
+    }))
+    .sort(
+      (a, b) =>
+        b.revenue - a.revenue ||
+        b.delivered - a.delivered ||
+        b.inquired - a.inquired
+    )
+    .slice(0, topN);
 }
 
 export function summarizePipelineByModel(
@@ -197,6 +268,7 @@ export function computeForecast(
     pipelineTotalValue,
     pipelineByModel: summarizePipelineByModel(pipeline),
     pipelineAging: summarizePipelineAging(pipeline),
+    revenueBySource: summarizeRevenueBySource(delivered90d, inquired90d),
     delivered90dCount,
     delivered90dValue,
     inquired90dCount,
@@ -233,13 +305,13 @@ export async function loadForecast(): Promise<ForecastReport | null> {
         .limit(2000),
       supabase
         .from("projects")
-        .select("status, invoice_amount, created_at, updated_at")
+        .select("status, invoice_amount, created_at, updated_at, utm_source")
         .eq("status", "delivered")
         .gte("updated_at", since90)
         .limit(2000),
       supabase
         .from("projects")
-        .select("status, invoice_amount, created_at")
+        .select("status, invoice_amount, created_at, utm_source")
         .gte("created_at", since90)
         .limit(2000),
     ]);
