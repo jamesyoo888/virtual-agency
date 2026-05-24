@@ -9,6 +9,7 @@ import { wowFromRows } from "@/lib/analytics/week-over-week";
 import { computeMtdRevenue } from "@/lib/analytics/mtd-revenue";
 import { aggregateSearchRows } from "@/lib/analytics/search-log";
 import {
+  computeAtRiskClients,
   computeCohortRetention,
   cohortWindowMature,
   type ClientRetentionProjectRow,
@@ -43,6 +44,7 @@ const KINDS = new Set([
   "audit",
   "search",
   "client-retention",
+  "at-risk-clients",
 ]);
 
 export async function GET(
@@ -1060,6 +1062,80 @@ export async function GET(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename("search")}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "at-risk-clients") {
+    // Materialize the at-risk list for offline outreach. Pulls the same 18mo
+    // delivered window the cohort export uses but joins client meta so the
+    // CSV is self-contained (company / email / role) — operator can paste
+    // this straight into a mail-merge tool.
+    const since18mo = new Date(
+      Date.now() - 18 * 30 * 86_400_000
+    ).toISOString();
+    const { data, error } = await supabase
+      .from("projects")
+      .select(
+        "client_id, invoice_amount, updated_at, client:clients(company, email)"
+      )
+      .eq("status", "delivered")
+      .gte("updated_at", since18mo)
+      .limit(10_000);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    type Row = {
+      client_id: string | null;
+      invoice_amount: number | null;
+      updated_at: string;
+      client?:
+        | { company: string | null; email: string | null }
+        | { company: string | null; email: string | null }[]
+        | null;
+    };
+    const pickOne = <T,>(v: T | T[] | null | undefined): T | null =>
+      Array.isArray(v) ? v[0] ?? null : v ?? null;
+    const rows: ClientRetentionProjectRow[] = ((data ?? []) as Row[]).map(
+      (r) => ({
+        client_id: r.client_id,
+        invoice_amount: r.invoice_amount,
+        delivered_at: r.updated_at,
+        client: pickOne(r.client),
+      })
+    );
+    // 100-row cap for CSV — covers any realistic outreach campaign without
+    // exposing tail noise; UI variant uses 20.
+    const list = computeAtRiskClients(rows, {
+      minDelivered: 2,
+      silentDays: 60,
+      limit: 100,
+    });
+    const csvRows = list.map((c) => ({
+      client_id: c.id,
+      company: c.company,
+      email: c.email ?? "",
+      delivered_count: String(c.deliveredCount),
+      lifetime_revenue_krw: String(c.totalRevenue),
+      last_delivered_at: c.lastDeliveredAt,
+      days_silent: String(c.daysSilent),
+    }));
+    const csv = toCSV(csvRows, [
+      "client_id",
+      "company",
+      "email",
+      "delivered_count",
+      "lifetime_revenue_krw",
+      "last_delivered_at",
+      "days_silent",
+    ] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "at-risk-clients"
+        )}"`,
         "Cache-Control": "no-store",
       },
     });

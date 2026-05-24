@@ -454,6 +454,22 @@ export default async function AdminHomePage() {
             return `${label} ${m.current} (${sign}${m.pct.toFixed(0)}%)`;
           };
           const today = new Date().toLocaleDateString("ko-KR");
+          // Retention summary uses only mature cohorts so the copy is honest
+          // about what's measurable today vs ripening data.
+          const matureCohorts90 = cohorts.filter(
+            (c) => c.size > 0 && cohortWindowMature(c.cohortMonth, 90)
+          );
+          const retentionAvg =
+            matureCohorts90.length > 0
+              ? matureCohorts90.reduce(
+                  (s, c) => s + (c.repeat90dRate ?? 0),
+                  0
+                ) / matureCohorts90.length
+              : null;
+          const atRiskLtv = atRiskClients.reduce(
+            (s, c) => s + c.totalRevenue,
+            0
+          );
           const text = [
             `[Virtual Agency · ${today}]`,
             `신규 문의 24h: ${kpis.newInquiries24h} (어제 ${kpis.newInquiriesPrev24h})`,
@@ -463,6 +479,12 @@ export default async function AdminHomePage() {
               ? `MTD 매출: ₩${mtd.mtdRevenue.toLocaleString("ko-KR")} (월말 예상 ₩${mtd.projectedMonthEnd.toLocaleString("ko-KR")})`
               : null,
             `WoW: ${fmt(wow.inquiries, "문의")} / ${fmt(wow.delivered, "납품")} / ${fmt(wow.revenue, "매출")}`,
+            atRiskClients.length > 0
+              ? `LTV at-risk: ${atRiskClients.length}건 / ₩${atRiskLtv.toLocaleString("ko-KR")}`
+              : null,
+            retentionAvg !== null
+              ? `90일 재구매율 (mature ${matureCohorts90.length}개 평균): ${(retentionAvg * 100).toFixed(0)}%`
+              : null,
           ]
             .filter(Boolean)
             .join("\n");

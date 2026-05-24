@@ -385,6 +385,16 @@ export default async function AdminClientsPage({
           >
             Clients CSV
           </a>
+          {showAtRisk && atRiskCount > 0 && (
+            <a
+              href="/api/admin/exports/at-risk-clients"
+              download
+              className="text-xs px-3 py-1.5 rounded-md border border-rose-500/50 text-rose-200 hover:border-rose-400 hover:text-rose-100 bg-rose-500/5"
+              title="At-risk 광고주 100건 (id, company, email, ltv, days_silent) — outreach mail-merge"
+            >
+              At-risk CSV
+            </a>
+          )}
           <a
             href="/api/admin/exports/client-retention"
             download
