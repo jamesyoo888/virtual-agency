@@ -8,6 +8,7 @@ import {
   type ClientRetentionProjectRow,
 } from "@/lib/analytics/client-retention";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
+import { loadStageTiming, type TimedStage } from "@/lib/analytics/stage-timing";
 
 /**
  * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
@@ -45,6 +46,13 @@ export interface AdminWeeklySummary {
   velocityMedianDays: number | null;
   velocityP90Days: number | null;
   velocityCount: number;
+  /**
+   * Slowest stage by median dwell time, plus its median in days. Surfaces
+   * where the calendar is actually being spent so the operator can target
+   * follow-ups. Null when no stage has enough data to publish.
+   */
+  bottleneckStage: TimedStage | null;
+  bottleneckMedianDays: number | null;
 }
 
 interface SearchLogRow {
@@ -78,6 +86,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       revenueRows,
       retentionRows,
       velocity,
+      stageTiming,
     ] = await Promise.all([
       supabase
         .from("projects")
@@ -127,6 +136,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
         .gte("updated_at", since18mo)
         .limit(10_000),
       loadPipelineVelocity(90),
+      loadStageTiming(90),
     ]);
 
     const searchAgg = aggregateSearchRows(
@@ -192,6 +202,13 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       velocityMedianDays: velocity.medianDays,
       velocityP90Days: velocity.p90Days,
       velocityCount: velocity.n,
+      bottleneckStage: stageTiming.slowestStage,
+      bottleneckMedianDays:
+        stageTiming.slowestStage !== null
+          ? stageTiming.buckets.find(
+              (b) => b.stage === stageTiming.slowestStage
+            )?.medianDays ?? null
+          : null,
     };
   } catch (err) {
     console.warn("[admin-summary] build failed:", err);
@@ -248,6 +265,17 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
         : "";
     lines.push(
       `납품 lead time (90d, inquiry→delivered): 중앙값 ${s.velocityMedianDays.toFixed(1)}d${p90} · ${s.velocityCount}건`
+    );
+  }
+  if (s.bottleneckStage !== null && s.bottleneckMedianDays !== null) {
+    const stageLabel: Record<string, string> = {
+      inquiry: "문의",
+      brief_received: "브리프",
+      in_progress: "제작",
+      review: "검토",
+    };
+    lines.push(
+      `병목 단계: ${stageLabel[s.bottleneckStage] ?? s.bottleneckStage} (중앙값 ${s.bottleneckMedianDays.toFixed(1)}d)`
     );
   }
   lines.push("");
@@ -314,6 +342,21 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
           ? stat(
               "납품 lead time (중앙값)",
               `${s.velocityMedianDays.toFixed(1)}d`
+            )
+          : ""
+      }
+      ${
+        s.bottleneckStage !== null && s.bottleneckMedianDays !== null
+          ? stat(
+              "병목 단계",
+              `${
+                {
+                  inquiry: "문의",
+                  brief_received: "브리프",
+                  in_progress: "제작",
+                  review: "검토",
+                }[s.bottleneckStage] ?? s.bottleneckStage
+              } ${s.bottleneckMedianDays.toFixed(1)}d`
             )
           : ""
       }

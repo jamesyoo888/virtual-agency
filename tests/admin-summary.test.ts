@@ -30,6 +30,8 @@ const fixture: AdminWeeklySummary = {
   velocityMedianDays: 5.4,
   velocityP90Days: 12.1,
   velocityCount: 8,
+  bottleneckStage: "in_progress",
+  bottleneckMedianDays: 6.7,
 };
 
 describe("formatAdminSummaryText", () => {
@@ -107,6 +109,20 @@ describe("formatAdminSummaryText", () => {
     expect(out).toMatch(/납품 lead time .* 중앙값 6\.2d · 3건/);
     expect(out).not.toMatch(/p90/);
   });
+
+  it("includes bottleneck line with translated stage label", () => {
+    const out = formatAdminSummaryText(fixture);
+    expect(out).toMatch(/병목 단계: 제작 \(중앙값 6\.7d\)/);
+  });
+
+  it("hides bottleneck line when stage is null", () => {
+    const noBottleneck: AdminWeeklySummary = {
+      ...fixture,
+      bottleneckStage: null,
+      bottleneckMedianDays: null,
+    };
+    expect(formatAdminSummaryText(noBottleneck)).not.toMatch(/병목 단계/);
+  });
 });
 
 describe("formatAdminSummaryHtml", () => {
@@ -170,5 +186,23 @@ describe("formatAdminSummaryHtml", () => {
       "https://example.com"
     );
     expect(html).not.toContain("납품 lead time");
+  });
+
+  it("renders bottleneck stat block with translated label", () => {
+    const html = formatAdminSummaryHtml(fixture, "https://example.com");
+    expect(html).toContain("병목 단계");
+    expect(html).toContain("제작 6.7d");
+  });
+
+  it("hides bottleneck stat when stage is null", () => {
+    const html = formatAdminSummaryHtml(
+      {
+        ...fixture,
+        bottleneckStage: null,
+        bottleneckMedianDays: null,
+      },
+      "https://example.com"
+    );
+    expect(html).not.toContain("병목 단계");
   });
 });

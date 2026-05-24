@@ -5,6 +5,7 @@ import { getBanner } from "@/lib/banner";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { loadModelPerformance } from "@/lib/analytics/model-performance";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
+import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -213,7 +214,7 @@ async function loadTrendingEngine(): Promise<{
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner, sla, perf, trending, retention, velocity] =
+  const [pulse, cost, recent, banner, sla, perf, trending, retention, velocity, stageTiming] =
     await Promise.all([
       loadPulse(),
       summarizeUsage(),
@@ -224,7 +225,33 @@ export default async function AdminHealthPage() {
       loadTrendingEngine(),
       loadRetentionHealth(),
       loadPipelineVelocity(90),
+      loadStageTiming(90),
     ]);
+
+  // Bottleneck = slowest stage's median exceeds 14d. We check the SLOWEST
+  // stage rather than every stage because surfacing N checks for the same
+  // metric is noise; the operator already sees the per-stage breakdown on
+  // /admin/forecast and only needs a binary signal here.
+  const STAGE_RUNBOOK: Record<string, string> = {
+    inquiry:
+      "inquiry 단계가 길다는 것은 응답 SLA 가 작동하지만 lead 가 답이 안 오는 것. /admin/inbox?stale=1 의 24h+ 인콰이어 따라 메시지 1통 더 시도",
+    brief_received:
+      "브리프 단계 정체 = 광고주가 스코프/가격 결정 못 함. inline quote 편집기에서 견적 명확히 + outreach mailto 로 결정 push",
+    in_progress:
+      "제작 단계 정체 = capacity 부족 또는 reference 부재. /admin/projects/[id] 내부 노트로 상황 확인 후 우선순위 재조정 또는 일정 협의",
+    review:
+      "검토 단계 정체 = 광고주 측 사인오프 지연. follow-up cron 작동 확인 + outreach mailto 로 결정 요청",
+  };
+  const slowestBucket =
+    stageTiming.slowestStage !== null
+      ? stageTiming.buckets.find((b) => b.stage === stageTiming.slowestStage)
+      : null;
+  const STAGE_LABEL_HEALTH: Record<string, string> = {
+    inquiry: "문의",
+    brief_received: "브리프",
+    in_progress: "제작",
+    review: "검토",
+  };
 
   // Underperformers — models with at least 500 views in the window AND an
   // inquiry rate below half of the catalog average. Surfaces models that are
@@ -338,6 +365,27 @@ export default async function AdminHealthPage() {
         : `${retention.atRiskCount}/${retention.payingClientCount} = ${(retention.atRiskShare * 100).toFixed(0)}%`,
       runbook:
         "40% 초과는 ‘대부분의 광고주가 60일+ 침묵 중’. /admin/clients?filter=at-risk 의 outreach mailto 또는 At-risk CSV 다운로드 → 1주일 내 5건 이상 컨택. 20% 미만이면 정상 churn 범위.",
+    },
+    {
+      // Bottleneck stage: slowest stage's median > 14d trips the check.
+      // We require at least 3 samples in the slowest stage to suppress the
+      // single-outlier case (one weird 60d project shouldn't flip a runbook).
+      label: "납품 병목 단계",
+      ok:
+        !slowestBucket ||
+        slowestBucket.n < 3 ||
+        slowestBucket.medianDays === null ||
+        slowestBucket.medianDays <= 14,
+      detail: !slowestBucket
+        ? "데이터 없음"
+        : slowestBucket.medianDays === null
+        ? "데이터 없음"
+        : `${STAGE_LABEL_HEALTH[slowestBucket.stage] ?? slowestBucket.stage} ${slowestBucket.medianDays.toFixed(
+            1
+          )}d 중앙값 (${slowestBucket.n}건 · ${(slowestBucket.totalShare * 100).toFixed(0)}% 점유)`,
+      runbook: slowestBucket
+        ? STAGE_RUNBOOK[slowestBucket.stage] ?? "/admin/forecast 에서 stage 별 timing 확인"
+        : "/admin/forecast 에서 stage 별 timing 확인",
     },
     {
       // Pipeline velocity: p90 lead-time inquiry → delivered. >21 days = the
