@@ -4,6 +4,7 @@ import { summarizeUsage, recentUsage } from "@/lib/cost/store";
 import { getBanner } from "@/lib/banner";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { loadModelPerformance } from "@/lib/analytics/model-performance";
+import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -212,7 +213,7 @@ async function loadTrendingEngine(): Promise<{
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner, sla, perf, trending, retention] =
+  const [pulse, cost, recent, banner, sla, perf, trending, retention, velocity] =
     await Promise.all([
       loadPulse(),
       summarizeUsage(),
@@ -222,6 +223,7 @@ export default async function AdminHealthPage() {
       loadModelPerformance(30),
       loadTrendingEngine(),
       loadRetentionHealth(),
+      loadPipelineVelocity(90),
     ]);
 
   // Underperformers — models with at least 500 views in the window AND an
@@ -336,6 +338,24 @@ export default async function AdminHealthPage() {
         : `${retention.atRiskCount}/${retention.payingClientCount} = ${(retention.atRiskShare * 100).toFixed(0)}%`,
       runbook:
         "40% 초과는 ‘대부분의 광고주가 60일+ 침묵 중’. /admin/clients?filter=at-risk 의 outreach mailto 또는 At-risk CSV 다운로드 → 1주일 내 5건 이상 컨택. 20% 미만이면 정상 churn 범위.",
+    },
+    {
+      // Pipeline velocity: p90 lead-time inquiry → delivered. >21 days = the
+      // backlog is dragging on conversions. n<5 in 90d means we don't have
+      // enough deliveries to publish p90; treat as vacuously OK so the check
+      // doesn't fire on a brand-new account.
+      label: "납품 lead time (p90, 90d)",
+      ok: velocity.p90Days === null || velocity.p90Days <= 21,
+      detail:
+        velocity.p90Days === null
+          ? velocity.n === 0
+            ? "데이터 없음"
+            : `표본 부족 (${velocity.n}건, p90 미산출)`
+          : `중앙값 ${velocity.medianDays?.toFixed(1)}d · p90 ${velocity.p90Days.toFixed(
+              1
+            )}d · ${velocity.n}건`,
+      runbook:
+        "p90 21일 초과는 deal 이 review/in_progress 에서 멎고 있다는 신호. /admin/forecast#aging 의 31d+ 버킷 + 월별 추세 표 확인 → in_progress 가장 오래된 5건 follow-up. 영업 측 가격/스코프 의사결정 지연이 흔한 원인.",
     },
     {
       // Trending feed health: need at least ~30% of active models to have

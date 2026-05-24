@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { TrendingUp, AlertCircle } from "lucide-react";
+import { TrendingUp, AlertCircle, Gauge } from "lucide-react";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { loadForecast } from "@/lib/analytics/forecast";
+import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,10 @@ const STAGE_LABEL: Record<string, string> = {
 };
 
 export default async function ForecastPage() {
-  const r = await loadForecast();
+  const [r, velocity] = await Promise.all([
+    loadForecast(),
+    loadPipelineVelocity(90),
+  ]);
 
   return (
     <div className="p-8 max-w-5xl mx-auto text-zinc-100">
@@ -323,6 +327,75 @@ export default async function ForecastPage() {
             </section>
           )}
 
+          {velocity.n > 0 && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-xs uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+                  <Gauge className="w-3.5 h-3.5" />
+                  납품 lead time (inquiry → delivered, 90일)
+                </h2>
+                <a
+                  href="/api/admin/exports/pipeline-velocity"
+                  download
+                  className="text-[10px] px-2 py-0.5 rounded-md border border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white"
+                >
+                  CSV
+                </a>
+              </div>
+              <p className="text-[11px] text-zinc-500 mb-3">
+                project_status_history 의 첫 `to_status=delivered` 시점 기준. 응답 SLA 는 첫 회신만 측정 — 이 카드는 끝까지 닫히는 시간.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <VelocityStat
+                  label="중앙값"
+                  value={fmtDays(velocity.medianDays)}
+                  hint={`${velocity.n}건 측정`}
+                />
+                <VelocityStat
+                  label="p90"
+                  value={fmtDays(velocity.p90Days)}
+                  hint={
+                    velocity.p90Days === null
+                      ? "표본 부족 (n<5)"
+                      : "90% 이내 완료"
+                  }
+                />
+                <VelocityStat
+                  label="최단"
+                  value={fmtDays(velocity.fastestDays)}
+                  hint="가장 빠른 납품"
+                />
+                <VelocityStat
+                  label="최장"
+                  value={fmtDays(velocity.slowestDays)}
+                  hint="가장 느린 납품"
+                />
+              </div>
+              {velocity.byMonth.some((m) => m.n > 0) && (
+                <ul className="space-y-1.5 text-xs">
+                  {velocity.byMonth.map((m) => (
+                    <li
+                      key={m.month}
+                      className="flex items-center gap-3 text-zinc-400"
+                    >
+                      <span className="w-20 shrink-0 tabular-nums">{m.month}</span>
+                      <span className="w-10 shrink-0 tabular-nums text-zinc-500 text-right">
+                        {m.n}
+                      </span>
+                      <span className="flex-1 text-zinc-300 tabular-nums">
+                        {m.medianDays === null ? (
+                          <span className="text-zinc-600">—</span>
+                        ) : (
+                          `${m.medianDays.toFixed(1)}d`
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
           <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 text-sm">
             <h2 className="text-xs uppercase tracking-wider text-amber-300 mb-2 flex items-center gap-2">
               <AlertCircle className="w-3.5 h-3.5" />
@@ -388,4 +461,29 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="tabular-nums font-medium text-zinc-100">{value}</span>
     </li>
   );
+}
+
+function VelocityStat({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+}) {
+  return (
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+      <p className="text-[10px] uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="mt-1 text-xl font-semibold tabular-nums text-zinc-100">
+        {value}
+      </p>
+      <p className="mt-0.5 text-[10px] text-zinc-500">{hint}</p>
+    </div>
+  );
+}
+
+function fmtDays(d: number | null): string {
+  if (d === null) return "—";
+  return `${d.toFixed(1)}d`;
 }

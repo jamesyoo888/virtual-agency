@@ -14,6 +14,7 @@ import {
   cohortWindowMature,
   type ClientRetentionProjectRow,
 } from "@/lib/analytics/client-retention";
+import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -45,6 +46,7 @@ const KINDS = new Set([
   "search",
   "client-retention",
   "at-risk-clients",
+  "pipeline-velocity",
 ]);
 
 export async function GET(
@@ -1202,6 +1204,37 @@ export async function GET(
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(
           "client-retention"
+        )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "pipeline-velocity") {
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [30, 90, 180].includes(w) ? w : 90;
+    const v = await loadPipelineVelocity(windowDays);
+    // Flat metric/value rows — same two-column layout used by forecast/mtd/wow
+    // so the spreadsheet ops are consistent.
+    const fmt = (d: number | null) => (d === null ? "" : d.toFixed(2));
+    const rows: { metric: string; value: string }[] = [
+      { metric: "window_days", value: String(v.windowDays) },
+      { metric: "delivered_count", value: String(v.n) },
+      { metric: "median_days", value: fmt(v.medianDays) },
+      { metric: "p90_days", value: fmt(v.p90Days) },
+      { metric: "fastest_days", value: fmt(v.fastestDays) },
+      { metric: "slowest_days", value: fmt(v.slowestDays) },
+      ...v.byMonth.flatMap((m) => [
+        { metric: `month_${m.month}_count`, value: String(m.n) },
+        { metric: `month_${m.month}_median_days`, value: fmt(m.medianDays) },
+      ]),
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "pipeline-velocity"
         )}"`,
         "Cache-Control": "no-store",
       },
