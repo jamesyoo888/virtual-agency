@@ -3,6 +3,7 @@ import { TrendingUp, AlertCircle, Gauge } from "lucide-react";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { loadForecast } from "@/lib/analytics/forecast";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
+import { loadStageTiming } from "@/lib/analytics/stage-timing";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +19,10 @@ const STAGE_LABEL: Record<string, string> = {
 };
 
 export default async function ForecastPage() {
-  const [r, velocity] = await Promise.all([
+  const [r, velocity, stageTiming] = await Promise.all([
     loadForecast(),
     loadPipelineVelocity(90),
+    loadStageTiming(90),
   ]);
 
   return (
@@ -393,6 +395,78 @@ export default async function ForecastPage() {
                   ))}
                 </ul>
               )}
+            </section>
+          )}
+
+          {stageTiming.measuredProjects > 0 && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 mb-8">
+              <h2 className="text-xs uppercase tracking-wider text-zinc-500 mb-1">
+                병목 단계 (delivered {stageTiming.measuredProjects}건 평균)
+              </h2>
+              <p className="text-[11px] text-zinc-500 mb-3">
+                lead time 의 어느 stage 가 가장 길게 잡고 있는지 — 영업/제작/검수 어디서 손이 멎고 있나.
+              </p>
+              <ul className="space-y-2 text-sm">
+                {stageTiming.buckets.map((b) => {
+                  const isSlowest = b.stage === stageTiming.slowestStage;
+                  const sharePct = b.totalShare * 100;
+                  return (
+                    <li
+                      key={b.stage}
+                      className="flex items-center gap-3"
+                    >
+                      <span
+                        className={`w-24 shrink-0 ${
+                          isSlowest
+                            ? "text-rose-300 font-medium"
+                            : "text-zinc-400"
+                        }`}
+                      >
+                        {STAGE_LABEL[b.stage] ?? b.stage}
+                      </span>
+                      <span className="text-zinc-500 tabular-nums shrink-0 w-10 text-right">
+                        {b.n}
+                      </span>
+                      <span
+                        className={`tabular-nums shrink-0 w-16 text-right ${
+                          b.medianDays === null
+                            ? "text-zinc-600"
+                            : isSlowest
+                            ? "text-rose-300 font-medium"
+                            : "text-zinc-200"
+                        }`}
+                        title="중앙값"
+                      >
+                        {b.medianDays === null
+                          ? "—"
+                          : `${b.medianDays.toFixed(1)}d`}
+                      </span>
+                      <span
+                        className="tabular-nums shrink-0 w-16 text-right text-zinc-500"
+                        title="p90"
+                      >
+                        {b.p90Days === null
+                          ? "—"
+                          : `${b.p90Days.toFixed(1)}d`}
+                      </span>
+                      <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                        <div
+                          className={`h-full ${
+                            isSlowest ? "bg-rose-500" : "bg-emerald-500"
+                          }`}
+                          style={{ width: `${sharePct}%` }}
+                        />
+                      </div>
+                      <span className="tabular-nums text-zinc-500 shrink-0 w-12 text-right">
+                        {sharePct.toFixed(0)}%
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="mt-3 text-[11px] text-zinc-500">
+                컬럼: 표본수 · 중앙값 · p90 · 전체 lead time 점유율. 점유율 막대는 stage 가 calendar 의 어느 비중을 먹는지 — 중앙값과 같이 봐야 함 (드물지만 길거나, 매번 적당히 긴 차이).
+              </p>
             </section>
           )}
 

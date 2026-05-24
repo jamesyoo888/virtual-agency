@@ -15,6 +15,7 @@ import {
   type ClientRetentionProjectRow,
 } from "@/lib/analytics/client-retention";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
+import { loadStageTiming } from "@/lib/analytics/stage-timing";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -1213,7 +1214,10 @@ export async function GET(
   if (kind === "pipeline-velocity") {
     const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
     const windowDays = [30, 90, 180].includes(w) ? w : 90;
-    const v = await loadPipelineVelocity(windowDays);
+    const [v, stages] = await Promise.all([
+      loadPipelineVelocity(windowDays),
+      loadStageTiming(windowDays),
+    ]);
     // Flat metric/value rows — same two-column layout used by forecast/mtd/wow
     // so the spreadsheet ops are consistent.
     const fmt = (d: number | null) => (d === null ? "" : d.toFixed(2));
@@ -1227,6 +1231,15 @@ export async function GET(
       ...v.byMonth.flatMap((m) => [
         { metric: `month_${m.month}_count`, value: String(m.n) },
         { metric: `month_${m.month}_median_days`, value: fmt(m.medianDays) },
+      ]),
+      // Per-stage dwell — drilldown into where the lead time goes.
+      { metric: "stage_measured_projects", value: String(stages.measuredProjects) },
+      { metric: "stage_slowest", value: stages.slowestStage ?? "" },
+      ...stages.buckets.flatMap((b) => [
+        { metric: `stage_${b.stage}_count`, value: String(b.n) },
+        { metric: `stage_${b.stage}_median_days`, value: fmt(b.medianDays) },
+        { metric: `stage_${b.stage}_p90_days`, value: fmt(b.p90Days) },
+        { metric: `stage_${b.stage}_share_pct`, value: (b.totalShare * 100).toFixed(2) },
       ]),
     ];
     const csv = toCSV(rows, ["metric", "value"] as const);
