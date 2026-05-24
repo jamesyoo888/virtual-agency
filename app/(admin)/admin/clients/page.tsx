@@ -338,11 +338,15 @@ export default async function AdminClientsPage({
     atRiskClients,
     cohorts,
   } = await loadSummaries();
-  const atRiskIds = new Set(atRiskClients.map((c) => c.id));
+  const atRiskById = new Map(atRiskClients.map((c) => [c.id, c]));
   const clients = showNeglected
     ? allClients.filter((c) => neglectedIds.has(c.id))
     : showAtRisk
-    ? allClients.filter((c) => atRiskIds.has(c.id))
+    ? // Preserve the at-risk sort (revenue desc, silence tiebreak) so the
+      // most valuable re-engagement targets show first when this filter is on.
+      atRiskClients
+        .map((a) => allClients.find((c) => c.id === a.id))
+        .filter((c): c is typeof allClients[number] => !!c)
     : allClients;
   const neglectedCount = neglectedIds.size;
   const atRiskCount = atRiskClients.length;
@@ -464,6 +468,65 @@ export default async function AdminClientsPage({
         </div>
       </section>
 
+      {showAtRisk && atRiskClients.length > 0 && (() => {
+        // At-risk recap: total LTV potentially at risk + avg silence so the
+        // operator gets a one-glance read on how big the problem is.
+        const totalAtRiskLtv = atRiskClients.reduce(
+          (s, c) => s + c.totalRevenue,
+          0
+        );
+        const avgSilence = Math.round(
+          atRiskClients.reduce((s, c) => s + c.daysSilent, 0) /
+            atRiskClients.length
+        );
+        return (
+          <section className="rounded-xl border border-rose-500/40 bg-rose-500/5 p-5 mb-8">
+            <h2 className="text-xs uppercase tracking-wider text-rose-200 mb-2 flex items-center gap-2">
+              <Flame className="w-3.5 h-3.5" />
+              LTV 재활성화 타깃
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-5 text-sm">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-rose-300/70">
+                  타깃 광고주
+                </p>
+                <p className="text-2xl font-bold tabular-nums mt-1 text-rose-100">
+                  {atRiskClients.length}
+                </p>
+                <p className="text-[10px] text-rose-200/70 mt-1">
+                  2건+ 납품 / 60일+ 침묵
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-rose-300/70">
+                  누적 LTV (at risk)
+                </p>
+                <p className="text-2xl font-bold tabular-nums mt-1 text-rose-100">
+                  ₩{KRW.format(totalAtRiskLtv)}
+                </p>
+                <p className="text-[10px] text-rose-200/70 mt-1">
+                  재활성화 시 회복 가능한 base
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-rose-300/70">
+                  평균 침묵 기간
+                </p>
+                <p className="text-2xl font-bold tabular-nums mt-1 text-rose-100">
+                  {avgSilence}일
+                </p>
+                <p className="text-[10px] text-rose-200/70 mt-1">
+                  90일 넘어가면 회복률 급락 — 우선순위는 침묵 짧은 쪽부터
+                </p>
+              </div>
+            </div>
+            <p className="mt-4 text-[11px] text-rose-200/80 leading-relaxed">
+              아래 표 우측의 <span className="text-rose-100">✉ Outreach</span> 버튼은 mailto: 링크로, 본문에 마지막 캠페인 날짜와 침묵 기간이 자동 prefill 됩니다. 보내기 전에 한 줄 personal touch 만 추가하세요.
+            </p>
+          </section>
+        );
+      })()}
+
       <ConcentrationCard
         clients={clients}
         totalRevenue={totalRevenue}
@@ -559,6 +622,15 @@ export default async function AdminClientsPage({
                         보기
                       </Link>
                     )}
+                    {showAtRisk && atRiskById.get(c.id) && c.email && (
+                      <a
+                        href={atRiskMailto(atRiskById.get(c.id)!)}
+                        className="ml-2 text-rose-300 hover:text-rose-100"
+                        title="재활성화 이메일 (mailto, 본문 prefill)"
+                      >
+                        ✉ Outreach
+                      </a>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -568,6 +640,29 @@ export default async function AdminClientsPage({
       )}
     </div>
   );
+}
+
+/**
+ * Build a `mailto:` URL with a pre-filled subject and body for re-engaging an
+ * at-risk client. We keep the body short and personal — the operator is meant
+ * to edit it before sending, but the structure (acknowledge last campaign,
+ * propose a concrete next step) saves the cold-start friction.
+ */
+function atRiskMailto(client: AtRiskClient): string {
+  if (!client.email) return "#";
+  const lastDate = new Date(client.lastDeliveredAt).toLocaleDateString("ko-KR");
+  const subject = `[Virtual Agency] ${client.company} 다음 캠페인 제안`;
+  const lines = [
+    `안녕하세요, ${client.company} 담당자님.`,
+    "",
+    `Virtual Agency 입니다. 마지막으로 함께한 캠페인 (${lastDate}) 이후 ${client.daysSilent}일이 지났네요. 그동안 잘 지내셨는지요.`,
+    "",
+    `지금 시즌 트렌드와 새로 합류한 모델들을 정리해 보았는데, ${client.company} 브랜드에 잘 맞을 것 같은 후보 2-3 개를 추려서 보내드리고 싶습니다. 다음주 짧게 통화 가능하시면 일정 알려주세요.`,
+    "",
+    "감사합니다.",
+  ];
+  const body = lines.join("\n");
+  return `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function CohortRetentionCard({ cohorts }: { cohorts: CohortBucket[] }) {
