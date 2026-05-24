@@ -4,6 +4,12 @@ import { summarizeUsage, recentUsage } from "@/lib/cost/store";
 import { getBanner } from "@/lib/banner";
 import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { loadModelPerformance } from "@/lib/analytics/model-performance";
+import {
+  computeAtRiskClients,
+  computeCohortRetention,
+  cohortWindowMature,
+  type ClientRetentionProjectRow,
+} from "@/lib/analytics/client-retention";
 import { Activity, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 
@@ -115,6 +121,69 @@ function trendBadge(today: number, avg7d: number): {
   return { label: "▼ 평소보다 조용", tone: "text-amber-400" };
 }
 
+interface RetentionHealth {
+  atRiskCount: number;
+  payingClientCount: number;
+  atRiskShare: number;
+  retention90dPct: number | null;
+  matureCohortCount: number;
+}
+
+async function loadRetentionHealth(): Promise<RetentionHealth | null> {
+  if (!SUPABASE_CONFIGURED) return null;
+  try {
+    const supabase = await createClient();
+    const since18mo = new Date(
+      Date.now() - 18 * 30 * 86_400_000
+    ).toISOString();
+    const { data } = await supabase
+      .from("projects")
+      .select("client_id, invoice_amount, updated_at")
+      .eq("status", "delivered")
+      .gte("updated_at", since18mo)
+      .limit(10_000);
+    type Row = {
+      client_id: string | null;
+      invoice_amount: number | null;
+      updated_at: string;
+    };
+    const rows = ((data ?? []) as Row[]).map<ClientRetentionProjectRow>((r) => ({
+      client_id: r.client_id,
+      invoice_amount: r.invoice_amount,
+      delivered_at: r.updated_at,
+    }));
+    const atRisk = computeAtRiskClients(rows, {
+      minDelivered: 2,
+      silentDays: 60,
+      limit: 1000,
+    });
+    // "Paying clients" denominator = distinct client_ids with at least one
+    // delivered project in the window. This is the same population the at-risk
+    // computation is checking against — so the share is meaningful.
+    const payingIds = new Set(
+      rows.filter((r) => r.client_id).map((r) => r.client_id!)
+    );
+    const cohorts = computeCohortRetention(rows, { months: 6 });
+    const mature = cohorts.filter(
+      (c) => c.size > 0 && cohortWindowMature(c.cohortMonth, 90)
+    );
+    const retention90dPct =
+      mature.length > 0
+        ? mature.reduce((s, c) => s + (c.repeat90dRate ?? 0), 0) /
+          mature.length
+        : null;
+    return {
+      atRiskCount: atRisk.length,
+      payingClientCount: payingIds.size,
+      atRiskShare: payingIds.size > 0 ? atRisk.length / payingIds.size : 0,
+      retention90dPct,
+      matureCohortCount: mature.length,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function loadTrendingEngine(): Promise<{
   modelsWithViews: number;
   totalActive: number;
@@ -143,15 +212,17 @@ async function loadTrendingEngine(): Promise<{
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner, sla, perf, trending] = await Promise.all([
-    loadPulse(),
-    summarizeUsage(),
-    recentUsage(10),
-    getBanner(),
-    loadResponseSla(30),
-    loadModelPerformance(30),
-    loadTrendingEngine(),
-  ]);
+  const [pulse, cost, recent, banner, sla, perf, trending, retention] =
+    await Promise.all([
+      loadPulse(),
+      summarizeUsage(),
+      recentUsage(10),
+      getBanner(),
+      loadResponseSla(30),
+      loadModelPerformance(30),
+      loadTrendingEngine(),
+      loadRetentionHealth(),
+    ]);
 
   // Underperformers — models with at least 500 views in the window AND an
   // inquiry rate below half of the catalog average. Surfaces models that are
@@ -230,6 +301,41 @@ export default async function AdminHealthPage() {
             }${sla.staleOpenCount > 0 ? ` · ${sla.staleOpenCount} 지연` : ""}`,
       runbook:
         "/admin/inbox?stale=1 에서 24h+ 인콰이어 즉시 처리. 중앙값 12h 초과면 운영 회의에서 1순위 안건",
+    },
+    {
+      // Retention health: avg 90d repeat rate across mature cohorts.
+      // <20% suggests one-shot business; 20% is the floor we treat as healthy
+      // for an agency model. Null = not enough mature data yet (vacuously OK
+      // to avoid noise in the early window).
+      label: "재구매 채널 건강도 (90d cohort)",
+      ok:
+        !retention ||
+        retention.retention90dPct === null ||
+        retention.retention90dPct >= 0.2,
+      detail: !retention
+        ? "데이터 없음"
+        : retention.retention90dPct === null
+        ? `mature cohort 없음 (90d 더 지나야 측정 가능)`
+        : `${(retention.retention90dPct * 100).toFixed(0)}% · ${retention.matureCohortCount}개 코호트 평균`,
+      runbook:
+        "20% 미만이면 단발 거래 위주 — 분석은 /admin/clients 코호트 표 + /admin/forecast 채널별 close rate. 채널 매칭 정확도 또는 사후 follow-up 부재가 흔한 원인",
+    },
+    {
+      // At-risk burden: at-risk clients / paying clients. >40% = systemic
+      // retention drop (operator triage urgent); 20-40% = normal churn;
+      // <20% = healthy.
+      label: "LTV at-risk 부담",
+      ok:
+        !retention ||
+        retention.payingClientCount === 0 ||
+        retention.atRiskShare <= 0.4,
+      detail: !retention
+        ? "데이터 없음"
+        : retention.payingClientCount === 0
+        ? "결제 광고주 없음"
+        : `${retention.atRiskCount}/${retention.payingClientCount} = ${(retention.atRiskShare * 100).toFixed(0)}%`,
+      runbook:
+        "40% 초과는 ‘대부분의 광고주가 60일+ 침묵 중’. /admin/clients?filter=at-risk 의 outreach mailto 또는 At-risk CSV 다운로드 → 1주일 내 5건 이상 컨택. 20% 미만이면 정상 churn 범위.",
     },
     {
       // Trending feed health: need at least ~30% of active models to have
