@@ -108,6 +108,7 @@ export async function GET(request: Request) {
   const isEnAiDisclosure = searchParams.get("en_ai_disclosure") === "1";
   const isEnMatch = searchParams.get("en_match") === "1";
   const isEnRfp = searchParams.get("en_rfp") === "1";
+  const isEnPress = searchParams.get("en_press") === "1";
   const enBlogTag = searchParams.get("en_blog_tag");
 
   if (isEnHome) {
@@ -178,6 +179,13 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · RFP",
       "Request for Proposal — print-ready",
       "One-page RFP with matched models, USD budget bands, and licensing terms. PDF in one click."
+    );
+  }
+  if (isEnPress) {
+    return bigCard(
+      "VIRTUAL AGENCY · PRESS",
+      "Press kit for global media",
+      "Stats, logos, one-line and long-form bios, media contact. Cleared for editorial use."
     );
   }
   if (enBlogTag) {

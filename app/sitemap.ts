@@ -138,6 +138,18 @@ export default async function sitemap(
             },
           },
           {
+            url: `${SITE_URL}/en/press`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.3,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/press`,
+                ko: `${SITE_URL}/press`,
+              },
+            },
+          },
+          {
             url: `${SITE_URL}/en/faq`,
             lastModified: now,
             changeFrequency: "monthly",

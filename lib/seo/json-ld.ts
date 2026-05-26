@@ -4,13 +4,21 @@ const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-mure
 const ORG_NAME = "Virtual Agency";
 
 export function organizationLd() {
+  // Single bilingual Organization node served from the root layout. We list
+  // both languages and the English mirror URL so crawlers can discover the
+  // /en surface from any page, and `alternateName` carries the English
+  // tagline so LLM citation surfaces the English brand line when relevant.
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: ORG_NAME,
+    alternateName: "Virtual Agency — K-Aesthetic AI Models",
     url: SITE_URL,
-    description: "AI 기반 버추얼 모델 에이전시 — 광고, SNS, 영상 콘텐츠를 위한 가상 모델 라이선싱",
-    sameAs: [],
+    description:
+      "AI 기반 버추얼 모델 에이전시 — 광고, SNS, 영상 콘텐츠를 위한 가상 모델 라이선싱. Production studio for K-aesthetic AI virtual models, built for global brands.",
+    knowsLanguage: ["ko", "en"],
+    areaServed: ["KR", "US", "GB", "EU", "SG"],
+    sameAs: [`${SITE_URL}/en`],
   };
 }
 
