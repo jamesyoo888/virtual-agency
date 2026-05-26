@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
 import { listAnchorCases } from "@/lib/cases/anchor-cases";
+import { listCharacters } from "@/lib/characters/registry";
 import { INDUSTRY_OPTIONS, MOOD_OPTIONS, GENRE_OPTIONS } from "@/lib/tags";
 
 const SITE_URL =
@@ -173,6 +174,18 @@ export default async function sitemap(
               },
             },
           },
+          {
+            url: `${SITE_URL}/en/character`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.8,
+          },
+          ...listCharacters().map((c) => ({
+            url: `${SITE_URL}/en/character/${c.slug}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.8,
+          })),
           ...INDUSTRY_OPTIONS.map((o) => ({
             url: `${SITE_URL}/en/explore/${o.value}`,
             lastModified: now,

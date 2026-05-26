@@ -56,6 +56,9 @@ export default async function EnHomePage() {
           Virtual Agency
         </Link>
         <nav className="flex gap-4 text-sm text-zinc-400">
+          <Link href="/en/character" className="hover:text-white">
+            Characters
+          </Link>
           <Link href="/en/pricing" className="hover:text-white">
             Pricing
           </Link>

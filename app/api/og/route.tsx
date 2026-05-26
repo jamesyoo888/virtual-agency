@@ -4,6 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import { getPostBySlug, listPostsByTag } from "@/lib/blog/posts";
 import { INDUSTRY_LABELS, MOOD_LABELS, GENRE_LABELS } from "@/lib/tags";
+import { getCharacter } from "@/lib/characters/registry";
 import type { Model } from "@/types";
 
 export const runtime = "nodejs";
@@ -110,6 +111,7 @@ export async function GET(request: Request) {
   const isEnRfp = searchParams.get("en_rfp") === "1";
   const isEnPress = searchParams.get("en_press") === "1";
   const enBlogTag = searchParams.get("en_blog_tag");
+  const enCharacter = searchParams.get("en_character");
 
   if (isEnHome) {
     return bigCard(
@@ -199,6 +201,16 @@ export async function GET(request: Request) {
           .slice(0, 2)
           .map((p) => p.title)
           .join(" · ")}`
+      );
+    }
+  }
+  if (enCharacter) {
+    const c = getCharacter(enCharacter);
+    if (c) {
+      return bigCard(
+        `VIRTUAL AGENCY · CHARACTER`,
+        c.name,
+        `${c.tagline} · Built for ${c.targetVerticals.slice(0, 3).join(", ")}.`
       );
     }
   }
