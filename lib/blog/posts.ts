@@ -1144,6 +1144,126 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "how-to-brief-an-ai-model-k-aesthetic",
+    locale: "en",
+    title: "How to Brief an AI Model for K-Aesthetic Campaigns",
+    excerpt:
+      "Most failed AI campaigns are briefing failures, not generation failures. A practical template for K-aesthetic that converts your creative intent into something a casting director — human or AI — can act on.",
+    publishedAt: "2026-05-23",
+    readingMinutes: 5,
+    tags: ["K-aesthetic", "creative direction", "guide"],
+    sections: [
+      {
+        heading: "Why most briefs fail",
+        body: "The single most common reason an AI campaign ends in disappointment is not the technology — it is a brief written in adjectives instead of constraints. «Cool, modern, elegant» reads naturally but tells the rendering process nothing it can lock to. Briefs that work define a small number of hard constraints and leave nothing else open to interpretation.",
+      },
+      {
+        heading: "Lock the tone in three words",
+        body: "Pick exactly three words that, together, describe the mood. «Cool, soft, editorial» is different from «warm, dewy, playful» — both are K-aesthetic, but they cast different faces, choose different lighting, and read differently on Instagram. Write them down. The matching engine and image generator both anchor to this triplet.",
+      },
+      {
+        heading: "Lock the palette",
+        body: "Choose one palette and stay there for the campaign. Cool minimal (gray-blue + cream + sage), warm dewy (peach + ivory + soft amber), or editorial mono (black + ash + one accent). Mixing palettes mid-campaign breaks the K-aesthetic cue more than any other single choice.",
+      },
+      {
+        heading: "Specify channel and crop",
+        body: "PDP hero (3:4), Instagram carousel (1:1 + 9:16 story), TikTok cover, OOH key art — the channel mix changes the framing and the way the model is composed. Tell us the channels and rough share, not just the deliverable count. A 3:4 hero crops awkwardly out of a 1:1 source if the casting director did not know it was coming.",
+      },
+      {
+        heading: "Five reference images, not twenty",
+        body: "Five images that all share the mood you want — not twenty that show variation. Variation tells the casting director you are still figuring out your direction; consistency tells them the direction is locked. Save the variation conversation for after the first round.",
+      },
+      {
+        heading: "Define the licensing window up front",
+        body: "Exclusive or non-exclusive, daily or multi-day, single-channel or full kit. Pricing varies by an order of magnitude across these axes, so deciding them in the brief, not after the first proof, removes the most common source of last-minute disagreements.",
+      },
+      {
+        heading: "Stage the delivery, not the deadline",
+        body: "Instead of «deliver everything by date X», break it into «concept lock → first proofs → hero delivery → social cuts → archive». Each stage gets its own date. This is how production teams actually work, and it lets us prioritize the right thing in the queue when something slips.",
+      },
+      {
+        heading: "What a good K-aesthetic brief looks like",
+        body: "Three tone words + one palette + channel mix + five locked references + license window + four-stage delivery dates. That is roughly one page. Brands that send this consistently get faster quotes, sharper first proofs, and fewer revision rounds. Brands that send a wall of text get longer turnarounds and more rounds — not because we mind reading, but because the casting director still has to extract these decisions from your prose before any work starts.",
+      },
+    ],
+  },
+  {
+    slug: "k-aesthetic-color-palettes-explained",
+    locale: "en",
+    title: "K-Aesthetic Color Palettes: Soft Blues, Cream, Sage, and the Mistake of Mixing Them",
+    excerpt:
+      "Three palettes do most of the work in K-aesthetic. Here is what each one signals to a consumer, when to pick which, and why mixing them is the single most common reason a campaign feels off.",
+    publishedAt: "2026-05-22",
+    readingMinutes: 4,
+    tags: ["K-aesthetic", "creative direction", "design"],
+    sections: [
+      {
+        heading: "Why palette matters more in K-aesthetic than in other registers",
+        body: "K-aesthetic is a tonal language, not a costume language. The wardrobe and product can vary across a campaign; what unifies the work and reads as K-aesthetic is the palette. Drop the palette and the same model, same brief, same wardrobe will suddenly read as generic minimal or worse, as cosplay.",
+      },
+      {
+        heading: "Palette 1 — Cool minimal (gray-blue + cream + sage)",
+        body: "The K-beauty default. Reads as calm, clean, premium. Works for skincare hero, minimalist fashion, electronics. Best when you want the brand to feel quietly confident. Light direction tends cool and overhead-soft; faces sit in low-contrast, almost silver light.",
+      },
+      {
+        heading: "Palette 2 — Warm dewy (peach + ivory + soft amber)",
+        body: "K-aesthetic's more approachable register. Reads as inviting, lifestyle-forward, glowy. Works for foundations and tints, fashion lookbooks targeting wider demographics, food and beverage. Lighting leans warmer, often with a key from below or at face level for the dewy skin signature.",
+      },
+      {
+        heading: "Palette 3 — Editorial mono (black + ash + one accent)",
+        body: "K-aesthetic's high-fashion register. Reads as deliberate, controlled, magazine-style. Works for fragrance, accessories, jewelry, premium fashion. Lighting is high-contrast and directional; the accent color (a single saturated red, sometimes a lacquer blue) does all the chromatic work.",
+      },
+      {
+        heading: "The mistake — mixing palettes within one campaign",
+        body: "Brands sometimes ship a campaign with cool-minimal on PDP, warm-dewy on social, and editorial mono on OOH — usually because three different team members briefed three different vendors. The output is technically «K-aesthetic» everywhere but reads as inconsistent. Lock one palette per campaign. Use the other palettes in the next campaign, not the next deliverable.",
+      },
+      {
+        heading: "Picking a palette in 60 seconds",
+        body: "If the product is functional and the brand voice is restrained → cool minimal. If the product is approachable and the brand voice is warm → warm dewy. If the product is aspirational and the brand voice is deliberate → editorial mono. Most K-beauty brands work in palette 1 or 2; most K-fashion brands move between 2 and 3.",
+      },
+    ],
+  },
+  {
+    slug: "eu-ai-act-article-50-for-brand-marketers",
+    locale: "en",
+    title: "EU AI Act Article 50 for Brand Marketers (2026)",
+    excerpt:
+      "What Article 50 actually says, what it means for synthetic-content campaigns in the EU, and the four practical changes brand teams need to make this year.",
+    publishedAt: "2026-05-21",
+    readingMinutes: 6,
+    tags: ["compliance", "EU AI Act", "guide"],
+    sections: [
+      {
+        heading: "What Article 50 actually requires",
+        body: "Article 50 §2 of the EU AI Act requires providers of AI systems that generate or manipulate image, audio, or video content to ensure the output is marked as artificially generated, in a machine-readable format and detectable as artificially generated. Article 50 §4 puts the labelling requirement on deployers — that is, the brand running the campaign — for the user-facing disclosure. Two halves, both in force from 2026.",
+      },
+      {
+        heading: "The machine-readable half (provider obligation)",
+        body: "The studio generating the asset must embed a watermark or provenance signal — most practitioners are converging on C2PA Content Credentials, with the AI tool listed as the producer. Virtual Agency embeds C2PA manifests automatically when the option is enabled. This is invisible to the consumer but readable by platforms and forensic tools.",
+      },
+      {
+        heading: "The user-facing half (deployer obligation)",
+        body: "The brand running the ad must inform the viewer that the content is artificially generated. The wording, position, and timing must be such that an average consumer notices and understands. In practice: a caption, a subtitle line, on-screen text on video, or alt-text plus visible badge. The Article is technology-neutral about exactly how — but it is not optional.",
+      },
+      {
+        heading: "Four practical changes most brand teams need to make",
+        body: "First, add a synthetic-content disclosure checklist to your campaign sign-off process — same place where IP clearance lives. Second, brief your studio (us or anyone else) to embed C2PA Content Credentials. Third, decide a default disclosure phrasing for your brand (most pick «AI-generated» in plain caption type at the bottom of the creative). Fourth, document compliance in the campaign archive — if asked by a DSA-aligned regulator, you want a paper trail.",
+      },
+      {
+        heading: "Penalties, briefly",
+        body: "Article 99 sets administrative fines for non-compliance. The cap for transparency-related infringements is the higher of €15 million or 3% of worldwide annual turnover for businesses. Enforcement against individual ads is unlikely to hit those numbers; the real risk is reputational and the cost of pulling a non-compliant campaign mid-flight. Both are avoidable with the four steps above.",
+      },
+      {
+        heading: "What is NOT covered",
+        body: "Internal tools, B2B sales decks, and content the company itself uses but does not publish to consumers are outside the scope of Article 50. The Act is about consumer-facing synthetic content. Internal AI-generated imagery does not need a public disclosure label. (Other parts of the Act may apply — this is specifically about the synthetic-content transparency provisions.)",
+      },
+      {
+        heading: "What this looks like in a synthetic-talent engagement",
+        body: "With Virtual Agency, the provider obligation is handled on our side — C2PA embedding is one click in the project settings. The deployer obligation stays with the brand, but our deliverables include a recommended disclosure caption per asset format, alt text, and a documentation block you can drop into your campaign archive. Brand teams report this turns Article 50 compliance from a special project into a five-minute checkbox.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
