@@ -102,6 +102,30 @@ export default async function sitemap(
             },
           },
           {
+            url: `${SITE_URL}/en/services`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.7,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/services`,
+                ko: `${SITE_URL}/services`,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/en/faq`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.4,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/faq`,
+                ko: `${SITE_URL}/faq`,
+              },
+            },
+          },
+          {
             url: `${SITE_URL}/en/legal/ai-disclosure`,
             lastModified: now,
             changeFrequency: "yearly",

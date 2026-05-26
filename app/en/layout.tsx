@@ -64,6 +64,11 @@ function EnFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/en/services" className="hover:text-white">
+                Services
+              </Link>
+            </li>
+            <li>
               <Link href="/en/about" className="hover:text-white">
                 About
               </Link>
@@ -76,6 +81,11 @@ function EnFooter() {
             <li>
               <Link href="/en/cases" className="hover:text-white">
                 Case studies
+              </Link>
+            </li>
+            <li>
+              <Link href="/en/faq" className="hover:text-white">
+                FAQ
               </Link>
             </li>
             <li>
