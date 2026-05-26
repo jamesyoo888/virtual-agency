@@ -149,6 +149,42 @@ export default async function sitemap(
               },
             },
           },
+          ...INDUSTRY_OPTIONS.map((o) => ({
+            url: `${SITE_URL}/en/explore/${o.value}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.6,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/explore/${o.value}`,
+                ko: `${SITE_URL}/explore/${o.value}`,
+              },
+            },
+          })),
+          ...MOOD_OPTIONS.map((o) => ({
+            url: `${SITE_URL}/en/explore/mood/${o.value}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.5,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/explore/mood/${o.value}`,
+                ko: `${SITE_URL}/explore/mood/${o.value}`,
+              },
+            },
+          })),
+          ...GENRE_OPTIONS.map((o) => ({
+            url: `${SITE_URL}/en/explore/genre/${o.value}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.5,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/explore/genre/${o.value}`,
+                ko: `${SITE_URL}/explore/genre/${o.value}`,
+              },
+            },
+          })),
           {
             url: `${SITE_URL}/en/faq`,
             lastModified: now,

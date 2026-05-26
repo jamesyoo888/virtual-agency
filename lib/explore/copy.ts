@@ -89,3 +89,101 @@ export const GENRE_COPY: Record<GenreTag, Copy> = {
     seoDescription: "공포·미스터리 무드 AI 버추얼 모델 카탈로그.",
   },
 };
+
+// English mirrors — same shape, K-aesthetic-aware voice for global brands.
+export const MOOD_COPY_EN: Record<MoodTag, Copy> = {
+  cold: {
+    heroTitle: "Cool-mood AI Virtual Models",
+    heroLede:
+      "Mono, minimal, K-aesthetic editorial. Luxury fashion, tech, premium beauty — built for restraint.",
+    seoDescription:
+      "Cool-mood AI virtual models for luxury, tech, and premium campaigns. K-aesthetic editorial lighting native.",
+  },
+  warm: {
+    heroTitle: "Warm-mood AI Virtual Models",
+    heroLede:
+      "Soft, dewy, approachable. Lifestyle, F&B, family-oriented K-beauty campaigns.",
+    seoDescription:
+      "Warm-mood AI virtual models for lifestyle and K-beauty campaigns. Dewy glass-skin lighting on demand.",
+  },
+  neutral: {
+    heroTitle: "Neutral-mood AI Virtual Models",
+    heroLede:
+      "Versatile across brand contexts. Strong for multi-concept catalog rollouts and seasonal pivots.",
+    seoDescription:
+      "Neutral-mood AI virtual models for catalog rollouts and multi-concept campaigns.",
+  },
+  edgy: {
+    heroTitle: "Edgy AI Virtual Models",
+    heroLede:
+      "Sharp K-street style, high-impact, editorial-with-bite. Film, hi-end fashion, statement campaigns.",
+    seoDescription:
+      "Edgy AI virtual models for high-impact campaigns, film, and editorial K-fashion.",
+  },
+};
+
+export const GENRE_COPY_EN: Record<GenreTag, Copy> = {
+  ad: {
+    heroTitle: "Advertising-optimized AI Virtual Models",
+    heroLede:
+      "TVC, social campaigns, digital ads. Casting tuned to ad rhythm and brand voice.",
+    seoDescription:
+      "AI virtual models cast for TV, social, and digital advertising campaigns.",
+  },
+  film: {
+    heroTitle: "Cinematic AI Virtual Models",
+    heroLede:
+      "Film tone, depth, K-cinema palette. Short-form film content and cinematic ads.",
+    seoDescription:
+      "Cinematic AI virtual models with K-aesthetic film-tone palettes.",
+  },
+  drama: {
+    heroTitle: "Drama-mood AI Virtual Models",
+    heroLede:
+      "Expressive faces, emotional range. K-drama-coded talent for serial content and brand storytelling.",
+    seoDescription:
+      "K-drama-coded AI virtual models for serial campaigns and brand storytelling.",
+  },
+  noir: {
+    heroTitle: "Noir AI Virtual Models",
+    heroLede:
+      "Hard light, deep shadow, cool monochrome. When you need visual impact, not warmth.",
+    seoDescription:
+      "Noir-style AI virtual models for high-contrast, mood-forward campaigns.",
+  },
+  romance: {
+    heroTitle: "Romance-mood AI Virtual Models",
+    heroLede:
+      "Soft, warm, K-beauty-adjacent. Fragrance, weddings, romance-coded F&B.",
+    seoDescription:
+      "Romance-mood AI virtual models for fragrance, wedding, and K-beauty-adjacent campaigns.",
+  },
+  "sci-fi": {
+    heroTitle: "Sci-Fi AI Virtual Models",
+    heroLede:
+      "Future-forward, cyberpunk, metaverse-coded. Tech, gaming, immersive campaigns.",
+    seoDescription:
+      "Sci-fi AI virtual models for tech, gaming, and future-forward campaigns.",
+  },
+  historical: {
+    heroTitle: "Historical-mood AI Virtual Models",
+    heroLede:
+      "Traditional Korean dress, court-era styling. Culture, tourism, museum-grade brand work.",
+    seoDescription:
+      "Historical-mood AI virtual models styled for Korean tradition and cultural campaigns.",
+  },
+  indie: {
+    heroTitle: "Indie AI Virtual Models",
+    heroLede:
+      "Natural light, lived-in tone, K-indie aesthetic. Small-batch brand work and editorial.",
+    seoDescription:
+      "Indie-mood AI virtual models with K-indie editorial aesthetic.",
+  },
+  horror: {
+    heroTitle: "Horror-mood AI Virtual Models",
+    heroLede:
+      "Dark tones, mystery, K-horror visual codes. Seasonal limited campaigns and gaming.",
+    seoDescription:
+      "Horror-mood AI virtual models for K-horror-coded seasonal campaigns and gaming.",
+  },
+};
