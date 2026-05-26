@@ -8,7 +8,8 @@ import { loadPersonaSignals } from "@/lib/matching/persona";
 import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import ShareLinkButton from "@/components/share-link-button";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { listCharacters, type Character } from "@/lib/characters/registry";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -106,6 +107,27 @@ export default async function MatchPage({ searchParams }: PageProps) {
 
   const ranked = hasInput ? rankModels(models, mergedBrief).slice(0, 12) : [];
 
+  // Owned-character match — when the brief intersects with a character's
+  // targetVerticals or defaultMoods, surface it above the catalog so the
+  // brand-kit funnel gets a chance before the visitor commits to a generic
+  // catalog model.
+  const characterMatches: Array<{ character: Character; score: number }> =
+    hasInput
+      ? listCharacters()
+          .map((c) => {
+            const industries = mergedBrief.industries as readonly string[];
+            const moods = mergedBrief.moods as readonly string[];
+            const verticalHits = c.targetVerticals.filter((v) =>
+              industries.includes(v)
+            ).length;
+            const moodHits = c.defaultMoods.filter((m) => moods.includes(m))
+              .length;
+            return { character: c, score: verticalHits * 2 + moodHits };
+          })
+          .filter((m) => m.score > 0)
+          .sort((a, b) => b.score - a.score)
+      : [];
+
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="border-b border-zinc-900 px-8 py-5 flex items-center justify-between">
@@ -197,6 +219,50 @@ export default async function MatchPage({ searchParams }: PageProps) {
             매칭 시작
           </button>
         </form>
+
+        {hasInput && characterMatches.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm uppercase tracking-wider text-zinc-400">
+                자체 캐릭터 매치
+              </h2>
+              <Link
+                href="/character"
+                className="text-xs text-zinc-400 hover:text-white underline"
+              >
+                전체 캐릭터 →
+              </Link>
+            </div>
+            <p className="text-xs text-zinc-500 mb-4">
+              브리프가 자체 캐릭터의 산업·무드와 겹칩니다. 브랜드 키트
+              (페어·독점·시즌 단위) 라이선스는 카탈로그가 아니라 캐릭터
+              페이지에서 시작합니다.
+            </p>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {characterMatches.map(({ character: c }) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`/character/${c.slug}`}
+                    className="group block rounded-xl border border-violet-500/30 bg-violet-500/5 p-4 hover:border-violet-400/50 transition-colors"
+                  >
+                    <div className="flex items-baseline justify-between mb-1">
+                      <p className="text-lg font-bold group-hover:underline">
+                        {c.name}
+                      </p>
+                      <span className="text-[10px] uppercase tracking-wider text-violet-300/80">
+                        자체 IP
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-400 mb-2">{c.tagline}</p>
+                    <span className="inline-flex items-center gap-1 text-xs text-zinc-300 group-hover:text-white">
+                      캐릭터 상세 <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {hasInput && (
           <section>

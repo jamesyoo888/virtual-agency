@@ -163,6 +163,12 @@ export default async function BlogPostPage({
                 AI 매칭 시작
               </Link>
               <Link
+                href="/character"
+                className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
+              >
+                캐릭터 둘러보기
+              </Link>
+              <Link
                 href="/pricing"
                 className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
               >

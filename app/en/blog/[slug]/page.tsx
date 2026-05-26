@@ -148,6 +148,12 @@ export default async function EnBlogPostPage({
                 Match a model
               </Link>
               <Link
+                href="/en/character"
+                className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
+              >
+                Meet the characters
+              </Link>
+              <Link
                 href="/en/pricing"
                 className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
               >
