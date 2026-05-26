@@ -52,6 +52,9 @@ export default async function EnHomePage() {
           <Link href="/en/pricing" className="hover:text-white">
             Pricing
           </Link>
+          <Link href="/en/blog" className="hover:text-white">
+            Blog
+          </Link>
           <Link href="/en/about" className="hover:text-white">
             About
           </Link>

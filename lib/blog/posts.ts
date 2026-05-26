@@ -13,6 +13,8 @@ export interface BlogSection {
   body: string;
 }
 
+export type BlogLocale = "ko" | "en";
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -21,6 +23,16 @@ export interface BlogPost {
   readingMinutes: number;
   tags: string[];
   sections: BlogSection[];
+  /**
+   * Language of the post. Default is "ko" for posts written without an
+   * explicit value, preserving the historical Korean catalog. English posts
+   * for the global rollout opt in by setting locale: "en".
+   */
+  locale?: BlogLocale;
+}
+
+export function postLocale(post: BlogPost): BlogLocale {
+  return post.locale ?? "ko";
 }
 
 export const BLOG_POSTS: BlogPost[] = [
@@ -1014,16 +1026,137 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+
+  /* ----------------------------------------------------------------
+   * English-language posts (locale: "en") — Phase 0.3 of the global
+   * rollout. Same data shape, separate locale so /en/blog filters cleanly.
+   * ---------------------------------------------------------------- */
+
+  {
+    slug: "what-is-k-aesthetic-brand-guide",
+    locale: "en",
+    title: "What Is K-Aesthetic? A Brand's Guide to Korean Visual Language",
+    excerpt:
+      "K-pop, K-drama, and K-beauty made K-aesthetic a global vocabulary. Here is what brands actually mean by it, and how to brief for it without sounding like a stereotype.",
+    publishedAt: "2026-05-26",
+    readingMinutes: 6,
+    tags: ["K-aesthetic", "brand strategy", "creative direction"],
+    sections: [
+      {
+        heading: "It's a vocabulary, not a costume",
+        body: "When a US or European brand asks for K-aesthetic, they almost never mean hanbok or K-pop costume — they mean a visual register: soft glass-skin lighting, cool-leaning color palettes, controlled minimalism, and product as protagonist rather than prop. Knowing this matters because the worst K-aesthetic campaigns look like cosplay; the best ones look like the brand finally got its tone right.",
+      },
+      {
+        heading: "Three palettes that travel",
+        body: "Cool minimal (gray-blue + cream + sage), warm dewy (peach + ivory + soft amber), and editorial mono (black + ash + a single accent). Pick one for the campaign and lock it across the lookbook. K-aesthetic is built on consistency — mixing palettes breaks the cue.",
+      },
+      {
+        heading: "Lighting beats wardrobe",
+        body: "The reason K-beauty photography reads as K-beauty is lighting, not products. Soft, dimensional, slightly cool key with low-contrast fill. That look is reproducible at low cost in AI-generated imagery, which is partly why the aesthetic scaled so quickly across digital.",
+      },
+      {
+        heading: "Casting choices that respect the source",
+        body: "Pick a face that fits the register, not a face that fits a stereotype. Modern K-aesthetic faces lean natural, often dewy, often soft-feature — not the high-glam mid-90s archetype. Avoid casting that flattens K-aesthetic into a single look; the actual aesthetic is broader and more nuanced than any one face.",
+      },
+      {
+        heading: "How to write the brief",
+        body: "Three locked words for tone (e.g. «cool, soft, editorial»), one locked palette, one reference image per lighting choice (3 max), and a clear use case (PDP hero vs Instagram carousel vs OOH). That's enough for a casting director — human or AI — to deliver work that reads as K-aesthetic without copying any specific brand.",
+      },
+      {
+        heading: "Where AI talent fits",
+        body: "If your brand will run the same K-aesthetic story across multiple markets in the same quarter, synthetic talent solves the consistency problem cheaply. You get one face across regions, one tone across formats, and zero scheduling friction. The trade-off is the disclosure requirement — every market we operate in now requires you to label synthetic content. See our disclosure for the per-market table.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-talent-vs-real-models-cost",
+    locale: "en",
+    title: "Synthetic Talent vs Real Models: Cost-per-Campaign Breakdown",
+    excerpt:
+      "Numbers from real campaigns. Where synthetic talent wins on cost, where traditional casting still makes sense, and the hybrid model most brands actually want.",
+    publishedAt: "2026-05-25",
+    readingMinutes: 7,
+    tags: ["pricing", "ROI", "strategy"],
+    sections: [
+      {
+        heading: "Why the comparison keeps getting asked",
+        body: "Procurement teams keep getting briefed on AI talent as «cheaper» but rarely see a like-for-like table. So they default to either rejecting it on principle or over-buying. The honest answer is that costs differ by an order of magnitude, but only for the right workloads — that's what this post tries to make concrete.",
+      },
+      {
+        heading: "Per-campaign cost — typical figures",
+        body: "Mid-market human model + studio campaign (5 hero stills, 3 lifestyle, one short video, 14-day non-exclusive): typically $40,000–$120,000 fully loaded (talent, studio, retouching, agency margin). Equivalent synthetic talent engagement: $5,000–$15,000. The 5–10x gap is real and it shows up in every benchmark we have run with clients who tried both.",
+      },
+      {
+        heading: "Where synthetic does NOT save money",
+        body: "Live events, influencer-driven storytelling, long-form interview content, and any campaign whose entire premise is a real person's audience. There is no synthetic substitute for an actual fanbase. If the brief calls for celebrity endorsement, synthetic is the wrong tool.",
+      },
+      {
+        heading: "The hybrid pattern most global brands settle into",
+        body: "Synthetic for catalog, look development, e-commerce hero, and seasonal lookbook. Human talent for hero campaign anchor, live activation, and any narrative that requires lived experience. Brands using this split typically spend 30–50% less than human-only programs while keeping the moments that require humanity.",
+      },
+      {
+        heading: "Variable costs at scale",
+        body: "Marginal cost of an additional synthetic shot is approximately the GPU electricity it consumed. That changes A/B testing economics entirely — running 12 hero variants becomes cheaper than running 3 with a human shoot. Brands that take advantage of this learn faster about what their audience responds to.",
+      },
+      {
+        heading: "Hidden costs to budget for",
+        body: "Disclosure overhead (watermark + caption + asset metadata) adds modest creative team time. Compliance review of synthetic content adds legal time on the first campaign and then drops to near zero. AI-content rights and licensing are simpler than human releases — there is no usage clock to renegotiate.",
+      },
+      {
+        heading: "The honest verdict",
+        body: "For a global brand running quarterly K-aesthetic campaigns across 3+ markets, synthetic talent is hard to beat economically. For a single-market hero campaign with celebrity endorsement, human talent is still the answer. Most brands need both, and most brands underuse the synthetic side.",
+      },
+    ],
+  },
+  {
+    slug: "why-k-beauty-brands-use-ai-models",
+    locale: "en",
+    title: "Why K-Beauty Brands Are Using AI Models for Global Expansion",
+    excerpt:
+      "Beauty brands face a structural problem when they go global. Synthetic talent solves three of the hardest constraints — consistency, regional adaptation, and shoot cost — at once.",
+    publishedAt: "2026-05-24",
+    readingMinutes: 6,
+    tags: ["K-beauty", "K-aesthetic", "global expansion", "case"],
+    sections: [
+      {
+        heading: "The constraint that prompted the shift",
+        body: "When a Korean beauty brand expands into the US, EU, and SEA simultaneously, the campaign manager faces three constraints that don't compose well: one consistent face across markets (or shoppers don't recognize you), regional adaptation of styling and product context (or it doesn't sell), and a budget that can't multiply by the number of markets (or the launch goes upside down). Synthetic talent makes those three constraints compatible for the first time.",
+      },
+      {
+        heading: "Consistency without shipping a model around the world",
+        body: "Pre-AI, the cost of taking a single human face to Seoul, Singapore, LA, and Berlin for a launch was logistically punishing. Brands compromised — different faces per region — and lost recognition. Synthetic talent stays the same in every market because there is no schedule, no flight, and no continuity error between shoots.",
+      },
+      {
+        heading: "Regional adaptation that scales",
+        body: "Skin tone, wardrobe, and environment can be re-rendered per market without re-shooting. The model's face stays canonical; the surroundings adapt. This is what made K-beauty brands serious adopters — the category needs both a stable visual identity and localized context for SKUs.",
+      },
+      {
+        heading: "The compliance bar that came with it",
+        body: "EU AI Act Article 50, US FTC endorsement guides, UK ASA / CAP code, and Korea KCSC labelling guidance all apply now. K-beauty brands have responded by treating the disclosure as part of the brand voice — small, well-designed «AI-generated» captions that don't break the aesthetic but satisfy the regulator. See our disclosure for the per-market table.",
+      },
+      {
+        heading: "Concrete benchmark — quarterly campaign",
+        body: "A mid-market Korean K-beauty brand running a four-market launch with synthetic talent typically spends $30,000–$60,000 per quarter for hero stills, social cuts, three videos, and persona Instagram. The equivalent traditional program with reshoots per region historically came in at $150,000–$300,000. The gap pays for the rest of the launch.",
+      },
+      {
+        heading: "Where K-beauty still uses humans",
+        body: "Brand ambassador deals, founder content, in-store activations, and TikTok creator partnerships. The model that works is: synthetic for the controlled brand surface (PDP, ads, lookbook) and human for the relationship surface (creators, ambassadors). Brands that try to use synthetic for both, or human for both, tend to overspend or underperform.",
+      },
+    ],
+  },
 ];
 
-export function getPostBySlug(slug: string): BlogPost | undefined {
-  return BLOG_POSTS.find((p) => p.slug === slug);
+export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
+  const post = BLOG_POSTS.find((p) => p.slug === slug);
+  if (!post) return undefined;
+  if (locale && postLocale(post) !== locale) return undefined;
+  return post;
 }
 
-export function listPosts(): BlogPost[] {
-  return [...BLOG_POSTS].sort((a, b) =>
-    b.publishedAt.localeCompare(a.publishedAt)
-  );
+export function listPosts(locale: BlogLocale = "ko"): BlogPost[] {
+  return [...BLOG_POSTS]
+    .filter((p) => postLocale(p) === locale)
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
 /**
@@ -1044,9 +1177,10 @@ export function decodeTagSlug(slug: string): string {
   }
 }
 
-export function listTags(): { tag: string; count: number }[] {
+export function listTags(locale: BlogLocale = "ko"): { tag: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const post of BLOG_POSTS) {
+    if (postLocale(post) !== locale) continue;
     for (const t of post.tags) {
       counts.set(t, (counts.get(t) ?? 0) + 1);
     }
@@ -1056,8 +1190,8 @@ export function listTags(): { tag: string; count: number }[] {
     .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
 }
 
-export function listPostsByTag(tag: string): BlogPost[] {
-  return listPosts().filter((p) => p.tags.includes(tag));
+export function listPostsByTag(tag: string, locale: BlogLocale = "ko"): BlogPost[] {
+  return listPosts(locale).filter((p) => p.tags.includes(tag));
 }
 
 /**
@@ -1068,8 +1202,9 @@ export function listPostsByTag(tag: string): BlogPost[] {
  */
 export function listRelatedPosts(slug: string, limit = 3): BlogPost[] {
   const source = getPostBySlug(slug);
-  if (!source) return listPosts().slice(0, limit);
-  const others = listPosts().filter((p) => p.slug !== slug);
+  const locale = source ? postLocale(source) : "ko";
+  if (!source) return listPosts(locale).slice(0, limit);
+  const others = listPosts(locale).filter((p) => p.slug !== slug);
   const scored = others.map((p) => {
     const overlap = p.tags.filter((t) => source.tags.includes(t)).length;
     return { post: p, overlap };

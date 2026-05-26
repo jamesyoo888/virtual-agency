@@ -113,6 +113,24 @@ export default async function sitemap(
             },
           },
           {
+            url: `${SITE_URL}/en/blog`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.6,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/blog`,
+                ko: `${SITE_URL}/blog`,
+              },
+            },
+          },
+          ...listPosts("en").map((p) => ({
+            url: `${SITE_URL}/en/blog/${p.slug}`,
+            lastModified: new Date(p.publishedAt),
+            changeFrequency: "monthly" as const,
+            priority: 0.5,
+          })),
+          {
             url: `${SITE_URL}/match`,
             lastModified: now,
             changeFrequency: "weekly",
