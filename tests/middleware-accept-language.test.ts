@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { prefersEnglish } from "@/middleware";
+import { prefersEnglish } from "@/proxy";
 
 describe("prefersEnglish", () => {
   it("returns false for null / empty input", () => {

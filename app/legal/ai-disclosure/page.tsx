@@ -1,154 +1,159 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "AI ?⑹꽦 肄섑뀗痢??쒓린 ?뺤콉 ??Virtual Agency",
+  title: "AI 합성 콘텐츠 표기 정책 — Virtual Agency",
   description:
-    "Virtual Agency 媛 ?댁쁺?섎뒗 AI 媛??紐⑤뜽???⑹꽦 肄섑뀗痢??쒓린 ?먯튃. EU AI Act Article 50, FTC Endorsement Guides, UK ASA / CAP Code 諛??쒓뎅 諛⑹떖??媛?대뱶 湲곕컲.",
+    "Virtual Agency가 운영하는 AI 가상 모델의 합성 콘텐츠 표기 원칙. EU AI Act Article 50, FTC Endorsement Guides, UK ASA / CAP Code 및 방심위·공정위 가이드 기반.",
 };
 
 export default function AiDisclosurePage() {
   return (
     <>
       <p className="text-xs text-zinc-500 uppercase tracking-widest">
-        理쒖쥌 媛쒖젙 2026-05-26 쨌 Version 1.0
+        최종 개정 2026-05-26 · Version 1.0
       </p>
       <h1 className="text-3xl font-bold mt-2 mb-3 text-white">
-        AI ?⑹꽦 肄섑뀗痢??쒓린 ?뺤콉
+        AI 합성 콘텐츠 표기 정책
       </h1>
       <p className="text-zinc-400 text-sm mb-8">
-        Virtual Agency ??紐⑤뱺 紐⑤뜽? AI 濡??앹꽦???⑹꽦 ?몃Ъ (synthetic talent) ?낅땲??
-        ?ㅼ젣濡?議댁옱?섎뒗 ?щ엺??珥ъ쁺??寃껋씠 ?꾨떃?덈떎. 蹂??섏씠吏???곕━媛 ???ъ떎??        ?대뼸寃?紐낆떆?섍퀬, 愿묎퀬二쇨? 罹좏럹??吏묓뻾 ???대뼡 ?섎Т瑜??댄뻾?댁빞 ?섎뒗吏瑜??ㅻ챸?⑸땲??
+        Virtual Agency의 모든 모델은 AI로 생성된 합성 인물(synthetic talent)
+        입니다. 실제 인물을 촬영한 것이 아닙니다. 본 페이지는 우리가 합성 사실을
+        어떻게 명시하고, 광고주가 캠페인 집행 시 어떤 의무를 이행해야 하는지를
+        설명합니다.
       </p>
 
-      <h2 className="text-xl font-semibold text-white mt-8 mb-3">1. ?듭떖 ?먯튃</h2>
+      <h2 className="text-xl font-semibold text-white mt-8 mb-3">1. 핵심 원칙</h2>
       <ul className="list-disc list-inside leading-relaxed space-y-1.5">
         <li>
-          <strong className="text-white">?⑹꽦?꾩쓣 ?④린吏 ?딅뒗??</strong> 紐⑤뱺 紐⑤뜽 ?꾨줈??          ?섏씠吏쨌OG 移대뱶쨌?앹꽦 ?대?吏?먮뒗 AI ?앹꽦 ?쒓린媛 紐낆떆?⑸땲??
+          <strong className="text-white">합성성을 숨기지 않습니다.</strong>{" "}
+          모든 모델 프로필·OG 카드·생성 이미지에 AI 생성 표기가 명시됩니다.
         </li>
         <li>
-          <strong className="text-white">?ㅼ젣 ?몃Ъ怨??쇰룞???쇱쑝?ㅼ? ?딅뒗??</strong>
-          罹먮┃?곕뒗 媛怨듭쓽 ?몃Ъ?대ŉ, ?ㅼ〈 ?몃Ъ ?먮뒗 ?좊챸?몄쓣 紐⑥궗?섏? ?딆뒿?덈떎.
+          <strong className="text-white">실제 인물 사칭을 하지 않습니다.</strong>{" "}
+          캐릭터는 가공의 인물이며, 실존 인물 또는 유명인을 모사하지 않습니다.
         </li>
         <li>
-          <strong className="text-white">議곗옉 媛?μ꽦???뚮┛??</strong> 愿묎퀬二쇱뿉寃??쒓났?섎뒗
-          紐⑤뱺 ?곗텧臾쇱? ?앹꽦 AI 濡?留뚮뱾?댁죱?뚯쓣 罹좏럹???щ━?먯씠?곕툕 ?④퀎?먯꽌 ?④퍡 ?덈궡?⑸땲??
+          <strong className="text-white">조작 가능성을 문서화합니다.</strong>{" "}
+          모든 산출물은 합성 메타데이터를 포함하므로 다운스트림 플랫폼이
+          올바르게 분류할 수 있습니다.
         </li>
       </ul>
 
       <h2 className="text-xl font-semibold text-white mt-8 mb-3">
-        2. ?곸슜?섎뒗 湲濡쒕쾶 洹쒖젣
+        2. 적용되는 법규
       </h2>
 
       <h3 className="text-base font-semibold text-zinc-200 mt-4 mb-2">
-        2.1 EU AI Act Article 50 (2026 ?쒗뻾)
+        2.1 EU AI Act Article 50 (2026 시행)
       </h3>
       <p className="leading-relaxed">
-        EU ?쒖옣????곸쑝濡???罹좏럹?몄? AI ?쒖뒪?쒖쑝濡??앹꽦쨌議곗옉???대?吏쨌?ㅻ뵒?ㅒ룹쁺?곸뿉 ???        ?대떦 肄섑뀗痢좉? ?멸났?곸쑝濡??앹꽦?섏뿀?뚯쓣 紐낆떆?곸쑝濡??쒖떆?댁빞 ?⑸땲??(Art. 50 짠2).
-        Virtual Agency ???ㅼ쓬???쒓났?⑸땲??
+        EU 시장을 대상으로 한 캠페인은 AI 시스템으로 생성·조작된 이미지·오디오·
+        영상 콘텐츠임을 명시적으로 표시해야 합니다 (Art. 50 §2). Virtual
+        Agency는 다음을 제공합니다.
       </p>
       <ul className="list-disc list-inside leading-relaxed space-y-1 mt-2">
         <li>
-          <strong className="text-white">C2PA / 硫뷀??곗씠???뚰꽣留덊겕</strong> {`??`}
-          ?곗텧臾?EXIF 諛?C2PA manifest ??{`짬AI-generated쨩`} 留덊궧???쎌엯 (?붿껌 ???쒖꽦??
+          <strong className="text-white">C2PA / 메타데이터 워터마크</strong> —
+          출력물 EXIF 및 C2PA manifest에 «AI-generated» 마킹 삽입 (요청 시
+          활성화)
         </li>
         <li>
-          <strong className="text-white">?쒓컖???뚰꽣留덊겕</strong> {`??`}
-          紐⑥꽌由??먮뒗 罹≪뀡??{`짬AI-generated쨩`} / {`짬?⑹꽦 肄섑뀗痢졖?} ?쒓린 ?듭뀡
+          <strong className="text-white">시각적 워터마크</strong> — 모서리
+          또는 캡션에 «AI-generated» / «합성 콘텐츠» 표기 옵션
         </li>
         <li>
-          <strong className="text-white">alt text</strong> {`??`}
-          {`짬AI-generated portrait of a fictional model named {name}쨩`} ?먮룞 ?앹꽦
+          <strong className="text-white">alt text</strong> — «AI-generated
+          portrait of a fictional model named {`{name}`}» 자동 생성
         </li>
       </ul>
 
       <h3 className="text-base font-semibold text-zinc-200 mt-4 mb-2">
-        2.2 FTC Endorsement Guides (誘멸뎅)
+        2.2 FTC Endorsement Guides (미국)
       </h3>
       <p className="leading-relaxed">
-        誘멸뎅 ?곕갑嫄곕옒?꾩썝?뚮뒗 媛???명뵆猷⑥뼵?쑣텮I 紐⑤뜽???멸컙 endorser ? ?숈씪??湲곗??쇰줈
-        洹쒖젣?⑸땲??(16 CFR Part 255, 2023 媛쒖젙). 罹좏럹??寃뚯떆臾쇱뿉 ?ㅼ쓬???ы븿?댁빞 ?⑸땲??
+        미국 연방거래위원회는 가상 인플루언서·AI 모델을 인간 endorser와 동일한
+        기준으로 규제합니다 (16 CFR Part 255, 2023 개정). 캠페인 게시물에
+        다음을 포함해야 합니다.
       </p>
       <ul className="list-disc list-inside leading-relaxed space-y-1 mt-2">
-        <li>{`짬This is a fictional, AI-generated character쨩`} ??紐낆떆</li>
-        <li>愿묎퀬?꾩쓣 #ad / #sponsored ?깆쑝濡??쒖떆</li>
-        <li>?ㅼ젣 ?ъ슜 寃쏀뿕??二쇱옣?섏? ?딆쓣 寃?(紐⑤뜽? ?쒗뭹???ъ슜?????놁쓬)</li>
+        <li>«This is a fictional, AI-generated character» 등 명시</li>
+        <li>광고임을 #ad / #sponsored 등으로 표시</li>
+        <li>실제 사용 경험을 주장하지 않을 것 (모델은 제품을 사용한 적이 없음)</li>
       </ul>
 
       <h3 className="text-base font-semibold text-zinc-200 mt-4 mb-2">
-        2.3 UK ASA / CAP Code (?곴뎅)
+        2.3 UK ASA / CAP Code (영국)
       </h3>
       <p className="leading-relaxed">
-        ?곴뎅 愿묎퀬湲곗??꾩썝?뚮뒗 misleading representation ??湲덉??⑸땲??(CAP Code Rule 3.1).
-        AI ?앹꽦 紐⑤뜽?꾩쓣 ?먮쭑쨌罹≪뀡쨌hashtag ?깆쑝濡??됯퇏 ?뚮퉬?먭? ?몄? 媛?ν븳 諛⑹떇?쇰줈
-        ?쒖떆?댁빞 ?⑸땲??
+        영국 광고심의기구(ASA)는 오인 가능한 표현을 금지합니다 (CAP Code Rule
+        3.1). 모델이 합성임을 일반 소비자가 명확히 인지할 수 있도록 캡션·자막·
+        해시태그·화면 텍스트 중 하나 이상으로 표기해야 합니다.
       </p>
 
       <h3 className="text-base font-semibold text-zinc-200 mt-4 mb-2">
-        2.4 ?쒓뎅 諛⑹떖??媛?대뱶 (2024.06)
+        2.4 방심위·공정위 가이드 (한국, 2024-06)
       </h3>
       <p className="leading-relaxed">
-        諛⑹넚?듭떊?ъ쓽?꾩썝?뙿룰났?뺢굅?섏쐞?먰쉶??AI 媛??紐⑤뜽 愿묎퀬??{`짬媛???몃Ъ?낅땲?ㅒ?}
-        ?먮뒗 {`짬AI 紐⑤뜽쨩`} ?쒓린瑜?沅뚭퀬?⑸땲?? ?붿옣?댟룹떇?댟룰툑?????⑤뒫 二쇱옣???곕Ⅴ??        ?낆쥌? ?쒓린媛 ?ъ떎???꾩닔?낅땲??
+        방송통신심의위원회와 공정거래위원회는 AI 가상 모델 광고에 «가상
+        인물입니다» 또는 «AI 모델» 등의 표기를 권고합니다. 화장품·식품·금융
+        등 효능 주장이 포함되는 카테고리는 사실상 의무에 가깝습니다.
       </p>
 
       <h2 className="text-xl font-semibold text-white mt-8 mb-3">
-        3. ?곕━媛 ?먮룞?쇰줈 ?곸슜?섎뒗 ?쒓린
+        3. 자동 적용 사항
       </h2>
       <ul className="list-disc list-inside leading-relaxed space-y-1.5">
-        <li>紐⑤뜽 detail ?섏씠吏 ?곗륫 ?곷떒 {`짬AI ?⑹꽦 ?몃Ъ쨩`} 諛곗?</li>
-        <li>OG 移대뱶 ?섎떒 {`짬AI-generated synthetic talent쨩`} ??以?/li>
+        <li>모든 모델 상세 페이지 우상단 «AI Synthetic» 배지</li>
+        <li>OG 카드에 «AI-generated synthetic talent» 문구</li>
         <li>
-          紐⑤뱺 紐⑤뜽 ?섏씠吏??蹂??뺤콉 ({" "}
+          모델 페이지마다 본 표기 정책({" "}
           <Link
             href="/legal/ai-disclosure"
             className="text-zinc-300 underline hover:text-white"
           >
             /legal/ai-disclosure
           </Link>{" "}
-          ) 留곹겕
+          )으로의 링크
         </li>
-        <li>寃ъ쟻 PDF ?명꽣??{`짬Synthetic talent ??campaign disclosure required쨩`} ??以?/li>
-        <li>JSON-LD ??<code className="text-zinc-300">additionalType</code> ???⑹꽦 ?몃Ъ 留덊궧</li>
+        <li>견적 PDF 푸터에 «합성 콘텐츠 — 캠페인 표기 필요» 문구</li>
+        <li>
+          JSON-LD Person 스키마의{" "}
+          <code className="text-zinc-300">additionalType</code> 표기
+        </li>
       </ul>
 
       <h2 className="text-xl font-semibold text-white mt-8 mb-3">
-        4. 愿묎퀬二쇨? 罹좏럹??吏묓뻾 ???댁빞 ????      </h2>
+        4. 광고주 의무
+      </h2>
       <ol className="list-decimal list-inside leading-relaxed space-y-1.5">
         <li>
-          罹좏럹???щ━?먯씠?곕툕 (?대?吏쨌?곸긽쨌SNS post) ???⑹꽦?꾩쓣 紐낆떆 ??罹≪뀡쨌?먮쭑쨌OSD
-          以???怨??댁긽??{`짬AI 紐⑤뜽쨩`}, {`짬Virtual model쨩`}, {`짬AI-generated쨩`} ?쒓린
+          크리에이티브에 합성성을 노출 — 캡션·자막·화면 텍스트 중 최소 하나는
+          «AI 모델», «가상 모델», 또는 «AI-generated» 등으로 표기.
         </li>
-        <li>
-          ?源??쒖옣???쒓린 ?섎Т??留욎떠 ?뚰꽣留덊겕 ?듭뀡 ?쒖꽦??(EU ?쒖옣 = C2PA ?꾩닔)
-        </li>
-        <li>
-          紐⑤뜽???ъ슜 寃쏀뿕??二쇱옣?섎뒗 ?뺥깭??移댄뵾 ?ъ슜 湲덉? (?? {`짬?쒓? 吏곸젒 ?⑤낯?┑?})
-        </li>
-        <li>
-          ?ㅼ〈 ?몃Ъ쨌?좊챸?몄쓣 紐⑥궗쨌?⑹꽦??寃껋쑝濡?蹂댁씪 ???덈뒗 蹂??湲덉?
-        </li>
+        <li>타깃 시장에 맞는 워터마크 옵션 활성화 (EU = C2PA 필수).</li>
+        <li>1인칭 제품 경험을 암시하는 카피를 작성하지 않을 것 (예: «사용해보니…»).</li>
+        <li>실제 인물 또는 유명인과 유사하게 보이도록 수정하지 않을 것 — 묵시적·명시적 모두.</li>
       </ol>
 
       <h2 className="text-xl font-semibold text-white mt-8 mb-3">
-        5. 湲덉??섎뒗 ?ъ슜
+        5. 금지 사용
       </h2>
       <ul className="list-disc list-inside leading-relaxed space-y-1">
-        <li>?ㅼ〈 ?몃Ъ???쇨뎬쨌紐⑹냼由?룹떊泥??뱀쭠??紐⑤갑???붿????몄쐢 ?앹꽦</li>
-        <li>?⑹꽦?꾩쓣 紐낆떆?섏? ?딆? ?뺤튂쨌?좉굅 肄섑뀗痢?/li>
-        <li>?섎즺쨌湲덉쑖 ?먮Ц ???꾨Ц ?먭꺽??媛?ν븳 肄섑뀗痢?/li>
-        <li>18??誘몃쭔?쇰줈 ?몄떇?????덈뒗 ?몃Ъ???깆쟻 ?먮뒗 ?꾪빐 肄섑뀗痢?/li>
-        <li>?뱀젙 ?몄쥌쨌?깅퀎쨌醫낃탳瑜?鍮꾪븯쨌?먯삤?섎뒗 臾섏궗</li>
+        <li>실제 인물의 디지털 트윈 생성 (얼굴·목소리·신체)</li>
+        <li>합성 표기 없는 정치·선거 콘텐츠</li>
+        <li>의료·금융 전문가 사칭</li>
+        <li>미성년으로 읽힐 수 있는 인물의 성적·유해 콘텐츠</li>
+        <li>인종·성별·종교에 대한 혐오·차별 표현</li>
       </ul>
       <p className="leading-relaxed mt-2">
-        蹂???ぉ ?꾨컲???뺤씤?섎㈃ ?곕━???곗텧臾??ъ슜??利됱떆 以묐떒 ?붿껌?섍퀬, 諛섎났 ??        怨꾩빟???댁??⑸땲??
+        확인된 위반은 즉시 takedown 요청 대상이며, 반복 위반 시 계약을
+        종료합니다.
       </p>
 
-      <h2 className="text-xl font-semibold text-white mt-8 mb-3">
-        6. 而댄뵆?쇱씠?몄뒪 臾몄쓽
-      </h2>
+      <h2 className="text-xl font-semibold text-white mt-8 mb-3">6. 컴플라이언스 문의</h2>
       <p className="leading-relaxed">
-        蹂??뺤콉??????섍껄쨌踰뺣쪧 臾몄쓽쨌?쒖옣蹂??쒓린 ?붽굔 ?뺤씤:{" "}
+        시장별 표기 관련 문의 또는 법무 검토:{" "}
         <a
           href="mailto:compliance@aihubs.uk"
           className="text-zinc-300 underline hover:text-white"
@@ -158,9 +163,10 @@ export default function AiDisclosurePage() {
       </p>
 
       <p className="text-xs text-zinc-500 mt-12">
-        ??蹂??뺤콉? EU AI Act, US FTC Endorsement Guides, UK ASA CAP Code, ?쒓뎅
-        諛⑹떖??媛?대뱶瑜?醫낇빀???댁쁺 湲곗??대ŉ, 媛쒕퀎 罹좏럹?몄쓽 踰뺣쪧 ?먮Ц???泥댄븯吏
-        ?딆뒿?덈떎. 愿묎퀬二쇰뒗 ?源??쒖옣??理쒖떊 洹쒖젣瑜?蹂꾨룄 ?뺤씤?댁빞 ?⑸땲??
+        본 정책은 EU AI Act, US FTC Endorsement Guides, UK ASA CAP Code 및
+        한국 방심위·공정위 가이드를 종합한 운영 기준입니다. 캠페인별 법률
+        자문을 대체하지 않으며, 광고주는 대상 시장의 최신 규제 확인 책임을
+        집니다.
       </p>
     </>
   );
