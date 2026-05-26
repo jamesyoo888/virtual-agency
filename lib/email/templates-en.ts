@@ -200,6 +200,35 @@ export function inquiryFollowupEn(vars: InquiryFollowupEnVars): RenderedEmail {
   return { subject, html, text };
 }
 
+export interface ReferralThanksEnVars {
+  clientName?: string | null;
+  refereeCompany: string | null;
+}
+
+export function referralThanksEn(vars: ReferralThanksEnVars): RenderedEmail {
+  const greet = vars.clientName ? `Hi ${vars.clientName},` : "Hello,";
+  const url = `${BASE_URL}/client/dashboard`;
+  const refereeLabel = vars.refereeCompany
+    ? `${vars.refereeCompany}`
+    : "Your referred client";
+  const subject = `[Virtual Agency] A referred client just submitted their first inquiry`;
+
+  const text =
+    `${greet}\n\n${refereeLabel} just submitted their first inquiry to Virtual Agency. ` +
+    `That confirms your referral link is wired correctly — referral rewards may apply per operating policy.\n\n` +
+    `Dashboard: ${url}\n`;
+
+  const html = wrap(
+    subject,
+    `<h2 style="margin:0 0 12px;font-size:20px;color:#fafafa">A referred client sent their first inquiry</h2>
+<p style="margin:0 0 16px;color:#d4d4d8">${escape(greet)} <strong style="color:#fafafa">${escape(refereeLabel)}</strong> just submitted their first inquiry to Virtual Agency.</p>
+<p style="margin:0 0 18px;color:#d4d4d8">That confirms your referral link is wired correctly — referral rewards may apply per operating policy.</p>
+<p style="margin:0"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">Open dashboard</a></p>`
+  );
+
+  return { subject, html, text };
+}
+
 export interface DigestEnVars {
   clientName?: string | null;
   active: Array<{

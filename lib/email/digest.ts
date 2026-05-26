@@ -22,11 +22,20 @@ const STATUS_KO: Record<string, string> = {
   delivered: "납품 완료",
 };
 
+const STATUS_EN: Record<string, string> = {
+  inquiry: "Inquiry received",
+  brief_received: "Brief received",
+  in_progress: "In production",
+  review: "Under review",
+  delivered: "Delivered",
+};
+
 export interface DigestProjectRow {
   id: string;
   title: string;
   status: string;
   status_ko: string;
+  status_en: string;
   modelName: string | null;
   updatedAt: string;
   isRecent: boolean; // updated within the digest window
@@ -36,6 +45,8 @@ export interface DigestPayload {
   clientId: string;
   email: string | null;
   name: string | null;
+  /** Preferred locale for the digest email — driven by clients.locale (mig 026). */
+  locale: "ko" | "en";
   active: DigestProjectRow[];
   recentChanges: DigestProjectRow[];
   deliveredCount: number;
@@ -57,9 +68,11 @@ export async function buildDigestPayload(
   // for the digest window. The history pull may fail (migration not yet
   // applied) — we tolerate that and fall back to updated_at as the signal.
   const [client, projects] = await Promise.all([
+    // `locale` may not yet exist (migration 026 not applied); the helper
+    // below tolerates that and defaults to "ko".
     supabase
       .from("clients")
-      .select("id, email, name")
+      .select("id, email, name, locale")
       .eq("id", clientId)
       .single(),
     supabase
@@ -71,6 +84,8 @@ export async function buildDigestPayload(
   ]);
 
   if (!client.data) return null;
+  const clientLocale: "ko" | "en" =
+    (client.data as { locale?: string | null }).locale === "en" ? "en" : "ko";
 
   const projectRows =
     (projects.data as unknown as Array<{
@@ -107,6 +122,7 @@ export async function buildDigestPayload(
     title: p.title,
     status: p.status,
     status_ko: STATUS_KO[p.status] ?? p.status,
+    status_en: STATUS_EN[p.status] ?? p.status,
     modelName: p.model?.name ?? null,
     updatedAt: p.updated_at,
     isRecent: historyAvailable
@@ -122,6 +138,7 @@ export async function buildDigestPayload(
     clientId: client.data.id,
     email: client.data.email ?? null,
     name: client.data.name ?? null,
+    locale: clientLocale,
     active,
     recentChanges,
     deliveredCount: deliveredRows.length,

@@ -111,10 +111,30 @@ export async function POST(request: Request) {
     supabase.from("models").select("name").eq("id", model_id).single(),
     supabase
       .from("clients")
-      .select("name, email, company")
+      .select("name, email, company, locale")
       .eq("id", user.id)
       .single(),
   ]);
+
+  // Locale preference (Wave 103 — migration 026). When this referer is from
+  // /en/* surfaces, opt the client into EN templates by upserting locale='en'
+  // — but only once and only when the column is missing/null/empty. We don't
+  // want to flip a Korean client's preference just because they happened to
+  // land on /en/ once.
+  const refererHeader = request.headers.get("referer") ?? "";
+  const cameFromEn = /\/en(?:\/|$)/.test(refererHeader);
+  const currentLocale = (client.data as { locale?: string | null } | null)?.locale;
+  if (cameFromEn && !currentLocale) {
+    // Fire-and-forget — locale is a soft signal and the user can always
+    // change it later from preferences. The dispatch below already uses
+    // 'en' for this request regardless of whether the UPDATE lands.
+    void supabase
+      .from("clients")
+      .update({ locale: "en" })
+      .eq("id", user.id);
+  }
+  const dispatchLocale: "ko" | "en" =
+    currentLocale === "en" || (cameFromEn && !currentLocale) ? "en" : "ko";
 
   // Conversion event for the hero experiments. The visitor's bucket was
   // assigned by the proxy and is read inside trackConversion via cookies, so
@@ -137,13 +157,19 @@ export async function POST(request: Request) {
   ];
   if (await canEmailClient(user.id, "inquiry_receipt")) {
     tasks.push(
-      notifyInquiryReceived(client.data?.email ?? user.email ?? null, {
-        clientName: client.data?.name ?? null,
-        modelName: model.data?.name ?? "선택한 모델",
-        projectTitle: project.title,
-        brief: composedBrief || null,
-        projectId: project.id,
-      })
+      notifyInquiryReceived(
+        client.data?.email ?? user.email ?? null,
+        {
+          clientName: client.data?.name ?? null,
+          modelName:
+            model.data?.name ??
+            (dispatchLocale === "en" ? "the selected model" : "선택한 모델"),
+          projectTitle: project.title,
+          brief: composedBrief || null,
+          projectId: project.id,
+        },
+        dispatchLocale
+      )
     );
   }
 
@@ -163,16 +189,24 @@ export async function POST(request: Request) {
       if ((priorCount ?? 0) === 0) {
         const { data: referrer } = await admin
           .from("clients")
-          .select("id, email, name")
+          .select("id, email, name, locale")
           .eq("id", utm_campaign)
           .maybeSingle();
         if (referrer?.email) {
+          const referrerLocale: "ko" | "en" =
+            (referrer as { locale?: string | null }).locale === "en"
+              ? "en"
+              : "ko";
           tasks.push(
-            notifyReferralThanks(referrer.email, {
-              clientName: referrer.name ?? null,
-              refereeCompany: client.data?.company ?? null,
-              referrerId: referrer.id,
-            })
+            notifyReferralThanks(
+              referrer.email,
+              {
+                clientName: referrer.name ?? null,
+                refereeCompany: client.data?.company ?? null,
+                referrerId: referrer.id,
+              },
+              referrerLocale
+            )
           );
         }
       }

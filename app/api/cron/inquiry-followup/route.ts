@@ -41,7 +41,7 @@ interface StaleRow {
   client_id: string | null;
   created_at: string;
   model?: { name: string | null } | null;
-  client?: { email: string | null; name: string | null } | null;
+  client?: { email: string | null; name: string | null; locale?: string | null } | null;
 }
 
 export async function GET(request: Request) {
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id, title, client_id, created_at, model:models(name), client:clients(email, name)"
+      "id, title, client_id, created_at, model:models(name), client:clients(email, name, locale)"
     )
     .eq("status", "inquiry")
     .is("inquiry_followup_sent_at", null)
@@ -110,13 +110,19 @@ export async function GET(request: Request) {
           (24 * 60 * 60 * 1000)
       );
 
-      const result = await notifyInquiryFollowup(row.client.email, {
-        clientName: row.client.name ?? null,
-        modelName: row.model?.name ?? null,
-        projectTitle: row.title,
-        projectId: row.id,
-        daysSinceInquiry: daysSince,
-      });
+      const followupLocale: "ko" | "en" =
+        (row.client as { locale?: string | null }).locale === "en" ? "en" : "ko";
+      const result = await notifyInquiryFollowup(
+        row.client.email,
+        {
+          clientName: row.client.name ?? null,
+          modelName: row.model?.name ?? null,
+          projectTitle: row.title,
+          projectId: row.id,
+          daysSinceInquiry: daysSince,
+        },
+        followupLocale
+      );
 
       // Even on provider failure we record the attempt — the at-most-once
       // guarantee is more important than retrying a flaky transactional

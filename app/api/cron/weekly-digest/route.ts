@@ -77,19 +77,24 @@ export async function GET(request: Request) {
         await markDigestSent(clientId);
         continue;
       }
-      await notifyWeeklyDigest(payload.email, {
-        clientId,
-        clientName: payload.name,
-        active: payload.active.map((p) => ({
-          id: p.id,
-          title: p.title,
-          status_ko: p.status_ko,
-          modelName: p.modelName,
-          isRecent: p.isRecent,
-        })),
-        recentChangesCount: payload.recentChanges.length,
-        deliveredCount: payload.deliveredCount,
-      });
+      await notifyWeeklyDigest(
+        payload.email,
+        {
+          clientId,
+          clientName: payload.name,
+          active: payload.active.map((p) => ({
+            id: p.id,
+            title: p.title,
+            status_ko: p.status_ko,
+            status_en: p.status_en,
+            modelName: p.modelName,
+            isRecent: p.isRecent,
+          })),
+          recentChangesCount: payload.recentChanges.length,
+          deliveredCount: payload.deliveredCount,
+        },
+        payload.locale
+      );
       await markDigestSent(clientId);
       results.push({ clientId, sent: true });
     } catch (err) {

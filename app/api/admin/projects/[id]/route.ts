@@ -87,23 +87,31 @@ export async function PATCH(
 
     const { data: client } = await supabase
       .from("clients")
-      .select("email, name")
+      .select("email, name, locale")
       .eq("id", priorRecord.client_id)
       .single();
 
     // Respect the client's notification opt-out before incurring the email
     // provider call. Defaults to allowed when no preference row exists.
     if (await canEmailClient(priorRecord.client_id, "status_changes")) {
+      const locale: "ko" | "en" =
+        (client as { locale?: string | null } | null)?.locale === "en"
+          ? "en"
+          : "ko";
       // Fire-and-await but never let an email failure roll back the status
       // change — `notifyStatusChanged` swallows + logs provider errors.
-      await notifyStatusChanged(client?.email ?? null, {
-        clientName: client?.name ?? null,
-        modelName: priorRecord.model?.name ?? null,
-        projectTitle: priorRecord.title,
-        projectId: id,
-        from: priorRecord.status,
-        to: parsed.data.status,
-      });
+      await notifyStatusChanged(
+        client?.email ?? null,
+        {
+          clientName: client?.name ?? null,
+          modelName: priorRecord.model?.name ?? null,
+          projectTitle: priorRecord.title,
+          projectId: id,
+          from: priorRecord.status,
+          to: parsed.data.status,
+        },
+        locale
+      );
     }
   }
 
