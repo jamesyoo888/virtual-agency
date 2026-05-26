@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
+import { listAnchorCases } from "@/lib/cases/anchor-cases";
 import { INDUSTRY_OPTIONS, MOOD_OPTIONS, GENRE_OPTIONS } from "@/lib/tags";
 
 const SITE_URL =
@@ -127,6 +128,24 @@ export default async function sitemap(
           ...listPosts("en").map((p) => ({
             url: `${SITE_URL}/en/blog/${p.slug}`,
             lastModified: new Date(p.publishedAt),
+            changeFrequency: "monthly" as const,
+            priority: 0.5,
+          })),
+          {
+            url: `${SITE_URL}/en/cases`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.6,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/cases`,
+                ko: `${SITE_URL}/cases`,
+              },
+            },
+          },
+          ...listAnchorCases().map((c) => ({
+            url: `${SITE_URL}/en/cases/${c.slug}`,
+            lastModified: new Date(c.publishedAt),
             changeFrequency: "monthly" as const,
             priority: 0.5,
           })),

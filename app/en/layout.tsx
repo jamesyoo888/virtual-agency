@@ -74,6 +74,11 @@ function EnFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/en/cases" className="hover:text-white">
+                Case studies
+              </Link>
+            </li>
+            <li>
               <Link href="/" className="hover:text-white">
                 Browse catalog (KR site)
               </Link>
