@@ -19,19 +19,10 @@ export const metadata: Metadata = {
 
 export default function EnAiDisclosurePage() {
   return (
-    <div className="min-h-screen bg-black text-zinc-200">
-      <header className="border-b border-zinc-900 px-8 py-4">
-        <Link
-          href="/en"
-          className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white"
-        >
-          ← Virtual Agency
-        </Link>
-      </header>
-      <article className="max-w-3xl mx-auto px-8 py-12 prose prose-invert prose-zinc">
-        <p className="text-xs text-zinc-500 uppercase tracking-widest">
-          Last revised 2026-05-26 · Version 1.0
-        </p>
+    <>
+      <p className="text-xs text-zinc-500 uppercase tracking-widest">
+        Last revised 2026-05-26 · Version 1.0
+      </p>
         <h1 className="text-3xl font-bold mt-2 mb-3 text-white">
           AI Synthetic Content Disclosure
         </h1>
@@ -216,7 +207,6 @@ export default function EnAiDisclosurePage() {
           remain responsible for confirming the latest rules in their target
           markets.
         </p>
-      </article>
-    </div>
+    </>
   );
 }

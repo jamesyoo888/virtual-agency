@@ -100,6 +100,16 @@ function EnFooter() {
           <p className="text-zinc-400 mb-2 font-medium">Compliance</p>
           <ul className="space-y-1">
             <li>
+              <Link href="/en/legal/terms" className="hover:text-white">
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <Link href="/en/legal/privacy" className="hover:text-white">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
               <Link href="/en/legal/ai-disclosure" className="hover:text-white">
                 AI synthetic content disclosure
               </Link>

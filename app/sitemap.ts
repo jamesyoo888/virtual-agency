@@ -138,6 +138,30 @@ export default async function sitemap(
             },
           },
           {
+            url: `${SITE_URL}/en/legal/terms`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.2,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/legal/terms`,
+                ko: `${SITE_URL}/legal/terms`,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/en/legal/privacy`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.2,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/legal/privacy`,
+                ko: `${SITE_URL}/legal/privacy`,
+              },
+            },
+          },
+          {
             url: `${SITE_URL}/en/blog`,
             lastModified: now,
             changeFrequency: "weekly",
