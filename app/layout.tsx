@@ -69,6 +69,7 @@ export default async function RootLayout({
   const navLd = siteNavigationLd([
     { name: "카탈로그", url: `${SITE_URL}/` },
     { name: "AI 매칭", url: `${SITE_URL}/match` },
+    { name: "캐릭터", url: `${SITE_URL}/character` },
     { name: "서비스", url: `${SITE_URL}/services` },
     { name: "가격", url: `${SITE_URL}/pricing` },
     { name: "사례", url: `${SITE_URL}/cases` },
