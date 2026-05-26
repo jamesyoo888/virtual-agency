@@ -1,0 +1,137 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { Briefcase, Link2, BookOpen } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+export const metadata = {
+  title: "Agency dashboard — Virtual Agency",
+  robots: { index: false },
+};
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
+
+interface ClientRow {
+  id: string;
+  agent_company: string | null;
+  agent_status: "pending" | "approved" | "rejected" | null;
+  role: "client" | "agent" | "admin";
+}
+
+export default async function AgentDashboardPage() {
+  if (!SUPABASE_CONFIGURED) {
+    return (
+      <main className="max-w-2xl mx-auto p-8">
+        <p className="text-sm text-zinc-500">Supabase not configured.</p>
+      </main>
+    );
+  }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/agent/dashboard");
+
+  const { data: row } = await supabase
+    .from("clients")
+    .select("id, agent_company, agent_status, role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const client = row as ClientRow | null;
+
+  if (!client || client.role !== "agent") {
+    redirect("/agent/onboard");
+  }
+  if (client.agent_status !== "approved") {
+    redirect("/agent/onboard");
+  }
+
+  // utm_campaign carries the agent's id; pre-built link saves the partner
+  // from constructing it. Same pattern as the Wave 25 referral flow.
+  const referralLink = `${SITE_URL}/?utm_source=agent&utm_campaign=${client.id}`;
+
+  return (
+    <main className="max-w-3xl mx-auto p-8">
+      <header className="mb-8">
+        <div className="flex items-center gap-2 mb-2">
+          <Briefcase className="w-5 h-5 text-emerald-400" />
+          <h1 className="text-2xl font-bold">
+            {client.agent_company ?? "Agency"} — partner dashboard
+          </h1>
+        </div>
+        <p className="text-sm text-zinc-400">
+          Welcome aboard. Use the referral link below to bring campaigns to
+          Virtual Agency — commission is 15% of delivered project revenue.
+        </p>
+      </header>
+
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Link2 className="w-4 h-4 text-zinc-400" />
+          <p className="text-sm font-medium text-zinc-200">
+            Your referral link
+          </p>
+        </div>
+        <code className="block bg-black/40 border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-300 break-all">
+          {referralLink}
+        </code>
+        <p className="text-[11px] text-zinc-500 mt-2">
+          Inquiries arriving via this link are attributed to your account.
+          Commission settles monthly on delivered projects.
+        </p>
+      </section>
+
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <BookOpen className="w-4 h-4 text-zinc-400" />
+          <p className="text-sm font-medium text-zinc-200">Sales materials</p>
+        </div>
+        <ul className="text-sm text-zinc-300 space-y-1.5">
+          <li>
+            <Link
+              href="/en/brief-template"
+              className="underline underline-offset-4 hover:text-white"
+            >
+              Campaign brief template
+            </Link>
+            <span className="text-zinc-500"> — shareable Markdown</span>
+          </li>
+          <li>
+            <Link
+              href="/en/pricing"
+              className="underline underline-offset-4 hover:text-white"
+            >
+              Pricing (USD)
+            </Link>
+            <span className="text-zinc-500"> — three engagement tiers</span>
+          </li>
+          <li>
+            <Link
+              href="/en/cases"
+              className="underline underline-offset-4 hover:text-white"
+            >
+              Case studies
+            </Link>
+            <span className="text-zinc-500"> — anchor engagements (recruiting)</span>
+          </li>
+          <li>
+            <Link
+              href="/en/legal/ai-disclosure"
+              className="underline underline-offset-4 hover:text-white"
+            >
+              Compliance disclosure
+            </Link>
+            <span className="text-zinc-500"> — EU AI Act / FTC / ASA / KCSC</span>
+          </li>
+        </ul>
+      </section>
+
+      <p className="text-xs text-zinc-500">
+        Commission reporting + payment scheduling are rolling out as Wave 106+.
+        Until then, contact press@aihubs.uk for manual settlement.
+      </p>
+    </main>
+  );
+}

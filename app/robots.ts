@@ -15,9 +15,11 @@ export default function robots(): MetadataRoute.Robots {
         allow: ["/", "/api/og", "/api/trending", "/trending", "/en/trending"],
         disallow: [
           "/admin/",
+          "/agent/",
           "/client/",
           "/creator/",
           "/api/admin/",
+          "/api/agents/",
           "/api/cron/",
           "/api/client/",
           "/api/creator/",
