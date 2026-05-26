@@ -13,7 +13,7 @@ import {
 } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
-import { listCharacters, type Character } from "@/lib/characters/registry";
+import { recommendCharacters } from "@/lib/characters/recommend";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -142,27 +142,14 @@ export default async function EnMatchPage({ searchParams }: PageProps) {
 
   const ranked = hasInput ? rankModels(models, mergedBrief).slice(0, 12) : [];
 
-  // Character recommendations — when the brief intersects with a character's
-  // targetVerticals or defaultMoods, surface the owned IP as a stronger
-  // alternative to a generic catalog match. Scoring is intentionally simple
-  // (verticals carry more weight than moods); we only surface characters with
-  // at least one intersection so the card stays editorially clean.
-  const characterMatches: Array<{ character: Character; score: number }> =
-    hasInput
-      ? listCharacters()
-          .map((c) => {
-            const industries = mergedBrief.industries as readonly string[];
-            const moods = mergedBrief.moods as readonly string[];
-            const verticalHits = c.targetVerticals.filter((v) =>
-              industries.includes(v)
-            ).length;
-            const moodHits = c.defaultMoods.filter((m) => moods.includes(m))
-              .length;
-            return { character: c, score: verticalHits * 2 + moodHits };
-          })
-          .filter((m) => m.score > 0)
-          .sort((a, b) => b.score - a.score)
-      : [];
+  // Surface owned characters above the catalog when the brief intersects
+  // with their targetVerticals or defaultMoods. See lib/characters/recommend.
+  const characterMatches = hasInput
+    ? recommendCharacters({
+        industries: mergedBrief.industries,
+        moods: mergedBrief.moods,
+      })
+    : [];
 
   return (
     <div className="min-h-screen bg-black text-white">
