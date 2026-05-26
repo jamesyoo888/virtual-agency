@@ -149,6 +149,18 @@ export default async function sitemap(
               },
             },
           },
+          {
+            url: `${SITE_URL}/en/brief-template`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.5,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/brief-template`,
+                ko: `${SITE_URL}/brief-template`,
+              },
+            },
+          },
           ...INDUSTRY_OPTIONS.map((o) => ({
             url: `${SITE_URL}/en/explore/${o.value}`,
             lastModified: now,
