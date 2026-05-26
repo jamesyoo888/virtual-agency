@@ -56,6 +56,61 @@ export default async function sitemap(
             lastModified: now,
             changeFrequency: "daily",
             priority: 1.0,
+            alternates: {
+              languages: {
+                ko: SITE_URL,
+                en: `${SITE_URL}/en`,
+              },
+            },
+          },
+          // English-language scaffolding for global brands (Phase 0).
+          {
+            url: `${SITE_URL}/en`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.9,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en`,
+                ko: SITE_URL,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/en/pricing`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.7,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/pricing`,
+                ko: `${SITE_URL}/pricing`,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/en/about`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.5,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/about`,
+                ko: `${SITE_URL}/about`,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/en/legal/ai-disclosure`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.4,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/legal/ai-disclosure`,
+                ko: `${SITE_URL}/legal/ai-disclosure`,
+              },
+            },
           },
           {
             url: `${SITE_URL}/match`,

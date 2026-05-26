@@ -32,6 +32,12 @@ export const metadata: Metadata = {
   description:
     "실제보다 완벽한, 언제나 브랜드에 최적화된 AI 버추얼 모델 에이전시.",
   applicationName: "Virtual Agency",
+  alternates: {
+    languages: {
+      ko: `${SITE_URL}/`,
+      en: `${SITE_URL}/en`,
+    },
+  },
   openGraph: {
     title: "Virtual Agency — AI Virtual Models",
     description:
@@ -39,6 +45,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "Virtual Agency",
     locale: "ko_KR",
+    alternateLocale: ["en_US"],
     type: "website",
   },
   twitter: {

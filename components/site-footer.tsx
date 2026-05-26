@@ -108,6 +108,21 @@ export default function SiteFooter() {
                 hello@virtualagency.example.com
               </a>
             </li>
+            <li className="pt-2 flex gap-2">
+              <Link
+                href="/"
+                className="rounded border border-zinc-800 px-2 py-0.5 text-zinc-300 bg-zinc-950"
+                aria-current="true"
+              >
+                KO
+              </Link>
+              <Link
+                href="/en"
+                className="rounded border border-zinc-900 px-2 py-0.5 text-zinc-500 hover:text-white"
+              >
+                EN
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
