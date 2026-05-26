@@ -70,7 +70,7 @@ const SERVICES: Service[] = [
       "Unlimited micro revisions after first-proof approval",
       "AI watermark option (EU AI Act / FTC compliant)",
     ],
-    cta: { label: "Quote an image campaign", href: "mailto:hello@aihubs.uk?subject=Image%20campaign%20brief" },
+    cta: { label: "Quote an image campaign", href: "/en/rfp?campaign=Image+campaign" },
   },
   {
     key: "video",
@@ -86,7 +86,7 @@ const SERVICES: Service[] = [
       "Simultaneous 16:9 / 9:16 / 1:1 export",
       "BGM, captions, logo integration",
     ],
-    cta: { label: "Quote video", href: "mailto:hello@aihubs.uk?subject=Video%20brief" },
+    cta: { label: "Quote video", href: "/en/rfp?campaign=Video+content&channels=tvc,digital" },
   },
   {
     key: "lookbook",
@@ -102,7 +102,7 @@ const SERVICES: Service[] = [
       "Campaign copy first draft included",
       "Auto-generates a /models/[id]/lookbook page",
     ],
-    cta: { label: "Quote a lookbook", href: "mailto:hello@aihubs.uk?subject=Lookbook%20brief" },
+    cta: { label: "Quote a lookbook", href: "/en/rfp?campaign=Lookbook+series&channels=lookbook" },
   },
   {
     key: "fitting",
@@ -118,7 +118,7 @@ const SERVICES: Service[] = [
       "Optional live generation of 1?? proofs in-session",
       "Fee credited if the engagement signs after the workshop",
     ],
-    cta: { label: "Request a fitting day", href: "mailto:hello@aihubs.uk?subject=Fitting%20day" },
+    cta: { label: "Request a fitting day", href: "/en/rfp?campaign=Fitting+day+workshop" },
   },
   {
     key: "brand-kit",
@@ -134,7 +134,7 @@ const SERVICES: Service[] = [
       "Quarterly concept refresh + new lookbook",
       "Campaign roadmap consult once per quarter",
     ],
-    cta: { label: "Discuss a brand kit", href: "mailto:hello@aihubs.uk?subject=Brand%20kit%20discussion" },
+    cta: { label: "Discuss a brand kit", href: "/en/rfp?campaign=Brand+model+kit&exclusive=true&budget_band=over_50k" },
   },
 ];
 
@@ -236,12 +236,18 @@ export default function EnServicesPage() {
             Unsure which service fits? Send the brief and we will scope it.
           </p>
           <div className="flex justify-center gap-2 flex-wrap">
-            <a
-              href="mailto:hello@aihubs.uk?subject=Campaign%20brief"
+            <Link
+              href="/en/rfp"
               className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-4 py-2 hover:bg-zinc-200"
             >
               Send a brief <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
+            <Link
+              href="/en/match"
+              className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-4 py-2 hover:bg-zinc-900"
+            >
+              Match a model
+            </Link>
             <Link
               href="/en/pricing"
               className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-4 py-2 hover:bg-zinc-900"

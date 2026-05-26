@@ -116,12 +116,18 @@ export default async function EnCaseStudyPage({
               Want a similar engagement for your brand?
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <a
-                href="mailto:hello@aihubs.uk?subject=Campaign%20brief"
+              <Link
+                href="/en/rfp"
                 className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
               >
                 Send a brief
-              </a>
+              </Link>
+              <Link
+                href="/en/match"
+                className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
+              >
+                Match a model
+              </Link>
               <Link
                 href="/en/pricing"
                 className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"

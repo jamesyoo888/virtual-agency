@@ -109,11 +109,12 @@ export default function EnCasesPage() {
               ))}
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="mailto:hello@aihubs.uk?subject=Anchor%20case%20engagement"
+              <Link
+                href="/en/rfp?campaign=Anchor+case+engagement"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
               >
-                Pitch an anchor engagement ??              </a>
+                Pitch an anchor engagement
+              </Link>
               <Link
                 href="/en/pricing"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
@@ -192,12 +193,12 @@ export default function EnCasesPage() {
             Want to be one of the first three?
           </p>
           <div className="mt-4 flex justify-center gap-2">
-            <a
-              href="mailto:hello@aihubs.uk?subject=Anchor%20engagement"
+            <Link
+              href="/en/rfp?campaign=Anchor+engagement"
               className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-4 py-2 hover:bg-zinc-200"
             >
               Start the conversation
-            </a>
+            </Link>
             <Link
               href="/en/legal/ai-disclosure"
               className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-4 py-2 hover:bg-zinc-900"

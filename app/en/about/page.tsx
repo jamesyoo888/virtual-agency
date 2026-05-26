@@ -116,18 +116,30 @@ export default function EnAboutPage() {
         <div className="border-t border-zinc-900 pt-8">
           <p className="text-sm text-zinc-500 mb-4">Talk to us</p>
           <div className="flex flex-wrap gap-3">
-            <a
-              href="mailto:hello@aihubs.uk?subject=Hello"
+            <Link
+              href="/en/rfp"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
             >
-              hello@aihubs.uk
-            </a>
+              Send a brief
+            </Link>
+            <Link
+              href="/en/match"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
+            >
+              Match a model
+            </Link>
             <Link
               href="/en/pricing"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
             >
               See pricing
             </Link>
+            <a
+              href="mailto:hello@aihubs.uk?subject=Hello"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
+            >
+              hello@aihubs.uk
+            </a>
           </div>
         </div>
       </div>

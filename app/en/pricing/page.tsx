@@ -233,11 +233,18 @@ export default function EnPricingPage() {
         <div className="border-t border-zinc-900 pt-8 mt-12">
           <p className="text-sm text-zinc-500 mb-4">Ready to start?</p>
           <div className="flex flex-wrap gap-3">
-            <a
-              href="mailto:hello@aihubs.uk?subject=Campaign%20brief"
+            <Link
+              href="/en/rfp"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
             >
-              Send a brief ??            </a>
+              Send a brief
+            </Link>
+            <Link
+              href="/en/match"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
+            >
+              Match a model
+            </Link>
             <Link
               href="/en/legal/ai-disclosure"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"

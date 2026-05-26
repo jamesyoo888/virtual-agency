@@ -279,12 +279,19 @@ export default function EnFAQPage() {
           ))}
         </ul>
 
-        <div className="mt-12 text-center">
-          <a
-            href="mailto:hello@aihubs.uk?subject=Campaign%20brief"
+        <div className="mt-12 text-center flex justify-center gap-2 flex-wrap">
+          <Link
+            href="/en/rfp"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
           >
-            Send a brief ??          </a>
+            Send a brief
+          </Link>
+          <Link
+            href="/en/match"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
+          >
+            Match a model
+          </Link>
         </div>
       </main>
     </div>
