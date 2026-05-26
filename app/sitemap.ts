@@ -161,6 +161,18 @@ export default async function sitemap(
               },
             },
           },
+          {
+            url: `${SITE_URL}/en/trending`,
+            lastModified: now,
+            changeFrequency: "daily",
+            priority: 0.7,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/trending`,
+                ko: `${SITE_URL}/trending`,
+              },
+            },
+          },
           ...INDUSTRY_OPTIONS.map((o) => ({
             url: `${SITE_URL}/en/explore/${o.value}`,
             lastModified: now,

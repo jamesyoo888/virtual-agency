@@ -12,7 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         // them; /api/trending is the partner-embeddable feed and benefits
         // from search engine surface. /trending itself is allowed by the
         // catch-all "/" but listing it keeps intent obvious to operators.
-        allow: ["/", "/api/og", "/api/trending", "/trending"],
+        allow: ["/", "/api/og", "/api/trending", "/trending", "/en/trending"],
         disallow: [
           "/admin/",
           "/client/",
