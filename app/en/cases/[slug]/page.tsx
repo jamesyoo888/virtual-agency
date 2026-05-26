@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -24,9 +24,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const c = getAnchorCaseBySlug(slug);
-  if (!c) return { title: "Case not found — Virtual Agency" };
+  if (!c) return { title: "Case not found ??Virtual Agency" };
   return {
-    title: `${c.title} — Virtual Agency`,
+    title: `${c.title} ??Virtual Agency`,
     description: c.pitch,
     alternates: {
       canonical: `${SITE_URL}/en/cases/${c.slug}`,
@@ -72,14 +72,14 @@ export default async function EnCaseStudyPage({
 
         <header className="mb-10">
           <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-3">
-            {c.vertical} · {c.market}
+            {c.vertical} 쨌 {c.market}
           </p>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
             {c.title}
           </h1>
           <p className="text-zinc-400 mt-3">{c.pitch}</p>
           <p className="text-xs text-zinc-500 mt-4 tabular-nums">
-            {c.publishedAt} · {c.durationLabel} · {c.companyMask}
+            {c.publishedAt} 쨌 {c.durationLabel} 쨌 {c.companyMask}
           </p>
         </header>
 
@@ -117,7 +117,7 @@ export default async function EnCaseStudyPage({
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <a
-                href="mailto:hello@virtualagency.example.com?subject=Campaign%20brief"
+                href="mailto:hello@aihubs.uk?subject=Campaign%20brief"
                 className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
               >
                 Send a brief

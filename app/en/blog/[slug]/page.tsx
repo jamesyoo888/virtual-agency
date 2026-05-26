@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -29,10 +29,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug, "en");
-  if (!post) return { title: "Post not found — Virtual Agency" };
+  if (!post) return { title: "Post not found ??Virtual Agency" };
   const ogImage = `${SITE_URL}/api/og?blog=${encodeURIComponent(post.slug)}`;
   return {
-    title: `${post.title} — Virtual Agency`,
+    title: `${post.title} ??Virtual Agency`,
     description: post.excerpt,
     alternates: {
       canonical: `${SITE_URL}/en/blog/${post.slug}`,
@@ -114,7 +114,7 @@ export default async function EnBlogPostPage({
           </h1>
           <p className="text-zinc-400 mt-3">{post.excerpt}</p>
           <p className="text-xs text-zinc-500 mt-4 tabular-nums">
-            {post.publishedAt} · {post.readingMinutes} min read
+            {post.publishedAt} 쨌 {post.readingMinutes} min read
           </p>
         </header>
 
@@ -136,7 +136,7 @@ export default async function EnBlogPostPage({
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <a
-                href="mailto:hello@virtualagency.example.com?subject=Campaign%20brief"
+                href="mailto:hello@aihubs.uk?subject=Campaign%20brief"
                 className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
               >
                 Send a brief

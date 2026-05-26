@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import NewsletterSignup from "@/components/newsletter-signup";
 
 const YEAR = new Date().getFullYear();
@@ -11,32 +11,32 @@ export default function SiteFooter() {
           <p className="text-zinc-300 font-bold tracking-widest uppercase mb-2">
             Virtual Agency
           </p>
-          <p>실제보다 완벽한 AI 버추얼 모델.</p>
-          <p className="mt-2">© {YEAR} Virtual Agency. All rights reserved.</p>
+          <p>?ㅼ젣蹂대떎 ?꾨꼍??AI 踰꾩텛??紐⑤뜽.</p>
+          <p className="mt-2">짤 {YEAR} Virtual Agency. All rights reserved.</p>
           <NewsletterSignup />
         </div>
 
         <div>
-          <p className="text-zinc-400 mb-2 font-medium">서비스</p>
+          <p className="text-zinc-400 mb-2 font-medium">?쒕퉬??/p>
           <ul className="space-y-1">
             <li>
               <Link href="/" className="hover:text-white">
-                카탈로그
+                移댄깉濡쒓렇
               </Link>
             </li>
             <li>
               <Link href="/match" className="hover:text-white">
-                AI 매칭
+                AI 留ㅼ묶
               </Link>
             </li>
             <li>
               <Link href="/services" className="hover:text-white">
-                서비스
+                ?쒕퉬??
               </Link>
             </li>
             <li>
               <Link href="/compare" className="hover:text-white">
-                모델 비교
+                紐⑤뜽 鍮꾧탳
               </Link>
             </li>
             <li>
@@ -46,66 +46,66 @@ export default function SiteFooter() {
             </li>
             <li>
               <Link href="/cases" className="hover:text-white">
-                사례
+                ?щ?
               </Link>
             </li>
             <li>
               <Link href="/blog" className="hover:text-white">
-                블로그
+                釉붾줈洹?
               </Link>
             </li>
             <li>
               <Link href="/press" className="hover:text-white">
-                프레스
+                ?꾨젅??
               </Link>
             </li>
             <li>
               <Link href="/careers" className="hover:text-white">
-                크리에이터 합류
+                ?щ━?먯씠???⑸쪟
               </Link>
             </li>
             <li>
               <Link href="/about" className="hover:text-white">
-                회사 소개
+                ?뚯궗 ?뚭컻
               </Link>
             </li>
             <li>
               <Link href="/brief-template" className="hover:text-white">
-                브리프 템플릿
+                釉뚮━???쒗뵆由?
               </Link>
             </li>
             <li>
               <Link href="/trending" className="hover:text-white">
-                트렌딩 모델
+                ?몃젋??紐⑤뜽
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <p className="text-zinc-400 mb-2 font-medium">정책</p>
+          <p className="text-zinc-400 mb-2 font-medium">?뺤콉</p>
           <ul className="space-y-1">
             <li>
               <Link href="/legal/terms" className="hover:text-white">
-                이용약관
+                ?댁슜?쎄?
               </Link>
             </li>
             <li>
               <Link href="/legal/privacy" className="hover:text-white">
-                개인정보 처리방침
+                媛쒖씤?뺣낫 泥섎━諛⑹묠
               </Link>
             </li>
             <li>
               <Link href="/legal/ai-disclosure" className="hover:text-white">
-                AI 합성 콘텐츠 표기
+                AI ?⑹꽦 肄섑뀗痢??쒓린
               </Link>
             </li>
             <li>
               <a
-                href="mailto:hello@virtualagency.example.com"
+                href="mailto:hello@aihubs.uk"
                 className="hover:text-white"
               >
-                hello@virtualagency.example.com
+                hello@aihubs.uk
               </a>
             </li>
             <li className="pt-2 flex gap-2">

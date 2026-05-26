@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,7 +16,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "Services — Virtual Agency",
+  title: "Services ??Virtual Agency",
   description:
     "Five core services for global brands using synthetic K-aesthetic talent: image campaigns, video, lookbooks, fitting day, and brand model kits.",
   alternates: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Services — Virtual Agency",
+    title: "Services ??Virtual Agency",
     description:
       "Image campaigns, video, lookbooks, fitting day, brand model kits.",
     url: `${SITE_URL}/en/services`,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Services — Virtual Agency",
+    title: "Services ??Virtual Agency",
     description: "Five services, one studio.",
     images: [`${SITE_URL}/api/og?en_services=1`],
   },
@@ -60,81 +60,81 @@ const SERVICES: Service[] = [
     key: "image",
     Icon: ImageIcon,
     title: "Image campaign",
-    tagline: "5–10 stills on a single concept for social, print, and OOH.",
+    tagline: "5??0 stills on a single concept for social, print, and OOH.",
     deliverable: "High-res JPG/PNG + channel-cropped variants",
-    turnaround: "24–72 hours",
-    priceBand: "$1,500–$5,500",
+    turnaround: "24??2 hours",
+    priceBand: "$1,500??5,500",
     bullets: [
       "Same model, same concept, full continuity",
       "Auto-cropped for square, vertical, and landscape social",
       "Unlimited micro revisions after first-proof approval",
       "AI watermark option (EU AI Act / FTC compliant)",
     ],
-    cta: { label: "Quote an image campaign", href: "mailto:hello@virtualagency.example.com?subject=Image%20campaign%20brief" },
+    cta: { label: "Quote an image campaign", href: "mailto:hello@aihubs.uk?subject=Image%20campaign%20brief" },
   },
   {
     key: "video",
     Icon: Video,
     title: "Video content",
-    tagline: "5–30s ad video with optional lip-sync, EN / KR / JA.",
+    tagline: "5??0s ad video with optional lip-sync, EN / KR / JA.",
     deliverable: "MP4 1080p or 4K + subtitle option",
-    turnaround: "3–7 days",
-    priceBand: "$3,000–$15,000",
+    turnaround: "3?? days",
+    priceBand: "$3,000??15,000",
     bullets: [
       "Same model concept carried into motion",
       "Lip-sync in English, Korean, Japanese",
       "Simultaneous 16:9 / 9:16 / 1:1 export",
       "BGM, captions, logo integration",
     ],
-    cta: { label: "Quote video", href: "mailto:hello@virtualagency.example.com?subject=Video%20brief" },
+    cta: { label: "Quote video", href: "mailto:hello@aihubs.uk?subject=Video%20brief" },
   },
   {
     key: "lookbook",
     Icon: Layers,
     title: "Lookbook / series",
-    tagline: "Same model, 4–12 stills, ideal for fashion and beauty.",
+    tagline: "Same model, 4??2 stills, ideal for fashion and beauty.",
     deliverable: "Styling guide + series stills + first-draft campaign copy",
-    turnaround: "5–10 days",
-    priceBand: "$4,500–$12,000",
+    turnaround: "5??0 days",
+    priceBand: "$4,500??12,000",
     bullets: [
       "Locked mood (cool / warm / editorial mono)",
       "Styling variation across the same canonical face",
       "Campaign copy first draft included",
       "Auto-generates a /models/[id]/lookbook page",
     ],
-    cta: { label: "Quote a lookbook", href: "mailto:hello@virtualagency.example.com?subject=Lookbook%20brief" },
+    cta: { label: "Quote a lookbook", href: "mailto:hello@aihubs.uk?subject=Lookbook%20brief" },
   },
   {
     key: "fitting",
     Icon: Calendar,
     title: "Fitting day",
     tagline: "Working session with your team to pick the model and lock the concept.",
-    deliverable: "5–10 recommended models + concept mood-board + campaign roadmap",
-    turnaround: "1–2 days (workshop day itself)",
-    priceBand: "$1,200–$3,500",
+    deliverable: "5??0 recommended models + concept mood-board + campaign roadmap",
+    turnaround: "1?? days (workshop day itself)",
+    priceBand: "$1,200??3,500",
     bullets: [
       "Our team visits your office or runs it over video",
       "Curated shortlist filtered to your brand fit",
-      "Optional live generation of 1–2 proofs in-session",
+      "Optional live generation of 1?? proofs in-session",
       "Fee credited if the engagement signs after the workshop",
     ],
-    cta: { label: "Request a fitting day", href: "mailto:hello@virtualagency.example.com?subject=Fitting%20day" },
+    cta: { label: "Request a fitting day", href: "mailto:hello@aihubs.uk?subject=Fitting%20day" },
   },
   {
     key: "brand-kit",
     Icon: Palette,
     title: "Brand model kit",
     tagline: "Quarterly-reuse dedicated talent + concept library.",
-    deliverable: "1–3 exclusive models + 50 new stills/quarter + a video series",
+    deliverable: "1?? exclusive models + 50 new stills/quarter + a video series",
     turnaround: "14-day initial setup, quarterly refresh",
-    priceBand: "$25,000–$80,000 / quarter",
+    priceBand: "$25,000??80,000 / quarter",
     bullets: [
       "Same talent carries across seasonal campaigns",
       "Category-exclusive licensing in your vertical",
       "Quarterly concept refresh + new lookbook",
       "Campaign roadmap consult once per quarter",
     ],
-    cta: { label: "Discuss a brand kit", href: "mailto:hello@virtualagency.example.com?subject=Brand%20kit%20discussion" },
+    cta: { label: "Discuss a brand kit", href: "mailto:hello@aihubs.uk?subject=Brand%20kit%20discussion" },
   },
 ];
 
@@ -180,7 +180,7 @@ export default function EnServicesPage() {
           <p className="mt-5 text-zinc-400 max-w-2xl leading-relaxed">
             Image, video, lookbook, fitting day, and brand kit. Each runs on
             the same continuity layer so the model who appears in one
-            deliverable carries cleanly into the next — across quarters and
+            deliverable carries cleanly into the next ??across quarters and
             across markets.
           </p>
         </header>
@@ -216,7 +216,7 @@ export default function EnServicesPage() {
               <ul className="space-y-1.5 text-sm text-zinc-300 mb-6 flex-1">
                 {s.bullets.map((b) => (
                   <li key={b} className="leading-relaxed">
-                    <span className="text-zinc-600 mr-2">·</span>
+                    <span className="text-zinc-600 mr-2">쨌</span>
                     {b}
                   </li>
                 ))}
@@ -237,7 +237,7 @@ export default function EnServicesPage() {
           </p>
           <div className="flex justify-center gap-2 flex-wrap">
             <a
-              href="mailto:hello@virtualagency.example.com?subject=Campaign%20brief"
+              href="mailto:hello@aihubs.uk?subject=Campaign%20brief"
               className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-4 py-2 hover:bg-zinc-200"
             >
               Send a brief <ArrowRight className="w-4 h-4" />

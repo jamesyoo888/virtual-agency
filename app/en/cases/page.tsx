@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ANCHOR_CATEGORIES,
@@ -13,9 +13,9 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "Case studies — Virtual Agency",
+  title: "Case studies ??Virtual Agency",
   description:
-    "Anchor case studies of global brands using K-aesthetic synthetic talent — and the categories we are actively recruiting next.",
+    "Anchor case studies of global brands using K-aesthetic synthetic talent ??and the categories we are actively recruiting next.",
   alternates: {
     canonical: `${SITE_URL}/en/cases`,
     languages: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Case studies — Virtual Agency",
+    title: "Case studies ??Virtual Agency",
     description:
       "Anchor case studies of global brands using K-aesthetic synthetic talent.",
     url: `${SITE_URL}/en/cases`,
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Case studies — Virtual Agency",
+    title: "Case studies ??Virtual Agency",
     description: "Anchor case studies + categories we are recruiting now.",
     images: [`${SITE_URL}/api/og?en_cases=1`],
   },
@@ -79,7 +79,7 @@ export default function EnCasesPage() {
         {cases.length === 0 ? (
           <section className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/40 p-8 md:p-10 mb-16">
             <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-400 mb-3">
-              Recruiting · anchor slots open
+              Recruiting 쨌 anchor slots open
             </p>
             <h2 className="text-2xl font-semibold tracking-tight mb-3">
               The first three cases publish here as soon as we ship them.
@@ -97,7 +97,7 @@ export default function EnCasesPage() {
                   className="rounded-xl border border-zinc-800 bg-black/40 p-5"
                 >
                   <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-2">
-                    {cat.vertical} · {cat.market}
+                    {cat.vertical} 쨌 {cat.market}
                   </p>
                   <p className="font-semibold text-zinc-100 mb-2">
                     {cat.title}
@@ -110,11 +110,10 @@ export default function EnCasesPage() {
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
-                href="mailto:hello@virtualagency.example.com?subject=Anchor%20case%20engagement"
+                href="mailto:hello@aihubs.uk?subject=Anchor%20case%20engagement"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
               >
-                Pitch an anchor engagement →
-              </a>
+                Pitch an anchor engagement ??              </a>
               <Link
                 href="/en/pricing"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
@@ -132,10 +131,10 @@ export default function EnCasesPage() {
               >
                 <div className="flex items-baseline justify-between gap-3 mb-2">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">
-                    {c.vertical} · {c.market}
+                    {c.vertical} 쨌 {c.market}
                   </p>
                   <p className="text-xs text-zinc-500 tabular-nums">
-                    {c.publishedAt} · {c.durationLabel}
+                    {c.publishedAt} 쨌 {c.durationLabel}
                   </p>
                 </div>
                 <h2 className="text-xl font-semibold mb-1">
@@ -194,7 +193,7 @@ export default function EnCasesPage() {
           </p>
           <div className="mt-4 flex justify-center gap-2">
             <a
-              href="mailto:hello@virtualagency.example.com?subject=Anchor%20engagement"
+              href="mailto:hello@aihubs.uk?subject=Anchor%20engagement"
               className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-4 py-2 hover:bg-zinc-200"
             >
               Start the conversation

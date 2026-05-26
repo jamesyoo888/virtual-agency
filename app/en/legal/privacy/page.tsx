@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Virtual Agency",
+  title: "Privacy Policy ??Virtual Agency",
   description: "How Virtual Agency collects and uses personal information.",
   alternates: {
     canonical: `${SITE_URL}/en/legal/privacy`,
@@ -76,11 +76,11 @@ export default function EnPrivacyPage() {
         We rely on the following processors to operate the Service:
       </p>
       <ul className="list-disc list-inside leading-relaxed space-y-1">
-        <li>Vercel — web hosting</li>
-        <li>Supabase (self-hosted) — database and authentication</li>
-        <li>Stripe — payment processing (for EN clients)</li>
-        <li>Replicate — model inference (transient)</li>
-        <li>Meshy — 3D mesh generation (transient input)</li>
+        <li>Vercel ??web hosting</li>
+        <li>Supabase (self-hosted) ??database and authentication</li>
+        <li>Stripe ??payment processing (for EN clients)</li>
+        <li>Replicate ??model inference (transient)</li>
+        <li>Meshy ??3D mesh generation (transient input)</li>
       </ul>
 
       <h2 className="text-xl font-semibold text-white mt-8 mb-3">
@@ -93,10 +93,10 @@ export default function EnPrivacyPage() {
         under the UK GDPR. California residents have rights under the CCPA.
         Contact{" "}
         <a
-          href="mailto:privacy@virtualagency.example.com"
+          href="mailto:privacy@aihubs.uk"
           className="text-zinc-300 underline hover:text-white"
         >
-          privacy@virtualagency.example.com
+          privacy@aihubs.uk
         </a>
         .
       </p>
@@ -127,10 +127,10 @@ export default function EnPrivacyPage() {
       <p className="leading-relaxed">
         Data Protection Officer:{" "}
         <a
-          href="mailto:privacy@virtualagency.example.com"
+          href="mailto:privacy@aihubs.uk"
           className="text-zinc-300 underline hover:text-white"
         >
-          privacy@virtualagency.example.com
+          privacy@aihubs.uk
         </a>
       </p>
 
