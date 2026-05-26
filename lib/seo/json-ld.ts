@@ -1,4 +1,5 @@
 import type { Model } from "@/types";
+import type { Character } from "@/lib/characters/registry";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-murex.vercel.app";
 const ORG_NAME = "Virtual Agency";
@@ -58,6 +59,44 @@ export function modelPersonLd(model: Model, rating?: AggregateRatingInput) {
           worstRating: rating.worstRating ?? 1,
         }
       : undefined,
+  };
+}
+
+export function characterPersonLd(character: Character) {
+  // Person schema for an owned, fictional K-aesthetic character. We mark
+  // additionalType to Service so search engines can model the character as
+  // both a public persona and a licensable production asset. Crucially we
+  // emit `disambiguatingDescription` calling out the synthetic nature, and
+  // omit `birthDate` / `birthPlace` so crawlers cannot interpret the entity
+  // as a real person. The character page is the canonical landing.
+  const url = `${SITE_URL}/en/character/${character.slug}`;
+  const ogImage = `${SITE_URL}/api/og?en_character=${character.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": url,
+    name: character.name,
+    alternateName: character.tagline,
+    description: `${character.persona} ${character.lore}`.slice(0, 600),
+    disambiguatingDescription:
+      "Fictional, AI-generated synthetic talent. Not a real person.",
+    url,
+    image: [ogImage],
+    gender: character.gender,
+    knowsAbout: [
+      ...character.targetVerticals,
+      ...character.defaultMoods,
+      "K-aesthetic",
+    ],
+    additionalType: "https://schema.org/Service",
+    sameAs: character.instagram
+      ? [`https://www.instagram.com/${character.instagram.replace(/^@/, "")}`]
+      : undefined,
+    affiliation: {
+      "@type": "Organization",
+      name: ORG_NAME,
+      url: SITE_URL,
+    },
   };
 }
 

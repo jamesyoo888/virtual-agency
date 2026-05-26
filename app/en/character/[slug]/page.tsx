@@ -10,6 +10,7 @@ import {
   Quote,
 } from "lucide-react";
 import { CHARACTERS, getCharacter, type CharacterSlug } from "@/lib/characters/registry";
+import { breadcrumbLd, characterPersonLd, ldScript } from "@/lib/seo/json-ld";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -67,8 +68,23 @@ export default async function CharacterPage({
 
   const otherCharacters = CHARACTERS.filter((c) => c.slug !== character.slug);
 
+  const personLd = characterPersonLd(character);
+  const crumbsLd = breadcrumbLd([
+    { name: "Home", url: `${SITE_URL}/en` },
+    { name: "Characters", url: `${SITE_URL}/en/character` },
+    { name: character.name, url: `${SITE_URL}/en/character/${character.slug}` },
+  ]);
+
   return (
     <div className="min-h-screen bg-black text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(personLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(crumbsLd) }}
+      />
       <main className="max-w-4xl mx-auto px-6 py-16 md:py-24">
         <Link
           href="/en"

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { listCharacters } from "@/lib/characters/registry";
+import { itemListLd, ldScript } from "@/lib/seo/json-ld";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -33,9 +34,21 @@ export const metadata: Metadata = {
 
 export default function CharactersIndex() {
   const characters = listCharacters();
+  const ld = itemListLd(
+    "Virtual Agency owned characters",
+    characters.map((c) => ({
+      name: c.name,
+      url: `${SITE_URL}/en/character/${c.slug}`,
+      image: `${SITE_URL}/api/og?en_character=${c.slug}`,
+    }))
+  );
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(ld) }}
+      />
       <main className="max-w-5xl mx-auto px-6 py-16 md:py-24">
         <header className="mb-12 max-w-2xl">
           <p className="text-xs tracking-[0.3em] text-zinc-500 uppercase mb-3">
