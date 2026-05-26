@@ -179,6 +179,12 @@ export default async function sitemap(
             changeFrequency: "monthly" as const,
             priority: 0.5,
           })),
+          ...listTags("en").map((t) => ({
+            url: `${SITE_URL}/en/blog/tag/${tagSlug(t.tag)}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.4,
+          })),
           {
             url: `${SITE_URL}/en/cases`,
             lastModified: now,

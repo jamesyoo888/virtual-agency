@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
 import { itemListLd, ldScript } from "@/lib/seo/json-ld";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Rss } from "lucide-react";
 
 export const revalidate = 3600;
 
@@ -68,16 +68,23 @@ export default function EnBlogIndexPage() {
             actually costs, and how to brief for it without sounding like a
             stereotype. Notes from running Virtual Agency.
           </p>
+          <a
+            href="/en/blog/rss.xml"
+            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 mt-4"
+          >
+            <Rss className="w-3 h-3" /> RSS
+          </a>
           {tags.length > 0 && (
             <div className="mt-6 flex flex-wrap gap-1.5">
               {tags.map((t) => (
-                <span
+                <Link
                   key={t.tag}
-                  className="text-[11px] text-zinc-400 border border-zinc-800 rounded-full px-2.5 py-1"
+                  href={`/en/blog/tag/${tagSlug(t.tag)}`}
+                  className="text-[11px] text-zinc-400 border border-zinc-800 hover:border-zinc-600 hover:text-zinc-200 rounded-full px-2.5 py-1"
                 >
                   #{t.tag}
                   <span className="ml-1 text-zinc-600">{t.count}</span>
-                </span>
+                </Link>
               ))}
             </div>
           )}
@@ -140,11 +147,6 @@ export default function EnBlogIndexPage() {
             /blog
           </Link>
         </p>
-        {/* Avoid the unused-var warning for tagSlug while we keep the import
-            ready for the future tag-page wiring. */}
-        <span className="hidden" aria-hidden>
-          {tagSlug("")}
-        </span>
       </main>
     </div>
   );
