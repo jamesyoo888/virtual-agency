@@ -171,6 +171,12 @@ export default async function sitemap(
             changeFrequency: "yearly",
             priority: 0.2,
           },
+          {
+            url: `${SITE_URL}/legal/ai-disclosure`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.3,
+          },
         ]
       : [];
 

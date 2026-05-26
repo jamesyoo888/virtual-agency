@@ -35,6 +35,7 @@ const LINKS: { href: string; label: string }[] = [
 const SECONDARY: { href: string; label: string }[] = [
   { href: "/legal/terms", label: "이용약관" },
   { href: "/legal/privacy", label: "개인정보 처리방침" },
+  { href: "/legal/ai-disclosure", label: "AI 합성 콘텐츠 표기" },
 ];
 
 export default function MobileNav() {

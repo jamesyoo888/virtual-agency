@@ -287,7 +287,17 @@ export default async function ShowcaseModelPage({
 
           {/* Right: info */}
           <div className="py-4">
-            <h1 className="text-4xl font-bold mb-2">{m.name}</h1>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <h1 className="text-4xl font-bold">{m.name}</h1>
+              <Link
+                href="/legal/ai-disclosure"
+                title="AI 합성 인물 — Synthetic talent. 표기 정책 보기"
+                className="shrink-0 inline-flex items-center gap-1 rounded-full border border-violet-500/40 bg-violet-500/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-violet-200 hover:bg-violet-500/20 hover:border-violet-400/70 transition-colors"
+              >
+                <span aria-hidden>✦</span>
+                AI Synthetic
+              </Link>
+            </div>
 
             {ageYears !== null && (
               <p className="text-zinc-400 mb-4">생체나이 {ageYears}세 · 데뷔 {debutDate?.getFullYear()}</p>

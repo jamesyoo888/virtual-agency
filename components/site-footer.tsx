@@ -96,6 +96,11 @@ export default function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/legal/ai-disclosure" className="hover:text-white">
+                AI 합성 콘텐츠 표기
+              </Link>
+            </li>
+            <li>
               <a
                 href="mailto:hello@virtualagency.example.com"
                 className="hover:text-white"
