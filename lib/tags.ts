@@ -39,3 +39,43 @@ export const GENRE_LABELS: Record<string, string> = Object.fromEntries(
 export const MOOD_LABELS: Record<string, string> = Object.fromEntries(
   MOOD_OPTIONS.map((o) => [o.value, o.label])
 );
+
+export const INDUSTRY_OPTIONS_EN: { value: IndustryTag; label: string }[] = [
+  { value: "beauty", label: "Beauty" },
+  { value: "tech", label: "Tech" },
+  { value: "food", label: "Food & beverage" },
+  { value: "luxury", label: "Luxury" },
+  { value: "sports", label: "Sports" },
+  { value: "lifestyle", label: "Lifestyle" },
+];
+
+export const GENRE_OPTIONS_EN: { value: GenreTag; label: string }[] = [
+  { value: "ad", label: "Advertising" },
+  { value: "film", label: "Film" },
+  { value: "drama", label: "Drama" },
+  { value: "noir", label: "Noir" },
+  { value: "romance", label: "Romance" },
+  { value: "sci-fi", label: "Sci-fi" },
+  { value: "historical", label: "Historical" },
+  { value: "indie", label: "Indie" },
+  { value: "horror", label: "Horror" },
+];
+
+export const MOOD_OPTIONS_EN: { value: MoodTag; label: string }[] = [
+  { value: "cold", label: "Cool" },
+  { value: "warm", label: "Warm" },
+  { value: "neutral", label: "Neutral" },
+  { value: "edgy", label: "Edgy" },
+];
+
+export const INDUSTRY_LABELS_EN: Record<string, string> = Object.fromEntries(
+  INDUSTRY_OPTIONS_EN.map((o) => [o.value, o.label])
+);
+
+export const GENRE_LABELS_EN: Record<string, string> = Object.fromEntries(
+  GENRE_OPTIONS_EN.map((o) => [o.value, o.label])
+);
+
+export const MOOD_LABELS_EN: Record<string, string> = Object.fromEntries(
+  MOOD_OPTIONS_EN.map((o) => [o.value, o.label])
+);

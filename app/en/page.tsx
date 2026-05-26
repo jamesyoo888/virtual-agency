@@ -95,22 +95,22 @@ export default async function EnHomePage() {
 
         <div className="flex flex-wrap gap-3 mt-6">
           <Link
-            href="/en/pricing"
+            href="/en/match"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
           >
-            See pricing →
+            Match my campaign →
           </Link>
-          <a
-            href="mailto:hello@virtualagency.example.com?subject=Campaign%20inquiry"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
-          >
-            Request a campaign →
-          </a>
           <Link
-            href="/en/about"
+            href="/en/rfp"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
           >
-            About us
+            Submit an RFP →
+          </Link>
+          <Link
+            href="/en/pricing"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
+          >
+            See pricing
           </Link>
         </div>
 

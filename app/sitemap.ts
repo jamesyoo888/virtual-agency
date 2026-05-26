@@ -114,6 +114,30 @@ export default async function sitemap(
             },
           },
           {
+            url: `${SITE_URL}/en/match`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.8,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/match`,
+                ko: `${SITE_URL}/match`,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/en/rfp`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.7,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/rfp`,
+                ko: `${SITE_URL}/rfp`,
+              },
+            },
+          },
+          {
             url: `${SITE_URL}/en/faq`,
             lastModified: now,
             changeFrequency: "monthly",
