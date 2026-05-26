@@ -1,4 +1,4 @@
-import type { BlogPost } from "@/lib/blog/posts";
+import type { BlogPost, BlogLocale } from "@/lib/blog/posts";
 
 /**
  * Google News sitemap eligibility: only posts published within the last 48
@@ -35,13 +35,23 @@ export interface NewsSitemapInput {
   posts: BlogPost[];
   /** Override clock for tests. */
   nowMs?: number;
+  /**
+   * Locale of the posts being rendered. Controls:
+   *  - URL prefix ("/blog/" for ko, "/en/blog/" for en)
+   *  - <news:language> tag
+   * Defaults to "ko" to preserve historical behavior.
+   */
+  locale?: BlogLocale;
 }
 
 export function renderNewsSitemap(input: NewsSitemapInput): string {
   const items = eligibleForNewsSitemap(input.posts, input.nowMs);
+  const locale = input.locale ?? "ko";
+  const pathPrefix = locale === "en" ? "/en/blog" : "/blog";
+  const langTag = locale === "en" ? "en" : "ko";
   const urls = items
     .map((p) => {
-      const loc = `${input.siteUrl}/blog/${p.slug}`;
+      const loc = `${input.siteUrl}${pathPrefix}/${p.slug}`;
       const pubDate = new Date(p.publishedAt).toISOString();
       return [
         "  <url>",
@@ -49,7 +59,7 @@ export function renderNewsSitemap(input: NewsSitemapInput): string {
         "    <news:news>",
         "      <news:publication>",
         `        <news:name>${xmlEscape(input.publicationName)}</news:name>`,
-        "        <news:language>ko</news:language>",
+        `        <news:language>${langTag}</news:language>`,
         "      </news:publication>",
         `      <news:publication_date>${pubDate}</news:publication_date>`,
         `      <news:title>${xmlEscape(p.title)}</news:title>`,

@@ -36,7 +36,9 @@ export async function generateMetadata({
     .join(" · ")}`;
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
-  const ogImage = `${siteUrl}/api/og?blog_tag=${encodeURIComponent(tag)}`;
+  // Use the en_blog_tag OG variant so the card copy is English ("X posts" vs
+  // the Korean "X개의 글") and only ranks English-locale posts.
+  const ogImage = `${siteUrl}/api/og?en_blog_tag=${encodeURIComponent(tag)}`;
   return {
     title: `#${tag} — Virtual Agency Blog`,
     description,

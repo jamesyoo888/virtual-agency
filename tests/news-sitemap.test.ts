@@ -88,4 +88,35 @@ describe("renderNewsSitemap", () => {
     expect(xml).toContain("<urlset");
     expect(xml).not.toContain("<url>");
   });
+
+  it("emits English-locale URLs and language tag when locale='en'", () => {
+    const xml = renderNewsSitemap({
+      siteUrl: "https://va.example.com",
+      publicationName: "Virtual Agency",
+      posts: [
+        mkPost("k-aesthetic-guide", "2026-05-21T08:00:00.000Z", {
+          locale: "en",
+          title: "What is K-aesthetic",
+        }),
+      ],
+      nowMs: NOW,
+      locale: "en",
+    });
+    expect(xml).toContain("https://va.example.com/en/blog/k-aesthetic-guide");
+    expect(xml).toContain("<news:language>en</news:language>");
+    expect(xml).not.toContain("<news:language>ko</news:language>");
+    // Must use the /en/blog prefix, not the bare /blog prefix.
+    expect(xml).not.toContain("https://va.example.com/blog/k-aesthetic-guide");
+  });
+
+  it("defaults to Korean URL prefix and language when locale is omitted", () => {
+    const xml = renderNewsSitemap({
+      siteUrl: "https://va.example.com",
+      publicationName: "Virtual Agency",
+      posts: [mkPost("ko-post", "2026-05-21T08:00:00.000Z")],
+      nowMs: NOW,
+    });
+    expect(xml).toContain("https://va.example.com/blog/ko-post");
+    expect(xml).toContain("<news:language>ko</news:language>");
+  });
 });

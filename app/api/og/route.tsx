@@ -106,6 +106,9 @@ export async function GET(request: Request) {
   const isEnBlog = searchParams.get("en_blog") === "1";
   const isEnFaq = searchParams.get("en_faq") === "1";
   const isEnAiDisclosure = searchParams.get("en_ai_disclosure") === "1";
+  const isEnMatch = searchParams.get("en_match") === "1";
+  const isEnRfp = searchParams.get("en_rfp") === "1";
+  const enBlogTag = searchParams.get("en_blog_tag");
 
   if (isEnHome) {
     return bigCard(
@@ -162,6 +165,34 @@ export async function GET(request: Request) {
       "AI synthetic content disclosure",
       "EU AI Act Article 50 · US FTC · UK ASA · Korea KCSC. The full posture, per market."
     );
+  }
+  if (isEnMatch) {
+    return bigCard(
+      "VIRTUAL AGENCY · MATCH",
+      "AI model matching for global campaigns",
+      "Describe your brief — industry, mood, day rate. We surface the K-aesthetic models that fit."
+    );
+  }
+  if (isEnRfp) {
+    return bigCard(
+      "VIRTUAL AGENCY · RFP",
+      "Request for Proposal — print-ready",
+      "One-page RFP with matched models, USD budget bands, and licensing terms. PDF in one click."
+    );
+  }
+  if (enBlogTag) {
+    const safeTag = enBlogTag.slice(0, 40);
+    const matches = listPostsByTag(safeTag, "en");
+    if (matches.length > 0) {
+      return bigCard(
+        "VIRTUAL AGENCY · BLOG",
+        `#${safeTag}`,
+        `${matches.length} post${matches.length === 1 ? "" : "s"} · ${matches
+          .slice(0, 2)
+          .map((p) => p.title)
+          .join(" · ")}`
+      );
+    }
   }
 
   // Static-card surfaces first — these never need a DB read.

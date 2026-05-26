@@ -29,6 +29,21 @@ export const metadata: Metadata = {
       ko: `${SITE_URL}/rfp`,
     },
   },
+  openGraph: {
+    title: "Request for Proposal — Virtual Agency",
+    description:
+      "One-page RFP with matched models, USD budget bands, licensing terms.",
+    url: `${SITE_URL}/en/rfp`,
+    locale: "en_US",
+    type: "website",
+    images: [`${SITE_URL}/api/og?en_rfp=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Request for Proposal — Virtual Agency",
+    description: "One-page RFP with matched models and licensing terms.",
+    images: [`${SITE_URL}/api/og?en_rfp=1`],
+  },
   // Print-friendly briefing pages don't need indexing.
   robots: { index: false, follow: false },
 };
