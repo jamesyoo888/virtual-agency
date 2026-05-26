@@ -58,3 +58,57 @@ describe("relatedPostsForGenre", () => {
     expect(relatedPostsForGenre("ad", 1)).toHaveLength(1);
   });
 });
+
+describe("locale='en' variants — surface English posts and English tag maps", () => {
+  it("relatedPostsForIndustry('beauty', _, 'en') returns only English posts", () => {
+    const out = relatedPostsForIndustry("beauty", 5, "en");
+    expect(out.length).toBeGreaterThan(0);
+    for (const p of out) {
+      expect(p.locale).toBe("en");
+    }
+  });
+
+  it("relatedPostsForIndustry('luxury', _, 'en') surfaces K-aesthetic/casting tagged posts first", () => {
+    const out = relatedPostsForIndustry("luxury", 5, "en");
+    const tagsUnion = out.flatMap((p) => p.tags);
+    expect(
+      tagsUnion.some((t) =>
+        ["K-aesthetic", "brand strategy", "casting"].includes(t)
+      )
+    ).toBe(true);
+  });
+
+  it("relatedPostsForMood('cold', _, 'en') returns only English posts", () => {
+    const out = relatedPostsForMood("cold", 3, "en");
+    expect(out.length).toBeGreaterThan(0);
+    for (const p of out) {
+      expect(p.locale).toBe("en");
+    }
+  });
+
+  it("relatedPostsForGenre('drama', _, 'en') returns only English posts", () => {
+    const out = relatedPostsForGenre("drama", 3, "en");
+    expect(out.length).toBeGreaterThan(0);
+    for (const p of out) {
+      expect(p.locale).toBe("en");
+    }
+  });
+
+  it("unknown industry on 'en' locale falls back to recent English posts only", () => {
+    const out = relatedPostsForIndustry("not-a-real-industry", 3, "en");
+    expect(out.length).toBeGreaterThan(0);
+    for (const p of out) {
+      expect(p.locale).toBe("en");
+    }
+  });
+
+  it("ko default still returns Korean posts (no locale arg)", () => {
+    const out = relatedPostsForIndustry("beauty", 3);
+    expect(out.length).toBeGreaterThan(0);
+    for (const p of out) {
+      // ko posts may have locale undefined (defaults to ko) or "ko"
+      const isKo = p.locale === undefined || p.locale === "ko";
+      expect(isKo).toBe(true);
+    }
+  });
+});
