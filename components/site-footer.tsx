@@ -79,6 +79,11 @@ export default function SiteFooter() {
                 트렌딩 모델
               </Link>
             </li>
+            <li>
+              <Link href="/character" className="hover:text-white">
+                캐릭터
+              </Link>
+            </li>
           </ul>
         </div>
 

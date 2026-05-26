@@ -385,6 +385,30 @@ export default async function sitemap(
             priority: 0.7,
           },
           {
+            url: `${SITE_URL}/character`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.8,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/character`,
+                en: `${SITE_URL}/en/character`,
+              },
+            },
+          },
+          ...listCharacters().map((c) => ({
+            url: `${SITE_URL}/character/${c.slug}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.8,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/character/${c.slug}`,
+                en: `${SITE_URL}/en/character/${c.slug}`,
+              },
+            },
+          })),
+          {
             url: `${SITE_URL}/blog`,
             lastModified: now,
             changeFrequency: "weekly",

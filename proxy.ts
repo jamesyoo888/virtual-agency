@@ -33,6 +33,7 @@ const MIRRORED_PATHS = new Set([
   "/match",
   "/rfp",
   "/press",
+  "/character",
   "/legal/terms",
   "/legal/privacy",
   "/legal/ai-disclosure",
@@ -73,7 +74,11 @@ export function prefersEnglish(acceptLanguage: string | null): boolean {
 function maybeLocaleRedirect(req: NextRequest): NextResponse | null {
   const { pathname } = req.nextUrl;
 
-  if (!MIRRORED_PATHS.has(pathname) && !pathname.startsWith("/blog/")) {
+  if (
+    !MIRRORED_PATHS.has(pathname) &&
+    !pathname.startsWith("/blog/") &&
+    !pathname.startsWith("/character/")
+  ) {
     return null;
   }
 
@@ -88,6 +93,8 @@ function maybeLocaleRedirect(req: NextRequest): NextResponse | null {
   const target = (() => {
     if (pathname === "/") return "/en";
     if (pathname.startsWith("/blog/")) return "/en/blog";
+    // /character/[slug] mirrors to /en/character/[slug] — both routes
+    // generate from the same registry so the slug always resolves.
     return `/en${pathname}`;
   })();
 
