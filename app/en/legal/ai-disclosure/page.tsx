@@ -15,6 +15,21 @@ export const metadata: Metadata = {
       ko: `${SITE_URL}/legal/ai-disclosure`,
     },
   },
+  openGraph: {
+    title: "AI Synthetic Content Disclosure — Virtual Agency",
+    description:
+      "EU AI Act Article 50, US FTC, UK ASA, Korea KCSC — the per-market posture.",
+    url: `${SITE_URL}/en/legal/ai-disclosure`,
+    locale: "en_US",
+    type: "website",
+    images: [`${SITE_URL}/api/og?en_ai_disclosure=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI Synthetic Content Disclosure",
+    description: "EU AI Act · FTC · UK ASA · KCSC — per-market posture.",
+    images: [`${SITE_URL}/api/og?en_ai_disclosure=1`],
+  },
 };
 
 export default function EnAiDisclosurePage() {

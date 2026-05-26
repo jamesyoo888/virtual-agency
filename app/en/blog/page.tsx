@@ -20,6 +20,20 @@ export const metadata: Metadata = {
       ko: `${SITE_URL}/blog`,
     },
   },
+  openGraph: {
+    title: "Blog — Virtual Agency",
+    description: "Notes on K-aesthetic and synthetic talent.",
+    url: `${SITE_URL}/en/blog`,
+    locale: "en_US",
+    type: "website",
+    images: [`${SITE_URL}/api/og?en_blog=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog — Virtual Agency",
+    description: "K-aesthetic, synthetic talent, brand strategy.",
+    images: [`${SITE_URL}/api/og?en_blog=1`],
+  },
 };
 
 export default function EnBlogIndexPage() {

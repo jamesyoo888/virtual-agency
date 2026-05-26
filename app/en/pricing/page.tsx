@@ -15,6 +15,20 @@ export const metadata: Metadata = {
       ko: `${SITE_URL}/pricing`,
     },
   },
+  openGraph: {
+    title: "Pricing — Virtual Agency",
+    description: "USD pricing, Stripe billing, three illustrative scenarios.",
+    url: `${SITE_URL}/en/pricing`,
+    locale: "en_US",
+    type: "website",
+    images: [`${SITE_URL}/api/og?en_pricing=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing — Virtual Agency",
+    description: "USD pricing, Stripe billing.",
+    images: [`${SITE_URL}/api/og?en_pricing=1`],
+  },
 };
 
 function Tier({

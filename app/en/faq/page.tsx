@@ -24,6 +24,13 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/en/faq`,
     locale: "en_US",
     type: "website",
+    images: [`${SITE_URL}/api/og?en_faq=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FAQ — Virtual Agency",
+    description: "Licensing, pricing, turnaround, compliance.",
+    images: [`${SITE_URL}/api/og?en_faq=1`],
   },
 };
 

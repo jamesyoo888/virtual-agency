@@ -30,6 +30,13 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/en/cases`,
     locale: "en_US",
     type: "website",
+    images: [`${SITE_URL}/api/og?en_cases=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Case studies — Virtual Agency",
+    description: "Anchor case studies + categories we are recruiting now.",
+    images: [`${SITE_URL}/api/og?en_cases=1`],
   },
 };
 

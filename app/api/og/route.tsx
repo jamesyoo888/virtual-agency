@@ -95,6 +95,75 @@ export async function GET(request: Request) {
   const exploreMood = searchParams.get("explore_mood");
   const exploreGenre = searchParams.get("explore_genre");
 
+  // English (Phase 0 global rollout) — separate from KR variants so the
+  // OG card copy can be tuned to global brand voice without being a literal
+  // translation of the Korean cards.
+  const isEnHome = searchParams.get("en") === "1";
+  const isEnPricing = searchParams.get("en_pricing") === "1";
+  const isEnAbout = searchParams.get("en_about") === "1";
+  const isEnServices = searchParams.get("en_services") === "1";
+  const isEnCases = searchParams.get("en_cases") === "1";
+  const isEnBlog = searchParams.get("en_blog") === "1";
+  const isEnFaq = searchParams.get("en_faq") === "1";
+  const isEnAiDisclosure = searchParams.get("en_ai_disclosure") === "1";
+
+  if (isEnHome) {
+    return bigCard(
+      "VIRTUAL AGENCY",
+      "K-Aesthetic AI Models for Global Brands",
+      "Cast in 24h, deliver in days, license per campaign. Synthetic talent built for global K-aesthetic."
+    );
+  }
+  if (isEnPricing) {
+    return bigCard(
+      "VIRTUAL AGENCY · PRICING",
+      "One day. One model. One license.",
+      "From $300/day base to $25K/quarter brand kits. Stripe billing in USD, EUR, SGD, GBP."
+    );
+  }
+  if (isEnAbout) {
+    return bigCard(
+      "VIRTUAL AGENCY · ABOUT",
+      "A production studio for K-aesthetic talent",
+      "End-to-end pipeline on our own GPUs. Synthetic by default, with operational depth global brands recognize."
+    );
+  }
+  if (isEnServices) {
+    return bigCard(
+      "VIRTUAL AGENCY · SERVICES",
+      "Five services, one studio",
+      "Image · video · lookbook · fitting day · brand model kit. Same continuity layer across all."
+    );
+  }
+  if (isEnCases) {
+    return bigCard(
+      "VIRTUAL AGENCY · CASES",
+      "Anchor case studies — recruiting now",
+      "K-beauty US, K-pop merch US, K-aesthetic EU. Discounted slots for the first three brands."
+    );
+  }
+  if (isEnBlog) {
+    return bigCard(
+      "VIRTUAL AGENCY · BLOG",
+      "Notes on K-aesthetic and synthetic talent",
+      "What K-aesthetic actually means · how to brief for it · what it costs vs traditional models."
+    );
+  }
+  if (isEnFaq) {
+    return bigCard(
+      "VIRTUAL AGENCY · FAQ",
+      "Frequently asked, globally answered",
+      "Licensing, pricing, turnaround, compliance, cross-market use — answered for global brands."
+    );
+  }
+  if (isEnAiDisclosure) {
+    return bigCard(
+      "VIRTUAL AGENCY · COMPLIANCE",
+      "AI synthetic content disclosure",
+      "EU AI Act Article 50 · US FTC · UK ASA · Korea KCSC. The full posture, per market."
+    );
+  }
+
   // Static-card surfaces first — these never need a DB read.
   if (blogTag) {
     // Tag string is user-controlled — cap length and skip rendering if it

@@ -15,6 +15,20 @@ export const metadata: Metadata = {
       ko: `${SITE_URL}/about`,
     },
   },
+  openGraph: {
+    title: "About — Virtual Agency",
+    description: "A production studio for K-aesthetic talent — built on our own GPUs.",
+    url: `${SITE_URL}/en/about`,
+    locale: "en_US",
+    type: "website",
+    images: [`${SITE_URL}/api/og?en_about=1`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About — Virtual Agency",
+    description: "K-aesthetic production studio.",
+    images: [`${SITE_URL}/api/og?en_about=1`],
+  },
 };
 
 function Principle({ n, title, body }: { n: string; title: string; body: string }) {
