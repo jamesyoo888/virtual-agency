@@ -97,6 +97,26 @@ export default function CharactersIndex() {
           ))}
         </ul>
 
+        <section className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-6 mb-10">
+          <p className="text-xs tracking-[0.3em] text-zinc-500 uppercase mb-2">
+            Brand kits
+          </p>
+          <p className="text-zinc-200 font-semibold mb-1">
+            Most brands license more than one face.
+          </p>
+          <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+            Yuna and Ren are designed to share a styling DNA — bundle them
+            for couple narratives, cross-gender launches, and series casting
+            under a single brand kit.
+          </p>
+          <Link
+            href="/en/character/brand-kits"
+            className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
+          >
+            See paired brand kits <ArrowRight className="w-3 h-3" />
+          </Link>
+        </section>
+
         <p className="text-xs text-zinc-500">
           All characters are AI-generated synthetic talent. See the{" "}
           <Link

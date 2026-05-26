@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { loadSocialProof } from "@/lib/social-proof";
+import { listCharacters } from "@/lib/characters/registry";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -45,6 +47,7 @@ function Value({ n, title, desc }: { n: string; title: string; desc: string }) {
 
 export default async function EnHomePage() {
   const socialProof = await loadSocialProof();
+  const characters = listCharacters();
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -199,6 +202,65 @@ export default async function EnHomePage() {
             </Link>
             .
           </p>
+        </div>
+      </section>
+
+      <section className="px-5 md:px-8 py-12 md:py-16 border-b border-zinc-900">
+        <div className="max-w-5xl">
+          <div className="flex items-baseline justify-between mb-6 gap-4 flex-wrap">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-2">
+                Owned characters
+              </p>
+              <h2 className="text-xl md:text-2xl font-semibold tracking-tight">
+                Named K-aesthetic talent, licensable by the campaign.
+              </h2>
+            </div>
+            <Link
+              href="/en/character"
+              className="text-sm text-zinc-300 underline hover:text-white"
+            >
+              See all characters →
+            </Link>
+          </div>
+          <p className="text-zinc-400 text-base leading-relaxed mb-6 max-w-2xl">
+            Anchor talent designed for cross-season brand consistency.
+            One face across markets, palettes locked across quarters,
+            disclosure baked into every asset.
+          </p>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {characters.map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={`/en/character/${c.slug}`}
+                  className="group block rounded-xl border border-zinc-900 bg-zinc-950/40 p-5 hover:border-zinc-700 transition-colors"
+                >
+                  <div className="flex items-baseline justify-between mb-1">
+                    <p className="text-lg font-semibold text-zinc-100 group-hover:underline">
+                      {c.name}
+                    </p>
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-600">
+                      Age {c.age} · {c.gender}
+                    </span>
+                  </div>
+                  <p className="text-sm text-zinc-400 mb-3">{c.tagline}</p>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {c.targetVerticals.slice(0, 3).map((v) => (
+                      <span
+                        key={v}
+                        className="text-[10px] px-1.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400"
+                      >
+                        {v}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-xs text-zinc-400 group-hover:text-white">
+                    View character <ArrowRight className="w-3 h-3" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

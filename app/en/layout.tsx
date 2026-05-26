@@ -74,6 +74,11 @@ function EnFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/en/character/brand-kits" className="hover:text-white">
+                Brand kits
+              </Link>
+            </li>
+            <li>
               <Link href="/en/about" className="hover:text-white">
                 About
               </Link>
