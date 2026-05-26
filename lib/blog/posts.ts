@@ -1264,6 +1264,154 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "glass-skin-photography-lighting",
+    locale: "en",
+    title: "Glass Skin in Photography: Lighting and Post for K-Beauty",
+    excerpt:
+      "The look you see in every K-beauty hero shot is a lighting recipe, not a product. Here is how to reproduce it on a synthetic talent shoot — and the post-production rules that matter.",
+    publishedAt: "2026-05-28",
+    readingMinutes: 6,
+    tags: ["K-beauty", "K-aesthetic", "creative direction", "lighting"],
+    sections: [
+      {
+        heading: "What «glass skin» actually means visually",
+        body: "Glass skin is high luminance, low contrast, very low specular harshness, with a slight cool color cast in the highlights. The skin reads as translucent rather than matte. Most brand teams ask for it by name without realizing it is a lighting recipe, not a product-application result — that is why post-production alone never quite gets there.",
+      },
+      {
+        heading: "The three-source recipe",
+        body: "Key: large soft box, 5500K, raised slightly above eye line, slightly cool-tinted gel (1/8 CTB). Fill: white bounce or second large soft box at half the key intensity, neutral. Rim: small hair light positioned behind and above the subject, slightly warm-tinted (1/8 CTO), kept dim so it carves the face without dominating. Background: separate flat-lit cyc, two stops down from the key, no gel.",
+      },
+      {
+        heading: "Reproducing this with synthetic talent",
+        body: "Prompt structure matters more than prompt length. Lead with the lighting setup, then the wardrobe, then the framing — in that order. «Soft glass-skin key from upper left, cool fill, warm rim, neutral cyc, half-length editorial portrait, [brand wardrobe], 85mm equivalent» reproduces the look more reliably than describing the model.",
+      },
+      {
+        heading: "Post-production rules that matter",
+        body: "Cool the shadows by 5 mireds, warm the highlights by 3 mireds, lift midtones gently, drop overall saturation 5 to 10 percent, then add localized highlight on cheekbones and lower lip. Do not crush blacks — glass skin lives in the upper midtones, and crushed blacks destroy the translucency cue. Avoid global skin smoothing; smoothing kills the dimensionality the lighting created.",
+      },
+      {
+        heading: "Where most attempts go wrong",
+        body: "Three common mistakes: (1) hard light source pretending to be soft, which creates a glossy plastic look rather than glass; (2) over-warmed highlights, which reads as sweat rather than luminance; (3) too much frequency-separation skin work in post, which erases the soft transition between specular and diffuse that is the entire effect. Fix the lighting, not the retouching.",
+      },
+      {
+        heading: "When to choose glass skin vs alternatives",
+        body: "Glass skin reads K-beauty and reads premium. It does not read youthful athleticism or rugged outdoor. For sports, fitness, or outdoor F&B campaigns, a matte / textured skin look with directional sun key serves better — same K-aesthetic camera language, different skin treatment. Match the skin to the product context, not to a moodboard pulled from another category.",
+      },
+    ],
+  },
+  {
+    slug: "seoul-street-style-brand-aesthetic",
+    locale: "en",
+    title: "Seoul Street Style as a Brand Aesthetic — What to Borrow, What to Skip",
+    excerpt:
+      "Seoul street style is the most-imitated and least-understood reference in global fashion. Here is the structural anatomy — silhouette, palette, accessory grammar — so your brand borrows the right things.",
+    publishedAt: "2026-05-29",
+    readingMinutes: 7,
+    tags: ["K-fashion", "K-aesthetic", "brand strategy", "creative direction"],
+    sections: [
+      {
+        heading: "Why Seoul style travels",
+        body: "Seoul street style exports cleanly because it is built on three shifts most other style capitals don't combine: oversized silhouettes that flatter most body types, gender-fluid styling without performative androgyny, and accessory layering that reads as deliberate rather than maximalist. Brands borrowing the look without understanding these shifts usually end up with a costume — Seoul style without the structure.",
+      },
+      {
+        heading: "Silhouette: volume on top, narrow on the bottom",
+        body: "The default Seoul silhouette is roomy outerwear and shirting paired with narrow trousers or short hemlines. The proportion does the work — it is forgiving across bodies and ages, and it photographs flatteringly at street angles. Wrong-direction inversion (slim on top, voluminous on bottom) almost never reads as Seoul; it reads as 2010s European.",
+      },
+      {
+        heading: "Palette: muted tone with one anchor color",
+        body: "Daily Seoul palettes are muted — soft black, ash gray, cream, deep navy — with a single saturated accent (often a wine red, deep moss, or burnt orange). Brand campaigns that swap in saturated palettes across the whole outfit lose the Seoul reference; the muted base is what makes the single anchor color register as intentional.",
+      },
+      {
+        heading: "Accessory grammar: layered but reductive",
+        body: "Stacked rings, layered necklaces, double-knotted scarves — Seoul style layers, but reductively. Each layer is a different scale (one small + one medium + one large) and each material is allowed to repeat (silver + silver + leather). Western fashion layering tends to escalate maximalism; Seoul layering compounds within a single visual vocabulary.",
+      },
+      {
+        heading: "Hair and makeup that does NOT translate",
+        body: "Korean street talent often has hair and makeup looks (specifically the «syrupy» glossed lip and clean concealer base) that are part of K-beauty product context rather than universally portable styling. Brands using non-Korean models in Seoul-style campaigns should keep the styling and silhouette, but adjust the beauty palette to fit the model rather than transplant the K-beauty default — otherwise the casting feels uncanny.",
+      },
+      {
+        heading: "How to brief synthetic talent for Seoul style",
+        body: "Lock the silhouette and palette first (e.g. «oversized cream wool coat over slim black trousers, single accent wine scarf»). Then the location verb — «standing at Hannam-dong intersection» reads more authentic than «K-fashion street style». Then the camera language — 35mm equivalent, slight overhead street angle, soft late-afternoon natural light. Three constraints, in that order, produce the most consistent Seoul-coded output.",
+      },
+      {
+        heading: "What to skip",
+        body: "Skip oversized brand logos (the modern Seoul wardrobe has moved away from logo-heavy looks), skip stereotype cues (school uniforms outside of editorial context, K-pop stage looks unless your brand is in that adjacent space), and skip cultural references your team cannot defend if asked — Hangul on a t-shirt without meaning is a quick way to lose authenticity points with the audience you are courting.",
+      },
+    ],
+  },
+  {
+    slug: "why-korean-brands-outperform-instagram",
+    locale: "en",
+    title: "Why Korean Brands Outperform on Instagram — A Structural View",
+    excerpt:
+      "Korean DTC brands consistently beat US and EU peers on Instagram engagement at half the spend. The reasons are structural, not stylistic — and most of them are reproducible.",
+    publishedAt: "2026-05-30",
+    readingMinutes: 6,
+    tags: ["social media", "K-aesthetic", "brand strategy", "performance"],
+    sections: [
+      {
+        heading: "The pattern that prompted the question",
+        body: "Across roughly comparable categories — beauty, accessories, lifestyle — Korean DTC brands routinely produce Instagram feeds with 2 to 5 times the engagement rate of their US and EU peers at a fraction of the media spend. The temptation is to chalk this up to «K-aesthetic taste», but the actual drivers are structural: posting cadence, asset density, story-to-feed ratio, and a few content-craft choices that compound.",
+      },
+      {
+        heading: "Posting cadence: high frequency, low ceremony",
+        body: "Korean brand feeds typically post 5 to 7 times per week with low ceremony — feed posts are not always hero campaign art. They often look more like a finely curated catalog with rotating accents. Western brands tend to post 2 to 3 times per week with heavily produced assets and pay a feed-momentum tax for the cadence gap. Synthetic talent makes the higher cadence economical because the marginal cost of an extra hero asset collapses.",
+      },
+      {
+        heading: "Asset density: one face, one tone, many contexts",
+        body: "Top Korean brand feeds repeat the same face across many product contexts — same model, different scenarios. This builds brand recognition quickly. Western brands often rotate faces between campaigns and never accumulate the recognition compounding effect. Synthetic talent makes consistent-face campaigns trivially cheap to scale across product lines.",
+      },
+      {
+        heading: "Story-to-feed ratio",
+        body: "Korean brand operators treat Stories as the primary daily channel and Feed as the curated archive. Western brands often invert that — feed-heavy, story-light. Story-heavy operators get more conversational shopper signal (DMs, replies, polls) and use it to inform feed selection. This is a workflow choice that doesn't require K-aesthetic talent to copy.",
+      },
+      {
+        heading: "Caption craft",
+        body: "Korean brand captions skew specific and short — they tell the shopper exactly what the post is (product name, color, scene context) without overselling. Western brand captions skew aspirational and long. Specific captions win for transactional engagement; aspirational captions win for brand awareness — and most brands need more of the former than they think.",
+      },
+      {
+        heading: "Reproducing the playbook outside Korea",
+        body: "The K-aesthetic visual cue is one input. The actual replication recipe is: same face across the season, higher posting cadence, story-led operating rhythm, specific-not-aspirational captions, and a palette locked across the quarter. Brands that adopt the workflow win on engagement regardless of whether their visual register is K-aesthetic or otherwise — though the visual register helps.",
+      },
+    ],
+  },
+  {
+    slug: "k-aesthetic-casting-mistakes-global-brands",
+    locale: "en",
+    title: "5 Mistakes Global Brands Make Casting for K-Aesthetic — and How to Avoid Them",
+    excerpt:
+      "Casting is where most K-aesthetic campaigns by global brands quietly fail. Five recurring mistakes — and the simple checks that prevent each one.",
+    publishedAt: "2026-05-31",
+    readingMinutes: 5,
+    tags: ["casting", "K-aesthetic", "brand strategy", "creative direction"],
+    sections: [
+      {
+        heading: "Mistake 1: Casting to a stereotype rather than a register",
+        body: "Brands often brief K-aesthetic as «Korean-looking face» — which is both reductive and almost never the brief K-aesthetic actually wants. K-aesthetic is a visual register (lighting, palette, restraint), not a specific facial archetype. The fix: brief by tone, palette, and silhouette first; choose face afterward.",
+      },
+      {
+        heading: "Mistake 2: Treating «K-pop visual» as a default casting note",
+        body: "K-pop visual is a specific, hyper-curated category. Most brand campaigns do not need it and many product contexts are actively harmed by it (skincare for adults, premium home goods, mature category lifestyle). The fix: only ask for K-pop visual when your product context is K-pop adjacent. Otherwise ask for «modern Korean editorial».",
+      },
+      {
+        heading: "Mistake 3: Forcing the model to do all the K-aesthetic work",
+        body: "When the casting is the only K-aesthetic cue in the campaign, the model has to over-perform — and the campaign reads as cosplay. The K-aesthetic must show up in lighting, palette, location, and styling too. The fix: distribute the K-aesthetic load across at least three layers (face, lighting, palette) so no single layer is doing the lifting.",
+      },
+      {
+        heading: "Mistake 4: Mismatched age signal",
+        body: "Modern K-aesthetic skews to late-20s and early-30s for premium product contexts, despite the K-pop association with younger archetypes. Brands casting too young for premium categories lose authority signal. The fix: match casting age to category positioning, not to the K-pop reference.",
+      },
+      {
+        heading: "Mistake 5: Single-face fragility",
+        body: "Many global brands build a campaign around one K-aesthetic face and then find that single face cannot carry every product variant. The fix: cast a small consistent pair (e.g. one editorial, one warmer-feeling) and let the product context drive which face appears. Synthetic talent makes this cheap; it is expensive with human casting.",
+      },
+      {
+        heading: "Lightweight pre-launch check",
+        body: "Three questions to ask before approving any K-aesthetic campaign: (1) Is the K-aesthetic cue distributed across at least three layers, not just casting? (2) Does the face's age signal match the category positioning? (3) Will this face work for the next two product drops, or only this one? If any answer is no, return to the brief — not the post-production.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
