@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import PrintButton from "@/components/print-button";
 import QuoteShareButton from "@/components/quote-share-button";
+import StripePayButton from "@/components/stripe-pay-button";
+import { STRIPE_ENABLED } from "@/lib/payment/stripe";
 import type { Project, Model } from "@/types";
 
 const KRW = new Intl.NumberFormat("ko-KR");
@@ -93,7 +95,15 @@ export default async function QuotePage({
         <Link href="/client/dashboard" className="text-sm text-zinc-600 hover:text-zinc-900">
           ← 대시보드
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <StripePayButton
+            projectId={project.id}
+            hidden={!STRIPE_ENABLED || subtotal <= 0}
+            paid={
+              (project as { stripe_payment_status?: string | null })
+                .stripe_payment_status === "succeeded"
+            }
+          />
           <QuoteShareButton projectId={project.id} />
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
           <a

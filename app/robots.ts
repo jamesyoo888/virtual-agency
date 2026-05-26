@@ -30,6 +30,7 @@ export default function robots(): MetadataRoute.Robots {
           "/api/models/",
           "/api/search/",
           "/api/newsletter",
+          "/api/stripe/",
           "/login",
           "/auth/",
           "/invite/",
