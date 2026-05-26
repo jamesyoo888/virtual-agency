@@ -5,7 +5,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "Pricing ??Virtual Agency",
+  title: "Pricing — Virtual Agency",
   description:
     "USD pricing for Virtual Agency AI virtual models. Per-day licensing, exclusive bundles, and three illustrative scenarios for social, lookbook, and launch campaigns.",
   alternates: {
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Pricing ??Virtual Agency",
+    title: "Pricing — Virtual Agency",
     description: "USD pricing, Stripe billing, three illustrative scenarios.",
     url: `${SITE_URL}/en/pricing`,
     locale: "en_US",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pricing ??Virtual Agency",
+    title: "Pricing — Virtual Agency",
     description: "USD pricing, Stripe billing.",
     images: [`${SITE_URL}/api/og?en_pricing=1`],
   },
@@ -60,7 +60,7 @@ function Tier({
       <ul className="text-sm text-zinc-300 space-y-1.5">
         {bullets.map((b) => (
           <li key={b} className="flex gap-2">
-            <span className="text-zinc-600">쨌</span>
+            <span className="text-zinc-600">·</span>
             <span>{b}</span>
           </li>
         ))}
@@ -163,7 +163,7 @@ export default function EnPricingPage() {
           Three real campaign sizes
         </h2>
         <p className="text-sm text-zinc-500 mb-6">
-          Line items are typical, not contractual ??your quote will reflect your
+          Line items are typical, not contractual — your quote will reflect your
           specific brief.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
@@ -175,7 +175,7 @@ export default function EnPricingPage() {
               { label: "5 hero stills", amount: "$300" },
               { label: "Social crop + caption hints", amount: "$300" },
             ]}
-            use="A single SKU drop or trend reaction. Quote ??delivery in a week."
+            use="A single SKU drop or trend reaction. Quote — delivery in a week."
           />
           <Scenario
             title="Seasonal lookbook"
@@ -197,7 +197,7 @@ export default function EnPricingPage() {
               { label: "3 hero videos (15-30s)", amount: "$3,000" },
               { label: "Persona Instagram (90 days)", amount: "$1,000" },
             ]}
-            use="Anchor talent for a global product launch ??locked competitor-out for the launch window."
+            use="Anchor talent for a global product launch — locked competitor-out for the launch window."
           />
         </div>
 
@@ -206,7 +206,7 @@ export default function EnPricingPage() {
         </h2>
         <ol className="list-decimal list-inside text-zinc-300 space-y-1.5 mb-12 leading-relaxed">
           <li>
-            Send a brief (or pick a model from the catalog) ??we reply with a
+            Send a brief (or pick a model from the catalog) — we reply with a
             quote PDF within 24 hours.
           </li>
           <li>

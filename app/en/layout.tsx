@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 const SITE_URL =
@@ -6,8 +6,8 @@ const SITE_URL =
 
 export const metadata: Metadata = {
   title: {
-    default: "Virtual Agency ??K-Aesthetic AI Models for Global Brands",
-    template: "%s 쨌 Virtual Agency",
+    default: "Virtual Agency — K-Aesthetic AI Models for Global Brands",
+    template: "%s · Virtual Agency",
   },
   description:
     "Production-grade AI virtual models built for global brands tapping K-aesthetic. Cast in 24h, deliver in days, license per campaign.",
@@ -36,10 +36,10 @@ function EnFooter() {
           </p>
           <p>K-aesthetic AI virtual models for global brands.</p>
           <p className="mt-2">
-            짤 {YEAR} Virtual Agency. All rights reserved.
+            © {YEAR} Virtual Agency. All rights reserved.
           </p>
           <p className="mt-3 text-[10px] text-zinc-600">
-            All talent is AI-generated synthetic ??see{" "}
+            All talent is AI-generated synthetic — see{" "}
             <Link
               href="/en/legal/ai-disclosure"
               className="underline hover:text-zinc-300"

@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy ??Virtual Agency",
+  title: "Privacy Policy — Virtual Agency",
   description: "How Virtual Agency collects and uses personal information.",
   alternates: {
     canonical: `${SITE_URL}/en/legal/privacy`,
@@ -76,11 +76,11 @@ export default function EnPrivacyPage() {
         We rely on the following processors to operate the Service:
       </p>
       <ul className="list-disc list-inside leading-relaxed space-y-1">
-        <li>Vercel ??web hosting</li>
-        <li>Supabase (self-hosted) ??database and authentication</li>
-        <li>Stripe ??payment processing (for EN clients)</li>
-        <li>Replicate ??model inference (transient)</li>
-        <li>Meshy ??3D mesh generation (transient input)</li>
+        <li>Vercel — web hosting</li>
+        <li>Supabase (self-hosted) — database and authentication</li>
+        <li>Stripe — payment processing (for EN clients)</li>
+        <li>Replicate — model inference (transient)</li>
+        <li>Meshy — 3D mesh generation (transient input)</li>
       </ul>
 
       <h2 className="text-xl font-semibold text-white mt-8 mb-3">

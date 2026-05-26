@@ -16,7 +16,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "Services ??Virtual Agency",
+  title: "Services — Virtual Agency",
   description:
     "Five core services for global brands using synthetic K-aesthetic talent: image campaigns, video, lookbooks, fitting day, and brand model kits.",
   alternates: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Services ??Virtual Agency",
+    title: "Services — Virtual Agency",
     description:
       "Image campaigns, video, lookbooks, fitting day, brand model kits.",
     url: `${SITE_URL}/en/services`,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Services ??Virtual Agency",
+    title: "Services — Virtual Agency",
     description: "Five services, one studio.",
     images: [`${SITE_URL}/api/og?en_services=1`],
   },
@@ -60,10 +60,10 @@ const SERVICES: Service[] = [
     key: "image",
     Icon: ImageIcon,
     title: "Image campaign",
-    tagline: "5??0 stills on a single concept for social, print, and OOH.",
+    tagline: "5–10 stills on a single concept for social, print, and OOH.",
     deliverable: "High-res JPG/PNG + channel-cropped variants",
-    turnaround: "24??2 hours",
-    priceBand: "$1,500??5,500",
+    turnaround: "24–72 hours",
+    priceBand: "$1,500–$5,500",
     bullets: [
       "Same model, same concept, full continuity",
       "Auto-cropped for square, vertical, and landscape social",
@@ -76,10 +76,10 @@ const SERVICES: Service[] = [
     key: "video",
     Icon: Video,
     title: "Video content",
-    tagline: "5??0s ad video with optional lip-sync, EN / KR / JA.",
+    tagline: "5–30s ad video with optional lip-sync, EN / KR / JA.",
     deliverable: "MP4 1080p or 4K + subtitle option",
-    turnaround: "3?? days",
-    priceBand: "$3,000??15,000",
+    turnaround: "3–5 days",
+    priceBand: "$3,000–$15,000",
     bullets: [
       "Same model concept carried into motion",
       "Lip-sync in English, Korean, Japanese",
@@ -92,10 +92,10 @@ const SERVICES: Service[] = [
     key: "lookbook",
     Icon: Layers,
     title: "Lookbook / series",
-    tagline: "Same model, 4??2 stills, ideal for fashion and beauty.",
+    tagline: "Same model, 4–12 stills, ideal for fashion and beauty.",
     deliverable: "Styling guide + series stills + first-draft campaign copy",
-    turnaround: "5??0 days",
-    priceBand: "$4,500??12,000",
+    turnaround: "5–10 days",
+    priceBand: "$4,500–$12,000",
     bullets: [
       "Locked mood (cool / warm / editorial mono)",
       "Styling variation across the same canonical face",
@@ -109,13 +109,13 @@ const SERVICES: Service[] = [
     Icon: Calendar,
     title: "Fitting day",
     tagline: "Working session with your team to pick the model and lock the concept.",
-    deliverable: "5??0 recommended models + concept mood-board + campaign roadmap",
-    turnaround: "1?? days (workshop day itself)",
-    priceBand: "$1,200??3,500",
+    deliverable: "5–10 recommended models + concept mood-board + campaign roadmap",
+    turnaround: "1–2 days (workshop day itself)",
+    priceBand: "$1,200–$3,500",
     bullets: [
       "Our team visits your office or runs it over video",
       "Curated shortlist filtered to your brand fit",
-      "Optional live generation of 1?? proofs in-session",
+      "Optional live generation of 1–3 proofs in-session",
       "Fee credited if the engagement signs after the workshop",
     ],
     cta: { label: "Request a fitting day", href: "/en/rfp?campaign=Fitting+day+workshop" },
@@ -125,9 +125,9 @@ const SERVICES: Service[] = [
     Icon: Palette,
     title: "Brand model kit",
     tagline: "Quarterly-reuse dedicated talent + concept library.",
-    deliverable: "1?? exclusive models + 50 new stills/quarter + a video series",
+    deliverable: "1–2 exclusive models + 50 new stills/quarter + a video series",
     turnaround: "14-day initial setup, quarterly refresh",
-    priceBand: "$25,000??80,000 / quarter",
+    priceBand: "$25,000–$80,000 / quarter",
     bullets: [
       "Same talent carries across seasonal campaigns",
       "Category-exclusive licensing in your vertical",
@@ -180,7 +180,7 @@ export default function EnServicesPage() {
           <p className="mt-5 text-zinc-400 max-w-2xl leading-relaxed">
             Image, video, lookbook, fitting day, and brand kit. Each runs on
             the same continuity layer so the model who appears in one
-            deliverable carries cleanly into the next ??across quarters and
+            deliverable carries cleanly into the next — across quarters and
             across markets.
           </p>
         </header>
@@ -216,7 +216,7 @@ export default function EnServicesPage() {
               <ul className="space-y-1.5 text-sm text-zinc-300 mb-6 flex-1">
                 {s.bullets.map((b) => (
                   <li key={b} className="leading-relaxed">
-                    <span className="text-zinc-600 mr-2">쨌</span>
+                    <span className="text-zinc-600 mr-2">·</span>
                     {b}
                   </li>
                 ))}

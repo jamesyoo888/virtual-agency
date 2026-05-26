@@ -5,7 +5,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "AI Synthetic Content Disclosure ??Virtual Agency",
+  title: "AI Synthetic Content Disclosure — Virtual Agency",
   description:
     "Virtual Agency's compliance posture for synthetic AI-generated talent. Covers EU AI Act Article 50, US FTC Endorsement Guides, UK ASA / CAP Code, and Korea's KCSC guidance.",
   alternates: {
@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "AI Synthetic Content Disclosure ??Virtual Agency",
+    title: "AI Synthetic Content Disclosure — Virtual Agency",
     description:
-      "EU AI Act Article 50, US FTC, UK ASA, Korea KCSC ??the per-market posture.",
+      "EU AI Act Article 50, US FTC, UK ASA, Korea KCSC — the per-market posture.",
     url: `${SITE_URL}/en/legal/ai-disclosure`,
     locale: "en_US",
     type: "website",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "AI Synthetic Content Disclosure",
-    description: "EU AI Act 쨌 FTC 쨌 UK ASA 쨌 KCSC ??per-market posture.",
+    description: "EU AI Act · FTC · UK ASA · KCSC — per-market posture.",
     images: [`${SITE_URL}/api/og?en_ai_disclosure=1`],
   },
 };
@@ -36,7 +36,7 @@ export default function EnAiDisclosurePage() {
   return (
     <>
       <p className="text-xs text-zinc-500 uppercase tracking-widest">
-        Last revised 2026-05-26 쨌 Version 1.0
+        Last revised 2026-05-26 · Version 1.0
       </p>
         <h1 className="text-3xl font-bold mt-2 mb-3 text-white">
           AI Synthetic Content Disclosure
@@ -78,7 +78,7 @@ export default function EnAiDisclosurePage() {
         </h3>
         <p className="leading-relaxed">
           Campaigns targeting the EU must disclose that image, audio, or video
-          content was artificially generated or manipulated (Art. 50 짠2).
+          content was artificially generated or manipulated (Art. 50 §2).
           Virtual Agency provides:
         </p>
         <ul className="list-disc list-inside leading-relaxed space-y-1 mt-2">
@@ -87,11 +87,11 @@ export default function EnAiDisclosurePage() {
             embedded in EXIF and C2PA manifest (enabled on request)
           </li>
           <li>
-            <strong className="text-white">Visible watermarks</strong> ??corner
-            or caption {`짬AI-generated쨩`} / {`짬Synthetic쨩`} option
+            <strong className="text-white">Visible watermarks</strong> — corner
+            or caption {`«AI-generated»`} / {`«Synthetic»`} option
           </li>
           <li>
-            <strong className="text-white">Alt text</strong> ??{`짬AI-generated portrait of a fictional model named {name}쨩`}{" "}
+            <strong className="text-white">Alt text</strong> — {`«AI-generated portrait of a fictional model named {name}»`}{" "}
             auto-generated
           </li>
         </ul>
@@ -105,7 +105,7 @@ export default function EnAiDisclosurePage() {
           revised 2023). Campaign posts must include:
         </p>
         <ul className="list-disc list-inside leading-relaxed space-y-1 mt-2">
-          <li>{`짬This is a fictional, AI-generated character쨩`} or similar</li>
+          <li>{`«This is a fictional, AI-generated character»`} or similar</li>
           <li>{`#ad / #sponsored`} for paid placements</li>
           <li>
             No claim of personal experience with the product (the model has
@@ -120,7 +120,7 @@ export default function EnAiDisclosurePage() {
           The UK Advertising Standards Authority prohibits misleading
           representation (CAP Code Rule 3.1). The synthetic nature of the model
           must be communicated clearly enough that the average consumer
-          understands it ??via caption, subtitle, hashtag, or on-screen text.
+          understands it — via caption, subtitle, hashtag, or on-screen text.
         </p>
 
         <h3 className="text-base font-semibold text-zinc-200 mt-4 mb-2">
@@ -129,8 +129,8 @@ export default function EnAiDisclosurePage() {
         <p className="leading-relaxed">
           The Korea Communications Standards Commission and the Korea Fair
           Trade Commission recommend labelling AI virtual model ads as
-          {` 짬媛???몃Ъ?낅땲?ㅒ?`} or {` 짬AI 紐⑤뜽쨩 `}. For cosmetics, food, and
-          finance ??categories with efficacy claims ??labelling is effectively
+          {` «가상 인물입니다» `} or {` «AI 모델» `}. For cosmetics, food, and
+          finance — categories with efficacy claims — labelling is effectively
           mandatory.
         </p>
 
@@ -139,9 +139,9 @@ export default function EnAiDisclosurePage() {
         </h2>
         <ul className="list-disc list-inside leading-relaxed space-y-1.5">
           <li>
-            {`짬AI Synthetic쨩`} badge on the top-right of every model detail page
+            {`«AI Synthetic»`} badge on the top-right of every model detail page
           </li>
-          <li>{`짬AI-generated synthetic talent쨩`} line in OG cards</li>
+          <li>{`«AI-generated synthetic talent»`} line in OG cards</li>
           <li>
             Link to this disclosure ({" "}
             <Link
@@ -153,7 +153,7 @@ export default function EnAiDisclosurePage() {
             ) on every model page
           </li>
           <li>
-            {`짬Synthetic talent ??campaign disclosure required쨩`} footer line on
+            {`«Synthetic talent — campaign disclosure required»`} footer line on
             every quote PDF
           </li>
           <li>
@@ -167,9 +167,9 @@ export default function EnAiDisclosurePage() {
         </h2>
         <ol className="list-decimal list-inside leading-relaxed space-y-1.5">
           <li>
-            Surface the synthetic nature in your creative ??at least one of
-            caption, subtitle, or on-screen text should say {`짬AI model쨩`},
-            {` 짬Virtual model쨩 `}, or {` 짬AI-generated쨩 `}.
+            Surface the synthetic nature in your creative — at least one of
+            caption, subtitle, or on-screen text should say {`«AI model»`},
+            {` «Virtual model» `}, or {` «AI-generated» `}.
           </li>
           <li>
             Enable the watermark option appropriate for your target market (EU
@@ -177,11 +177,11 @@ export default function EnAiDisclosurePage() {
           </li>
           <li>
             Do not write copy that implies first-person product experience
-            (e.g., {`짬I've been using this for?┑?}).
+            (e.g., {`«I've been using this for…»`}).
           </li>
           <li>
             Do not modify the output to resemble a real person or
-            celebrity ??implicitly or explicitly.
+            celebrity — implicitly or explicitly.
           </li>
         </ol>
 

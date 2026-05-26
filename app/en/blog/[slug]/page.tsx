@@ -29,10 +29,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug, "en");
-  if (!post) return { title: "Post not found ??Virtual Agency" };
+  if (!post) return { title: "Post not found — Virtual Agency" };
   const ogImage = `${SITE_URL}/api/og?blog=${encodeURIComponent(post.slug)}`;
   return {
-    title: `${post.title} ??Virtual Agency`,
+    title: `${post.title} — Virtual Agency`,
     description: post.excerpt,
     alternates: {
       canonical: `${SITE_URL}/en/blog/${post.slug}`,
@@ -114,7 +114,7 @@ export default async function EnBlogPostPage({
           </h1>
           <p className="text-zinc-400 mt-3">{post.excerpt}</p>
           <p className="text-xs text-zinc-500 mt-4 tabular-nums">
-            {post.publishedAt} 쨌 {post.readingMinutes} min read
+            {post.publishedAt} · {post.readingMinutes} min read
           </p>
         </header>
 

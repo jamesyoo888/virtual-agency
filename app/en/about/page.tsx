@@ -5,9 +5,9 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "About ??Virtual Agency",
+  title: "About — Virtual Agency",
   description:
-    "Virtual Agency is a production studio for AI-generated K-aesthetic models. We build talent that scales with global campaigns ??built on our own GPU infrastructure.",
+    "Virtual Agency is a production studio for AI-generated K-aesthetic models. We build talent that scales with global campaigns — built on our own GPU infrastructure.",
   alternates: {
     canonical: `${SITE_URL}/en/about`,
     languages: {
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "About ??Virtual Agency",
-    description: "A production studio for K-aesthetic talent ??built on our own GPUs.",
+    title: "About — Virtual Agency",
+    description: "A production studio for K-aesthetic talent — built on our own GPUs.",
     url: `${SITE_URL}/en/about`,
     locale: "en_US",
     type: "website",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "About ??Virtual Agency",
+    title: "About — Virtual Agency",
     description: "K-aesthetic production studio.",
     images: [`${SITE_URL}/api/og?en_about=1`],
   },
@@ -60,12 +60,12 @@ export default function EnAboutPage() {
           About
         </p>
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
-          A production studio for K-aesthetic talent ??built on our own GPUs.
+          A production studio for K-aesthetic talent — built on our own GPUs.
         </h1>
         <p className="text-zinc-300 text-base md:text-lg leading-relaxed mb-12">
           Virtual Agency makes synthetic models that global brands can license,
           campaign by campaign. We focus on K-aesthetic because that&apos;s
-          where global demand is moving ??and because we run the production
+          where global demand is moving — and because we run the production
           pipeline end-to-end, not as a SaaS layer over someone else&apos;s API.
         </p>
 
@@ -79,7 +79,7 @@ export default function EnAboutPage() {
           <Principle
             n="02"
             title="Always disclosed"
-            body="Synthetic by default in every surface ??model page, OG card, quote PDF, alt text, and JSON-LD."
+            body="Synthetic by default in every surface — model page, OG card, quote PDF, alt text, and JSON-LD."
           />
           <Principle
             n="03"
@@ -89,7 +89,7 @@ export default function EnAboutPage() {
           <Principle
             n="04"
             title="Operational depth"
-            body="Lead time, bottleneck, at-risk client, cohort retention ??we track the same dashboards a real ops team would, so the campaigns ship on time."
+            body="Lead time, bottleneck, at-risk client, cohort retention — we track the same dashboards a real ops team would, so the campaigns ship on time."
           />
         </div>
 

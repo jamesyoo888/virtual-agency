@@ -7,7 +7,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
 
 export const metadata: Metadata = {
-  title: "FAQ ??Virtual Agency",
+  title: "FAQ — Virtual Agency",
   description:
     "Frequently asked questions on licensing, pricing, production timelines, compliance, and global use.",
   alternates: {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "FAQ ??Virtual Agency",
+    title: "FAQ — Virtual Agency",
     description:
       "AI virtual model licensing, pricing, turnaround, compliance, billing.",
     url: `${SITE_URL}/en/faq`,
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "FAQ ??Virtual Agency",
+    title: "FAQ — Virtual Agency",
     description: "Licensing, pricing, turnaround, compliance.",
     images: [`${SITE_URL}/api/og?en_faq=1`],
   },
@@ -56,30 +56,31 @@ const FAQ: QA[] = [
       "Each model card lists a daily rate. Multi-day discounts apply automatically (5% from 5 days, 10% from 10 days, 15% from 30 days). The model detail page has a live quote calculator; final pricing is confirmed in our written quote within 24 hours.",
   },
   {
-    q: "Exclusive vs non-exclusive ??what's the difference?",
+    q: "Exclusive vs non-exclusive — what's the difference?",
     a: (
       <p>
         Exclusive licensing locks the model away from competitors in your
-        category for the contract window. It typically prices 3??x non-exclusive
+        category for the contract window. It typically prices 3–5x non-exclusive
         but is the right call when the model becomes part of your brand
         identity. Non-exclusive licensing lets the same model appear in other
         campaigns and is significantly cheaper.
       </p>
     ),
     aText:
-      "Exclusive locks the model away from competitors in your category for the contract window. It typically prices 3??x non-exclusive but is the right call when the model becomes part of your brand identity. Non-exclusive is significantly cheaper and allows concurrent campaigns.",
+      "Exclusive locks the model away from competitors in your category for the contract window. It typically prices 3–5x non-exclusive but is the right call when the model becomes part of your brand identity. Non-exclusive is significantly cheaper and allows concurrent campaigns.",
   },
   {
     q: "How long does production take?",
     a: (
       <p>
-        Images and lookbooks: typically 2?? business days. Video (5??0s):
-        typically 3?? business days. 3D assets and lip-sync: 5?? business days.
-        Every stage ??inquiry ??brief ??in production ??review ??delivered ??        is visible in the client dashboard in real time.
+        Images and lookbooks: typically 2–4 business days. Video (5–30s):
+        typically 3–5 business days. 3D assets and lip-sync: 5–7 business days.
+        Every stage — inquiry → brief → in production → review → delivered —
+        is visible in the client dashboard in real time.
       </p>
     ),
     aText:
-      "Images and lookbooks: 2?? business days. Video (5??0s): 3?? business days. 3D assets and lip-sync: 5?? business days. Every stage ??inquiry ??brief ??in production ??review ??delivered ??is visible in the client dashboard in real time.",
+      "Images and lookbooks: 2–4 business days. Video (5–30s): 3–5 business days. 3D assets and lip-sync: 5–7 business days. Every stage — inquiry → brief → in production → review → delivered — is visible in the client dashboard in real time.",
   },
   {
     q: "How does the AI matching work?",
@@ -128,12 +129,12 @@ const FAQ: QA[] = [
     a: (
       <p>
         Standard package: two free revision rounds at the review stage.
-        Additional revisions are billed at $50??150 per round depending on
+        Additional revisions are billed at $50–150 per round depending on
         model complexity. Concept-level reshoots are quoted separately.
       </p>
     ),
     aText:
-      "Standard package includes two free revision rounds at review. Additional revisions are billed at $50??150 per round depending on model complexity. Concept-level reshoots are quoted separately.",
+      "Standard package includes two free revision rounds at review. Additional revisions are billed at $50–150 per round depending on model complexity. Concept-level reshoots are quoted separately.",
   },
   {
     q: "Are 3D and lip-sync video supported?",
@@ -173,7 +174,8 @@ const FAQ: QA[] = [
         Yes, in every market we operate in. EU AI Act Article 50 (in force
         2026), US FTC Endorsement Guides, UK CAP Code, and Korea KCSC guidance
         all require advertiser-side disclosure. We provide a per-deliverable
-        recommended caption, alt text, and a compliance documentation block ??        see the{" "}
+        recommended caption, alt text, and a compliance documentation block —
+        see the{" "}
         <Link
           href="/en/legal/ai-disclosure"
           className="underline hover:text-white"
@@ -190,7 +192,7 @@ const FAQ: QA[] = [
     q: "Can the same model be used across multiple markets?",
     a: (
       <p>
-        Yes ??that is one of the structural reasons brands choose synthetic
+        Yes — that is one of the structural reasons brands choose synthetic
         talent. The same canonical face renders in different markets with
         regional styling. Pricing depends on the territory bundle (Asia,
         North America, EU, Global).

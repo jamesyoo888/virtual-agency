@@ -24,9 +24,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const c = getAnchorCaseBySlug(slug);
-  if (!c) return { title: "Case not found ??Virtual Agency" };
+  if (!c) return { title: "Case not found — Virtual Agency" };
   return {
-    title: `${c.title} ??Virtual Agency`,
+    title: `${c.title} — Virtual Agency`,
     description: c.pitch,
     alternates: {
       canonical: `${SITE_URL}/en/cases/${c.slug}`,
@@ -72,14 +72,14 @@ export default async function EnCaseStudyPage({
 
         <header className="mb-10">
           <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-3">
-            {c.vertical} 쨌 {c.market}
+            {c.vertical} · {c.market}
           </p>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
             {c.title}
           </h1>
           <p className="text-zinc-400 mt-3">{c.pitch}</p>
           <p className="text-xs text-zinc-500 mt-4 tabular-nums">
-            {c.publishedAt} 쨌 {c.durationLabel} 쨌 {c.companyMask}
+            {c.publishedAt} · {c.durationLabel} · {c.companyMask}
           </p>
         </header>
 
