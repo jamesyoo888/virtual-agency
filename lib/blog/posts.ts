@@ -1592,6 +1592,50 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "yuna-vs-ren-brand-kit-pairing-strategy",
+    locale: "en",
+    title: "Yuna vs Ren — How to Decide Which K-Aesthetic Character Anchors Your Quarter",
+    excerpt:
+      "Two synthetic K-aesthetic faces. Different visual registers. The wrong pick wastes a quarter — and the right pick is usually obvious once you frame the brief around three buyer questions.",
+    publishedAt: "2026-06-08",
+    readingMinutes: 7,
+    tags: ["Yuna", "Ren", "character casting", "brand kit", "strategy"],
+    sections: [
+      {
+        heading: "The decision is not «which face is better»",
+        body: "Buyers default to a beauty-contest framing: which face do I prefer? Wrong frame. Both Yuna and Ren are built to a high consistency bar — neither is the «better» face. The decision is which face fits your product context, your audience, and your visual register. Three buyer questions resolve this in under five minutes.",
+      },
+      {
+        heading: "Question 1 — Where does your category sit?",
+        body: "Yuna anchors beauty, fashion-tech, editorial-leaning luxury, and lifestyle. Her register reads cool, soft-feature, dewy — the K-beauty + Seoul editorial axis. Ren anchors fragrance, watches, motorsport, menswear, and luxury narrative work where directional lighting and editorial restraint carry the campaign. Categories that overlap (luxury, tech) are paired-kit territory by default. Categories that don't overlap pick the face that maps to the existing brand register.",
+      },
+      {
+        heading: "Question 2 — What is the dominant lighting recipe?",
+        body: "If your hero shot lives in soft glass-skin key (5500K, low contrast, warm rim), that is Yuna's native recipe — the face was designed around it. If your campaign needs directional cool key, deeper shadow fall, noir-leaning restraint, that is Ren's. Brands sometimes try to force a face into the «wrong» lighting recipe and the result reads off. Don't fight the recipe; the lighting recipe is the brand cue.",
+      },
+      {
+        heading: "Question 3 — Is the campaign a single voice or a duet?",
+        body: "If the campaign is one product, one tone, one tight launch, you want solo. Pick the face whose register matches the product. If the campaign spans multiple SKUs, multiple tones across a season, or a couple narrative (fragrance especially), you want paired. Yuna and Ren are designed with shared styling DNA so the paired kit reads as one tone with two faces, not two campaigns stitched together.",
+      },
+      {
+        heading: "What about the brand-kit math?",
+        body: "Solo character licensing is per-day. Paired Editorial kit is $8.5K/quarter; Season Anchor (couple) is $22K with category exclusivity; Custom Multi-Face is $50K+ for Yuna + Ren + a brand-built third character. If you'll need more than 12 days across a quarter, the paired kit beats day-rate math by a wide margin. If you'll need anchor work for a full season across multiple product launches, Season Anchor with exclusivity is what actually defends the brand cue against competitors who try the same K-aesthetic vocabulary.",
+      },
+      {
+        heading: "The three patterns we see most",
+        body: "(1) K-beauty US launch — Yuna solo or Season Anchor with exclusivity. Glass-skin recipe is the entire campaign. (2) Fragrance Europe rollout — Ren solo for the hero, or Paired Editorial for the couple narrative if the scent has masculine + feminine pillars. (3) Multi-market luxury watch launch — Ren solo with category exclusivity is the default; the paired kit only beats this when the brand also runs a sister product line. Most other patterns reduce to one of these three.",
+      },
+      {
+        heading: "The «test before you commit» path",
+        body: "We always recommend the concept sheet pass first: 24-hour turnaround with one or two sample shots in your lighting recipe + wardrobe register. The sheet costs an order of magnitude less than the full brand kit and tells you whether the character — and the recipe assumptions you brought — actually carry the campaign. Most buyers who follow this path lock the right tier without renegotiation.",
+      },
+      {
+        heading: "Where to take the brief next",
+        body: "If the decision is clear, send an RFP and pre-fill the character + exclusive flags from the character detail page — both Yuna and Ren have direct submit buttons that mark the inquiry as character-attributed for tracking. If the decision is between solo Yuna and paired Yuna+Ren, the compare page (/en/character/compare) lays out the 9-row side-by-side that resolves the rest.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

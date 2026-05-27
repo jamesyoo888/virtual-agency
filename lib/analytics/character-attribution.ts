@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
 
 /**
  * Character-attributed inquiry funnel.
@@ -31,11 +32,17 @@ export interface CharacterAttributionReport {
   bySlug: CharacterAttributionRow[];
   /** Projects tagged utm_source=character but utm_campaign didn't parse. */
   unknown: number;
+  /** Dense daily series of attributed inquiries (zero-filled). */
+  daily: DailyBucket[];
 }
 
 interface Row {
   status: string | null;
   utm_campaign: string | null;
+}
+
+interface RowWithDate extends Row {
+  created_at: string;
 }
 
 export function summarizeCharacterAttribution(
@@ -94,6 +101,7 @@ export async function loadCharacterAttribution(
     totalDelivered: 0,
     bySlug: [],
     unknown: 0,
+    daily: aggregateDaily([], windowDays),
   };
   if (!SUPABASE_CONFIGURED) return empty;
 
@@ -101,7 +109,7 @@ export async function loadCharacterAttribution(
   const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabase
     .from("projects")
-    .select("status, utm_campaign")
+    .select("status, utm_campaign, created_at")
     .eq("utm_source", "character")
     .gte("created_at", since)
     .limit(5000);
@@ -111,6 +119,8 @@ export async function loadCharacterAttribution(
     return empty;
   }
 
-  const summary = summarizeCharacterAttribution((data ?? []) as Row[]);
-  return { windowDays, ...summary };
+  const rowsWithDate = (data ?? []) as RowWithDate[];
+  const summary = summarizeCharacterAttribution(rowsWithDate);
+  const daily = aggregateDaily(rowsWithDate, windowDays);
+  return { windowDays, ...summary, daily };
 }

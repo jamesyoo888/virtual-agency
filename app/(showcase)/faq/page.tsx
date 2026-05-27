@@ -356,7 +356,18 @@ export default function FAQPage() {
           ))}
         </ul>
 
-        <div className="mt-12 text-center">
+        <p className="mt-10 text-center text-xs text-zinc-500">
+          용어가 낯설다면{" "}
+          <Link
+            href="/glossary"
+            className="text-zinc-300 underline hover:text-white"
+          >
+            용어집
+          </Link>
+          에서 K-aesthetic · 합성 모델 · 라이선스 용어 14가지를 정리해 두었습니다.
+        </p>
+
+        <div className="mt-6 text-center">
           <Link
             href="/match"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"

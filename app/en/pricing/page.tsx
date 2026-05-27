@@ -252,6 +252,18 @@ export default function EnPricingPage() {
               Compliance disclosure
             </Link>
           </div>
+
+          <p className="mt-8 text-xs text-zinc-500 max-w-3xl">
+            New to vocabulary like «brand kit», «category exclusivity», or
+            «disclosure metadata»? The{" "}
+            <Link
+              href="/en/glossary"
+              className="text-zinc-300 underline hover:text-white"
+            >
+              glossary
+            </Link>{" "}
+            defines all 14 terms used across pricing and contracts.
+          </p>
         </div>
       </div>
     </div>

@@ -281,7 +281,19 @@ export default function EnFAQPage() {
           ))}
         </ul>
 
-        <div className="mt-12 text-center flex justify-center gap-2 flex-wrap">
+        <p className="mt-10 text-center text-xs text-zinc-500">
+          New vocabulary? The{" "}
+          <Link
+            href="/en/glossary"
+            className="text-zinc-300 underline hover:text-white"
+          >
+            glossary
+          </Link>{" "}
+          defines K-aesthetic, synthetic talent, brand kits, disclosure
+          metadata, and 10 more terms in one page.
+        </p>
+
+        <div className="mt-6 text-center flex justify-center gap-2 flex-wrap">
           <Link
             href="/en/rfp"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"

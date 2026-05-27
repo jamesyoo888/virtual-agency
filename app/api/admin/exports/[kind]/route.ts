@@ -16,6 +16,7 @@ import {
 } from "@/lib/analytics/client-retention";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
+import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -48,6 +49,7 @@ const KINDS = new Set([
   "client-retention",
   "at-risk-clients",
   "pipeline-velocity",
+  "character-attribution",
 ]);
 
 export async function GET(
@@ -1205,6 +1207,33 @@ export async function GET(
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(
           "client-retention"
+        )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "character-attribution") {
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 30;
+    const report = await loadCharacterAttribution(windowDays);
+    const rows: { metric: string; value: string }[] = [
+      { metric: "window_days", value: String(report.windowDays) },
+      { metric: "total_inquiries", value: String(report.totalInquiries) },
+      { metric: "total_delivered", value: String(report.totalDelivered) },
+      { metric: "unknown_campaign", value: String(report.unknown) },
+      ...report.bySlug.flatMap((c) => [
+        { metric: `slug_${c.slug}_inquiries`, value: String(c.inquiries) },
+        { metric: `slug_${c.slug}_delivered`, value: String(c.delivered) },
+        { metric: `slug_${c.slug}_conversion_pct`, value: String(c.conversionPct) },
+      ]),
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "character-attribution"
         )}"`,
         "Cache-Control": "no-store",
       },

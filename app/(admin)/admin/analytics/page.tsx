@@ -258,19 +258,54 @@ export default async function AnalyticsPage({
 
       {characterAttribution.totalInquiries > 0 && (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          {(() => {
+            const peak = Math.max(
+              1,
+              ...characterAttribution.daily.map((d) => d.count)
+            );
+            return (
+              <div className="flex items-end gap-px h-12 mb-5">
+                {characterAttribution.daily.map((d) => {
+                  const heightPct = (d.count / peak) * 100;
+                  return (
+                    <div
+                      key={d.date}
+                      title={`${d.date} — ${d.count}건`}
+                      className="flex-1 flex flex-col justify-end"
+                    >
+                      <div
+                        className={`w-full rounded-sm ${
+                          d.count > 0 ? "bg-fuchsia-500/70" : "bg-zinc-900"
+                        }`}
+                        style={{ height: `${Math.max(2, heightPct)}%` }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
           <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
               캐릭터 페이지 → 문의 ({windowDays}일)
             </h2>
-            <p className="text-xs text-zinc-500 tabular-nums">
-              utm_source=character · 총 {characterAttribution.totalInquiries}건 ·
-              납품 {characterAttribution.totalDelivered}건
-              {characterAttribution.unknown > 0 && (
-                <span className="ml-2 text-zinc-600">
-                  · 미분류 {characterAttribution.unknown}
-                </span>
-              )}
-            </p>
+            <div className="flex items-center gap-3 text-xs">
+              <p className="text-zinc-500 tabular-nums">
+                utm_source=character · 총 {characterAttribution.totalInquiries}건 ·
+                납품 {characterAttribution.totalDelivered}건
+                {characterAttribution.unknown > 0 && (
+                  <span className="ml-2 text-zinc-600">
+                    · 미분류 {characterAttribution.unknown}
+                  </span>
+                )}
+              </p>
+              <Link
+                href={`/api/admin/exports/character-attribution?window=${windowDays}`}
+                className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+              >
+                CSV
+              </Link>
+            </div>
           </div>
           <ul className="space-y-2">
             {characterAttribution.bySlug.map((c) => {

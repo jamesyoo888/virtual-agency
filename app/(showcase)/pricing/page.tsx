@@ -299,6 +299,17 @@ export default async function PricingPage() {
           <p className="mt-6 text-xs text-zinc-600 leading-relaxed max-w-3xl">
             *전통 에이전시 수치는 식음료·뷰티·패션 카테고리의 일반적인 캠페인 견적 범위로, Virtual Agency 광고주가 직전 견적과 비교 제공한 데이터에 기반합니다. 캠페인 규모·매체에 따라 차이가 발생합니다.
           </p>
+
+          <p className="mt-10 text-xs text-zinc-500 max-w-3xl">
+            «독점», «브랜드 키트», «컨셉 시트», «컴플라이언스 메타데이터» 같은 용어가 처음이라면{" "}
+            <Link
+              href="/glossary"
+              className="text-zinc-300 underline hover:text-white"
+            >
+              용어집
+            </Link>
+            에서 견적 검토 전에 14개 핵심 용어를 정리할 수 있습니다.
+          </p>
         </div>
       </section>
     </div>
