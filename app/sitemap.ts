@@ -186,6 +186,12 @@ export default async function sitemap(
             changeFrequency: "monthly",
             priority: 0.7,
           },
+          {
+            url: `${SITE_URL}/en/character/compare`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.7,
+          },
           ...listCharacters().map((c) => ({
             url: `${SITE_URL}/en/character/${c.slug}`,
             lastModified: now,
@@ -405,6 +411,18 @@ export default async function sitemap(
               languages: {
                 ko: `${SITE_URL}/character/brand-kits`,
                 en: `${SITE_URL}/en/character/brand-kits`,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/character/compare`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.7,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/character/compare`,
+                en: `${SITE_URL}/en/character/compare`,
               },
             },
           },

@@ -117,12 +117,20 @@ export default function KrCharactersIndex() {
             남녀 라인 동시 런칭·시리즈 캐스팅을 하나의 브랜드 키트로 묶을 수
             있습니다.
           </p>
-          <Link
-            href="/character/brand-kits"
-            className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
-          >
-            페어 브랜드 키트 보기 <ArrowRight className="w-3 h-3" />
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/character/brand-kits"
+              className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
+            >
+              페어 브랜드 키트 보기 <ArrowRight className="w-3 h-3" />
+            </Link>
+            <Link
+              href="/character/compare"
+              className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 text-zinc-200 hover:bg-zinc-900"
+            >
+              유나 vs 렌 비교
+            </Link>
+          </div>
         </section>
 
         <p className="text-xs text-zinc-500">

@@ -109,12 +109,20 @@ export default function CharactersIndex() {
             for couple narratives, cross-gender launches, and series casting
             under a single brand kit.
           </p>
-          <Link
-            href="/en/character/brand-kits"
-            className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
-          >
-            See paired brand kits <ArrowRight className="w-3 h-3" />
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/en/character/brand-kits"
+              className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
+            >
+              See paired brand kits <ArrowRight className="w-3 h-3" />
+            </Link>
+            <Link
+              href="/en/character/compare"
+              className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 text-zinc-200 hover:bg-zinc-900"
+            >
+              Compare Yuna vs Ren
+            </Link>
+          </div>
         </section>
 
         <p className="text-xs text-zinc-500">
