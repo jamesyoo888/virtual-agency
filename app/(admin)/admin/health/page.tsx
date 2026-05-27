@@ -8,6 +8,8 @@ import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import { loadBlogViews } from "@/lib/analytics/blog-views";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
+import { loadCharacterViews } from "@/lib/analytics/character-views";
+import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -216,8 +218,22 @@ async function loadTrendingEngine(): Promise<{
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner, sla, perf, trending, retention, velocity, stageTiming, blogViews30d, blogAttr30d] =
-    await Promise.all([
+  const [
+    pulse,
+    cost,
+    recent,
+    banner,
+    sla,
+    perf,
+    trending,
+    retention,
+    velocity,
+    stageTiming,
+    blogViews30d,
+    blogAttr30d,
+    charViews30d,
+    charAttr30d,
+  ] = await Promise.all([
       loadPulse(),
       summarizeUsage(),
       recentUsage(10),
@@ -230,6 +246,8 @@ export default async function AdminHealthPage() {
       loadStageTiming(90),
       loadBlogViews(30),
       loadBlogAttribution(30),
+      loadCharacterViews(30),
+      loadCharacterAttribution(30),
     ]);
 
   // Bottleneck = slowest stage's median exceeds 14d. We check the SLOWEST
@@ -424,6 +442,26 @@ export default async function AdminHealthPage() {
         : "popularity view 미생성 또는 쿼리 실패",
       runbook:
         "30% 미만이면 카탈로그 노출이 부족. /admin 의 funnel + bySource 확인. popularity view 자체가 없으면 마이그레이션 006 재적용",
+    },
+    {
+      // Symmetric to blog conversion: if 30d character page views > 200 but
+      // utm_source=character inquiries are 0, the funnel exists but the
+      // conversion step is broken. The CTA on character pages is the most
+      // likely failure point — it's the one place referrer + utm_source both
+      // need to be set correctly for attribution to land.
+      label: "캐릭터 페이지 → 인콰이어 전환",
+      ok: charViews30d.total < 200 || charAttr30d.totalInquiries > 0,
+      detail:
+        charViews30d.total < 200
+          ? `30d 조회 ${charViews30d.total} — 표본 부족 (200+ 부터 측정)`
+          : charAttr30d.totalInquiries === 0
+          ? `30d 조회 ${charViews30d.total.toLocaleString()} · utm_source=character 인콰이어 0`
+          : `30d 조회 ${charViews30d.total.toLocaleString()} · 인콰이어 ${charAttr30d.totalInquiries} (${(
+              (charAttr30d.totalInquiries / charViews30d.total) *
+              100
+            ).toFixed(2)}%)`,
+      runbook:
+        "트래픽은 있는데 attribution 인콰이어가 없으면 (1) /character/[slug] CTA 가 utm_source=character 를 떨어트리지 않거나 (2) /rfp · /match 폼이 utm_source 를 보존 안 함. /admin/analytics 캐릭터 funnel 카드 + /admin/inbox 의 ★ Char 칩 카운트 대조. 최근 character detail 페이지 변경분 점검.",
     },
     {
       // Blog conversion gate — high views but no attributed inquiries means

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { BookOpen, TrendingUp } from "lucide-react";
 import { loadBlogViews } from "@/lib/analytics/blog-views";
+import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { getPostBySlug } from "@/lib/blog/posts";
-import { listSeries } from "@/lib/blog/series";
+import { listSeries, BLOG_SERIES } from "@/lib/blog/series";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Blog analytics — Virtual Agency" };
@@ -26,7 +27,32 @@ export default async function BlogAnalyticsPage({
 }) {
   const sp = await searchParams;
   const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
-  const blogViews = await loadBlogViews(windowDays);
+  const [blogViews, blogAttr] = await Promise.all([
+    loadBlogViews(windowDays),
+    loadBlogAttribution(windowDays),
+  ]);
+
+  // Per-series attribution rollup. For each series id, sum inquiries +
+  // delivered + revenue across the slugs that belong to it (both KR and
+  // EN variants of the series). Series id is shared across locales so a
+  // single rollup is meaningful — readers landing on either variant feed
+  // the same funnel.
+  const seriesAttributionById = new Map<
+    string,
+    { inquiries: number; delivered: number; revenue: number }
+  >();
+  for (const slugStat of blogAttr.bySlug) {
+    for (const series of BLOG_SERIES) {
+      if (!series.slugs.includes(slugStat.slug)) continue;
+      const cur =
+        seriesAttributionById.get(series.id) ??
+        { inquiries: 0, delivered: 0, revenue: 0 };
+      cur.inquiries += slugStat.inquiries;
+      cur.delivered += slugStat.delivered;
+      cur.revenue += slugStat.revenue;
+      seriesAttributionById.set(series.id, cur);
+    }
+  }
 
   const maxBlogViews = Math.max(1, ...blogViews.bySlug.map((b) => b.total));
   const maxSeriesViews = Math.max(1, ...blogViews.bySeries.map((s) => s.total));
@@ -132,6 +158,19 @@ export default async function BlogAnalyticsPage({
                 locale === "en"
                   ? `/en/blog/series/${s.seriesId}`
                   : `/blog/series/${s.seriesId}`;
+              const attr = seriesAttributionById.get(s.seriesId);
+              const convPct =
+                attr && s.total > 0
+                  ? (attr.inquiries / s.total) * 100
+                  : null;
+              const convTone =
+                convPct === null
+                  ? "text-zinc-600"
+                  : convPct >= 1
+                  ? "text-emerald-300"
+                  : convPct >= 0.3
+                  ? "text-amber-300"
+                  : "text-rose-300";
               return (
                 <li
                   key={s.seriesId}
@@ -144,7 +183,7 @@ export default async function BlogAnalyticsPage({
                   >
                     {s.title}
                   </Link>
-                  <div className="col-span-6 h-2 rounded bg-zinc-900 overflow-hidden">
+                  <div className="col-span-4 h-2 rounded bg-zinc-900 overflow-hidden">
                     <div
                       className="h-full bg-violet-500"
                       style={{ width: `${widthPct}%` }}
@@ -161,10 +200,36 @@ export default async function BlogAnalyticsPage({
                       ↗
                     </Link>
                   </span>
+                  <span
+                    className="col-span-2 text-right text-xs tabular-nums"
+                    title={
+                      attr
+                        ? `${attr.inquiries} 인콰이어 · 납품 ${attr.delivered} · ₩${attr.revenue.toLocaleString("ko-KR")}`
+                        : "attribution 데이터 없음"
+                    }
+                  >
+                    {attr ? (
+                      <>
+                        <span className={convTone}>
+                          {convPct !== null ? `${convPct.toFixed(2)}%` : "—"}
+                        </span>{" "}
+                        <span className="text-zinc-600">
+                          ({attr.inquiries})
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-zinc-700">—</span>
+                    )}
+                  </span>
                 </li>
               );
             })}
           </ul>
+          <p className="mt-4 text-[11px] text-zinc-600">
+            전환 % = 시리즈 조회 → blog-attributed 인콰이어. KR + EN 시리즈
+            id 가 공유되므로 두 변형의 인콰이어가 합산. 0.3%~1% = 평균,
+            1%+ = healthy buyer-funnel.
+          </p>
         </section>
       )}
 

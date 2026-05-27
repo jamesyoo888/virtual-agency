@@ -196,8 +196,8 @@ export default async function sitemap(
           {
             url: `${SITE_URL}/en/glossary`,
             lastModified: now,
-            changeFrequency: "monthly",
-            priority: 0.6,
+            changeFrequency: "weekly",
+            priority: 0.7,
           },
           {
             url: `${SITE_URL}/en/press/character-launch`,
@@ -458,8 +458,8 @@ export default async function sitemap(
           {
             url: `${SITE_URL}/glossary`,
             lastModified: now,
-            changeFrequency: "monthly",
-            priority: 0.6,
+            changeFrequency: "weekly",
+            priority: 0.7,
             alternates: {
               languages: {
                 ko: `${SITE_URL}/glossary`,
