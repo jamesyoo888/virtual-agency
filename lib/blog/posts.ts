@@ -1512,6 +1512,86 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "ai-content-disclosure-metadata-4-markets",
+    locale: "en",
+    title: "AI Content Disclosure Metadata Across 4 Markets — Bake It Into Delivery",
+    excerpt:
+      "The EU AI Act, US FTC, UK ASA, and Korea KCSC all require AI-content disclosure — but they require it differently. The per-market metadata bundle most brands need, and how to bake it into delivery instead of bolting it on later.",
+    publishedAt: "2026-06-03",
+    readingMinutes: 7,
+    tags: ["compliance", "AI disclosure", "operations", "EU AI Act"],
+    sections: [
+      {
+        heading: "Why disclosure became a delivery problem",
+        body: "Through 2025, AI-content disclosure was a legal review item — flagged late, bolted on in post. In 2026, four major markets enforce it as a delivery requirement. The metadata travels with the file, the watermark is visible per market, and the label copy is regulator-prescribed. That moves disclosure from legal-late to operations-early.",
+      },
+      {
+        heading: "EU AI Act Article 50 — labeling + provenance",
+        body: "Article 50 requires that AI-generated content carrying real-person likeness be labeled where users see it. Provenance metadata (C2PA-aligned) must be embedded. Practical implication: brand campaigns running in EU markets need the visible label plus C2PA metadata baked in. Audiovisual content carries additional duties under Article 50(3). Verify against your DSO designation before launch.",
+      },
+      {
+        heading: "US FTC Endorsement Guides — material connection",
+        body: "FTC guidance updated in 2024 treats AI-generated talent the same way it treats paid endorsers: the material connection must be disclosed clearly and conspicuously. For static ads, a #ai or 'AI synthetic' tag adjacent to the brand name is the safe form. For video, the disclosure must appear in the first frame and persist across the duration.",
+      },
+      {
+        heading: "UK ASA / CAP Code — recognizable as advertising",
+        body: "The CAP Code requires ads to be recognizable as ads, and AI-generated talent inside that ad must not mislead viewers about real-person endorsement. The safe form: a clear AI marker on the asset and a one-line statement in the campaign metadata. The ASA has signaled enforcement priority on health, finance, and beauty categories — bake in early.",
+      },
+      {
+        heading: "Korea KCSC + Fair Trade Commission",
+        body: "The 방심위 (Korea Communications Standards Commission) and 공정거래위원회 have aligned on synthetic-content labeling for advertising. Practical implication: AI-generated talent must carry a Korean-language label («AI 합성» or equivalent) where the consumer sees it, and the metadata must travel with the file for platform-side checks. Beauty and health categories carry stricter enforcement.",
+      },
+      {
+        heading: "The metadata bundle that ships per file",
+        body: "Per-market metadata travels in the file XMP block. Practical components: (1) C2PA-aligned provenance for EU. (2) Schema.org Person.disambiguatingDescription for SEO. (3) Per-market 'AI Synthetic' string in the locale. (4) Generator hash for chain-of-custody review. (5) Brand-side approval signature. We ship all five with every Yuna and Ren delivery — most platforms detect them automatically.",
+      },
+      {
+        heading: "Pre-launch checklist",
+        body: "(1) List every market the campaign runs in. (2) For each market, confirm the disclosure form (label string + position + duration for video). (3) Verify the metadata bundle includes per-market strings. (4) Run a 3-platform check (Meta, Google, TikTok) to confirm none of them flag the asset. (5) Confirm the disclosure stays intact through brand-side resizing and reformat. Skip any of these and the disclosure problem returns as a moderation problem mid-campaign.",
+      },
+    ],
+  },
+  {
+    slug: "paired-character-kits-vs-single-face-consistency",
+    locale: "en",
+    title: "Why Paired Character Kits Beat Single-Face Campaigns on Consistency",
+    excerpt:
+      "Most global brands cast one face for a season and find that face can't carry every variant. Paired kits solve consistency differently — and the math favors them at scale.",
+    publishedAt: "2026-06-04",
+    readingMinutes: 6,
+    tags: ["paired kits", "casting", "strategy", "consistency"],
+    sections: [
+      {
+        heading: "The single-face fragility problem",
+        body: "Most brands cast one face for a quarter and discover three or four product contexts where that face doesn't read right. A skincare line wants quiet authority for serums but warmth for moisturizers. A fashion line wants editorial restraint for the launch hero but accessible energy for everyday SKUs. One face cannot land all of those convincingly — and forcing it lowers the credibility of every shot.",
+      },
+      {
+        heading: "Why the paired-face solution works",
+        body: "Two faces sharing a styling DNA give you contextual range without breaking the brand cue. The hero retains continuity (same palette, same lighting recipe, same wardrobe register) while the face shifts to fit the product context. Brands have used this trick for decades — the difference now is that synthetic talent makes it cheap to maintain across every market and surface.",
+      },
+      {
+        heading: "Where it shows up in real campaigns",
+        body: "Three patterns recur. (1) Couple narrative — fragrance brand pairing a male and female anchor to carry the story. (2) Tone split — same brand using one face for premium SKUs and another for accessible SKUs. (3) Series casting — recurring drops where the cast functions as a small ensemble. All three suffer with one face and resolve with two.",
+      },
+      {
+        heading: "The economics — why paired beats two solo deals",
+        body: "Paired kits cost 60-70% of what two solo licenses would cost separately, because the styling DNA work is shared. The brand pays once for palette lock, lighting recipe, and wardrobe consistency. Solo licenses duplicate that overhead. At quarter-long scope, the paired tier is the obvious choice.",
+      },
+      {
+        heading: "When solo still wins",
+        body: "Two cases. (1) The brand has only one product line and one tone; no contextual range needed. Solo is simpler. (2) The campaign is a one-shot launch where the face becomes a campaign-level character. The single face is the asset — pairing dilutes the story. For everything else, paired is the default.",
+      },
+      {
+        heading: "How to brief for a paired campaign",
+        body: "Lock the styling DNA at the brief layer (palette, lighting, wardrobe register). Then map each product context to the face that fits — fragrance hero to Ren, beauty PDP to Yuna, lifestyle adapt to either. The brief gets simpler, not more complex; the operational consistency improves because the DNA layer is locked.",
+      },
+      {
+        heading: "Try the math on your next quarter",
+        body: "Take your last four campaign shots and ask: which face would each shot land best with? If the answer is the same face for all four, solo works. If the answer is two faces split across the four, you have a paired kit case. We ship a brief template that walks through this — see /en/brief-template.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
