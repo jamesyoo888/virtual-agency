@@ -18,6 +18,7 @@ import {
 } from "@/lib/seo/json-ld";
 import { BRAND_KIT_TIERS, formatUsd } from "@/lib/characters/brand-kits";
 import { characterFaqEn } from "@/lib/characters/faq";
+import { relatedPostsForIndustry } from "@/lib/blog/industry-map";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -83,6 +84,10 @@ export default async function CharacterPage({
   ]);
   const faqEntries = characterFaqEn(character);
   const faqLd = faqPageLd(faqEntries);
+  const primaryVertical = character.targetVerticals[0];
+  const relatedPosts = primaryVertical
+    ? relatedPostsForIndustry(primaryVertical, 3, "en")
+    : [];
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -279,6 +284,31 @@ export default async function CharacterPage({
             </Link>
           </div>
         </section>
+
+        {relatedPosts.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-sm uppercase tracking-wider text-zinc-500 mb-4">
+              Related reading
+            </h2>
+            <ul className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {relatedPosts.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/en/blog/${p.slug}`}
+                    className="block rounded-xl border border-zinc-900 bg-zinc-950/40 p-4 hover:border-zinc-700 transition-colors h-full"
+                  >
+                    <p className="text-sm font-semibold text-zinc-200 leading-tight">
+                      {p.title}
+                    </p>
+                    <p className="mt-2 text-xs text-zinc-500 line-clamp-3 leading-relaxed">
+                      {p.excerpt}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="mb-12">
           <h2 className="text-sm uppercase tracking-wider text-zinc-500 mb-4">
