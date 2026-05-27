@@ -23,6 +23,8 @@ import { trackImpression } from "@/lib/experiments-track";
 import { loadSocialProof } from "@/lib/social-proof";
 import { loadTopTestimonials } from "@/lib/testimonials";
 import HomeTestimonials from "@/components/home-testimonials";
+import { listCharacters } from "@/lib/characters/registry";
+import { ArrowRight } from "lucide-react";
 import { logCatalogSearch } from "@/lib/analytics/search-log";
 
 function Value({ n, title, desc }: { n: string; title: string; desc: string }) {
@@ -355,6 +357,75 @@ export default async function CatalogPage({ searchParams }: PageProps) {
       </div>
 
       <HomeTestimonials testimonials={testimonials} />
+
+      {/* Owned K-aesthetic characters — Plan §1.1 */}
+      <section className="border-y border-zinc-900 bg-zinc-950/30">
+        <div className="max-w-6xl mx-auto px-8 py-10 md:py-12">
+          <div className="flex items-end justify-between mb-6 flex-wrap gap-2">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-2">
+                자체 K-aesthetic 캐릭터
+              </p>
+              <h2 className="text-xl md:text-2xl font-semibold tracking-tight">
+                시즌·시장을 가로질러 같은 얼굴
+              </h2>
+            </div>
+            <Link
+              href="/character"
+              className="text-sm text-zinc-300 underline hover:text-white"
+            >
+              캐릭터 로스터 →
+            </Link>
+          </div>
+          <p className="text-sm text-zinc-400 mb-6 max-w-2xl leading-relaxed">
+            매 시즌 같은 얼굴로 일관된 브랜드 아이덴티티를 구축할 수 있도록
+            자체 설계한 K-aesthetic 합성 모델. 솔로 캐스팅도, 페어 브랜드
+            키트도 가능합니다.
+          </p>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {listCharacters().map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={`/character/${c.slug}`}
+                  className="group block rounded-xl border border-zinc-900 bg-black/40 p-5 hover:border-zinc-700 transition-colors"
+                >
+                  <p className="text-lg font-bold text-zinc-100 group-hover:underline">
+                    {c.name}
+                  </p>
+                  <p className="text-sm text-zinc-400 mt-1">{c.tagline}</p>
+                  <div className="mt-3 flex flex-wrap gap-1.5 text-[10px]">
+                    {c.targetVerticals.slice(0, 4).map((v) => (
+                      <span
+                        key={v}
+                        className="px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300"
+                      >
+                        {v}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs text-zinc-400 group-hover:text-white">
+                    캐릭터 상세 <ArrowRight className="w-3 h-3" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 flex flex-wrap gap-2 text-xs">
+            <Link
+              href="/character/brand-kits"
+              className="rounded-md border border-zinc-800 px-3 py-1.5 text-zinc-300 hover:border-zinc-600 hover:text-white"
+            >
+              페어 브랜드 키트
+            </Link>
+            <Link
+              href="/character/compare"
+              className="rounded-md border border-zinc-800 px-3 py-1.5 text-zinc-300 hover:border-zinc-600 hover:text-white"
+            >
+              유나 vs 렌 비교
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <div className="flex flex-col md:flex-row">
         {/* Filters sidebar — collapses to top accordion on mobile */}
