@@ -258,6 +258,49 @@ export function aggregateBlogPostDetail(
 }
 
 /**
+ * Per-series drill-down. Filters usage_log to rows whose model is one of the
+ * series' post slugs, then aggregates the same way loadBlogViews does. Used
+ * by /admin/blog-analytics/series/[id] to surface which posts in a series are
+ * pulling weight vs which are dead weight.
+ *
+ * Returns a BlogViewSummary scoped to the series — bySlug is naturally
+ * already filtered, bySeries is omitted (one series, no rollup needed).
+ */
+export async function loadBlogSeriesDetail(
+  slugs: string[],
+  windowDays = 30
+): Promise<BlogViewSummary> {
+  if (!SUPABASE_CONFIGURED || slugs.length === 0) {
+    return {
+      windowDays,
+      total: 0,
+      totalKo: 0,
+      totalEn: 0,
+      bySlug: [],
+      bySeries: [],
+      daily: emptyDailySeries(windowDays),
+    };
+  }
+  const supabase = await createClient();
+  const since = new Date(
+    Date.now() - windowDays * 24 * 60 * 60 * 1000
+  ).toISOString();
+  const models = slugs.map((s) => `blog:${s}`);
+  const { data } = await supabase
+    .from("usage_log")
+    .select("model, metadata, created_at")
+    .eq("route", "blog.view")
+    .in("model", models)
+    .gte("created_at", since)
+    .limit(10_000);
+  // Reuse aggregateBlogViews — the series rollup section will see only
+  // matching slugs so bySeries is naturally empty when the series isn't
+  // listed (and a single-series rollup is redundant info on this page anyway).
+  const summary = aggregateBlogViews(data ?? [], windowDays);
+  return { ...summary, bySeries: [] };
+}
+
+/**
  * Reduce a raw Referer header to a coarse source bucket.
  *
  * - null/empty → "(direct)"

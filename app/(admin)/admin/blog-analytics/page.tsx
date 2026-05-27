@@ -128,7 +128,7 @@ export default async function BlogAnalyticsPage({
                 : enSeriesIds.has(s.seriesId)
                 ? "en"
                 : "ko";
-              const href =
+              const publicHref =
                 locale === "en"
                   ? `/en/blog/series/${s.seriesId}`
                   : `/blog/series/${s.seriesId}`;
@@ -138,9 +138,9 @@ export default async function BlogAnalyticsPage({
                   className="grid grid-cols-12 gap-3 items-center text-sm"
                 >
                   <Link
-                    href={href}
+                    href={`/admin/blog-analytics/series/${s.seriesId}?window=${windowDays}`}
                     className="col-span-4 text-violet-200 truncate hover:text-white"
-                    title={s.title}
+                    title={`${s.title} — admin drill-down`}
                   >
                     {s.title}
                   </Link>
@@ -151,7 +151,15 @@ export default async function BlogAnalyticsPage({
                     />
                   </div>
                   <span className="col-span-2 text-right text-xs text-zinc-300 tabular-nums">
-                    {s.total.toLocaleString()}
+                    {s.total.toLocaleString()}{" "}
+                    <Link
+                      href={publicHref}
+                      target="_blank"
+                      className="text-zinc-600 hover:text-zinc-300"
+                      title="공개 시리즈 페이지"
+                    >
+                      ↗
+                    </Link>
                   </span>
                 </li>
               );

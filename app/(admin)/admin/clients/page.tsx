@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Building2, AlertTriangle, Repeat, Flame, Sparkles } from "lucide-react";
+import {
+  Building2,
+  AlertTriangle,
+  Repeat,
+  Flame,
+  Sparkles,
+  BookOpen,
+} from "lucide-react";
+import { parseBlogReferrer } from "@/lib/analytics/blog-attribution";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -32,6 +40,7 @@ interface ProjectAgg {
   created_at: string;
   updated_at: string;
   utm_source: string | null;
+  referrer: string | null;
 }
 
 interface ClientSummary {
@@ -57,6 +66,8 @@ async function loadSummaries(): Promise<{
   neglectedIds: Set<string>;
   /** Set of client_ids whose projects originated from /character/* (utm_source=character). */
   characterAttributedIds: Set<string>;
+  /** Set of client_ids whose projects' referrer matches /blog/* or /en/blog/*. */
+  blogAttributedIds: Set<string>;
   /** At-risk = ≥2 delivered + silent ≥60d. Materialized from project rows
    *  joined to the same clients fetch so the order matches the table. */
   atRiskClients: AtRiskClient[];
@@ -70,6 +81,7 @@ async function loadSummaries(): Promise<{
       totalRevenue90d: 0,
       neglectedIds: new Set(),
       characterAttributedIds: new Set(),
+      blogAttributedIds: new Set(),
       atRiskClients: [],
       cohorts: [],
     };
@@ -83,7 +95,7 @@ async function loadSummaries(): Promise<{
       .limit(500),
     supabase
       .from("projects")
-      .select("client_id, status, invoice_amount, created_at, updated_at, utm_source")
+      .select("client_id, status, invoice_amount, created_at, updated_at, utm_source, referrer")
       .order("updated_at", { ascending: false })
       .limit(2000),
   ]);
@@ -178,6 +190,15 @@ async function loadSummaries(): Promise<{
       .filter((p) => p.utm_source === "character" && p.client_id)
       .map((p) => p.client_id)
   );
+  // Blog-attributed = at least one project whose referrer matched the blog
+  // post URL pattern. parseBlogReferrer handles absolute + relative URLs and
+  // KR/EN locale split. We don't double-classify when both utm_source=character
+  // and blog referrer apply — character takes precedence at render time.
+  const blogAttributedIds = new Set(
+    projects
+      .filter((p) => p.client_id && parseBlogReferrer(p.referrer) !== null)
+      .map((p) => p.client_id)
+  );
   const atRiskClients = computeAtRiskClients(deliveredRows, {
     minDelivered: 2,
     silentDays: 60,
@@ -191,6 +212,7 @@ async function loadSummaries(): Promise<{
     totalRevenue90d,
     neglectedIds,
     characterAttributedIds,
+    blogAttributedIds,
     atRiskClients,
     cohorts,
   };
@@ -344,12 +366,14 @@ export default async function AdminClientsPage({
   const showNeglected = filter === "neglected";
   const showAtRisk = filter === "at-risk";
   const showCharacter = filter === "character-attributed";
+  const showBlog = filter === "blog-attributed";
   const {
     clients: allClients,
     totalRevenue,
     totalRevenue90d,
     neglectedIds,
     characterAttributedIds,
+    blogAttributedIds,
     atRiskClients,
     cohorts,
   } = await loadSummaries();
@@ -364,10 +388,13 @@ export default async function AdminClientsPage({
         .filter((c): c is typeof allClients[number] => !!c)
     : showCharacter
     ? allClients.filter((c) => characterAttributedIds.has(c.id))
+    : showBlog
+    ? allClients.filter((c) => blogAttributedIds.has(c.id))
     : allClients;
   const neglectedCount = neglectedIds.size;
   const atRiskCount = atRiskClients.length;
   const characterCount = characterAttributedIds.size;
+  const blogCount = blogAttributedIds.size;
 
   const activeClients = allClients.filter((c) => c.campaignCount > 0);
   const repeatClients = allClients.filter((c) => c.campaignCount >= 2);
@@ -428,7 +455,7 @@ export default async function AdminClientsPage({
         <Link
           href="/admin/clients"
           className={`px-3 py-1.5 rounded-md border transition-colors ${
-            !showNeglected && !showAtRisk && !showCharacter
+            !showNeglected && !showAtRisk && !showCharacter && !showBlog
               ? "bg-white text-black border-white"
               : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
           }`}
@@ -449,6 +476,21 @@ export default async function AdminClientsPage({
           Character IP 유입
           {characterCount > 0 && (
             <span className="opacity-90 tabular-nums">{characterCount}</span>
+          )}
+        </Link>
+        <Link
+          href="/admin/clients?filter=blog-attributed"
+          className={`px-3 py-1.5 rounded-md border transition-colors inline-flex items-center gap-1 ${
+            showBlog
+              ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/50"
+              : "bg-transparent text-emerald-300 border-emerald-500/30 hover:border-emerald-400 hover:text-emerald-200"
+          }`}
+          title="referrer 가 /blog/* 또는 /en/blog/* — 블로그 글 경유 인입 광고주 (parseBlogReferrer)"
+        >
+          <BookOpen className="w-3 h-3" />
+          Blog 유입
+          {blogCount > 0 && (
+            <span className="opacity-90 tabular-nums">{blogCount}</span>
           )}
         </Link>
         <Link
@@ -633,6 +675,15 @@ export default async function AdminClientsPage({
                           ★ Char
                         </span>
                       )}
+                      {blogAttributedIds.has(c.id) &&
+                        !characterAttributedIds.has(c.id) && (
+                          <span
+                            className="ml-1.5 text-[10px] text-emerald-300 border border-emerald-500/30 rounded px-1.5 py-0.5 bg-emerald-500/10"
+                            title="referrer matches /blog/* — 블로그 글 경유 인입"
+                          >
+                            ★ Blog
+                          </span>
+                        )}
                     </p>
                     {c.email && (
                       <p className="text-xs text-zinc-500 truncate">

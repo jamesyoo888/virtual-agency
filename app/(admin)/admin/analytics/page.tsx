@@ -271,6 +271,135 @@ export default async function AnalyticsPage({
         </section>
       )}
 
+      {characterViews.total > 0 && characterAttribution.totalInquiries > 0 && (() => {
+        // Join the two datasets per slug. View counts are the funnel top,
+        // utm_source=character inquiries are the funnel bottom. We use a
+        // smoothed conversion (+1 prior on inquiries, +20 prior on views) so
+        // a single-view character doesn't blow up the percentage; raw
+        // numbers stay in the cells for the operator to see the underlying
+        // counts.
+        const slugs = Array.from(
+          new Set([
+            ...characterViews.bySlug.map((c) => c.slug),
+            ...characterAttribution.bySlug.map((c) => c.slug),
+          ])
+        );
+        const overallViews = characterViews.total;
+        const overallInq = characterAttribution.totalInquiries;
+        const overallRateRaw =
+          overallViews > 0 ? (overallInq / overallViews) * 100 : 0;
+        const rows = slugs.map((slug) => {
+          const vs = characterViews.bySlug.find((c) => c.slug === slug);
+          const att = characterAttribution.bySlug.find((c) => c.slug === slug);
+          const views = vs?.total ?? 0;
+          const inquiries = att?.inquiries ?? 0;
+          const delivered = att?.delivered ?? 0;
+          const revenue = att?.revenue ?? 0;
+          const rateRaw = views > 0 ? (inquiries / views) * 100 : 0;
+          // Smoothed rate stabilizes the bar for low-view characters; we
+          // keep the raw % visible too so the operator can sanity-check.
+          const rateSmoothed =
+            (inquiries + 1) / (views + 20) * 100;
+          return { slug, views, inquiries, delivered, revenue, rateRaw, rateSmoothed };
+        });
+        rows.sort((a, b) => b.views - a.views);
+        const maxRate = Math.max(
+          0.5,
+          ...rows.map((r) => Math.max(r.rateRaw, r.rateSmoothed))
+        );
+        return (
+          <section className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/[0.03] p-5">
+            <div className="flex items-baseline justify-between mb-1 flex-wrap gap-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-fuchsia-200">
+                캐릭터 페이지 → 인콰이어 전환 funnel ({windowDays}일)
+              </h2>
+              <p className="text-xs text-zinc-500 tabular-nums">
+                전체 조회 {overallViews.toLocaleString()} → 문의 {overallInq} ·
+                평균 전환{" "}
+                <span
+                  className={
+                    overallRateRaw >= 1
+                      ? "text-emerald-300"
+                      : overallRateRaw >= 0.3
+                      ? "text-amber-300"
+                      : "text-rose-300"
+                  }
+                >
+                  {overallRateRaw.toFixed(2)}%
+                </span>
+              </p>
+            </div>
+            <p className="text-[11px] text-zinc-500 mb-4">
+              utm_source=character 인콰이어 ÷ 캐릭터 페이지 조회. 회색 = raw %,
+              컬러 = 베이지안 스무딩 (조회 ≤ 20 캐릭터 안정화용).
+              경험상 K-aesthetic AI 캐릭터의 healthy 베이스라인은 0.5-1.2% — 그
+              아래면 페이지의 CTA 또는 가격 hint 약점, 위면 funnel-top이 일하고
+              있는 신호.
+            </p>
+            <ul className="space-y-2">
+              {rows.map((r) => {
+                const widthPctRaw = (r.rateRaw / maxRate) * 100;
+                const widthPctSmoothed = (r.rateSmoothed / maxRate) * 100;
+                const tone =
+                  r.rateRaw >= 1
+                    ? "bg-emerald-500"
+                    : r.rateRaw >= 0.3
+                    ? "bg-amber-500"
+                    : "bg-rose-500";
+                return (
+                  <li
+                    key={r.slug}
+                    className="grid grid-cols-12 gap-3 items-center text-sm"
+                  >
+                    <Link
+                      href={`/character/${r.slug}`}
+                      className="col-span-2 text-zinc-200 hover:text-white capitalize"
+                    >
+                      {r.slug}
+                    </Link>
+                    <div className="col-span-5 relative h-2 rounded bg-zinc-900 overflow-hidden">
+                      <div
+                        className="absolute inset-y-0 left-0 bg-zinc-600/40"
+                        style={{ width: `${Math.min(100, widthPctRaw)}%` }}
+                        title={`raw ${r.rateRaw.toFixed(2)}%`}
+                      />
+                      <div
+                        className={`absolute inset-y-0 left-0 ${tone}`}
+                        style={{
+                          width: `${Math.min(100, widthPctSmoothed)}%`,
+                          opacity: 0.7,
+                        }}
+                        title={`smoothed ${r.rateSmoothed.toFixed(2)}%`}
+                      />
+                    </div>
+                    <span className="col-span-2 text-right text-xs tabular-nums text-zinc-400">
+                      {r.views.toLocaleString()} →{" "}
+                      <span className="text-zinc-200">{r.inquiries}</span>
+                    </span>
+                    <span className="col-span-3 text-right text-xs tabular-nums">
+                      <span className={tone === "bg-emerald-500" ? "text-emerald-300" : tone === "bg-amber-500" ? "text-amber-300" : "text-rose-300"}>
+                        {r.rateRaw.toFixed(2)}%
+                      </span>
+                      {r.delivered > 0 && (
+                        <span className="ml-2 text-zinc-600">
+                          납품 {r.delivered}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-4 text-[10px] text-zinc-600 leading-relaxed">
+              주의: 전환 = 캐릭터 페이지 조회 트래픽 중 utm_source=character로
+              들어온 인콰이어만. /match, /rfp에서 다른 utm_source로 시작한 동일
+              세션은 캡쳐되지 않음 — 그 갭은 cross-session attribution 도입 시
+              해결. 현 카드는 명시 attribution funnel 의 fast-feedback view.
+            </p>
+          </section>
+        );
+      })()}
+
       {characterAttribution.totalInquiries > 0 && (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
           {(() => {
