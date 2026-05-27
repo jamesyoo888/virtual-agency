@@ -6,6 +6,8 @@ import { loadResponseSla } from "@/lib/analytics/response-sla";
 import { loadModelPerformance } from "@/lib/analytics/model-performance";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
+import { loadBlogViews } from "@/lib/analytics/blog-views";
+import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -214,7 +216,7 @@ async function loadTrendingEngine(): Promise<{
 }
 
 export default async function AdminHealthPage() {
-  const [pulse, cost, recent, banner, sla, perf, trending, retention, velocity, stageTiming] =
+  const [pulse, cost, recent, banner, sla, perf, trending, retention, velocity, stageTiming, blogViews30d, blogAttr30d] =
     await Promise.all([
       loadPulse(),
       summarizeUsage(),
@@ -226,6 +228,8 @@ export default async function AdminHealthPage() {
       loadRetentionHealth(),
       loadPipelineVelocity(90),
       loadStageTiming(90),
+      loadBlogViews(30),
+      loadBlogAttribution(30),
     ]);
 
   // Bottleneck = slowest stage's median exceeds 14d. We check the SLOWEST
@@ -420,6 +424,23 @@ export default async function AdminHealthPage() {
         : "popularity view 미생성 또는 쿼리 실패",
       runbook:
         "30% 미만이면 카탈로그 노출이 부족. /admin 의 funnel + bySource 확인. popularity view 자체가 없으면 마이그레이션 006 재적용",
+    },
+    {
+      // Blog conversion gate — high views but no attributed inquiries means
+      // the funnel exists but the conversion step is broken. We only fire
+      // when 30d views exceed 200 (enough sample to expect ≥1 inquiry if the
+      // funnel was working) AND 30d blog-attributed inquiries are 0.
+      label: "블로그 → 인콰이어 전환",
+      ok:
+        blogViews30d.total < 200 || blogAttr30d.totalInquiries > 0,
+      detail:
+        blogViews30d.total < 200
+          ? `30d 조회 ${blogViews30d.total} — 표본 부족 (200+ 부터 측정)`
+          : blogAttr30d.totalInquiries === 0
+          ? `30d 조회 ${blogViews30d.total.toLocaleString()} · attribut 인콰이어 0`
+          : `30d 조회 ${blogViews30d.total.toLocaleString()} · attribut 인콰이어 ${blogAttr30d.totalInquiries}`,
+      runbook:
+        "트래픽은 들어오는데 인콰이어가 없으면 CTA 가 깨졌거나 referrer 가 capture 안 되는 중. /admin/blog-analytics 에서 top 글의 OG/CTA 확인 → /admin/forecast 의 블로그 attribut 카드와 대조. RFP/match 폼이 referrer 를 projects.referrer 로 저장하는지 점검.",
     },
   ];
 

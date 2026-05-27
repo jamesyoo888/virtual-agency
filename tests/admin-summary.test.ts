@@ -34,6 +34,8 @@ const fixture: AdminWeeklySummary = {
   bottleneckMedianDays: 6.7,
   characterAttributedInquiries: 4,
   characterAttributedRevenueKrw: 11_000_000,
+  blogAttributedInquiries: 3,
+  blogAttributedRevenueKrw: 6_500_000,
 };
 
 describe("formatAdminSummaryText", () => {
@@ -152,6 +154,21 @@ describe("formatAdminSummaryText", () => {
     // "30일 매출" line is the unrelated KPI — the character-attribution
     // clause specifically must not append "· 매출 ₩…" since revenue=0.
     expect(out).not.toMatch(/캐릭터 페이지 → 문의 \(30일\): 2건 · 매출/);
+  });
+
+  it("includes blog-attribution line with revenue when present", () => {
+    const out = formatAdminSummaryText(fixture);
+    expect(out).toMatch(/블로그 글 → 문의 \(30일\): 3건/);
+    expect(out).toMatch(/매출 ₩6,500,000/);
+  });
+
+  it("omits blog-attribution line entirely when inquiries=0", () => {
+    const quiet: AdminWeeklySummary = {
+      ...fixture,
+      blogAttributedInquiries: 0,
+      blogAttributedRevenueKrw: 0,
+    };
+    expect(formatAdminSummaryText(quiet)).not.toMatch(/블로그 글/);
   });
 });
 

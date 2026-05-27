@@ -8,6 +8,7 @@ import { loadCharacterViews } from "@/lib/analytics/character-views";
 import { loadBlogViews } from "@/lib/analytics/blog-views";
 import { getPostBySlug } from "@/lib/blog/posts";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { getKitTier, type BrandKitTier } from "@/lib/characters/brand-kits";
 
 function humanTierLabel(tier: string): string {
@@ -163,11 +164,12 @@ export default async function AnalyticsPage({
 }) {
   const sp = await searchParams;
   const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
-  const [a, characterViews, characterAttribution, blogViews] = await Promise.all([
+  const [a, characterViews, characterAttribution, blogViews, blogAttribution] = await Promise.all([
     loadAnalytics(windowDays),
     loadCharacterViews(windowDays),
     loadCharacterAttribution(windowDays),
     loadBlogViews(windowDays),
+    loadBlogAttribution(windowDays),
   ]);
   const maxBlogViews = Math.max(1, ...blogViews.bySlug.slice(0, 10).map((b) => b.total));
   const maxSeriesViews = Math.max(1, ...blogViews.bySeries.map((s) => s.total));
@@ -527,6 +529,84 @@ export default async function AnalyticsPage({
           </ul>
           <p className="mt-3 text-[11px] text-zinc-600">
             usage_log route=blog.view · 1시간 dedup · bot 제외. 어떤 글이 트래픽을 견인하는지 판단.
+          </p>
+        </section>
+      )}
+
+      {blogAttribution.totalInquiries > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              블로그 글 → 인콰이어 ({windowDays}일)
+            </h2>
+            <div className="flex items-center gap-3 text-xs">
+              <p className="text-zinc-500 tabular-nums">
+                referrer=/blog · {blogAttribution.totalInquiries}건 · 납품{" "}
+                {blogAttribution.totalDelivered}건 ·{" "}
+                <span className="text-emerald-300">
+                  ₩{blogAttribution.totalRevenue.toLocaleString("ko-KR")}
+                </span>
+              </p>
+            </div>
+          </div>
+          {(() => {
+            const top = blogAttribution.bySlug.slice(0, 8);
+            const maxInq = Math.max(1, ...top.map((b) => b.inquiries));
+            return (
+              <ul className="space-y-1.5">
+                {top.map((b) => {
+                  const post =
+                    getPostBySlug(b.slug, b.locale) ??
+                    getPostBySlug(b.slug, "ko") ??
+                    getPostBySlug(b.slug, "en");
+                  const title = post?.title ?? b.slug;
+                  const widthPct = (b.inquiries / maxInq) * 100;
+                  return (
+                    <li
+                      key={`${b.locale}:${b.slug}`}
+                      className="grid grid-cols-12 gap-3 items-center text-sm"
+                    >
+                      <Link
+                        href={`/admin/blog-analytics/${encodeURIComponent(b.slug)}?window=${windowDays}`}
+                        className="col-span-6 truncate text-zinc-200 hover:text-white"
+                        title={title}
+                      >
+                        <span className="mr-1.5 inline-block text-[9px] uppercase tracking-wider rounded px-1 py-0.5 bg-zinc-800 text-zinc-400">
+                          {b.locale.toUpperCase()}
+                        </span>
+                        {title}
+                      </Link>
+                      <div className="col-span-3 h-2 rounded bg-zinc-900 overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500"
+                          style={{ width: `${widthPct}%` }}
+                        />
+                      </div>
+                      <span className="col-span-3 text-right text-xs text-zinc-300 tabular-nums">
+                        {b.inquiries}{" "}
+                        <span
+                          className={
+                            b.conversionPct >= 30
+                              ? "text-emerald-400"
+                              : "text-zinc-500"
+                          }
+                        >
+                          {b.conversionPct}%
+                        </span>
+                        {b.revenue > 0 && (
+                          <span className="ml-2 text-emerald-300">
+                            ₩{b.revenue.toLocaleString("ko-KR")}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()}
+          <p className="mt-3 text-[11px] text-zinc-600">
+            인콰이어 폼 직전 referrer 가 블로그 글이었던 케이스. 「조회」 카드와 다른 신호 — 조회는 트래픽, 이건 컨버전.
           </p>
         </section>
       )}

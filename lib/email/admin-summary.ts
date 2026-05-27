@@ -10,6 +10,7 @@ import {
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming, type TimedStage } from "@/lib/analytics/stage-timing";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 
 /**
  * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
@@ -58,6 +59,10 @@ export interface AdminWeeklySummary {
   characterAttributedInquiries: number;
   /** 30d delivered revenue from character-attributed projects. */
   characterAttributedRevenueKrw: number;
+  /** 30d blog-attributed inquiry count (referrer=/blog/[slug] or /en/blog/[slug]). */
+  blogAttributedInquiries: number;
+  /** 30d delivered revenue from blog-attributed projects. */
+  blogAttributedRevenueKrw: number;
 }
 
 interface SearchLogRow {
@@ -93,6 +98,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       velocity,
       stageTiming,
       characterAttribution,
+      blogAttribution,
     ] = await Promise.all([
       supabase
         .from("projects")
@@ -144,6 +150,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       loadPipelineVelocity(90),
       loadStageTiming(90),
       loadCharacterAttribution(30),
+      loadBlogAttribution(30),
     ]);
 
     const searchAgg = aggregateSearchRows(
@@ -218,6 +225,8 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
           : null,
       characterAttributedInquiries: characterAttribution.totalInquiries,
       characterAttributedRevenueKrw: characterAttribution.totalRevenue,
+      blogAttributedInquiries: blogAttribution.totalInquiries,
+      blogAttributedRevenueKrw: blogAttribution.totalRevenue,
     };
   } catch (err) {
     console.warn("[admin-summary] build failed:", err);
@@ -294,6 +303,15 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
         : "";
     lines.push(
       `캐릭터 페이지 → 문의 (30일): ${s.characterAttributedInquiries}건${revPart}`
+    );
+  }
+  if (s.blogAttributedInquiries > 0) {
+    const revPart =
+      s.blogAttributedRevenueKrw > 0
+        ? ` · 매출 ₩${s.blogAttributedRevenueKrw.toLocaleString("ko-KR")}`
+        : "";
+    lines.push(
+      `블로그 글 → 문의 (30일): ${s.blogAttributedInquiries}건${revPart}`
     );
   }
   lines.push("");
@@ -385,6 +403,18 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
               `${s.characterAttributedInquiries}건${
                 s.characterAttributedRevenueKrw > 0
                   ? ` · ₩${s.characterAttributedRevenueKrw.toLocaleString("ko-KR")}`
+                  : ""
+              }`
+            )
+          : ""
+      }
+      ${
+        s.blogAttributedInquiries > 0
+          ? stat(
+              "블로그 attribut (30d)",
+              `${s.blogAttributedInquiries}건${
+                s.blogAttributedRevenueKrw > 0
+                  ? ` · ₩${s.blogAttributedRevenueKrw.toLocaleString("ko-KR")}`
                   : ""
               }`
             )
