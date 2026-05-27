@@ -77,6 +77,7 @@ export default async function RootLayout({
     { name: "사례", url: `${SITE_URL}/cases` },
     { name: "블로그", url: `${SITE_URL}/blog` },
     { name: "FAQ", url: `${SITE_URL}/faq` },
+    { name: "용어집", url: `${SITE_URL}/glossary` },
     { name: "프레스", url: `${SITE_URL}/press` },
     { name: "크리에이터 합류", url: `${SITE_URL}/careers` },
     { name: "회사 소개", url: `${SITE_URL}/about` },

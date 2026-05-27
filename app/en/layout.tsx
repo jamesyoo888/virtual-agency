@@ -100,6 +100,11 @@ function EnFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/en/glossary" className="hover:text-white">
+                Glossary
+              </Link>
+            </li>
+            <li>
               <Link href="/en/faq" className="hover:text-white">
                 FAQ
               </Link>
@@ -178,6 +183,7 @@ export default function EnLayout({
     { name: "Blog", url: `${SITE_URL}/en/blog` },
     { name: "Case studies", url: `${SITE_URL}/en/cases` },
     { name: "FAQ", url: `${SITE_URL}/en/faq` },
+    { name: "Glossary", url: `${SITE_URL}/en/glossary` },
     { name: "Press", url: `${SITE_URL}/en/press` },
   ]);
   return (

@@ -312,6 +312,34 @@ export function faqPageLd(entries: FaqEntry[]) {
   };
 }
 
+/** Glossary entry — emitted as schema.org DefinedTerm inside a DefinedTermSet. */
+export interface DefinedTermEntry {
+  /** Anchor identifier — `${SITE_URL}/glossary#${slug}` resolved at call site. */
+  url: string;
+  term: string;
+  description: string;
+}
+
+/**
+ * DefinedTermSet JSON-LD for /glossary pages. Each entry surfaces as a
+ * rich-snippet-eligible term. Pass the resolved URL so KR vs EN can ship
+ * locale-specific identifiers.
+ */
+export function definedTermSetLd(name: string, entries: DefinedTermEntry[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    name,
+    hasDefinedTerm: entries.map((e) => ({
+      "@type": "DefinedTerm",
+      "@id": e.url,
+      name: e.term,
+      description: e.description,
+      inDefinedTermSet: { "@id": "VirtualAgencyGlossary" },
+    })),
+  };
+}
+
 /** Serialize a JSON-LD object for embedding in a <script type="application/ld+json"> tag. */
 export function ldScript(obj: unknown): string {
   // Prevent </script> injection in case any string contains it.

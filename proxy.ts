@@ -34,6 +34,7 @@ const MIRRORED_PATHS = new Set([
   "/rfp",
   "/press",
   "/character",
+  "/glossary",
   "/legal/terms",
   "/legal/privacy",
   "/legal/ai-disclosure",

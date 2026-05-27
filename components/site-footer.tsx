@@ -94,6 +94,11 @@ export default function SiteFooter() {
                 캐릭터 비교
               </Link>
             </li>
+            <li>
+              <Link href="/glossary" className="hover:text-white">
+                용어집
+              </Link>
+            </li>
           </ul>
         </div>
 
