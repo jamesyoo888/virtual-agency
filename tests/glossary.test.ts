@@ -3,8 +3,8 @@ import { GLOSSARY_TERMS, getTerm } from "@/lib/glossary/terms";
 import { definedTermSetLd } from "@/lib/seo/json-ld";
 
 describe("glossary registry", () => {
-  it("exports the 14-term K-aesthetic / synthetic-talent vocabulary", () => {
-    expect(GLOSSARY_TERMS).toHaveLength(14);
+  it("exports the K-aesthetic / synthetic-talent vocabulary (>= 14 terms, grows over time)", () => {
+    expect(GLOSSARY_TERMS.length).toBeGreaterThanOrEqual(14);
   });
 
   it("every term has KR + EN entries with definitions ≥ 30 chars", () => {

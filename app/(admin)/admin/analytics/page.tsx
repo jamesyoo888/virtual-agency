@@ -431,11 +431,19 @@ export default async function AnalyticsPage({
             <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
               블로그 글 조회 ({windowDays}일)
             </h2>
-            <p className="text-xs text-zinc-500 tabular-nums">
-              총 {blogViews.total.toLocaleString()} · KR{" "}
-              {blogViews.totalKo.toLocaleString()} · EN{" "}
-              {blogViews.totalEn.toLocaleString()}
-            </p>
+            <div className="flex items-center gap-3 text-xs">
+              <p className="text-zinc-500 tabular-nums">
+                총 {blogViews.total.toLocaleString()} · KR{" "}
+                {blogViews.totalKo.toLocaleString()} · EN{" "}
+                {blogViews.totalEn.toLocaleString()}
+              </p>
+              <Link
+                href={`/api/admin/exports/blog-engagement?window=${windowDays}`}
+                className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+              >
+                CSV
+              </Link>
+            </div>
           </div>
           {blogViews.bySeries.some((s) => s.total > 0) && (
             <div className="mb-5">

@@ -17,6 +17,7 @@ import {
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { loadBlogViews } from "@/lib/analytics/blog-views";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -50,6 +51,7 @@ const KINDS = new Set([
   "at-risk-clients",
   "pipeline-velocity",
   "character-attribution",
+  "blog-engagement",
 ]);
 
 export async function GET(
@@ -1242,6 +1244,57 @@ export async function GET(
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(
           "character-attribution"
+        )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "blog-engagement") {
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 30;
+    const report = await loadBlogViews(windowDays);
+    type BlogRow = Record<string, unknown> & {
+      slug: string;
+      total: string;
+      ko_views: string;
+      en_views: string;
+      kind: string;
+    };
+    const slugRows: BlogRow[] = report.bySlug.map((b) => ({
+      slug: b.slug,
+      total: String(b.total),
+      ko_views: String(b.ko),
+      en_views: String(b.en),
+      kind: "post",
+    }));
+    const seriesRows: BlogRow[] = report.bySeries.map((s) => ({
+      slug: s.seriesId,
+      total: String(s.total),
+      ko_views: "",
+      en_views: "",
+      kind: "series",
+    }));
+    const totalRow: BlogRow = {
+      slug: "__total__",
+      total: String(report.total),
+      ko_views: String(report.totalKo),
+      en_views: String(report.totalEn),
+      kind: "summary",
+    };
+    const rows: BlogRow[] = [totalRow, ...seriesRows, ...slugRows];
+    const csv = toCSV(rows, [
+      "kind",
+      "slug",
+      "total",
+      "ko_views",
+      "en_views",
+    ] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "blog-engagement"
         )}"`,
         "Cache-Control": "no-store",
       },

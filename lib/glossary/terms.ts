@@ -239,6 +239,94 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
         "Takes free-text campaign concept + industry/mood/genre + budget and ranks catalog models by weighted tag overlap (35/25/20) plus budget bonus and persona boost from past inquiries and RFPs. Available at /en/match.",
     },
   },
+  {
+    slug: "ambassador-licensing",
+    category: "commercial",
+    ko: {
+      term: "앰배서더 라이선스",
+      definition:
+        "한 캐릭터가 한 브랜드의 «얼굴» 로 다년 또는 분기 단위로 묶이는 계약. 카테고리 독점이 포함되며, 한 시즌의 여러 SKU·캠페인에 동일 얼굴이 사용됩니다. 일별 라이선스의 5-10배 가격이지만 브랜드 정체성과 시각 일관성 가치가 큰 브랜드에 합당.",
+    },
+    en: {
+      term: "Ambassador licensing",
+      definition:
+        "A multi-year or quarterly license that binds a character as a brand's «face» across all in-category creative. Carries category exclusivity. Priced 5-10× a per-day license, but worth it when brand identity and visual consistency carry strategic weight.",
+    },
+    relatedPostSlug: "ai-model-exclusivity-when-to-pay-for-it",
+  },
+  {
+    slug: "run-rate",
+    category: "commercial",
+    ko: {
+      term: "런-레이트 (Run rate)",
+      definition:
+        "현재의 매출 흐름이 같은 페이스로 유지된다고 가정했을 때의 forward 예상치. /admin/forecast 의 «next-90d projection» 은 현재 90일 run-rate 를 그대로 forward 한 값. 시즌·캠페인 영향이 있는 경우 보정 필요.",
+    },
+    en: {
+      term: "Run rate",
+      definition:
+        "A forward projection assuming current revenue pace continues unchanged. The /admin/forecast «next-90d» figures roll forward the trailing 90-day run-rate; seasonal or campaign effects need manual adjustment.",
+    },
+  },
+  {
+    slug: "paired-campaign",
+    category: "visual",
+    ko: {
+      term: "페어 캠페인 (Paired campaign)",
+      definition:
+        "두 캐릭터 (e.g. Yuna + Ren) 가 공유된 스타일링 DNA 로 같이 등장하는 캠페인. 커플 내러티브·크로스젠더 캐스팅·시즌 앵커 등에서 «한 톤, 두 얼굴» 로 읽힙니다. brand-kit 의 paired-editorial / season-anchor 티어에 포함.",
+    },
+    en: {
+      term: "Paired campaign",
+      definition:
+        "A campaign featuring two characters (e.g. Yuna + Ren) under a shared styling DNA. Reads as «one tone, two faces» — used for couple narratives, cross-gender casting, and season anchors. Covered by the paired-editorial and season-anchor brand-kit tiers.",
+    },
+    relatedPostSlug: "paired-character-kits-vs-single-face-consistency",
+  },
+  {
+    slug: "localization-layer",
+    category: "workflow",
+    ko: {
+      term: "로컬라이제이션 레이어",
+      definition:
+        "한 캠페인을 4개 시장 (KR/US/EU/SG) 으로 전개할 때, 동일한 크리에이티브 어셋 위에 시장별 카피·통화·디스클로저 레이블·플랫폼 어셋만 다르게 입히는 워크플로. 4 캠페인이 아닌 «1 캠페인 + 4 레이어» 로 운영해야 비용·일관성이 모두 가능.",
+    },
+    en: {
+      term: "Localization layer",
+      definition:
+        "When the same campaign runs across KR/US/EU/SG, deliver one creative asset and layer market-specific copy, currency, disclosure label, and platform format on top. Treats it as «one campaign + four layers» instead of four campaigns — the only way to keep cost and consistency together.",
+    },
+    relatedPostSlug: "cross-market-launch-kr-us-eu-sg",
+  },
+  {
+    slug: "disclosure-provenance",
+    category: "compliance",
+    ko: {
+      term: "디스클로저 프로비넌스 (C2PA)",
+      definition:
+        "어셋의 출처·합성 여부·생성기·서명을 체인 형태로 기록하는 표준. C2PA-aligned manifest 가 어셋 파일과 같이 이동하며, 플랫폼 측 AI 감지층과 규제 inquiry 시 chain-of-custody 증명에 사용. Virtual Agency 의 모든 캐릭터 출하물에 포함.",
+    },
+    en: {
+      term: "Disclosure provenance (C2PA)",
+      definition:
+        "A chained record of an asset's origin, synthetic status, generator, and signature. The C2PA-aligned manifest travels with the file and is used by platform AI-detection layers and regulator inquiries as chain-of-custody. Shipped with every Virtual Agency character delivery.",
+    },
+    relatedPostSlug: "ai-content-disclosure-metadata-4-markets",
+  },
+  {
+    slug: "buyer-funnel",
+    category: "product",
+    ko: {
+      term: "Buyer funnel",
+      definition:
+        "광고주의 의사결정 단계 (인지·탐색·검토·견적·계약) 를 따라 검색 의도가 진화하는 흐름. Virtual Agency 의 블로그·캐릭터 페이지·시리즈는 단계별 검색 키워드에 응대하도록 설계 — 인지 단계는 «K-aesthetic 이란», 견적 단계는 «K-aesthetic AI 예산 밴드» 식.",
+    },
+    en: {
+      term: "Buyer funnel",
+      definition:
+        "The flow of search intent as a brand buyer progresses through awareness → exploration → review → quote → contract. Virtual Agency's blog, character pages, and series are built to answer the dominant keyword at each step — e.g. «what is K-aesthetic» at awareness, «K-aesthetic AI budget bands» at quote.",
+    },
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {
