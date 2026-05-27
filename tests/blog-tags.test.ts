@@ -5,6 +5,7 @@ import {
   tagSlug,
   decodeTagSlug,
   BLOG_POSTS,
+  postLocale,
 } from "@/lib/blog/posts";
 
 describe("blog tag helpers", () => {
@@ -18,10 +19,15 @@ describe("blog tag helpers", () => {
     }
   });
 
-  it("listTags counts match raw posts", () => {
+  it("listTags counts match raw posts in the same locale", () => {
+    // listTags() defaults to "ko"; tag counts must reflect posts in that
+    // locale only — EN posts that happen to share a tag string don't bleed
+    // into the KR tag page.
     const tags = listTags();
     for (const { tag, count } of tags) {
-      const expected = BLOG_POSTS.filter((p) => p.tags.includes(tag)).length;
+      const expected = BLOG_POSTS.filter(
+        (p) => postLocale(p) === "ko" && p.tags.includes(tag)
+      ).length;
       expect(count).toBe(expected);
     }
   });

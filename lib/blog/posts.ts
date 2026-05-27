@@ -1724,6 +1724,49 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
   },
   {
+    slug: "k-aesthetic-rfp-budget-bands-krw-ko",
+    title: "RFP 예산 밴드 — 카테고리별 ₩가이드 (K-aesthetic 캠페인)",
+    excerpt:
+      "₩2M / ₩7.5M / ₩27.5M+ 세 구간. 각 밴드가 사는 캠페인 스코프가 다릅니다. 잘못 고르면 매칭 로스터가 안 맞고, 잘 고르면 첫 견적이 사인 가능한 수준으로 도착합니다.",
+    publishedAt: "2026-06-10",
+    readingMinutes: 6,
+    tags: ["RFP", "예산", "가격", "캐스팅", "스코프"],
+    sections: [
+      {
+        heading: "예산 밴드는 스코프 버킷이지 협상 카드가 아닙니다",
+        body: "광고주들은 가끔 RFP 예산 밴드를 협상 시작점으로 사용합니다 — 일단 낮게 부르고 업셀을 받자. 잘못된 프레임입니다. 밴드는 매칭 엔진에 어떤 모델 티어를 surface 할지, 어떤 라이선스 조건이 현실적인지, 어떤 산출물 스코프가 예산에 맞는지를 알려줍니다. 너무 낮게 고르면 매칭된 로스터가 브리프에 안 맞고, 너무 높게 고르면 캠페인이 필요한 것보다 많이 씁니다. 정확히 고르면 첫 견적이 사인 가능한 수준입니다.",
+      },
+      {
+        heading: "~₩2M — 단발 촬영, 한 채널, 비독점",
+        body: "사용 케이스: 단일 SKU 런칭의 인스타그램 / PDP 페이지 리프레시. 일별 라이선스 + 컨셉 1 변형 + 리비전 2회. Disclosure 메타데이터 항상 포함. 카테고리 독점 없음 — 같은 날 경쟁사가 같은 얼굴을 쓸 수 있습니다. 잘 맞는 광고주: 한 제품 테스트 중인 작은 D2C 브랜드, 또는 단일 히어로 자산만 필요한 시즌 스토리.",
+      },
+      {
+        heading: "₩2M ~ ₩7.5M — 묶음 룩북 또는 페어 에디토리얼 브랜드 키트",
+        body: "여기에 페어 에디토리얼 브랜드 키트 (₩11M) 가 살짝 걸쳐 있고, 시즌 룩북 풀세트도 이 범위에 들어옵니다. 솔로 시: 10-15 컷 + 영상 1개의 카테고리 런칭 룩북. 사용 케이스: 이커머스 시즌 리프레시, 여러 SKU 가 있는 B2C 뷰티 드롭, 한 라인의 패션 룩북.",
+      },
+      {
+        heading: "₩7.5M ~ ₩27.5M — 카테고리 독점 시즌 앵커",
+        body: "시즌 앵커 (커플) 브랜드 키트 (₩28.5M) 가 이 위에 살짝 걸쳐 있습니다. 분기 동안 두 캐릭터 + 카테고리 내 경쟁사 락아웃 + 40+ 스틸 + 3 히어로 영상 + 피팅 데이 + 한 캐릭터 90일 페르소나 인스타그램. 사용 케이스: K-뷰티 시즌 앰배서더 프로그램, 패션하우스 멘즈+위민즈웨어 조율 드롭, 커플 내러티브가 필요한 향수 런칭.",
+      },
+      {
+        heading: "₩27.5M+ — 커스텀 멀티페이스 또는 멀티 분기 앵커",
+        body: "커스텀 멀티페이스 (₩65M부터) — 유나 + 렌 + 브랜드 DNA 로 빌드된 추가 캐릭터. 멀티 캐릭터 내러티브 가능. 옵션으로 커스텀 캐릭터 전체 IP 양도 (브랜드가 세 번째 얼굴을 소유). 또는 멀티 분기 시즌 앵커 갱신 — 2-4 분기 같은 캐스트 락업.",
+      },
+      {
+        heading: "밴드 사이에서 바뀌는 것 — 명확히",
+        body: "세 가지가 스케일: 독점성 (없음 → 카테고리 → 멀티 마켓), 산출물 볼륨 (1-3 컷 → 40+ 컷 + 영상), 캐스트 크기 (싱글 → 페어 → 멀티페이스). 변하지 않는 것: 24시간 컨셉 시트, EU/US/UK/KR disclosure 메타데이터, 컷당 2회 무료 리비전, RAW + TIFF + JPG 납품. 컴플라이언스와 운영 레이어는 동일 — 자산 깊이와 라이선스 폭만 달라집니다.",
+      },
+      {
+        heading: "광고주가 가장 자주 잘못 판단하는 지점",
+        body: "(1) 카테고리 독점이 실제로 필요한데 ₩2-7.5M 밴드 선택 — 분기 안에 경쟁사가 같은 얼굴 사용하면 브랜드 큐 희석. (2) 단발 런칭에 ₩27.5M+ 선택 — 멀티페이스 / 멀티분기 스코프 미사용. (3) 「~₩2M」고른 후 시즌 앵커 분량 산출물 요구 후 재협상. 스코프에 맞는 밴드 첫 시도로 고르면 견적 턴어라운드가 24시간 이내.",
+      },
+      {
+        heading: "RFP 보내기 전 확인 질문 3개",
+        body: "(1) 이 캠페인에 실제로 몇 컷이 필요한가? 총합. (2) 우리 카테고리에 이 얼굴을 락업 안 하면 사용할 경쟁사가 있는가? (3) 단발 런칭인가, 시즌의 시작인가? 답을 위 밴드에 매핑하면 정답이 보통 명확해집니다. 여전히 망설이면 페어 에디토리얼 (₩2-7.5M 밴드) 로 시작하세요 — 캠페인이 확장되면 시즌 앵커로 클린하게 업그레이드됩니다.",
+      },
+    ],
+  },
+  {
     slug: "synthetic-talent-vs-stock-photography-when-to-choose-which",
     locale: "en",
     title: "Synthetic Talent vs Stock Photography — When to Choose Which for Brand Campaigns",
@@ -1760,6 +1803,54 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: "Three questions to resolve the call",
         body: "(1) Will the face appear more than 10 times in the next 6 months? If yes, lean synthetic. (2) Does any competitor in your category run similar campaigns from the same stock library? If yes, lean synthetic. (3) Does your legal team require AI/synthetic disclosure metadata travel with the asset? If yes, synthetic talent already ships that. If all three answers are no, stock is fine. Otherwise the math points at synthetic.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-campaign-pre-launch-compliance-checklist",
+    locale: "en",
+    title: "The Pre-Launch Compliance Checklist for Synthetic Talent Campaigns — 4 Markets",
+    excerpt:
+      "EU AI Act Article 50, US FTC, UK ASA, Korea KCSC each require something specific before your AI-talent campaign goes live. This is the audit list — run it once, ship clean.",
+    publishedAt: "2026-06-14",
+    readingMinutes: 7,
+    tags: ["compliance", "checklist", "AI disclosure", "EU AI Act", "FTC", "ASA", "KCSC"],
+    sections: [
+      {
+        heading: "Why the audit happens before launch, not after",
+        body: "Synthetic talent disclosure is a contract requirement in four major markets and the enforcement curve is steepening. The right time to audit is before the assets ship — after launch, the cost of recall plus the platform-side moderation flags compounds. This checklist is what we run for every brand kit before delivery, and it's the same audit we recommend brand-side legal teams run independently.",
+      },
+      {
+        heading: "Item 1 — Identify every market the campaign runs in",
+        body: "List the legal entities + the platforms + the geography. EU AI Act Article 50 enforcement applies when the audience is in the EU (regardless of where the ad runs from). US FTC applies for US-served impressions. UK ASA / CAP Code applies for UK-served impressions. Korea KCSC + 공정거래위원회 apply for KR-served impressions. Multi-market campaigns need every regime's requirements satisfied, not just the strictest one — different markets have different label forms.",
+      },
+      {
+        heading: "Item 2 — Per-market disclosure label form",
+        body: "Each market has a different visible-disclosure form. EU: identifiable «AI-generated» indicator within the consumer-perceptible part of the asset. US FTC: clear and conspicuous «AI-generated» or equivalent. UK ASA: must be obvious to the consumer that the imagery is AI-generated (CAP Code amendment 2025). KR 방심위: «AI 합성» 또는 명확한 한국어 표기. Different forms, but the substantive standard is the same — a consumer can identify the asset as AI-generated without prior knowledge.",
+      },
+      {
+        heading: "Item 3 — Metadata bundle that travels with the file",
+        body: "Even where the visible label is the legal requirement, the metadata bundle is what platform-side moderation uses to confirm compliance and what regulators reference in disputes. Required components: (1) C2PA-aligned provenance manifest. (2) schema.org Person.disambiguatingDescription field in the asset's accompanying structured data. (3) Per-market AI-synthetic string in the locale. (4) Generator hash for chain-of-custody. (5) Brand-side approval signature. We ship all five with every Yuna and Ren delivery — your audit should confirm they're present.",
+      },
+      {
+        heading: "Item 4 — Platform-side flag detection",
+        body: "Test the asset on Meta, Google Ads, TikTok, and (for KR) NAVER's ad platforms before launch. Each platform has its own AI-detection layer; rejection at platform-level can stall a launch by 24-72 hours. The dry-run upload to each platform's ad preview takes 10 minutes per platform and catches metadata stripping or visible-label issues before they hit production.",
+      },
+      {
+        heading: "Item 5 — Resize and reformat preservation",
+        body: "Disclosure metadata can be stripped when a brand-side team resizes for different aspect ratios, recompresses for video platforms, or runs the asset through a third-party color grade tool. Confirm the disclosure stays intact through the brand's actual production pipeline — not just the deliverable file we ship. A common failure: PSD layered export → JPG without preserving XMP.",
+      },
+      {
+        heading: "Item 6 — Influencer / endorsement disclosure separately if applicable",
+        body: "If the synthetic talent is positioned as endorsing a product (claiming benefits, sharing experience), the endorsement disclosure regime kicks in alongside the synthetic disclosure. US FTC Endorsement Guides and KR 공정거래위 endorsement guidance both apply. The combined disclosure must satisfy both — typically «AI-generated · sponsored» or equivalent. Pure brand imagery (the talent appearing without an endorsement claim) avoids this overhead.",
+      },
+      {
+        heading: "Item 7 — Contractual disclosure on the brand side",
+        body: "The licensing contract should call out which party is responsible for disclosure enforcement in each market. Our standard: we ship compliant assets and metadata; the brand is responsible for placement-level disclosure in markets where the ad creative travels through brand-side ad platforms. Two-party clarity prevents the «who was supposed to do this» dispute at the regulator inquiry stage.",
+      },
+      {
+        heading: "Item 8 — Quarterly re-audit for new regulation",
+        body: "EU AI Act, FTC, ASA, and KR all have active regulatory work — the disclosure form requirements shift roughly every 6-9 months. Set a calendar event for the quarter to re-run this checklist against the latest regulator guidance. The checklist itself is stable; the form details aren't. Our /en/legal/ai-disclosure page is updated in the same cadence and is a good cross-reference.",
       },
     ],
   },

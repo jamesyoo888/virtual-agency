@@ -6,6 +6,14 @@ import { INDUSTRY_LABELS } from "@/lib/tags";
 import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
 import { loadCharacterViews } from "@/lib/analytics/character-views";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { getKitTier, type BrandKitTier } from "@/lib/characters/brand-kits";
+
+function humanTierLabel(tier: string): string {
+  const kit = getKitTier(tier as BrandKitTier["slug"]);
+  if (kit) return kit.nameEn;
+  if (tier === "index") return "Brand kits (index)";
+  return tier;
+}
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics — Virtual Agency" };
@@ -370,10 +378,13 @@ export default async function AnalyticsPage({
                           key={t.tier}
                           className="grid grid-cols-12 gap-3 items-center text-sm"
                         >
-                          <span className="col-span-2 text-zinc-300 capitalize">
-                            {t.tier}
+                          <span
+                            className="col-span-3 text-zinc-300 truncate"
+                            title={humanTierLabel(t.tier)}
+                          >
+                            {humanTierLabel(t.tier)}
                           </span>
-                          <div className="col-span-6 h-2 rounded bg-zinc-900 overflow-hidden">
+                          <div className="col-span-5 h-2 rounded bg-zinc-900 overflow-hidden">
                             <div
                               className="h-full bg-amber-400"
                               style={{ width: `${widthPct}%` }}
