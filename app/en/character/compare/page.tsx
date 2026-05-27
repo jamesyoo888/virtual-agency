@@ -23,13 +23,13 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/en/character/compare`,
     locale: "en_US",
     type: "website",
-    images: [`${SITE_URL}/api/og?en_characters=1`],
+    images: [`${SITE_URL}/api/og?en_character_compare=1`],
   },
   twitter: {
     card: "summary_large_image",
     title: "Yuna vs Ren — Character Comparison",
     description: "Two K-aesthetic characters compared side by side.",
-    images: [`${SITE_URL}/api/og?en_characters=1`],
+    images: [`${SITE_URL}/api/og?en_character_compare=1`],
   },
 };
 

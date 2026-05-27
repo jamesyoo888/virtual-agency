@@ -26,13 +26,13 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/character/compare`,
     locale: "ko_KR",
     type: "website",
-    images: [`${SITE_URL}/api/og?characters=1`],
+    images: [`${SITE_URL}/api/og?character_compare=1`],
   },
   twitter: {
     card: "summary_large_image",
     title: "유나 vs 렌 — 캐릭터 비교",
     description: "두 K-aesthetic 캐릭터를 한 화면에서 비교.",
-    images: [`${SITE_URL}/api/og?characters=1`],
+    images: [`${SITE_URL}/api/og?character_compare=1`],
   },
 };
 

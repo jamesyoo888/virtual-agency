@@ -117,6 +117,8 @@ export async function GET(request: Request) {
   const characterBrandKits = searchParams.get("character_brand_kits") === "1";
   const isEnCharacters = searchParams.get("en_characters") === "1";
   const isCharacters = searchParams.get("characters") === "1";
+  const isEnCharacterCompare = searchParams.get("en_character_compare") === "1";
+  const isCharacterCompare = searchParams.get("character_compare") === "1";
 
   if (isEnHome) {
     return bigCard(
@@ -231,6 +233,13 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · CHARACTERS",
       "Owned K-aesthetic talent",
       "Yuna and Ren — synthetic K-aesthetic faces designed to anchor brand campaigns across markets."
+    );
+  }
+  if (isEnCharacterCompare) {
+    return bigCard(
+      "VIRTUAL AGENCY · COMPARE",
+      "Yuna vs Ren — pick your face",
+      "Persona, lighting, palette, target verticals side by side. The reference for deciding between solo casting and a paired brand kit."
     );
   }
 
@@ -362,6 +371,13 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · 캐릭터",
       "자체 K-aesthetic 캐스트",
       "유나·렌 — 시즌과 시장을 가로질러 같은 얼굴로 일관된 브랜드 아이덴티티를 구축할 수 있는 합성 모델."
+    );
+  }
+  if (isCharacterCompare) {
+    return bigCard(
+      "VIRTUAL AGENCY · 비교",
+      "유나 vs 렌 — 한 화면에서 결정",
+      "페르소나·라이팅·팔레트·산업 적합도 9 항목 비교. 솔로 캐스팅과 페어 브랜드 키트 사이의 결정 가이드."
     );
   }
   if (isAbout) {
