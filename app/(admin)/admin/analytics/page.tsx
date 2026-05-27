@@ -5,6 +5,8 @@ import { BarChart3, TrendingUp } from "lucide-react";
 import { INDUSTRY_LABELS } from "@/lib/tags";
 import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
 import { loadCharacterViews } from "@/lib/analytics/character-views";
+import { loadBlogViews } from "@/lib/analytics/blog-views";
+import { getPostBySlug } from "@/lib/blog/posts";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { getKitTier, type BrandKitTier } from "@/lib/characters/brand-kits";
 
@@ -161,11 +163,14 @@ export default async function AnalyticsPage({
 }) {
   const sp = await searchParams;
   const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
-  const [a, characterViews, characterAttribution] = await Promise.all([
+  const [a, characterViews, characterAttribution, blogViews] = await Promise.all([
     loadAnalytics(windowDays),
     loadCharacterViews(windowDays),
     loadCharacterAttribution(windowDays),
+    loadBlogViews(windowDays),
   ]);
+  const maxBlogViews = Math.max(1, ...blogViews.bySlug.slice(0, 10).map((b) => b.total));
+  const maxSeriesViews = Math.max(1, ...blogViews.bySeries.map((s) => s.total));
   const maxModelInquiries = Math.max(1, ...a.topModels.map((m) => m.inquiries));
   const maxIndustry = Math.max(1, ...a.byIndustry.map((i) => i.inquiries));
   const maxCharacterViews = Math.max(
@@ -416,6 +421,98 @@ export default async function AnalyticsPage({
             })()}
           <p className="mt-3 text-[11px] text-zinc-600">
             캐릭터 디테일 페이지 CTA 가 utm_source=character 로 attribut. 분기별 캐릭터 ROI 판단에 사용.
+          </p>
+        </section>
+      )}
+
+      {blogViews.total > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              블로그 글 조회 ({windowDays}일)
+            </h2>
+            <p className="text-xs text-zinc-500 tabular-nums">
+              총 {blogViews.total.toLocaleString()} · KR{" "}
+              {blogViews.totalKo.toLocaleString()} · EN{" "}
+              {blogViews.totalEn.toLocaleString()}
+            </p>
+          </div>
+          {blogViews.bySeries.some((s) => s.total > 0) && (
+            <div className="mb-5">
+              <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+                시리즈별
+              </p>
+              <ul className="space-y-1.5">
+                {blogViews.bySeries.map((s) => {
+                  const widthPct = (s.total / maxSeriesViews) * 100;
+                  return (
+                    <li
+                      key={s.seriesId}
+                      className="grid grid-cols-12 gap-3 items-center text-sm"
+                    >
+                      <span className="col-span-4 text-violet-200 truncate">
+                        {s.title}
+                      </span>
+                      <div className="col-span-6 h-2 rounded bg-zinc-900 overflow-hidden">
+                        <div
+                          className="h-full bg-violet-500"
+                          style={{ width: `${widthPct}%` }}
+                        />
+                      </div>
+                      <span className="col-span-2 text-right text-xs text-zinc-300 tabular-nums">
+                        {s.total.toLocaleString()}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+            Top 10 글
+          </p>
+          <ul className="space-y-1.5">
+            {blogViews.bySlug.slice(0, 10).map((b) => {
+              const widthPct = (b.total / maxBlogViews) * 100;
+              // Locale agnostic title — try ko first, fall back to en. The
+              // slug is the same across locales so either works.
+              const post =
+                getPostBySlug(b.slug, "ko") ?? getPostBySlug(b.slug, "en");
+              const title = post?.title ?? b.slug;
+              const href =
+                post && post.locale === "en"
+                  ? `/en/blog/${b.slug}`
+                  : `/blog/${b.slug}`;
+              return (
+                <li
+                  key={b.slug}
+                  className="grid grid-cols-12 gap-3 items-center text-sm"
+                >
+                  <Link
+                    href={href}
+                    className="col-span-7 truncate text-zinc-200 hover:text-white"
+                    title={title}
+                  >
+                    {title}
+                  </Link>
+                  <div className="col-span-3 h-2 rounded bg-zinc-900 overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500"
+                      style={{ width: `${widthPct}%` }}
+                    />
+                  </div>
+                  <span
+                    className="col-span-2 text-right text-xs text-zinc-300 tabular-nums"
+                    title={`KR ${b.ko} / EN ${b.en}`}
+                  >
+                    {b.total.toLocaleString()}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-3 text-[11px] text-zinc-600">
+            usage_log route=blog.view · 1시간 dedup · bot 제외. 어떤 글이 트래픽을 견인하는지 판단.
           </p>
         </section>
       )}

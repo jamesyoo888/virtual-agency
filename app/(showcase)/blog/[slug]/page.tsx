@@ -9,6 +9,7 @@ import {
 import { getSeriesForPost } from "@/lib/blog/series";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import { blogPostingLd, breadcrumbLd, howToLd, ldScript } from "@/lib/seo/json-ld";
+import { trackBlogView } from "@/lib/analytics/track-blog-view";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -57,6 +58,7 @@ export default async function BlogPostPage({
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  void trackBlogView(post.slug, "ko");
   const related = listRelatedPosts(post.slug, 3);
   const seriesPos = getSeriesForPost(post.slug, "ko");
   const prevPost = seriesPos?.prevSlug ? getPostBySlug(seriesPos.prevSlug, "ko") : null;

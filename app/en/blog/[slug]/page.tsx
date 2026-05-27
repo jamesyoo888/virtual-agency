@@ -8,6 +8,7 @@ import {
 } from "@/lib/blog/posts";
 import { getSeriesForPost } from "@/lib/blog/series";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
+import { trackBlogView } from "@/lib/analytics/track-blog-view";
 import {
   blogPostingLd,
   breadcrumbLd,
@@ -65,6 +66,7 @@ export default async function EnBlogPostPage({
   const post = getPostBySlug(slug, "en");
   if (!post) notFound();
 
+  void trackBlogView(post.slug, "en");
   const related = listRelatedPosts(post.slug, 3);
   const seriesPos = getSeriesForPost(post.slug, "en");
   const prevPost = seriesPos?.prevSlug ? getPostBySlug(seriesPos.prevSlug, "en") : null;
