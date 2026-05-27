@@ -23,6 +23,7 @@ import {
 import { BRAND_KIT_TIERS, formatKrw } from "@/lib/characters/brand-kits";
 import { characterFaqKo } from "@/lib/characters/faq";
 import { relatedPostsForIndustry } from "@/lib/blog/industry-map";
+import { trackCharacterView } from "@/lib/analytics/track-character-view";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -93,6 +94,8 @@ export default async function KrCharacterPage({
   const { slug } = await params;
   const character = getCharacter(slug);
   if (!character) notFound();
+
+  void trackCharacterView(character.slug, "ko");
 
   const otherCharacters = CHARACTERS.filter((c) => c.slug !== character.slug);
   const personLd = characterPersonLd(character);

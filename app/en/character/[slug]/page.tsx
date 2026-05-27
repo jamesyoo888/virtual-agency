@@ -19,6 +19,7 @@ import {
 import { BRAND_KIT_TIERS, formatUsd } from "@/lib/characters/brand-kits";
 import { characterFaqEn } from "@/lib/characters/faq";
 import { relatedPostsForIndustry } from "@/lib/blog/industry-map";
+import { trackCharacterView } from "@/lib/analytics/track-character-view";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -73,6 +74,8 @@ export default async function CharacterPage({
   const { slug } = await params;
   const character = getCharacter(slug);
   if (!character) notFound();
+
+  void trackCharacterView(character.slug, "en");
 
   const otherCharacters = CHARACTERS.filter((c) => c.slug !== character.slug);
 

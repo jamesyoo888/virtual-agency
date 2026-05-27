@@ -4,6 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { BarChart3, TrendingUp } from "lucide-react";
 import { INDUSTRY_LABELS } from "@/lib/tags";
 import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
+import { loadCharacterViews } from "@/lib/analytics/character-views";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics — Virtual Agency" };
@@ -151,9 +152,16 @@ export default async function AnalyticsPage({
 }) {
   const sp = await searchParams;
   const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
-  const a = await loadAnalytics(windowDays);
+  const [a, characterViews] = await Promise.all([
+    loadAnalytics(windowDays),
+    loadCharacterViews(windowDays),
+  ]);
   const maxModelInquiries = Math.max(1, ...a.topModels.map((m) => m.inquiries));
   const maxIndustry = Math.max(1, ...a.byIndustry.map((i) => i.inquiries));
+  const maxCharacterViews = Math.max(
+    1,
+    ...characterViews.bySlug.map((c) => c.total)
+  );
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
@@ -172,6 +180,51 @@ export default async function AnalyticsPage({
         <Card label="납품 완료" value={a.totalDelivered.toLocaleString()} />
         <Card label="전환율" value={`${a.conversionPct}%`} />
       </section>
+
+      {characterViews.total > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              캐릭터 페이지 조회 ({windowDays}일)
+            </h2>
+            <p className="text-xs text-zinc-500 tabular-nums">
+              총 {characterViews.total.toLocaleString()} · KR{" "}
+              {characterViews.totalKo.toLocaleString()} · EN{" "}
+              {characterViews.totalEn.toLocaleString()}
+            </p>
+          </div>
+          {characterViews.bySlug.length === 0 ? (
+            <p className="text-xs text-zinc-500">
+              아직 캐릭터 페이지 조회 데이터가 없습니다 (bot 제외 / 1시간 dedup).
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {characterViews.bySlug.map((c) => {
+                const widthPct = (c.total / maxCharacterViews) * 100;
+                return (
+                  <li
+                    key={c.slug}
+                    className="grid grid-cols-12 gap-3 items-center text-sm"
+                  >
+                    <span className="col-span-2 text-zinc-300 capitalize">
+                      {c.slug}
+                    </span>
+                    <div className="col-span-7 h-2 rounded bg-zinc-900 overflow-hidden">
+                      <div
+                        className="h-full bg-violet-500"
+                        style={{ width: `${widthPct}%` }}
+                      />
+                    </div>
+                    <span className="col-span-3 text-right text-xs text-zinc-400 tabular-nums">
+                      {c.total} · KR {c.ko} · EN {c.en}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      )}
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
         <div className="flex items-center gap-2 mb-4">
