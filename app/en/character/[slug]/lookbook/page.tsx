@@ -10,7 +10,11 @@ import {
   Construction,
 } from "lucide-react";
 import { CHARACTERS, getCharacter, type CharacterSlug } from "@/lib/characters/registry";
-import { lookbookForCharacter } from "@/lib/characters/lookbook";
+import {
+  conceptFrameSlots,
+  conceptRenderedCount,
+  lookbookForCharacter,
+} from "@/lib/characters/lookbook";
 import { breadcrumbLd, ldScript } from "@/lib/seo/json-ld";
 
 const SITE_URL =
@@ -126,45 +130,68 @@ export default async function EnCharacterLookbookPage({
         </section>
 
         <div className="space-y-8">
-          {concepts.map((c, idx) => (
-            <section
-              key={c.id}
-              id={c.id}
-              className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-6 scroll-mt-20"
-            >
-              <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums">
-                  Concept {String(idx + 1).padStart(2, "0")}
-                </span>
-                <h2 className="text-xl font-semibold">{c.titleEn}</h2>
-              </div>
-              <p className="text-sm text-zinc-300 leading-relaxed mb-5">
-                {c.briefEn}
-              </p>
-              <ul className="space-y-3 text-sm">
-                <Row
-                  icon={<Palette className="w-3.5 h-3.5 text-violet-300" />}
-                  label="Mood"
-                  value={c.mood.join(" · ")}
-                />
-                <Row
-                  icon={<Shirt className="w-3.5 h-3.5 text-violet-300" />}
-                  label="Wardrobe"
-                  value={c.wardrobeEn}
-                />
-                <Row
-                  icon={<Lightbulb className="w-3.5 h-3.5 text-violet-300" />}
-                  label="Lighting"
-                  value={c.lighting}
-                />
-                <Row
-                  icon={<Camera className="w-3.5 h-3.5 text-violet-300" />}
-                  label="Delivery"
-                  value={`Hero ${c.heroShots} · Supporting ${c.supportingShots}`}
-                />
-              </ul>
-            </section>
-          ))}
+          {concepts.map((c, idx) => {
+            const slots = conceptFrameSlots(c);
+            const rendered = conceptRenderedCount(c);
+            return (
+              <section
+                key={c.id}
+                id={c.id}
+                className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-6 scroll-mt-20"
+              >
+                <div className="flex items-baseline gap-3 mb-4">
+                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums">
+                    Concept {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <h2 className="text-xl font-semibold">{c.titleEn}</h2>
+                  {rendered > 0 && (
+                    <span className="ml-auto text-[10px] uppercase tracking-wider text-emerald-300">
+                      {rendered}/{slots.length} rendered
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-zinc-300 leading-relaxed mb-5">
+                  {c.briefEn}
+                </p>
+                {slots.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-5">
+                    {slots.map((slot, slotIdx) => (
+                      <FrameSlot
+                        key={`${c.id}-slot-${slotIdx}`}
+                        slot={slot}
+                        labelEn={
+                          slot.role === "hero" ? "Hero" : "Supporting"
+                        }
+                        alt={`${c.titleEn} ${slot.role} ${slotIdx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+                <ul className="space-y-3 text-sm">
+                  <Row
+                    icon={<Palette className="w-3.5 h-3.5 text-violet-300" />}
+                    label="Mood"
+                    value={c.mood.join(" · ")}
+                  />
+                  <Row
+                    icon={<Shirt className="w-3.5 h-3.5 text-violet-300" />}
+                    label="Wardrobe"
+                    value={c.wardrobeEn}
+                  />
+                  <Row
+                    icon={<Lightbulb className="w-3.5 h-3.5 text-violet-300" />}
+                    label="Lighting"
+                    value={c.lighting}
+                  />
+                  <Row
+                    icon={<Camera className="w-3.5 h-3.5 text-violet-300" />}
+                    label="Delivery"
+                    value={`Hero ${c.heroShots} · Supporting ${c.supportingShots}`}
+                  />
+                </ul>
+              </section>
+            );
+          })}
         </div>
 
         <footer className="mt-16 pt-8 border-t border-zinc-900">
@@ -236,5 +263,54 @@ function Row({
       </span>
       <span className="text-zinc-300">{value}</span>
     </li>
+  );
+}
+
+function FrameSlot({
+  slot,
+  labelEn,
+  alt,
+}: {
+  slot: { url: string | null; role: "hero" | "supporting" };
+  labelEn: string;
+  alt: string;
+}) {
+  const isHero = slot.role === "hero";
+  if (slot.url) {
+    return (
+      <div
+        className={`relative aspect-[3/4] rounded-md overflow-hidden border ${
+          isHero ? "border-violet-900" : "border-zinc-900"
+        }`}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={slot.url}
+          alt={alt}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <span
+          className={`absolute top-1 left-1 text-[9px] uppercase tracking-wider rounded px-1 py-0.5 ${
+            isHero
+              ? "bg-violet-900/80 text-violet-100"
+              : "bg-black/60 text-zinc-300"
+          }`}
+        >
+          {labelEn}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div
+      className={`relative aspect-[3/4] rounded-md border border-dashed flex items-center justify-center text-[10px] uppercase tracking-wider ${
+        isHero
+          ? "border-violet-900/60 text-violet-300/60 bg-violet-900/5"
+          : "border-zinc-800 text-zinc-600 bg-zinc-950/30"
+      }`}
+    >
+      {labelEn}
+    </div>
   );
 }

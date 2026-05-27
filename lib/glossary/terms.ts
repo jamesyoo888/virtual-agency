@@ -327,6 +327,64 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
         "The flow of search intent as a brand buyer progresses through awareness → exploration → review → quote → contract. Virtual Agency's blog, character pages, and series are built to answer the dominant keyword at each step — e.g. «what is K-aesthetic» at awareness, «K-aesthetic AI budget bands» at quote.",
     },
   },
+  {
+    slug: "brief-template",
+    category: "workflow",
+    ko: {
+      term: "브리프 템플릿 (Brief template)",
+      definition:
+        "RFP 직전 단계에 광고주가 내부 정렬을 위해 채우는 1-page 구조 문서. 캠페인 목표·헤로 카피·헤로 컷 컨셉·시즌·금지선·심사 시점·예산 밴드 항목이 표준. /brief-template 에서 한 영 양식 다운로드 가능 — 좋은 브리프가 좋은 매칭의 70%.",
+    },
+    en: {
+      term: "Brief template",
+      definition:
+        "The one-page document brand teams fill out before RFP to align internally — campaign goal, hero copy, hero-shot concept, season, no-go zones, approval gate, budget band. Download the KR/EN template at /en/brief-template. A good brief carries 70% of the match quality.",
+    },
+    relatedPostSlug: "rfp-brief-checklist-k-aesthetic-campaign",
+  },
+  {
+    slug: "moodboard",
+    category: "workflow",
+    ko: {
+      term: "무드보드 (Moodboard)",
+      definition:
+        "캐스트·라이팅·팔레트·텍스처 톤의 시각 레퍼런스를 6-12 이미지로 묶은 인테이크 산출물. 컨셉 시트 발송 24h 전에 광고주와 합의되어 «어떤 톤으로 갈지» 를 픽셀 전 단계에서 잠그는 게이트. 사후 «톤이 다르다» 분쟁의 90% 가 이 단계에서 예방됩니다.",
+    },
+    en: {
+      term: "Moodboard",
+      definition:
+        "A 6-12 image visual reference bundle covering cast, lighting, palette, and texture tone. Signed off with the buyer 24h before the concept sheet ships — the pre-pixel gate that locks tone direction. About 90% of «that's the wrong tone» disputes are prevented here.",
+    },
+  },
+  {
+    slug: "likeness-rights",
+    category: "commercial",
+    ko: {
+      term: "초상권 (Likeness rights)",
+      definition:
+        "실제 인물의 얼굴·신체 특징을 광고에 사용할 권리. 합성 캐릭터는 실제 인물 초상권을 보유하지 않으므로 이 협상이 필요 없으며, 모델 사망·은퇴·계약 종료로 인한 캠페인 단절 리스크도 제거. 단, 우연한 유사성을 회피하는 face-similarity 검수가 별도로 필요합니다.",
+    },
+    en: {
+      term: "Likeness rights",
+      definition:
+        "The right to use a real person's face / body in advertising. Synthetic characters carry no real-person likeness, so this negotiation disappears — and so does campaign continuity risk from death, retirement, or contract end. A face-similarity check still runs at delivery to rule out accidental real-person resemblance.",
+    },
+    relatedPostSlug: "synthetic-talent-vs-real-models-cost",
+  },
+  {
+    slug: "content-velocity",
+    category: "product",
+    ko: {
+      term: "콘텐츠 속도 (Content velocity)",
+      definition:
+        "한 캠페인 내에서 새 컷을 추가로 출하하는 데 필요한 시간. 실제 모델 + 스튜디오 + 헤어 메이크업 + 어시스턴트의 합산 lead-time 이 5-15일이라면, 합성 캐릭터는 동일 라이팅 레시피·워드로브·캐스트가 이미 잠겨 있어 4-48h. SNS 페이스를 매주 갱신해야 하는 광고주가 가장 가치 있게 평가하는 차이.",
+    },
+    en: {
+      term: "Content velocity",
+      definition:
+        "How quickly additional shots ship within a single campaign. A real-model + studio + HMUA + assistant chain runs 5-15 days per refresh; a synthetic character with locked recipe/wardrobe/cast turns shots in 4-48h. The single dimension SNS-paced advertisers value most.",
+    },
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {

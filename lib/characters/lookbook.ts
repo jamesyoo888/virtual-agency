@@ -31,6 +31,59 @@ export interface ConceptSheet {
   heroShots: number;
   /** Number of supporting shots delivered. */
   supportingShots: number;
+  /**
+   * Optional public-URL list of rendered hero/supporting frames.
+   *
+   * Stays undefined (or empty) for unrendered concepts — the lookbook page
+   * then falls back to placeholder slots. Once asset URLs land (CDN / Blob /
+   * Supabase storage), wiring them here surfaces the actual frames without
+   * any page-level code changes.
+   *
+   * Order: hero shots first, then supporting shots. The page slices by
+   * heroShots / supportingShots so the split is deterministic.
+   */
+  imageUrls?: string[];
+}
+
+/**
+ * How many concrete frames are wired for a concept.
+ *
+ * Exposed for tests + the lookbook page so we can render either real
+ * frames or placeholder slots without each call site re-implementing the
+ * trim/clamp logic.
+ */
+export function conceptRenderedCount(sheet: ConceptSheet): number {
+  if (!sheet.imageUrls) return 0;
+  return sheet.imageUrls.filter((u) => typeof u === "string" && u.length > 0)
+    .length;
+}
+
+export interface ConceptFrameSlot {
+  /** Public URL when an asset is wired, null when still a placeholder slot. */
+  url: string | null;
+  role: "hero" | "supporting";
+}
+
+/**
+ * Expand a concept sheet into hero + supporting slots, filling concrete
+ * URLs from imageUrls and padding with placeholder nulls to match the
+ * declared heroShots / supportingShots count.
+ */
+export function conceptFrameSlots(sheet: ConceptSheet): ConceptFrameSlot[] {
+  const urls = (sheet.imageUrls ?? []).filter(
+    (u): u is string => typeof u === "string" && u.length > 0
+  );
+  const slots: ConceptFrameSlot[] = [];
+  for (let i = 0; i < sheet.heroShots; i++) {
+    slots.push({ url: urls[i] ?? null, role: "hero" });
+  }
+  for (let i = 0; i < sheet.supportingShots; i++) {
+    slots.push({
+      url: urls[sheet.heroShots + i] ?? null,
+      role: "supporting",
+    });
+  }
+  return slots;
 }
 
 export const LOOKBOOK_CONCEPTS: Record<CharacterSlug, ConceptSheet[]> = {

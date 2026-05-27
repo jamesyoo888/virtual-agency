@@ -28,6 +28,10 @@
     {
       "path": "/api/cron/character-attribution-health",
       "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/blog-content-health",
+      "schedule": "0 4 * * *"
     }
   ]
 }

@@ -438,6 +438,12 @@ export default async function AnalyticsPage({
                 {blogViews.totalEn.toLocaleString()}
               </p>
               <Link
+                href={`/admin/blog-analytics?window=${windowDays}`}
+                className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+              >
+                상세 →
+              </Link>
+              <Link
                 href={`/api/admin/exports/blog-engagement?window=${windowDays}`}
                 className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
               >

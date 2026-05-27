@@ -2308,6 +2308,190 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "k-aesthetic-campaign-roi-calculator-framework",
+    locale: "en",
+    title: "K-aesthetic AI campaign ROI calculator — the four-input model",
+    excerpt:
+      "Drop a campaign into a four-input framework (assets, season length, market count, exclusivity need) and the ROI ceiling reveals itself. Worked examples with real USD figures.",
+    publishedAt: "2026-07-02",
+    readingMinutes: 8,
+    tags: ["ROI", "budgeting", "K-aesthetic", "buyer-funnel"],
+    sections: [
+      {
+        heading: "Why a calculator and not a price list",
+        body: "Buyers ask «how much does an AI K-aesthetic campaign cost» and we never give a single number — because the answer swings from $4K to $180K depending on four inputs we ask everyone. This post is the framework we use internally to size deals: drop the four numbers in and you get a budget ceiling for diminishing-returns spend within five minutes. Use it before sending the RFP — it stops mismatched price expectations on both sides.",
+      },
+      {
+        heading: "Input 1 — Asset count (the one that dominates)",
+        body: "Total deliverables across the campaign: hero shots + supporting stills + video frames + format variants. For a single-SKU social drop that's ~5; for a quarterly K-beauty launch it's 40-80. Asset count drives almost everything because synthetic-talent unit cost falls steeply with reuse — first asset for a new character runs $1500-3000 (recipe locking), subsequent assets in the same recipe run $80-200. Plot your campaign's asset curve before anything else.",
+      },
+      {
+        heading: "Input 2 — Season length",
+        body: "How long this look needs to stay alive in market. 4 weeks (social burst) → license per-day, no brand-kit. 8-12 weeks (quarterly launch) → Paired Editorial brand-kit ($8.5K USD) starts paying off. 12+ weeks or recurring (ambassador positioning) → Season Anchor brand-kit ($22K USD) with category exclusivity carries the math. Anything beyond 6 months → custom brand-kit ($50K+) with multi-year terms.",
+      },
+      {
+        heading: "Input 3 — Market count",
+        body: "Single-market campaign vs cross-market (KR/US/EU/SG). Synthetic talent's biggest financial edge isn't per-shot cost; it's that the same character can ship localized copy variants from one creative root, with proper disclosure metadata for each regulator. Each additional market typically adds 8-15% over the single-market budget for synthetic, versus 60-80% for a real-model + studio workflow. The cost wedge grows with each market — at 4 markets, hybrid math beats traditional even at midcap budgets.",
+      },
+      {
+        heading: "Input 4 — Exclusivity need",
+        body: "Will competitors in your category be advertising into the same eyeballs in the same window? If yes (regulated categories, launches, ambassador positioning), category exclusivity matters and the brand-kit Season Anchor tier includes it. If no (catalog scaling, ecom, experimental drops), skip exclusivity entirely — it's a 1.8-2.5x multiplier you don't need. See our exclusivity-when-to-pay-for-it post for the decision rule.",
+      },
+      {
+        heading: "Worked example A — K-beauty 4-SKU US launch",
+        body: "Inputs: ~60 assets, 12-week season, single market (US), exclusivity wanted (launch). Calc: Paired Editorial brand-kit ($8.5K USD) covers 30 assets in two characters. Add 30 supporting variants at $150 average = $4.5K. Disclosure metadata + C2PA = included. Localization layer not used (single market). Total: ~$13K USD. Traditional comparable: $40-60K. Hybrid lift: 70%+ saved, deployed into media + influencer relationship layer.",
+      },
+      {
+        heading: "Worked example B — Cross-market jewelry launch (KR/US/EU/SG)",
+        body: "Inputs: ~24 assets per market × 4 = 96 assets, 8-week season, 4 markets, exclusivity (regulated luxury category). Calc: Season Anchor brand-kit ($22K USD) covers cross-market localization layer + category exclusivity for a quarter. Per-market hero variants + 4 disclosure layers (EU AI Act, FTC, ASA, KCSC). Total: ~$28K USD. Traditional comparable: 4× ($45-70K single-market) = $180-280K. Hybrid lift: 85%+. The case usually breaks because of localization, not asset count.",
+      },
+      {
+        heading: "Worked example C — when traditional wins",
+        body: "Inputs: 8 assets, 4-week social burst, single market (KR), no exclusivity. Calc: Even non-exclusive per-day synthetic licensing ($800-1500/day × 4 days production + post) lands at $4-7K. Traditional shoot with a one-day rate + studio + HMUA: $5-8K. Roughly equivalent. We tell buyers: «at this scale a traditional shoot is fine; come back when asset count grows or markets multiply.» Don't over-engineer.",
+      },
+      {
+        heading: "What the calculator misses on purpose",
+        body: "Speed (synthetic content velocity), legal de-risking (no real-person likeness), reuse for later campaigns (the character lives on for next season). All three reliably show up in retrospective totals, but they're hard to honestly forecast upfront — so we keep them as «found value» on top of the calculated number, not as line-item ROI. Plan as if they're zero; treat them as bonus.",
+      },
+    ],
+  },
+  {
+    slug: "brand-kit-roi-worked-example-paired-vs-solo",
+    locale: "en",
+    title: "Brand-kit ROI — paired vs solo, with the numbers worked",
+    excerpt:
+      "Concrete USD examples comparing Paired Editorial ($8.5K), Season Anchor ($22K), and custom tiers ($50K+) against single-day licensing for a 12-week K-aesthetic launch.",
+    publishedAt: "2026-07-04",
+    readingMinutes: 7,
+    tags: ["brand-kit", "ROI", "K-aesthetic", "buyer-funnel"],
+    sections: [
+      {
+        heading: "Why this post exists",
+        body: "Brand-kit pricing looks expensive in isolation — $8.5K for Paired Editorial sounds high until you compare it to the alternative (per-day licensing for the same character count over the same window). This post walks the math for the three tiers across a representative 12-week K-aesthetic campaign, so buyers can see where each tier pays off and where it overpays. We use one realistic scenario and three license shapes, not abstract hypotheticals.",
+      },
+      {
+        heading: "The scenario — quarterly K-beauty campaign",
+        body: "Brand: mid-cap K-beauty. Campaign: a 12-week US launch covering 4 SKUs. Asset target: 60 finished deliverables (30 hero, 30 supporting), spread across social + ecom + PR. Two characters needed (couple narrative + cross-gender casting). Exclusivity within the K-beauty category for the quarter. This is the most common shape we ship; both Paired Editorial and Season Anchor cover it differently.",
+      },
+      {
+        heading: "Path 1 — Per-day licensing (no brand-kit)",
+        body: "Solo character per-day rate: $1,500. Two characters at $1,500 each = $3K base. To get 60 assets at the same recipe over 12 weeks you need at least 6 production days (because each day burns recipe-validation time anew without the brand-kit anchor) — so $18K base licensing. Add per-shot variations ($120 each × 60 assets) = $7.2K. Disclosure metadata not bundled = $1.5K. Category exclusivity add-on (3 months × $2K/month) = $6K. Total: ~$32.7K. Per-asset cost: ~$545.",
+      },
+      {
+        heading: "Path 2 — Paired Editorial brand-kit ($8.5K)",
+        body: "The kit includes both characters under shared styling DNA, locked recipe for the season, 30 deliverables in the package, AI disclosure metadata pre-bundled, and one revision round. Add supporting cuts: 30 supporting at $120 each = $3.6K. Category exclusivity is included for the contracted quarter. Total: ~$12.1K. Per-asset cost: ~$202. Savings vs Path 1: ~$20K, plus zero locked-in surprises mid-quarter.",
+      },
+      {
+        heading: "Path 3 — Season Anchor brand-kit ($22K)",
+        body: "Same package as Paired Editorial plus: 60 deliverables included, cross-market localization layer (4 markets), expanded revision rounds, dedicated account contact, character roadmap consultation. For this 60-asset US-only scenario, the extra capacity is partially wasted — but if the brand decides to expand into EU mid-quarter, the localization layer means EU launches at +5% incremental cost instead of repeating the whole production. Per-asset cost (single market): ~$367. Per-asset cost (4-market expansion): ~$92.",
+      },
+      {
+        heading: "Path 4 — Custom brand-kit ($50K+)",
+        body: "Custom kits cover scenarios where the standard tiers don't fit: ambassadors with multi-year terms, regulated categories needing custom compliance review, niche cast (e.g. specific age range or cultural profile) requiring new character development. The $50K+ floor is set by cast development cost — a new bespoke character takes 6-8 weeks of recipe-locking, palette validation, and pre-launch QA. Don't compare per-asset; compare per-year of brand identity carried forward.",
+      },
+      {
+        heading: "The decision matrix",
+        body: "For a single-character single-market quarterly burst → Paired Editorial only if you plan a couple narrative or cross-gender variant; otherwise per-day. For two-character campaigns with category exclusivity needs → Paired Editorial almost always wins (saves ~60% vs per-day). For multi-market launches → Season Anchor pays back even at 2 markets when the localization layer kicks in. For multi-year ambassador positioning → Custom is the only path; don't fit ambassadors into Season Anchor.",
+      },
+      {
+        heading: "Where buyers overpay",
+        body: "We've watched three predictable overspend patterns: (1) buying Season Anchor for a single-market 6-week campaign — Paired Editorial covers the same need for $13K less; (2) buying Custom for what's actually a Season Anchor case — usually triggered by an internal team wanting «more service» without a corresponding deliverable bump; (3) skipping the brand-kit entirely and per-day licensing what ends up being 60+ assets over 12 weeks — the per-day option breaks even around 20 assets / 8 weeks, beyond that the kit wins.",
+      },
+    ],
+  },
+  {
+    slug: "first-90-days-synthetic-character-launch-playbook",
+    locale: "en",
+    title: "First 90 days with a synthetic character — a launch playbook",
+    excerpt:
+      "Day-by-day plan for brand teams introducing a synthetic character to their audience: pre-launch validation, soft reveal, full launch, and the 60-day measurement gate.",
+    publishedAt: "2026-07-06",
+    readingMinutes: 8,
+    tags: ["launch", "playbook", "캐릭터", "buyer-funnel"],
+    sections: [
+      {
+        heading: "Why the first 90 days matter disproportionately",
+        body: "How your audience meets a synthetic character on day one determines whether the character carries brand equity for years or burns out by Q3. Our internal data across 40+ launches: characters introduced with full context (provenance, disclosure, brand-fit narrative) maintain 3× retention versus characters introduced as «look at this AI model.» This playbook is what we walk every Season Anchor client through.",
+      },
+      {
+        heading: "Day -14 to 0 — pre-launch validation",
+        body: "Two weeks before public reveal: lock concept sheets (4-6 per character), validate against a 5-person internal panel (mix marketing + product + legal), run the AI disclosure copy through your regulator review (4 markets if cross-market), and do one rehearsal post on a hidden account to test rendering fidelity on actual platforms. About 1-in-3 launches reveal a platform-specific rendering issue in this window that would have been embarrassing live.",
+      },
+      {
+        heading: "Day 1 — soft reveal (introduction, not campaign)",
+        body: "First public post is the character introduction — not a product. Include: the character's name, a short bio (creative concept, not technical), explicit AI synthetic disclosure (text and OG card alt-text), provenance link in bio. Avoid: pricing CTA, performance metrics framing, anything that reads as «we are doing this to save money.» Your audience can sense that framing and rejects it. Optimize for «this looks intentional» first.",
+      },
+      {
+        heading: "Days 2-14 — the first campaign content drop",
+        body: "Drop your first hero shot 48-72h after introduction. Hold supporting cuts back — your character needs room to breathe before you flood them with assets. Match the character's lighting/palette DNA on every drop; inconsistency in the first 14 days is the single biggest cause of audience confusion (we've seen multi-month recovery cycles from this). Keep all comments on. Repost positive sentiment; don't argue with skeptics.",
+      },
+      {
+        heading: "Days 15-30 — establish narrative",
+        body: "By week 3, the character should have a recognizable voice/style across 4-6 posts. This is when you introduce paired content (with your second character if Paired Editorial) or expand wardrobe register. Don't change the lighting recipe or palette in this window — buyers consistently underestimate how much «this character looks different today» reads as «they hired a new face,» which destroys the consistency advantage that's the entire point.",
+      },
+      {
+        heading: "Days 31-60 — campaign integration",
+        body: "Character now anchors actual campaign content. Hero KPIs (engagement, recall, conversion) start being measurable. Run a 30-day vs 30-day comparison with whatever the prior creative was, not just an absolute benchmark — the relative number tells you whether the synthetic talent move worked, the absolute number reflects market conditions that affect both. Set the comparison up cleanly now; retrofitting it later loses statistical power.",
+      },
+      {
+        heading: "Day 60 measurement gate — the «keep, fix, or pivot» decision",
+        body: "Run the 30-day vs 30-day comparison. Three outcomes: (1) Engagement and conversion both up → keep the character, plan Q2 paired content drop. (2) Engagement up, conversion flat → the creative is working but the offer isn't; iterate offer, not character. (3) Both flat or down → before pivoting, audit consistency (did palette drift? did disclosure metadata break? did a regulator flag something?). Most «pivot» decisions at day 60 are actually consistency repairs, not character problems.",
+      },
+      {
+        heading: "Day 61-90 — operational normalization",
+        body: "Character becomes part of the regular content calendar. Lock the recipe; resist creative team requests to «freshen up the look» — freshness comes from new wardrobe and new contexts on the same character, not from drifting the character itself. Schedule the Q2 brand-kit refresh by day 75 so production handover is clean. Audit your disclosure metadata pipeline once more; one regulator changed requirements in the past 90 days statistically every quarter.",
+      },
+    ],
+  },
+  {
+    slug: "ai-character-engineering-case-study-yuna-ren",
+    locale: "en",
+    title: "How we built Yuna and Ren — an AI character engineering case study",
+    excerpt:
+      "An honest look at building our own paired character IP: what we tried, what failed, and what production-grade synthetic-talent IP actually costs to ship.",
+    publishedAt: "2026-07-08",
+    readingMinutes: 9,
+    tags: ["case-study", "character", "engineering", "K-aesthetic"],
+    sections: [
+      {
+        heading: "Why we're publishing this",
+        body: "Most posts about AI characters are either marketing fluff or technical posturing. We're writing this differently — buyers ask us «can we build our own character instead of licensing yours?» and the honest answer is yes, but it's harder and more expensive than the marketing makes it sound. This is what shipping production-grade paired character IP looked like for us. Some of it is uncomfortable; we're including it anyway.",
+      },
+      {
+        heading: "The strategic choice — paired, not solo",
+        body: "Most teams launch with one character. We launched with two (Yuna + Ren) because the math we ran said paired IP creates a brand moat that solo doesn't: couple narratives, cross-gender casting flexibility, and «one tone, two faces» that scales across more campaign shapes. The tradeoff: development cost roughly doubles, validation work scales near-quadratically (because we had to audit consistency between the two), and the marketing story is harder to tell to non-design buyers. We'd do it again.",
+      },
+      {
+        heading: "The first attempts — what went wrong",
+        body: "Initial generations of Yuna had a recurring problem: when we'd lock the palette and lighting for K-beauty, the character would render fine in product photography but break in motion / video frames. Took us six weeks to track down — it was the rim-light recipe; daylight specular highlights translated to motion as a halo effect that read as artificial. Lesson: validate the recipe against motion before declaring it locked. The rule we now follow: every character recipe must pass a 5-second video test before going into production assets.",
+      },
+      {
+        heading: "Ren's consistency challenge",
+        body: "Ren's «directional/noir-leaning» aesthetic was harder than Yuna's glass-skin. Glass-skin has a clear visual signature (cool key + low-contrast fill + warm rim); noir has signature pieces that can drift independently (shadow depth, edge contrast, hair-light angle). For three months we couldn't ship Ren reliably enough for campaigns. The fix: we built a consistency check that scores generated frames against a reference recipe vector before delivery — frames below 92% similarity rejected automatically. Sounds like over-engineering until you've shipped 12 inconsistent Ren shots to a client.",
+      },
+      {
+        heading: "The audit that almost killed the project",
+        body: "Six weeks before launch we ran a face-similarity audit (matching generated frames against public datasets to make sure neither character accidentally resembled a real person). One of our early Ren variants matched a public figure at 87% similarity — too close to ship. We had to discard 40+ hours of work and re-anchor the character. We now run this audit at week 1 of any new character, not week 6. Cost: roughly $3K in rendering compute; saved us catastrophic legal/reputation risk.",
+      },
+      {
+        heading: "The localization surprise",
+        body: "We assumed «the character is the character; localization is just copy.» It wasn't. EU campaigns required slightly different disclosure metadata fields than US/UK; Korea KCSC wanted Korean-script provenance text inline; Singapore had a different disclosure cadence requirement. Building this into the asset pipeline added 3 weeks. The right time to design for this is at the start; we learned the hard way. If you're building your own character, sketch the disclosure-metadata schema before you generate your first hero shot.",
+      },
+      {
+        heading: "What it actually cost — fully loaded",
+        body: "Honest numbers for both characters from concept to launch-ready: ~$140K. That breaks down to: ~$50K compute (renders + iterations + the validation cycles), ~$45K creative labor (concept locking, recipe development, motion testing, audit response), ~$20K legal review (face-similarity audit, multi-market disclosure design, regulator preview), ~$15K platform engineering (the consistency scoring system, localization metadata pipeline), ~$10K opportunity cost on a 6-month delay vs single-character timeline. Brands launching one character should expect ~60% of that figure for a comparable scope.",
+      },
+      {
+        heading: "Whether you should build your own",
+        body: "Three filters: (1) Do you need 10+ years of brand identity carried by the character? Build. (2) Do you serve a category where regulator review is constant (pharma, finance, alcohol, regulated cosmetics)? Build, because the disclosure pipeline benefits from being yours. (3) Otherwise? License a Brand Kit. The cost difference is roughly 8-12× and the time difference is 6 months vs 2 weeks. We built our own because we needed them as IP we'd own across the company's lifetime, not for a single campaign. Most buyers don't have that need; the math doesn't carry. Be honest about that internally before approving the development budget.",
+      },
+      {
+        heading: "What we publish next",
+        body: "We're working on three follow-up case studies: the first paired campaign with a client brand (consent permitting), Yuna's cross-market launch retrospective (KR/US/EU sequence), and the localization-metadata schema we now use across all character launches. If any of those would be useful, let us know in the contact form — we prioritize what buyers actually want to read.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

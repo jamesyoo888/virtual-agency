@@ -24,6 +24,7 @@ import {
   Mail,
   ScrollText,
   Search,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -38,6 +39,7 @@ const links = [
   { href: "/admin/image-studio", label: "Image Studio", icon: Image },
   { href: "/admin/video-studio", label: "Video Studio", icon: Video },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/admin/blog-analytics", label: "Blog Analytics", icon: BookOpen },
   { href: "/admin/forecast", label: "Forecast", icon: TrendingUp },
   { href: "/admin/experiments", label: "Experiments", icon: FlaskConical },
   { href: "/admin/rfps", label: "RFPs", icon: FileText },

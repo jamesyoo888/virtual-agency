@@ -899,7 +899,8 @@ export default async function AdminHomePage() {
       )}
 
       {(dailyRevenue.some((b) => b.revenue > 0) ||
-        dailyInquiries.some((b) => b.count > 0)) && (() => {
+        dailyInquiries.some((b) => b.count > 0) ||
+        blogViews30d.daily.slice(-14).some((b) => b.count > 0)) && (() => {
         // Summary stats from the same dense series so the chart, the headline
         // total, and the "high day" caption can never disagree.
         const total = dailyRevenue.reduce((s, b) => s + b.revenue, 0);
@@ -915,12 +916,29 @@ export default async function AdminHomePage() {
           (best, b) => (b.count > best.count ? b : best),
           dailyInquiries[0] ?? { date: "", count: 0 }
         );
+        // Slice the 30d blog daily series down to the same 14-day window
+        // as the revenue + inquiry charts so the three sparklines line up
+        // visually on the same x-axis.
+        const blogDaily14d = blogViews30d.daily.slice(-14);
+        const blogTotal14d = blogDaily14d.reduce((s, b) => s + b.count, 0);
+        const blogActiveDays = blogDaily14d.filter((b) => b.count > 0).length;
+        const blogPeak = blogDaily14d.reduce(
+          (best, b) => (b.count > best.count ? b : best),
+          blogDaily14d[0] ?? { date: "", count: 0 }
+        );
+        const showBlog = blogTotal14d > 0;
         return (
           <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 mb-4">
               지난 14일 추세
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div
+              className={
+                showBlog
+                  ? "grid grid-cols-1 md:grid-cols-3 gap-6"
+                  : "grid grid-cols-1 md:grid-cols-2 gap-6"
+              }
+            >
               <div>
                 <div className="flex items-start justify-between mb-3 gap-4">
                   <div>
@@ -945,7 +963,7 @@ export default async function AdminHomePage() {
                     </div>
                   )}
                 </div>
-                <DailyRevenueSparkline buckets={dailyRevenue} width={420} />
+                <DailyRevenueSparkline buckets={dailyRevenue} width={showBlog ? 280 : 420} />
               </div>
               <div>
                 <div className="flex items-start justify-between mb-3 gap-4">
@@ -973,10 +991,45 @@ export default async function AdminHomePage() {
                 </div>
                 <DailyCountSparkline
                   buckets={dailyInquiries}
-                  width={420}
+                  width={showBlog ? 280 : 420}
                   ariaLabel="지난 14일 신규 문의"
                 />
               </div>
+              {showBlog && (
+                <div>
+                  <div className="flex items-start justify-between mb-3 gap-4">
+                    <div>
+                      <h3 className="text-xs uppercase tracking-wider text-zinc-400">
+                        일별 블로그 조회
+                      </h3>
+                      <p className="text-xs text-zinc-500 mt-0.5">
+                        총 {blogTotal14d.toLocaleString()}회 · {blogActiveDays}일 활성
+                      </p>
+                    </div>
+                    {blogPeak.count > 0 && (
+                      <div className="text-right shrink-0">
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                          최고일
+                        </p>
+                        <p className="text-[11px] text-zinc-300 tabular-nums">
+                          {blogPeak.date}
+                        </p>
+                        <p className="text-[11px] text-zinc-300 tabular-nums">
+                          {blogPeak.count}회
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <DailyCountSparkline
+                    buckets={blogDaily14d}
+                    width={280}
+                    unit="회"
+                    ariaLabel="지난 14일 블로그 조회"
+                    fillActive="#10b981"
+                    fillLast="#34d399"
+                  />
+                </div>
+              )}
             </div>
             <p className="mt-3 text-[11px] text-zinc-600">
               막대에 마우스를 올리면 일별 값이 표시됩니다. 회색은 0건/0원 (해당일 활동 없음).
