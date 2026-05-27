@@ -198,6 +198,12 @@ export default async function sitemap(
             changeFrequency: "monthly",
             priority: 0.6,
           },
+          {
+            url: `${SITE_URL}/en/press/character-launch`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.6,
+          },
           ...listCharacters().map((c) => ({
             url: `${SITE_URL}/en/character/${c.slug}`,
             lastModified: now,
@@ -441,6 +447,18 @@ export default async function sitemap(
               languages: {
                 ko: `${SITE_URL}/glossary`,
                 en: `${SITE_URL}/en/glossary`,
+              },
+            },
+          },
+          {
+            url: `${SITE_URL}/press/character-launch`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.6,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/press/character-launch`,
+                en: `${SITE_URL}/en/press/character-launch`,
               },
             },
           },
