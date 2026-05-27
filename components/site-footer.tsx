@@ -84,6 +84,11 @@ export default function SiteFooter() {
                 캐릭터
               </Link>
             </li>
+            <li>
+              <Link href="/character/brand-kits" className="hover:text-white">
+                브랜드 키트
+              </Link>
+            </li>
           </ul>
         </div>
 
