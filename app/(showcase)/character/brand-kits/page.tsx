@@ -221,7 +221,7 @@ export default function KrCharacterBrandKitsPage() {
                   </p>
                 </div>
                 <Link
-                  href={`/rfp?campaign=${encodeURIComponent(k.name)}&exclusive=${i >= 1 ? "true" : "false"}`}
+                  href={`/rfp?campaign=${encodeURIComponent(k.name)}&exclusive=${i >= 1 ? "true" : "false"}&utm_source=character&utm_campaign=brand_kit_${i === 0 ? "paired" : i === 1 ? "season" : "custom"}`}
                   className={`mt-5 inline-flex items-center justify-center gap-1 text-sm rounded-md px-3 py-2 ${
                     i === 1
                       ? "bg-white text-black hover:bg-zinc-200"
@@ -284,7 +284,7 @@ export default function KrCharacterBrandKitsPage() {
 
         <footer className="mt-12 pt-8 border-t border-zinc-900 flex flex-wrap gap-3">
           <Link
-            href="/rfp?campaign=캐릭터 브랜드 키트"
+            href="/rfp?campaign=캐릭터 브랜드 키트&utm_source=character&utm_campaign=brand_kit_index"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
           >
             브랜드 키트 견적 받기

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   parseSlugFromCampaign,
+  parseTierFromCampaign,
   summarizeCharacterAttribution,
 } from "@/lib/analytics/character-attribution";
 
@@ -21,6 +22,21 @@ describe("parseSlugFromCampaign", () => {
     expect(parseSlugFromCampaign("character_Yuna")).toBeNull(); // upper
     expect(parseSlugFromCampaign("character_ren$")).toBeNull(); // bad char
     expect(parseSlugFromCampaign("character_" + "a".repeat(40))).toBeNull();
+  });
+});
+
+describe("parseTierFromCampaign", () => {
+  it("extracts tier from brand_kit_<tier>", () => {
+    expect(parseTierFromCampaign("brand_kit_paired")).toBe("paired");
+    expect(parseTierFromCampaign("brand_kit_season")).toBe("season");
+    expect(parseTierFromCampaign("brand_kit_custom")).toBe("custom");
+    expect(parseTierFromCampaign("brand_kit_index")).toBe("index");
+  });
+
+  it("returns null for non-tier campaigns", () => {
+    expect(parseTierFromCampaign(null)).toBeNull();
+    expect(parseTierFromCampaign("character_yuna")).toBeNull();
+    expect(parseTierFromCampaign("anything_else")).toBeNull();
   });
 });
 
@@ -88,6 +104,27 @@ describe("summarizeCharacterAttribution", () => {
     expect(summary.totalInquiries).toBe(0);
     expect(summary.totalRevenue).toBe(0);
     expect(summary.bySlug).toHaveLength(0);
+    expect(summary.byTier).toHaveLength(0);
+    expect(summary.unknown).toBe(0);
+  });
+
+  it("splits brand-kit tier campaigns into byTier (not bySlug)", () => {
+    const summary = summarizeCharacterAttribution([
+      { status: "inquiry", utm_campaign: "brand_kit_paired", invoice_amount: null },
+      { status: "delivered", utm_campaign: "brand_kit_paired", invoice_amount: 11_000_000 },
+      { status: "inquiry", utm_campaign: "brand_kit_season", invoice_amount: null },
+      { status: "inquiry", utm_campaign: "character_yuna", invoice_amount: null },
+    ]);
+    expect(summary.byTier).toHaveLength(2);
+    expect(summary.byTier[0]).toEqual({
+      tier: "paired",
+      inquiries: 2,
+      delivered: 1,
+      revenue: 11_000_000,
+      conversionPct: 50,
+    });
+    expect(summary.bySlug).toHaveLength(1);
+    expect(summary.bySlug[0].slug).toBe("yuna");
     expect(summary.unknown).toBe(0);
   });
 });

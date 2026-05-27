@@ -1679,6 +1679,90 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "k-aesthetic-rfp-budget-bands-usd",
+    locale: "en",
+    title: "How to Pick a USD Budget Band on a K-Aesthetic RFP — A Buyer Calibration Guide",
+    excerpt:
+      "Under $5K, $5–15K, $15–50K, $50K+. Each band buys a different campaign scope. Pick wrong and the matched roster won't fit. This is what each band actually pays for.",
+    publishedAt: "2026-06-10",
+    readingMinutes: 6,
+    tags: ["RFP", "budget", "pricing", "casting", "scope"],
+    sections: [
+      {
+        heading: "Budget bands are scope buckets, not haggling targets",
+        body: "Buyers sometimes treat the RFP budget band as a negotiation opener — pick the lowest and let us upsell. That misreads what the band does. It tells the matching engine which model tier to surface, which licensing terms are realistic, and which deliverable scope fits the spend. Pick too low and the matched roster is too small to fit the brief. Pick too high and you spend more than the campaign needs. Get it right and the first quote is close enough to sign.",
+      },
+      {
+        heading: "Under $5K — single-shoot, one channel, no exclusivity",
+        body: "Use case: a single SKU launch on Instagram or a PDP page refresh. Day rate covers the model license, one concept variant, two revisions. Disclosure metadata always included. No category exclusivity; competitors can use the same face on the same day. Buyers who fit this band: small DTC brands testing one product, or seasonal stories with a single hero asset.",
+      },
+      {
+        heading: "$5–15K — bundled lookbook or paired editorial brand kit",
+        body: "This is where the Paired Editorial brand kit ($8.5K) lives. You get both Yuna and Ren in a single editorial concept — 10 paired hero shots, 10 solo shots, one short video. Or as a solo: a multi-shot lookbook (10-15 stills + 1 video) for a category launch. Use case: e-commerce season refresh, a B2C beauty drop with multiple SKUs, fashion lookbook for a single line.",
+      },
+      {
+        heading: "$15–50K — season anchor with category exclusivity",
+        body: "Season Anchor (couple) brand kit lives here ($22K). Full season of both characters with competitor lockout in your category. 40+ stills, 3 hero videos, fitting day with the team, persona Instagram for one character. Use case: K-beauty ambassador program for the season, fashion house menswear+womenswear coordinated drop, fragrance launch needing couple narrative across multiple markets.",
+      },
+      {
+        heading: "$50K+ — custom multi-face program or multi-quarter anchor",
+        body: "Custom Multi-Face tier — Yuna + Ren + an additional character built to your brand DNA. Multi-character narrative scenes possible. Optional full IP transfer of the custom character (you own the third face). Or multi-quarter Season Anchor renewals — beauty houses and fashion brands locking the same cast across 2-4 quarters. Use case: brand-defining campaigns where the cast itself is the campaign.",
+      },
+      {
+        heading: "What changes between bands — explicit",
+        body: "Three things scale: exclusivity (none → category → multi-market), deliverable volume (1-3 shots → 40+ shots + video), and cast size (single model → paired → multi-face). What stays constant: 24-hour concept sheet, EU/US/UK/KR disclosure metadata, 2 free revisions per shot, RAW + TIFF + JPG delivery. The compliance and ops layer is the same — only the asset depth and the licensing breadth change.",
+      },
+      {
+        heading: "Where buyers most often misjudge",
+        body: "(1) Picking $5–15K when the campaign actually needs exclusivity — competitors using the same face within the quarter dilutes the brand cue. (2) Picking $50K+ for a one-shot launch where the multi-face / multi-quarter scope isn't used. (3) Picking «under $5K» and asking for a season anchor's worth of deliverables, then renegotiating. Picking the band that matches the scope first time keeps the quote turnaround under 24 hours.",
+      },
+      {
+        heading: "How to confirm before you send the RFP",
+        body: "Ask three questions: (1) How many shots do I actually need for this campaign? Total. (2) Does my category have competitors who'd use this face if I don't lock it? (3) Is this a single launch or the start of a season? Map the answers to the bands above and the right one usually becomes obvious. If still unsure, start with the Paired Editorial brand kit ($5-15K band) — it scales up cleanly to Season Anchor if the campaign expands.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-talent-vs-stock-photography-when-to-choose-which",
+    locale: "en",
+    title: "Synthetic Talent vs Stock Photography — When to Choose Which for Brand Campaigns",
+    excerpt:
+      "Stock is fast and cheap. Synthetic talent is consistent and licensed across markets. Knowing where each shines saves both the budget and the brand cue.",
+    publishedAt: "2026-06-12",
+    readingMinutes: 5,
+    tags: ["synthetic talent", "stock photography", "casting", "decision framework"],
+    sections: [
+      {
+        heading: "Both options exist for a reason",
+        body: "Stock photography solves a real problem — fast generic imagery at low cost. Synthetic talent solves a different problem — owned, consistent visual identity that scales across markets and seasons. Buyers conflate them because both bypass a traditional model shoot. They're solving different problems and the decision should reflect that.",
+      },
+      {
+        heading: "When stock wins",
+        body: "(1) The image is generic on purpose — a landing-page hero where the face shouldn't be memorable. (2) The brand voice doesn't depend on visual continuity (B2B SaaS often falls here). (3) The campaign is one-shot with no follow-on series. (4) Budget is under $500 and the use is supporting content not the campaign hero. Stock libraries — Adobe, Unsplash+, Getty — cover these cases efficiently.",
+      },
+      {
+        heading: "When stock fails brands quietly",
+        body: "Three failure modes recur. (1) Competitors discover the same model on the same stock library — brand recognition collapses. (2) The face doesn't carry a recognizable brand cue (K-aesthetic, premium luxury, specific demographic register). (3) The image is technically released but not actually licensed for the markets you're running in — international ad placement runs into rights restrictions buyers didn't read.",
+      },
+      {
+        heading: "When synthetic talent wins",
+        body: "(1) The face is the brand cue — beauty, fashion, fragrance, luxury all qualify. (2) You need the same face across multiple SKUs, markets, or quarters. (3) You want a paired cast with shared styling DNA (impossible to source as stock). (4) You need category exclusivity — locking competitors out of the face for a season. (5) Disclosure compliance is a contract requirement, not just a hope.",
+      },
+      {
+        heading: "Where the costs actually compare",
+        body: "Stock: $5-50 per image, sometimes bulk subscription at $30/month for ~20 images. Synthetic talent: $300/day base for catalog models, $8.5K/quarter for paired brand kits, $22K+/quarter for category-exclusive Season Anchor. Synthetic talent is 100-1000× the cost of stock per asset — but it ships continuity, exclusivity, and disclosure metadata that stock cannot. The right comparison is total campaign cost, not per-image cost.",
+      },
+      {
+        heading: "The hybrid pattern most brands miss",
+        body: "Use synthetic talent for the hero assets (the 5-20 shots that define the campaign), use stock for supporting content (blog headers, internal slides, ancillary social posts). The brand cue stays locked on the hero work, and the long-tail supporting content stays cheap. Trying to use stock for the hero or synthetic talent for the supporting content gets the cost-to-value ratio wrong in both directions.",
+      },
+      {
+        heading: "Three questions to resolve the call",
+        body: "(1) Will the face appear more than 10 times in the next 6 months? If yes, lean synthetic. (2) Does any competitor in your category run similar campaigns from the same stock library? If yes, lean synthetic. (3) Does your legal team require AI/synthetic disclosure metadata travel with the asset? If yes, synthetic talent already ships that. If all three answers are no, stock is fine. Otherwise the math points at synthetic.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

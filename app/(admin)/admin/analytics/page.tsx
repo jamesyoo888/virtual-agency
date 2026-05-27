@@ -351,6 +351,58 @@ export default async function AnalyticsPage({
               );
             })}
           </ul>
+          {characterAttribution.byTier.length > 0 &&
+            (() => {
+              const maxTier = Math.max(
+                1,
+                ...characterAttribution.byTier.map((t) => t.inquiries)
+              );
+              return (
+                <>
+                  <p className="mt-6 mb-2 text-[11px] uppercase tracking-wider text-zinc-500">
+                    브랜드 키트 티어별
+                  </p>
+                  <ul className="space-y-2">
+                    {characterAttribution.byTier.map((t) => {
+                      const widthPct = (t.inquiries / maxTier) * 100;
+                      return (
+                        <li
+                          key={t.tier}
+                          className="grid grid-cols-12 gap-3 items-center text-sm"
+                        >
+                          <span className="col-span-2 text-zinc-300 capitalize">
+                            {t.tier}
+                          </span>
+                          <div className="col-span-6 h-2 rounded bg-zinc-900 overflow-hidden">
+                            <div
+                              className="h-full bg-amber-400"
+                              style={{ width: `${widthPct}%` }}
+                            />
+                          </div>
+                          <span className="col-span-4 text-right text-xs text-zinc-400 tabular-nums">
+                            {t.inquiries} ·{" "}
+                            <span
+                              className={
+                                t.conversionPct >= 30
+                                  ? "text-emerald-400"
+                                  : "text-zinc-500"
+                              }
+                            >
+                              {t.conversionPct}%
+                            </span>
+                            {t.revenue > 0 && (
+                              <span className="ml-2 text-emerald-300">
+                                ₩{t.revenue.toLocaleString("ko-KR")}
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              );
+            })()}
           <p className="mt-3 text-[11px] text-zinc-600">
             캐릭터 디테일 페이지 CTA 가 utm_source=character 로 attribut. 분기별 캐릭터 ROI 판단에 사용.
           </p>

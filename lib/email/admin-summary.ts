@@ -9,6 +9,7 @@ import {
 } from "@/lib/analytics/client-retention";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming, type TimedStage } from "@/lib/analytics/stage-timing";
+import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 
 /**
  * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
@@ -53,6 +54,10 @@ export interface AdminWeeklySummary {
    */
   bottleneckStage: TimedStage | null;
   bottleneckMedianDays: number | null;
+  /** 30d character-attributed inquiry count (utm_source=character). */
+  characterAttributedInquiries: number;
+  /** 30d delivered revenue from character-attributed projects. */
+  characterAttributedRevenueKrw: number;
 }
 
 interface SearchLogRow {
@@ -87,6 +92,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       retentionRows,
       velocity,
       stageTiming,
+      characterAttribution,
     ] = await Promise.all([
       supabase
         .from("projects")
@@ -137,6 +143,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
         .limit(10_000),
       loadPipelineVelocity(90),
       loadStageTiming(90),
+      loadCharacterAttribution(30),
     ]);
 
     const searchAgg = aggregateSearchRows(
@@ -209,6 +216,8 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
               (b) => b.stage === stageTiming.slowestStage
             )?.medianDays ?? null
           : null,
+      characterAttributedInquiries: characterAttribution.totalInquiries,
+      characterAttributedRevenueKrw: characterAttribution.totalRevenue,
     };
   } catch (err) {
     console.warn("[admin-summary] build failed:", err);
@@ -276,6 +285,15 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
     };
     lines.push(
       `병목 단계: ${stageLabel[s.bottleneckStage] ?? s.bottleneckStage} (중앙값 ${s.bottleneckMedianDays.toFixed(1)}d)`
+    );
+  }
+  if (s.characterAttributedInquiries > 0) {
+    const revPart =
+      s.characterAttributedRevenueKrw > 0
+        ? ` · 매출 ₩${s.characterAttributedRevenueKrw.toLocaleString("ko-KR")}`
+        : "";
+    lines.push(
+      `캐릭터 페이지 → 문의 (30일): ${s.characterAttributedInquiries}건${revPart}`
     );
   }
   lines.push("");
@@ -357,6 +375,18 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
                   review: "검토",
                 }[s.bottleneckStage] ?? s.bottleneckStage
               } ${s.bottleneckMedianDays.toFixed(1)}d`
+            )
+          : ""
+      }
+      ${
+        s.characterAttributedInquiries > 0
+          ? stat(
+              "캐릭터 attribut (30d)",
+              `${s.characterAttributedInquiries}건${
+                s.characterAttributedRevenueKrw > 0
+                  ? ` · ₩${s.characterAttributedRevenueKrw.toLocaleString("ko-KR")}`
+                  : ""
+              }`
             )
           : ""
       }

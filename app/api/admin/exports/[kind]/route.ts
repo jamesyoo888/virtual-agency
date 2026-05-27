@@ -1229,6 +1229,12 @@ export async function GET(
         { metric: `slug_${c.slug}_revenue_krw`, value: String(c.revenue) },
         { metric: `slug_${c.slug}_conversion_pct`, value: String(c.conversionPct) },
       ]),
+      ...report.byTier.flatMap((t) => [
+        { metric: `tier_${t.tier}_inquiries`, value: String(t.inquiries) },
+        { metric: `tier_${t.tier}_delivered`, value: String(t.delivered) },
+        { metric: `tier_${t.tier}_revenue_krw`, value: String(t.revenue) },
+        { metric: `tier_${t.tier}_conversion_pct`, value: String(t.conversionPct) },
+      ]),
     ];
     const csv = toCSV(rows, ["metric", "value"] as const);
     return new NextResponse(csv, {

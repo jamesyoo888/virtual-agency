@@ -16,7 +16,8 @@ import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
  * is the filter; `utm_campaign='character_<slug>'` is the dimension.
  */
 
-const CAMPAIGN_PREFIX = "character_";
+const CHARACTER_CAMPAIGN_PREFIX = "character_";
+const TIER_CAMPAIGN_PREFIX = "brand_kit_";
 
 export interface CharacterAttributionRow {
   slug: string;
@@ -27,6 +28,14 @@ export interface CharacterAttributionRow {
   revenue: number;
 }
 
+export interface CharacterAttributionRowByTier {
+  tier: string;
+  inquiries: number;
+  delivered: number;
+  conversionPct: number;
+  revenue: number;
+}
+
 export interface CharacterAttributionReport {
   windowDays: number;
   totalInquiries: number;
@@ -34,6 +43,8 @@ export interface CharacterAttributionReport {
   /** Sum of invoice_amount across all character-attributed rows. */
   totalRevenue: number;
   bySlug: CharacterAttributionRow[];
+  /** Same shape as `bySlug` but grouped by brand-kit tier (paired/season/custom). */
+  byTier: CharacterAttributionRowByTier[];
   /** Projects tagged utm_source=character but utm_campaign didn't parse. */
   unknown: number;
   /** Dense daily series of attributed inquiries (zero-filled). */
@@ -54,9 +65,18 @@ export function summarizeCharacterAttribution(
   rows: Row[]
 ): Pick<
   CharacterAttributionReport,
-  "totalInquiries" | "totalDelivered" | "totalRevenue" | "bySlug" | "unknown"
+  | "totalInquiries"
+  | "totalDelivered"
+  | "totalRevenue"
+  | "bySlug"
+  | "byTier"
+  | "unknown"
 > {
   const bySlug = new Map<
+    string,
+    { inquiries: number; delivered: number; revenue: number }
+  >();
+  const byTier = new Map<
     string,
     { inquiries: number; delivered: number; revenue: number }
   >();
@@ -75,21 +95,40 @@ export function summarizeCharacterAttribution(
     totalRevenue += revenue;
 
     const slug = parseSlugFromCampaign(r.utm_campaign);
-    if (!slug) {
+    const tier = parseTierFromCampaign(r.utm_campaign);
+    if (slug) {
+      const entry =
+        bySlug.get(slug) ?? { inquiries: 0, delivered: 0, revenue: 0 };
+      entry.inquiries += 1;
+      if (isDelivered) entry.delivered += 1;
+      entry.revenue += revenue;
+      bySlug.set(slug, entry);
+    } else if (tier) {
+      const entry =
+        byTier.get(tier) ?? { inquiries: 0, delivered: 0, revenue: 0 };
+      entry.inquiries += 1;
+      if (isDelivered) entry.delivered += 1;
+      entry.revenue += revenue;
+      byTier.set(tier, entry);
+    } else {
       unknown += 1;
-      continue;
     }
-    const entry =
-      bySlug.get(slug) ?? { inquiries: 0, delivered: 0, revenue: 0 };
-    entry.inquiries += 1;
-    if (isDelivered) entry.delivered += 1;
-    entry.revenue += revenue;
-    bySlug.set(slug, entry);
   }
 
-  const ordered: CharacterAttributionRow[] = [...bySlug.entries()]
+  const orderedSlugs: CharacterAttributionRow[] = [...bySlug.entries()]
     .map(([slug, c]) => ({
       slug,
+      inquiries: c.inquiries,
+      delivered: c.delivered,
+      revenue: c.revenue,
+      conversionPct:
+        c.inquiries > 0 ? Math.round((c.delivered / c.inquiries) * 100) : 0,
+    }))
+    .sort((a, b) => b.inquiries - a.inquiries);
+
+  const orderedTiers: CharacterAttributionRowByTier[] = [...byTier.entries()]
+    .map(([tier, c]) => ({
+      tier,
       inquiries: c.inquiries,
       delivered: c.delivered,
       revenue: c.revenue,
@@ -102,7 +141,8 @@ export function summarizeCharacterAttribution(
     totalInquiries,
     totalDelivered,
     totalRevenue,
-    bySlug: ordered,
+    bySlug: orderedSlugs,
+    byTier: orderedTiers,
     unknown,
   };
 }
@@ -111,11 +151,21 @@ export function parseSlugFromCampaign(
   campaign: string | null | undefined
 ): string | null {
   if (!campaign) return null;
-  if (!campaign.startsWith(CAMPAIGN_PREFIX)) return null;
-  const slug = campaign.slice(CAMPAIGN_PREFIX.length);
+  if (!campaign.startsWith(CHARACTER_CAMPAIGN_PREFIX)) return null;
+  const slug = campaign.slice(CHARACTER_CAMPAIGN_PREFIX.length);
   // Defensive — slug must match the registry shape ([a-z0-9-]{1,32}).
   if (!/^[a-z0-9-]{1,32}$/.test(slug)) return null;
   return slug;
+}
+
+export function parseTierFromCampaign(
+  campaign: string | null | undefined
+): string | null {
+  if (!campaign) return null;
+  if (!campaign.startsWith(TIER_CAMPAIGN_PREFIX)) return null;
+  const tier = campaign.slice(TIER_CAMPAIGN_PREFIX.length);
+  if (!/^[a-z0-9_-]{1,32}$/.test(tier)) return null;
+  return tier;
 }
 
 export async function loadCharacterAttribution(
@@ -127,6 +177,7 @@ export async function loadCharacterAttribution(
     totalDelivered: 0,
     totalRevenue: 0,
     bySlug: [],
+    byTier: [],
     unknown: 0,
     daily: aggregateDaily([], windowDays),
   };

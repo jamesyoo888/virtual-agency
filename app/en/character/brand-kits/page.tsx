@@ -218,7 +218,7 @@ export default function CharacterBrandKitsPage() {
                   </p>
                 </div>
                 <Link
-                  href={`/en/rfp?campaign=${encodeURIComponent(k.name)}&exclusive=${i >= 1 ? "true" : "false"}&budget_band=${i === 0 ? "5k_15k" : i === 1 ? "15k_50k" : "over_50k"}`}
+                  href={`/en/rfp?campaign=${encodeURIComponent(k.name)}&exclusive=${i >= 1 ? "true" : "false"}&budget_band=${i === 0 ? "5k_15k" : i === 1 ? "15k_50k" : "over_50k"}&utm_source=character&utm_campaign=brand_kit_${i === 0 ? "paired" : i === 1 ? "season" : "custom"}`}
                   className={`mt-5 inline-flex items-center justify-center gap-1 text-sm rounded-md px-3 py-2 ${
                     i === 1
                       ? "bg-white text-black hover:bg-zinc-200"
@@ -282,7 +282,7 @@ export default function CharacterBrandKitsPage() {
 
         <footer className="mt-12 pt-8 border-t border-zinc-900 flex flex-wrap gap-3">
           <Link
-            href="/en/rfp?campaign=Character+brand+kit"
+            href="/en/rfp?campaign=Character+brand+kit&utm_source=character&utm_campaign=brand_kit_index"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white text-black text-sm font-medium hover:bg-zinc-200"
           >
             Pitch a brand kit

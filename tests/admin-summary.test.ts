@@ -32,6 +32,8 @@ const fixture: AdminWeeklySummary = {
   velocityCount: 8,
   bottleneckStage: "in_progress",
   bottleneckMedianDays: 6.7,
+  characterAttributedInquiries: 4,
+  characterAttributedRevenueKrw: 11_000_000,
 };
 
 describe("formatAdminSummaryText", () => {
@@ -122,6 +124,34 @@ describe("formatAdminSummaryText", () => {
       bottleneckMedianDays: null,
     };
     expect(formatAdminSummaryText(noBottleneck)).not.toMatch(/병목 단계/);
+  });
+
+  it("includes character-attribution line with revenue when present", () => {
+    const out = formatAdminSummaryText(fixture);
+    expect(out).toMatch(/캐릭터 페이지 → 문의 \(30일\): 4건/);
+    expect(out).toMatch(/매출 ₩11,000,000/);
+  });
+
+  it("omits character-attribution line entirely when inquiries=0", () => {
+    const quiet: AdminWeeklySummary = {
+      ...fixture,
+      characterAttributedInquiries: 0,
+      characterAttributedRevenueKrw: 0,
+    };
+    expect(formatAdminSummaryText(quiet)).not.toMatch(/캐릭터 페이지/);
+  });
+
+  it("omits revenue clause when no delivered revenue yet (inquiries > 0)", () => {
+    const noRev: AdminWeeklySummary = {
+      ...fixture,
+      characterAttributedInquiries: 2,
+      characterAttributedRevenueKrw: 0,
+    };
+    const out = formatAdminSummaryText(noRev);
+    expect(out).toMatch(/캐릭터 페이지 → 문의 \(30일\): 2건/);
+    // "30일 매출" line is the unrelated KPI — the character-attribution
+    // clause specifically must not append "· 매출 ₩…" since revenue=0.
+    expect(out).not.toMatch(/캐릭터 페이지 → 문의 \(30일\): 2건 · 매출/);
   });
 });
 
