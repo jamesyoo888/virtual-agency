@@ -17,8 +17,11 @@ import {
 import {
   breadcrumbLd,
   characterPersonLd,
+  faqPageLd,
   ldScript,
 } from "@/lib/seo/json-ld";
+import { BRAND_KIT_TIERS, formatKrw } from "@/lib/characters/brand-kits";
+import { characterFaqKo } from "@/lib/characters/faq";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -52,7 +55,7 @@ export async function generateMetadata({
 
   const title = `${character.name} — Virtual Agency 캐릭터`;
   const description = `${KO_PERSONA[character.slug] ?? character.persona} ${character.targetVerticals.join("·")} 광고에 활용 가능한 K-aesthetic AI 합성 모델.`;
-  const ogImage = `${SITE_URL}/api/og?en_character=${character.slug}`;
+  const ogImage = `${SITE_URL}/api/og?character=${character.slug}`;
 
   return {
     title,
@@ -97,6 +100,8 @@ export default async function KrCharacterPage({
     { name: "캐릭터", url: `${SITE_URL}/character` },
     { name: character.name, url: `${SITE_URL}/character/${character.slug}` },
   ]);
+  const faqEntries = characterFaqKo(character);
+  const faqLd = faqPageLd(faqEntries);
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -107,6 +112,10 @@ export default async function KrCharacterPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldScript(crumbsLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(faqLd) }}
       />
       <main className="max-w-4xl mx-auto px-6 py-16 md:py-24">
         <Link
@@ -222,6 +231,36 @@ export default async function KrCharacterPage({
           </div>
         </section>
 
+        <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-6">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+            예상 투자 규모
+          </p>
+          <ul className="text-sm text-zinc-300 space-y-2">
+            {BRAND_KIT_TIERS.map((tier) => (
+              <li
+                key={tier.slug}
+                className="flex justify-between gap-3 border-b border-zinc-900 last:border-b-0 pb-2 last:pb-0"
+              >
+                <span className="text-zinc-400">{tier.nameKo}</span>
+                <span className="tabular-nums">
+                  {formatKrw(tier.krw, tier.startingAt)}
+                  <span className="text-zinc-600 text-xs ml-1">/ 분기</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/character/brand-kits"
+            className="mt-4 inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white"
+          >
+            전체 키트 구성 보기 <ArrowRight className="w-3 h-3" />
+          </Link>
+          <p className="mt-3 text-[11px] text-zinc-600 leading-relaxed">
+            티어별 산출물·독점성 차이는 브랜드 키트 페이지에서 확인하세요.
+            솔로 캠페인은 일별 라이선스로 별도 견적합니다.
+          </p>
+        </section>
+
         <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-12">
           <p className="text-xs uppercase tracking-wider text-zinc-500 mb-2">
             라이선스
@@ -250,6 +289,24 @@ export default async function KrCharacterPage({
               가격 보기
             </Link>
           </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-sm uppercase tracking-wider text-zinc-500 mb-4">
+            자주 묻는 질문
+          </h2>
+          <dl className="divide-y divide-zinc-900 border-y border-zinc-900">
+            {faqEntries.map((entry) => (
+              <div key={entry.question} className="py-4">
+                <dt className="text-sm font-semibold text-zinc-200">
+                  {entry.question}
+                </dt>
+                <dd className="mt-2 text-sm text-zinc-400 leading-relaxed">
+                  {entry.answer}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         {otherCharacters.length > 0 && (

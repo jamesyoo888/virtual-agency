@@ -10,7 +10,14 @@ import {
   Quote,
 } from "lucide-react";
 import { CHARACTERS, getCharacter, type CharacterSlug } from "@/lib/characters/registry";
-import { breadcrumbLd, characterPersonLd, ldScript } from "@/lib/seo/json-ld";
+import {
+  breadcrumbLd,
+  characterPersonLd,
+  faqPageLd,
+  ldScript,
+} from "@/lib/seo/json-ld";
+import { BRAND_KIT_TIERS, formatUsd } from "@/lib/characters/brand-kits";
+import { characterFaqEn } from "@/lib/characters/faq";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -74,6 +81,8 @@ export default async function CharacterPage({
     { name: "Characters", url: `${SITE_URL}/en/character` },
     { name: character.name, url: `${SITE_URL}/en/character/${character.slug}` },
   ]);
+  const faqEntries = characterFaqEn(character);
+  const faqLd = faqPageLd(faqEntries);
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -84,6 +93,10 @@ export default async function CharacterPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldScript(crumbsLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(faqLd) }}
       />
       <main className="max-w-4xl mx-auto px-6 py-16 md:py-24">
         <Link
@@ -195,6 +208,36 @@ export default async function CharacterPage({
           </div>
         </section>
 
+        <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-6">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+            Investment range
+          </p>
+          <ul className="text-sm text-zinc-300 space-y-2">
+            {BRAND_KIT_TIERS.map((tier) => (
+              <li
+                key={tier.slug}
+                className="flex justify-between gap-3 border-b border-zinc-900 last:border-b-0 pb-2 last:pb-0"
+              >
+                <span className="text-zinc-400">{tier.nameEn}</span>
+                <span className="tabular-nums">
+                  {formatUsd(tier.usd, tier.startingAt)}
+                  <span className="text-zinc-600 text-xs ml-1">/ quarter</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/en/character/brand-kits"
+            className="mt-4 inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white"
+          >
+            See full brand-kit breakdown <ArrowRight className="w-3 h-3" />
+          </Link>
+          <p className="mt-3 text-[11px] text-zinc-600 leading-relaxed">
+            Tiers cover paired campaigns with both characters. Solo campaigns
+            are quoted on a per-day license — request a custom quote via RFP.
+          </p>
+        </section>
+
         <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-12">
           <p className="text-xs uppercase tracking-wider text-zinc-500 mb-2">
             Licensing
@@ -222,6 +265,24 @@ export default async function CharacterPage({
               Pricing
             </Link>
           </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-sm uppercase tracking-wider text-zinc-500 mb-4">
+            FAQ
+          </h2>
+          <dl className="divide-y divide-zinc-900 border-y border-zinc-900">
+            {faqEntries.map((entry) => (
+              <div key={entry.question} className="py-4">
+                <dt className="text-sm font-semibold text-zinc-200">
+                  {entry.question}
+                </dt>
+                <dd className="mt-2 text-sm text-zinc-400 leading-relaxed">
+                  {entry.answer}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         {otherCharacters.length > 0 && (
