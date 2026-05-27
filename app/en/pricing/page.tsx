@@ -118,11 +118,17 @@ export default function EnPricingPage() {
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
           One day. One model. One license.
         </h1>
-        <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
+        <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-2xl mb-6">
           Prices below are illustrative USD. Final quotes account for exclusivity,
           territory, channel, and post-production. Quoted in under 24 hours;
           paid via Stripe or wire.
         </p>
+        <Link
+          href="/en/pricing-calculator"
+          className="mb-12 inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 text-sm font-medium hover:bg-emerald-500/20"
+        >
+          Cost estimator — 4 inputs, instant range →
+        </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
           <Tier

@@ -92,6 +92,18 @@ export default async function sitemap(
             },
           },
           {
+            url: `${SITE_URL}/en/pricing-calculator`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.8,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/pricing-calculator`,
+                ko: `${SITE_URL}/pricing-calculator`,
+              },
+            },
+          },
+          {
             url: `${SITE_URL}/en/about`,
             lastModified: now,
             changeFrequency: "monthly",
@@ -376,6 +388,18 @@ export default async function sitemap(
             lastModified: now,
             changeFrequency: "monthly",
             priority: 0.6,
+          },
+          {
+            url: `${SITE_URL}/pricing-calculator`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.8,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/pricing-calculator`,
+                en: `${SITE_URL}/en/pricing-calculator`,
+              },
+            },
           },
           {
             url: `${SITE_URL}/press`,
