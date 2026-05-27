@@ -1221,10 +1221,12 @@ export async function GET(
       { metric: "window_days", value: String(report.windowDays) },
       { metric: "total_inquiries", value: String(report.totalInquiries) },
       { metric: "total_delivered", value: String(report.totalDelivered) },
+      { metric: "total_revenue_krw", value: String(report.totalRevenue) },
       { metric: "unknown_campaign", value: String(report.unknown) },
       ...report.bySlug.flatMap((c) => [
         { metric: `slug_${c.slug}_inquiries`, value: String(c.inquiries) },
         { metric: `slug_${c.slug}_delivered`, value: String(c.delivered) },
+        { metric: `slug_${c.slug}_revenue_krw`, value: String(c.revenue) },
         { metric: `slug_${c.slug}_conversion_pct`, value: String(c.conversionPct) },
       ]),
     ];

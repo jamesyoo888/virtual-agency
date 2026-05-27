@@ -23,12 +23,16 @@ export interface CharacterAttributionRow {
   inquiries: number;
   delivered: number;
   conversionPct: number;
+  /** Sum of invoice_amount across all attributed rows (KRW base units). */
+  revenue: number;
 }
 
 export interface CharacterAttributionReport {
   windowDays: number;
   totalInquiries: number;
   totalDelivered: number;
+  /** Sum of invoice_amount across all character-attributed rows. */
+  totalRevenue: number;
   bySlug: CharacterAttributionRow[];
   /** Projects tagged utm_source=character but utm_campaign didn't parse. */
   unknown: number;
@@ -39,6 +43,7 @@ export interface CharacterAttributionReport {
 interface Row {
   status: string | null;
   utm_campaign: string | null;
+  invoice_amount?: number | null;
 }
 
 interface RowWithDate extends Row {
@@ -47,24 +52,38 @@ interface RowWithDate extends Row {
 
 export function summarizeCharacterAttribution(
   rows: Row[]
-): Pick<CharacterAttributionReport, "totalInquiries" | "totalDelivered" | "bySlug" | "unknown"> {
-  const bySlug = new Map<string, { inquiries: number; delivered: number }>();
+): Pick<
+  CharacterAttributionReport,
+  "totalInquiries" | "totalDelivered" | "totalRevenue" | "bySlug" | "unknown"
+> {
+  const bySlug = new Map<
+    string,
+    { inquiries: number; delivered: number; revenue: number }
+  >();
   let unknown = 0;
   let totalInquiries = 0;
   let totalDelivered = 0;
+  let totalRevenue = 0;
 
   for (const r of rows) {
     totalInquiries += 1;
-    if (r.status === "delivered") totalDelivered += 1;
+    const isDelivered = r.status === "delivered";
+    // Revenue only counts on delivered rows — inquiries that never closed
+    // shouldn't inflate the per-character ROI signal.
+    const revenue = isDelivered ? r.invoice_amount ?? 0 : 0;
+    if (isDelivered) totalDelivered += 1;
+    totalRevenue += revenue;
 
     const slug = parseSlugFromCampaign(r.utm_campaign);
     if (!slug) {
       unknown += 1;
       continue;
     }
-    const entry = bySlug.get(slug) ?? { inquiries: 0, delivered: 0 };
+    const entry =
+      bySlug.get(slug) ?? { inquiries: 0, delivered: 0, revenue: 0 };
     entry.inquiries += 1;
-    if (r.status === "delivered") entry.delivered += 1;
+    if (isDelivered) entry.delivered += 1;
+    entry.revenue += revenue;
     bySlug.set(slug, entry);
   }
 
@@ -73,12 +92,19 @@ export function summarizeCharacterAttribution(
       slug,
       inquiries: c.inquiries,
       delivered: c.delivered,
+      revenue: c.revenue,
       conversionPct:
         c.inquiries > 0 ? Math.round((c.delivered / c.inquiries) * 100) : 0,
     }))
     .sort((a, b) => b.inquiries - a.inquiries);
 
-  return { totalInquiries, totalDelivered, bySlug: ordered, unknown };
+  return {
+    totalInquiries,
+    totalDelivered,
+    totalRevenue,
+    bySlug: ordered,
+    unknown,
+  };
 }
 
 export function parseSlugFromCampaign(
@@ -99,6 +125,7 @@ export async function loadCharacterAttribution(
     windowDays,
     totalInquiries: 0,
     totalDelivered: 0,
+    totalRevenue: 0,
     bySlug: [],
     unknown: 0,
     daily: aggregateDaily([], windowDays),
@@ -109,7 +136,7 @@ export async function loadCharacterAttribution(
   const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabase
     .from("projects")
-    .select("status, utm_campaign, created_at")
+    .select("status, utm_campaign, created_at, invoice_amount")
     .eq("utm_source", "character")
     .gte("created_at", since)
     .limit(5000);

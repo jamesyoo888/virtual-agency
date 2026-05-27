@@ -292,7 +292,10 @@ export default async function AnalyticsPage({
             <div className="flex items-center gap-3 text-xs">
               <p className="text-zinc-500 tabular-nums">
                 utm_source=character · 총 {characterAttribution.totalInquiries}건 ·
-                납품 {characterAttribution.totalDelivered}건
+                납품 {characterAttribution.totalDelivered}건 ·{" "}
+                <span className="text-emerald-300">
+                  ₩{characterAttribution.totalRevenue.toLocaleString("ko-KR")}
+                </span>
                 {characterAttribution.unknown > 0 && (
                   <span className="ml-2 text-zinc-600">
                     · 미분류 {characterAttribution.unknown}
@@ -321,14 +324,14 @@ export default async function AnalyticsPage({
                   >
                     {c.slug}
                   </Link>
-                  <div className="col-span-7 h-2 rounded bg-zinc-900 overflow-hidden">
+                  <div className="col-span-6 h-2 rounded bg-zinc-900 overflow-hidden">
                     <div
                       className="h-full bg-violet-400"
                       style={{ width: `${widthPct}%` }}
                     />
                   </div>
-                  <span className="col-span-3 text-right text-xs text-zinc-400 tabular-nums">
-                    {c.inquiries} 문의 ·{" "}
+                  <span className="col-span-4 text-right text-xs text-zinc-400 tabular-nums">
+                    {c.inquiries} ·{" "}
                     <span
                       className={
                         c.conversionPct >= 30
@@ -338,6 +341,11 @@ export default async function AnalyticsPage({
                     >
                       {c.conversionPct}%
                     </span>
+                    {c.revenue > 0 && (
+                      <span className="ml-2 text-emerald-300">
+                        ₩{c.revenue.toLocaleString("ko-KR")}
+                      </span>
+                    )}
                   </span>
                 </li>
               );

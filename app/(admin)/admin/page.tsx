@@ -28,6 +28,7 @@ import {
   type ClientRetentionProjectRow,
 } from "@/lib/analytics/client-retention";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
+import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import AdminCopySummary from "@/components/admin-copy-summary";
 import DailyRevenueSparkline, {
   DailyCountSparkline,
@@ -47,6 +48,7 @@ import {
   Star,
   AlertTriangle,
   Timer,
+  Sparkles,
 } from "lucide-react";
 
 const STAGE_LABELS_KO: Record<string, string> = {
@@ -427,6 +429,7 @@ export default async function AdminHomePage() {
     clientAnalytics,
     stuck,
     velocity,
+    characterAttribution30d,
   ] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
@@ -442,6 +445,7 @@ export default async function AdminHomePage() {
     loadClientAnalytics(),
     loadStuckPipeline(),
     loadPipelineVelocity(90),
+    loadCharacterAttribution(30),
   ]);
   const wow = wowDaily.wow;
   const dailyRevenue = wowDaily.daily;
@@ -676,6 +680,7 @@ export default async function AdminHomePage() {
                   </p>
                   <Timer className="w-4 h-4 text-zinc-500" />
                 </div>
+                {/* (lead time number rendered just below) */}
                 <p
                   className={`mt-3 text-2xl font-bold tabular-nums ${
                     velocity.medianDays === null
@@ -701,6 +706,35 @@ export default async function AdminHomePage() {
           </section>
         );
       })()}
+
+      {characterAttribution30d.totalInquiries > 0 && (
+        <Link
+          href="/admin/analytics"
+          className="block rounded-xl border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 transition-colors p-5"
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-wider text-zinc-500">
+              캐릭터 페이지 → 문의 (30일)
+            </p>
+            <Sparkles className="w-4 h-4 text-violet-300" />
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums text-violet-100">
+            {characterAttribution30d.totalInquiries}
+            <span className="text-sm text-violet-300/60 ml-2">건</span>
+          </p>
+          <p className="mt-1 text-[11px] text-zinc-400 tabular-nums">
+            납품 {characterAttribution30d.totalDelivered} ·{" "}
+            {characterAttribution30d.totalRevenue > 0 ? (
+              <span className="text-emerald-300">
+                ₩{characterAttribution30d.totalRevenue.toLocaleString("ko-KR")}
+              </span>
+            ) : (
+              <span className="text-zinc-500">대기 중</span>
+            )}
+            {" "}· utm_source=character → /admin/analytics
+          </p>
+        </Link>
+      )}
 
       {mtd.mtdRevenue > 0 || mtd.priorMonthTotal > 0 ? (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
