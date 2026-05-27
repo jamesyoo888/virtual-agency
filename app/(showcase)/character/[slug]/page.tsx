@@ -24,6 +24,7 @@ import { BRAND_KIT_TIERS, formatKrw } from "@/lib/characters/brand-kits";
 import { characterFaqKo } from "@/lib/characters/faq";
 import { glossaryForCharacter } from "@/lib/characters/glossary-links";
 import { relatedPostsForIndustry } from "@/lib/blog/industry-map";
+import { listSeries } from "@/lib/blog/series";
 import { trackCharacterView } from "@/lib/analytics/track-character-view";
 
 const SITE_URL =
@@ -112,6 +113,7 @@ export default async function KrCharacterPage({
     ? relatedPostsForIndustry(primaryVertical, 3, "ko")
     : [];
   const glossaryTerms = glossaryForCharacter(character);
+  const characterSeries = listSeries("ko").find((s) => s.id === "character-ip");
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -347,6 +349,28 @@ export default async function KrCharacterPage({
                 </li>
               ))}
             </ul>
+          </section>
+        )}
+
+        {characterSeries && characterSeries.slugs.length > 0 && (
+          <section className="mb-12">
+            <Link
+              href={`/blog/series/${characterSeries.id}`}
+              className="block rounded-xl border border-violet-500/30 bg-violet-500/5 p-5 hover:border-violet-400/50 hover:bg-violet-500/10 transition-colors"
+            >
+              <p className="text-[10px] uppercase tracking-[0.3em] text-violet-300 mb-2">
+                블로그 시리즈 · {characterSeries.slugs.length}편
+              </p>
+              <p className="text-base font-semibold text-zinc-100">
+                {characterSeries.title}
+              </p>
+              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+                {characterSeries.description}
+              </p>
+              <p className="mt-3 text-xs text-violet-300 inline-flex items-center gap-1">
+                시리즈 전체 보기 <ArrowRight className="w-3 h-3" />
+              </p>
+            </Link>
           </section>
         )}
 

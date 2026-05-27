@@ -387,6 +387,7 @@ export default async function AdminInboxPage({ searchParams }: Props) {
           <span className="text-zinc-500 mr-1">출처:</span>
           {[{ value: "all", label: "전체" }, { value: "(direct)", label: "(direct)" }, ...sourceOptions.map((s) => ({ value: s, label: s }))].map((opt) => {
             const active = (source ?? "all") === opt.value;
+            const isCharacter = opt.value === "character";
             const params = new URLSearchParams();
             if (opt.value !== "all") params.set("source", opt.value);
             if (status && status !== "all") params.set("status", status);
@@ -394,16 +395,21 @@ export default async function AdminInboxPage({ searchParams }: Props) {
             if (sort) params.set("sort", sort);
             const qs = params.toString();
             const href = qs ? `/admin/inbox?${qs}` : "/admin/inbox";
+            const baseClass = active
+              ? isCharacter
+                ? "bg-violet-500/30 text-violet-100 border-violet-400"
+                : "bg-zinc-100 text-black border-zinc-100"
+              : isCharacter
+              ? "bg-transparent text-violet-300 border-violet-500/30 hover:border-violet-400 hover:text-violet-100"
+              : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white";
             return (
               <Link
                 key={opt.value}
                 href={href}
-                className={`px-2 py-1 rounded border transition-colors ${
-                  active
-                    ? "bg-zinc-100 text-black border-zinc-100"
-                    : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
-                }`}
+                className={`px-2 py-1 rounded border transition-colors inline-flex items-center gap-1 ${baseClass}`}
+                title={isCharacter ? "Character IP 페이지 경유 인콰이어 (utm_source=character)" : undefined}
               >
+                {isCharacter && <Sparkles className="w-3 h-3" />}
                 {opt.label}
               </Link>
             );

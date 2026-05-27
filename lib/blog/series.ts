@@ -86,8 +86,12 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "ko",
     title: "캐릭터 IP 시리즈",
     description:
-      "Yuna 와 Ren 을 자체 캐릭터로 만든 이유 — 결정·브리프·캐스팅 가이드.",
-    slugs: ["yuna-vs-ren-character-casting-guide-ko"],
+      "Yuna 와 Ren 을 자체 캐릭터로 만든 이유 — 결정·브리프·캐스팅·운영 가이드.",
+    slugs: [
+      "yuna-vs-ren-character-casting-guide-ko",
+      "paired-character-kits-vs-single-face-ko",
+      "owned-character-as-brand-moat-ko",
+    ],
   },
   {
     id: "compliance",
