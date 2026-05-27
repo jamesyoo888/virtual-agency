@@ -5,6 +5,7 @@ import { BarChart3, TrendingUp } from "lucide-react";
 import { INDUSTRY_LABELS } from "@/lib/tags";
 import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
 import { loadCharacterViews } from "@/lib/analytics/character-views";
+import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics — Virtual Agency" };
@@ -152,15 +153,20 @@ export default async function AnalyticsPage({
 }) {
   const sp = await searchParams;
   const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
-  const [a, characterViews] = await Promise.all([
+  const [a, characterViews, characterAttribution] = await Promise.all([
     loadAnalytics(windowDays),
     loadCharacterViews(windowDays),
+    loadCharacterAttribution(windowDays),
   ]);
   const maxModelInquiries = Math.max(1, ...a.topModels.map((m) => m.inquiries));
   const maxIndustry = Math.max(1, ...a.byIndustry.map((i) => i.inquiries));
   const maxCharacterViews = Math.max(
     1,
     ...characterViews.bySlug.map((c) => c.total)
+  );
+  const maxCharacterInquiries = Math.max(
+    1,
+    ...characterAttribution.bySlug.map((c) => c.inquiries)
   );
 
   return (
@@ -247,6 +253,64 @@ export default async function AnalyticsPage({
               })}
             </ul>
           )}
+        </section>
+      )}
+
+      {characterAttribution.totalInquiries > 0 && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              캐릭터 페이지 → 문의 ({windowDays}일)
+            </h2>
+            <p className="text-xs text-zinc-500 tabular-nums">
+              utm_source=character · 총 {characterAttribution.totalInquiries}건 ·
+              납품 {characterAttribution.totalDelivered}건
+              {characterAttribution.unknown > 0 && (
+                <span className="ml-2 text-zinc-600">
+                  · 미분류 {characterAttribution.unknown}
+                </span>
+              )}
+            </p>
+          </div>
+          <ul className="space-y-2">
+            {characterAttribution.bySlug.map((c) => {
+              const widthPct = (c.inquiries / maxCharacterInquiries) * 100;
+              return (
+                <li
+                  key={c.slug}
+                  className="grid grid-cols-12 gap-3 items-center text-sm"
+                >
+                  <Link
+                    href={`/character/${c.slug}`}
+                    className="col-span-2 text-zinc-300 hover:text-white capitalize"
+                  >
+                    {c.slug}
+                  </Link>
+                  <div className="col-span-7 h-2 rounded bg-zinc-900 overflow-hidden">
+                    <div
+                      className="h-full bg-violet-400"
+                      style={{ width: `${widthPct}%` }}
+                    />
+                  </div>
+                  <span className="col-span-3 text-right text-xs text-zinc-400 tabular-nums">
+                    {c.inquiries} 문의 ·{" "}
+                    <span
+                      className={
+                        c.conversionPct >= 30
+                          ? "text-emerald-400"
+                          : "text-zinc-500"
+                      }
+                    >
+                      {c.conversionPct}%
+                    </span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-3 text-[11px] text-zinc-600">
+            캐릭터 디테일 페이지 CTA 가 utm_source=character 로 attribut. 분기별 캐릭터 ROI 판단에 사용.
+          </p>
         </section>
       )}
 

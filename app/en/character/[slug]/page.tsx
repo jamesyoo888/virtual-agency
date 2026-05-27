@@ -18,6 +18,7 @@ import {
 } from "@/lib/seo/json-ld";
 import { BRAND_KIT_TIERS, formatUsd } from "@/lib/characters/brand-kits";
 import { characterFaqEn } from "@/lib/characters/faq";
+import { glossaryForCharacter } from "@/lib/characters/glossary-links";
 import { relatedPostsForIndustry } from "@/lib/blog/industry-map";
 import { trackCharacterView } from "@/lib/analytics/track-character-view";
 
@@ -91,6 +92,7 @@ export default async function CharacterPage({
   const relatedPosts = primaryVertical
     ? relatedPostsForIndustry(primaryVertical, 3, "en")
     : [];
+  const glossaryTerms = glossaryForCharacter(character);
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
@@ -268,13 +270,13 @@ export default async function CharacterPage({
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link
-              href={`/en/rfp?campaign=${encodeURIComponent(character.name + " campaign")}&exclusive=true`}
+              href={`/en/rfp?campaign=${encodeURIComponent(character.name + " campaign")}&exclusive=true&utm_source=character&utm_campaign=character_${character.slug}`}
               className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
             >
               Submit an RFP <ArrowRight className="w-3 h-3" />
             </Link>
             <Link
-              href={`/en/match?industries=${character.targetVerticals[0] ?? ""}&moods=${character.defaultMoods[0] ?? ""}`}
+              href={`/en/match?industries=${character.targetVerticals[0] ?? ""}&moods=${character.defaultMoods[0] ?? ""}&utm_source=character&utm_campaign=character_${character.slug}`}
               className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
             >
               Match similar models
@@ -287,6 +289,34 @@ export default async function CharacterPage({
             </Link>
           </div>
         </section>
+
+        {glossaryTerms.length > 0 && (
+          <section className="mb-12 rounded-xl border border-zinc-900 bg-zinc-950/40 p-6">
+            <div className="flex items-baseline justify-between gap-4 mb-3">
+              <h2 className="text-sm uppercase tracking-wider text-zinc-500">
+                Vocabulary on this page
+              </h2>
+              <Link
+                href="/en/glossary"
+                className="text-xs text-zinc-500 hover:text-zinc-300"
+              >
+                Full glossary →
+              </Link>
+            </div>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              {glossaryTerms.map((t) => (
+                <li key={t.slug}>
+                  <Link
+                    href={`/en/glossary#${t.slug}`}
+                    className="block rounded-md border border-zinc-900 bg-black/40 px-3 py-2 hover:border-zinc-700"
+                  >
+                    <span className="text-zinc-200">{t.en.term}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {relatedPosts.length > 0 && (
           <section className="mb-12">

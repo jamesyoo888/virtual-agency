@@ -10,9 +10,26 @@
  * the blog.
  */
 
+/**
+ * Coarse buckets for navigation grouping on the glossary page.
+ * - visual: things you see in the frame (K-aesthetic, glass-skin, styling-dna)
+ * - commercial: license mechanics buyers negotiate (brand-kit, exclusivity)
+ * - compliance: regulator-facing artifacts (disclosure metadata, AI disclosure)
+ * - workflow: how the campaign moves through the pipeline (RFP, concept sheet)
+ * - product: platform features (matching engine, Person JSON-LD)
+ */
+export type GlossaryCategory =
+  | "visual"
+  | "commercial"
+  | "compliance"
+  | "workflow"
+  | "product";
+
 export interface GlossaryTerm {
   /** URL slug — used by anchor links and JSON-LD identifier. */
   slug: string;
+  /** Thematic bucket for nav grouping + page rendering. */
+  category: GlossaryCategory;
   ko: { term: string; definition: string };
   en: { term: string; definition: string };
   /** Cross-link to a blog post that goes deep on the term. */
@@ -22,6 +39,7 @@ export interface GlossaryTerm {
 export const GLOSSARY_TERMS: GlossaryTerm[] = [
   {
     slug: "k-aesthetic",
+    category: "visual",
     ko: {
       term: "K-aesthetic",
       definition:
@@ -36,6 +54,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "glass-skin",
+    category: "visual",
     ko: {
       term: "글래스 스킨 (Glass skin)",
       definition:
@@ -50,6 +69,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "synthetic-talent",
+    category: "visual",
     ko: {
       term: "Synthetic talent (합성 모델)",
       definition:
@@ -64,6 +84,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "brand-kit",
+    category: "commercial",
     ko: {
       term: "브랜드 키트 (Brand kit)",
       definition:
@@ -77,6 +98,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "category-exclusivity",
+    category: "commercial",
     ko: {
       term: "카테고리 독점 (Category exclusivity)",
       definition:
@@ -90,6 +112,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "disclosure-metadata",
+    category: "compliance",
     ko: {
       term: "Disclosure 메타데이터",
       definition:
@@ -104,6 +127,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "styling-dna",
+    category: "visual",
     ko: {
       term: "Styling DNA",
       definition:
@@ -118,6 +142,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "concept-sheet",
+    category: "workflow",
     ko: {
       term: "컨셉 시트 (Concept sheet)",
       definition:
@@ -131,6 +156,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "lookbook",
+    category: "workflow",
     ko: {
       term: "Lookbook",
       definition:
@@ -144,6 +170,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "rfp",
+    category: "workflow",
     ko: {
       term: "RFP (Request for Proposal)",
       definition:
@@ -158,6 +185,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "ai-disclosure",
+    category: "compliance",
     ko: {
       term: "AI 표기 (AI disclosure)",
       definition:
@@ -171,6 +199,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "exclusive-campaign",
+    category: "commercial",
     ko: {
       term: "독점 캠페인 (Exclusive campaign)",
       definition:
@@ -184,6 +213,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "person-jsonld",
+    category: "product",
     ko: {
       term: "Person JSON-LD",
       definition:
@@ -197,6 +227,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     slug: "matching-engine",
+    category: "product",
     ko: {
       term: "AI 매칭 엔진",
       definition:
@@ -212,4 +243,32 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
 
 export function getTerm(slug: string): GlossaryTerm | undefined {
   return GLOSSARY_TERMS.find((t) => t.slug === slug);
+}
+
+export const GLOSSARY_CATEGORY_ORDER: GlossaryCategory[] = [
+  "visual",
+  "commercial",
+  "compliance",
+  "workflow",
+  "product",
+];
+
+export const GLOSSARY_CATEGORY_LABELS: Record<
+  GlossaryCategory,
+  { ko: string; en: string }
+> = {
+  visual: { ko: "비주얼", en: "Visual" },
+  commercial: { ko: "라이선스", en: "Commercial" },
+  compliance: { ko: "컴플라이언스", en: "Compliance" },
+  workflow: { ko: "워크플로", en: "Workflow" },
+  product: { ko: "플랫폼", en: "Product" },
+};
+
+export function groupByCategory(
+  terms: GlossaryTerm[] = GLOSSARY_TERMS
+): Array<{ category: GlossaryCategory; entries: GlossaryTerm[] }> {
+  return GLOSSARY_CATEGORY_ORDER.map((category) => ({
+    category,
+    entries: terms.filter((t) => t.category === category),
+  })).filter((g) => g.entries.length > 0);
 }

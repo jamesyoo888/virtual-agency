@@ -229,6 +229,31 @@ export default function EnCharacterLaunchPress() {
           </div>
         </section>
 
+        <section className="mt-8 rounded-xl border border-zinc-900 bg-zinc-950/40 p-5">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+            Vocabulary reference
+          </p>
+          <ul className="flex flex-wrap gap-1.5 text-sm">
+            {[
+              { slug: "synthetic-talent", label: "Synthetic talent" },
+              { slug: "k-aesthetic", label: "K-aesthetic" },
+              { slug: "styling-dna", label: "Styling DNA" },
+              { slug: "brand-kit", label: "Brand kit" },
+              { slug: "category-exclusivity", label: "Category exclusivity" },
+              { slug: "disclosure-metadata", label: "Disclosure metadata" },
+            ].map((entry) => (
+              <li key={entry.slug}>
+                <Link
+                  href={`/en/glossary#${entry.slug}`}
+                  className="inline-flex items-center px-2 py-0.5 rounded-md border border-zinc-800 text-zinc-300 hover:border-zinc-600 hover:text-white"
+                >
+                  {entry.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <p className="mt-12 text-[11px] text-zinc-600 leading-relaxed">
           ###
           <br />

@@ -119,6 +119,8 @@ export async function GET(request: Request) {
   const isCharacters = searchParams.get("characters") === "1";
   const isEnCharacterCompare = searchParams.get("en_character_compare") === "1";
   const isCharacterCompare = searchParams.get("character_compare") === "1";
+  const isGlossary = searchParams.get("glossary") === "1";
+  const isEnGlossary = searchParams.get("en_glossary") === "1";
 
   if (isEnHome) {
     return bigCard(
@@ -240,6 +242,13 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · COMPARE",
       "Yuna vs Ren — pick your face",
       "Persona, lighting, palette, target verticals side by side. The reference for deciding between solo casting and a paired brand kit."
+    );
+  }
+  if (isEnGlossary) {
+    return bigCard(
+      "VIRTUAL AGENCY · GLOSSARY",
+      "K-aesthetic & synthetic talent — 14 terms",
+      "Glass skin, styling DNA, brand kit, disclosure metadata, category exclusivity. The vocabulary that buyers and compliance reviewers actually use."
     );
   }
 
@@ -378,6 +387,13 @@ export async function GET(request: Request) {
       "VIRTUAL AGENCY · 비교",
       "유나 vs 렌 — 한 화면에서 결정",
       "페르소나·라이팅·팔레트·산업 적합도 9 항목 비교. 솔로 캐스팅과 페어 브랜드 키트 사이의 결정 가이드."
+    );
+  }
+  if (isGlossary) {
+    return bigCard(
+      "VIRTUAL AGENCY · 용어집",
+      "K-aesthetic · 합성 모델 14 용어",
+      "글래스 스킨, 스타일링 DNA, 브랜드 키트, 디스클로저 메타데이터, 카테고리 독점. 브리프·견적·컴플라이언스 검토 시 필요한 어휘."
     );
   }
   if (isAbout) {
