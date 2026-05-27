@@ -231,6 +231,19 @@ export default async function KrCharacterPage({
           </div>
         </section>
 
+        <section className="mb-6 rounded-xl border border-zinc-800 p-6 bg-zinc-950/40">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+            납품 형태
+          </p>
+          <ul className="text-sm text-zinc-300 space-y-2 leading-relaxed">
+            <li>· <span className="text-zinc-400">파일 형식:</span> RAW 16-bit TIFF + 압축 JPG. PSD layered (보정 가능 상태).</li>
+            <li>· <span className="text-zinc-400">해상도:</span> PDP 3000×4000 / OOH 6000×9000 / 9:16 reels 1080×1920.</li>
+            <li>· <span className="text-zinc-400">컷 수:</span> 1차 컨셉 시트 (24h) → 풀 셋 5컷 (3–5일) → 추가 시 컷당 견적.</li>
+            <li>· <span className="text-zinc-400">리비전:</span> 컷별 2회 무료 — 컬러·크롭·소품. 컨셉 변경은 새 라운드.</li>
+            <li>· <span className="text-zinc-400">합성 표기:</span> EU AI Act / FTC / ASA / 방심위 4개 시장 메타데이터 모든 파일에 동봉.</li>
+          </ul>
+        </section>
+
         <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-6">
           <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
             예상 투자 규모

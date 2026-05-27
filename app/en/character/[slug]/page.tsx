@@ -208,6 +208,19 @@ export default async function CharacterPage({
           </div>
         </section>
 
+        <section className="mb-6 rounded-xl border border-zinc-800 p-6 bg-zinc-950/40">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
+            How it ships
+          </p>
+          <ul className="text-sm text-zinc-300 space-y-2 leading-relaxed">
+            <li>· <span className="text-zinc-400">File formats:</span> 16-bit TIFF + compressed JPG. Layered PSD on request (retouch-ready).</li>
+            <li>· <span className="text-zinc-400">Resolution:</span> PDP 3000×4000 · OOH 6000×9000 · 9:16 reels 1080×1920.</li>
+            <li>· <span className="text-zinc-400">Volume:</span> Concept sheet within 24h → full 5-shot set in 3–5 days → additional shots quoted per cut.</li>
+            <li>· <span className="text-zinc-400">Revisions:</span> 2 free per shot — color, crop, props. Concept changes start a new round.</li>
+            <li>· <span className="text-zinc-400">Disclosure:</span> EU AI Act / FTC / ASA / Korea KCSC metadata shipped with every file.</li>
+          </ul>
+        </section>
+
         <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-6">
           <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">
             Investment range
