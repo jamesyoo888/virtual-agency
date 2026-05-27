@@ -26,13 +26,13 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/character`,
     locale: "ko_KR",
     type: "website",
-    images: [`${SITE_URL}/api/og?en=1`],
+    images: [`${SITE_URL}/api/og?characters=1`],
   },
   twitter: {
     card: "summary_large_image",
     title: "캐릭터 — Virtual Agency",
     description: "Virtual Agency 소유 K-aesthetic 캐릭터 로스터.",
-    images: [`${SITE_URL}/api/og?en=1`],
+    images: [`${SITE_URL}/api/og?characters=1`],
   },
 };
 

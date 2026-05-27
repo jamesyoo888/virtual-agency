@@ -26,13 +26,13 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/character/brand-kits`,
     locale: "ko_KR",
     type: "website",
-    images: [`${SITE_URL}/api/og?en=1`],
+    images: [`${SITE_URL}/api/og?character_brand_kits=1`],
   },
   twitter: {
     card: "summary_large_image",
     title: "캐릭터 브랜드 키트 — 페어·시리즈 캐스팅",
     description: "유나 + 렌을 묶은 멀티 페이스 캠페인 패키지.",
-    images: [`${SITE_URL}/api/og?en=1`],
+    images: [`${SITE_URL}/api/og?character_brand_kits=1`],
   },
 };
 

@@ -21,14 +21,14 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/en/character`,
     locale: "en_US",
     type: "website",
-    images: [`${SITE_URL}/api/og?en=1`],
+    images: [`${SITE_URL}/api/og?en_characters=1`],
   },
   twitter: {
     card: "summary_large_image",
     title: "Characters — Virtual Agency",
     description:
       "Owned K-aesthetic synthetic talent — Yuna, Ren, and the character roster.",
-    images: [`${SITE_URL}/api/og?en=1`],
+    images: [`${SITE_URL}/api/og?en_characters=1`],
   },
 };
 

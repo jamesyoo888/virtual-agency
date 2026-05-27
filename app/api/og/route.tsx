@@ -112,6 +112,11 @@ export async function GET(request: Request) {
   const isEnPress = searchParams.get("en_press") === "1";
   const enBlogTag = searchParams.get("en_blog_tag");
   const enCharacter = searchParams.get("en_character");
+  const enCharacterBrandKits = searchParams.get("en_character_brand_kits") === "1";
+  const character = searchParams.get("character");
+  const characterBrandKits = searchParams.get("character_brand_kits") === "1";
+  const isEnCharacters = searchParams.get("en_characters") === "1";
+  const isCharacters = searchParams.get("characters") === "1";
 
   if (isEnHome) {
     return bigCard(
@@ -213,6 +218,20 @@ export async function GET(request: Request) {
         `${c.tagline} · Built for ${c.targetVerticals.slice(0, 3).join(", ")}.`
       );
     }
+  }
+  if (enCharacterBrandKits) {
+    return bigCard(
+      "VIRTUAL AGENCY · BRAND KITS",
+      "Cast the pair, license the season",
+      "Yuna + Ren — paired K-aesthetic brand kits at $8.5K · $22K · $50K+ per quarter. Category exclusivity available."
+    );
+  }
+  if (isEnCharacters) {
+    return bigCard(
+      "VIRTUAL AGENCY · CHARACTERS",
+      "Owned K-aesthetic talent",
+      "Yuna and Ren — synthetic K-aesthetic faces designed to anchor brand campaigns across markets."
+    );
   }
 
   // Static-card surfaces first — these never need a DB read.
@@ -319,6 +338,30 @@ export async function GET(request: Request) {
       eyebrow,
       "이번 주 광고주가 가장 많이 둘러본 모델",
       "30일 페이지 뷰 기준 카탈로그 모멘텀 상위 12명. 실시간 동향 그대로 노출."
+    );
+  }
+  if (character) {
+    const c = getCharacter(character);
+    if (c) {
+      return bigCard(
+        "VIRTUAL AGENCY · 캐릭터",
+        c.name,
+        `${c.tagline} · ${c.targetVerticals.slice(0, 3).join("·")} 산업 라이선스.`
+      );
+    }
+  }
+  if (characterBrandKits) {
+    return bigCard(
+      "VIRTUAL AGENCY · 브랜드 키트",
+      "캐스트를 묶어서 라이선스",
+      "유나 + 렌 페어 브랜드 키트 ₩11M · ₩28.5M · ₩65M부터 / 분기. 카테고리 독점 옵션."
+    );
+  }
+  if (isCharacters) {
+    return bigCard(
+      "VIRTUAL AGENCY · 캐릭터",
+      "자체 K-aesthetic 캐스트",
+      "유나·렌 — 시즌과 시장을 가로질러 같은 얼굴로 일관된 브랜드 아이덴티티를 구축할 수 있는 합성 모델."
     );
   }
   if (isAbout) {
