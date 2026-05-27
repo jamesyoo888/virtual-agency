@@ -1,10 +1,13 @@
 import Link from "next/link";
-import { TrendingUp, AlertCircle, Gauge } from "lucide-react";
+import { TrendingUp, AlertCircle, Gauge, Sparkles } from "lucide-react";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { loadForecast } from "@/lib/analytics/forecast";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import { loadSlowOpenProjects } from "@/lib/analytics/slow-open-projects";
+import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { getCharacter } from "@/lib/characters/registry";
+import { getKitTier } from "@/lib/characters/brand-kits";
 
 export const dynamic = "force-dynamic";
 
@@ -20,11 +23,12 @@ const STAGE_LABEL: Record<string, string> = {
 };
 
 export default async function ForecastPage() {
-  const [r, velocity, stageTiming, slowOpen] = await Promise.all([
+  const [r, velocity, stageTiming, slowOpen, charAttr] = await Promise.all([
     loadForecast(),
     loadPipelineVelocity(90),
     loadStageTiming(90),
     loadSlowOpenProjects(5),
+    loadCharacterAttribution(90),
   ]);
 
   return (
@@ -520,6 +524,140 @@ export default async function ForecastPage() {
                   );
                 })}
               </ul>
+            </section>
+          )}
+
+          {(charAttr.bySlug.length > 0 || charAttr.byTier.length > 0) && (
+            <section className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-5 mb-8">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-xs uppercase tracking-wider text-violet-300 flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Character IP 기여 (90일 attribution)
+                </h2>
+                <a
+                  href="/api/admin/exports/character-attribution?window=90"
+                  download
+                  className="text-[10px] px-2 py-0.5 rounded-md border border-violet-500/30 text-violet-200 hover:border-violet-400 hover:text-white"
+                >
+                  CSV
+                </a>
+              </div>
+              <p className="text-[11px] text-zinc-400 mb-3">
+                /character/[slug] CTA 경유 인콰이어(utm_source=character). 다음 90일 예상 = 현재 run-rate 유지 가정 — 신규 캠페인이나 시즌 효과가 있으면 보정 필요.
+              </p>
+              {charAttr.bySlug.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+                    캐릭터별
+                  </p>
+                  <ul className="space-y-2 text-sm">
+                    {charAttr.bySlug.map((c) => {
+                      const character = getCharacter(c.slug);
+                      const label = character?.name ?? c.slug;
+                      const sharePct =
+                        charAttr.totalRevenue > 0
+                          ? (c.revenue / charAttr.totalRevenue) * 100
+                          : 0;
+                      return (
+                        <li
+                          key={c.slug}
+                          className="flex items-center gap-3 text-sm"
+                        >
+                          <Link
+                            href={`/character/${c.slug}`}
+                            className="w-24 shrink-0 text-violet-200 hover:text-white"
+                          >
+                            {label}
+                          </Link>
+                          <span className="text-zinc-500 tabular-nums shrink-0 w-14 text-right">
+                            {c.delivered}/{c.inquiries}
+                          </span>
+                          <span
+                            className={`tabular-nums shrink-0 w-12 text-right ${
+                              c.conversionPct >= 30
+                                ? "text-emerald-300"
+                                : c.conversionPct >= 15
+                                ? "text-zinc-300"
+                                : "text-rose-300"
+                            }`}
+                            title="conversion (delivered / inquiries)"
+                          >
+                            {c.conversionPct}%
+                          </span>
+                          <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                            <div
+                              className="h-full bg-violet-500"
+                              style={{ width: `${sharePct}%` }}
+                            />
+                          </div>
+                          <span className="tabular-nums text-zinc-200 shrink-0 w-28 text-right">
+                            ₩{KRW.format(c.revenue)}
+                          </span>
+                          <span className="tabular-nums text-violet-300 shrink-0 w-28 text-right" title="다음 90일 예상 (run-rate)">
+                            ₩{KRW.format(c.revenue)}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+              {charAttr.byTier.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+                    Brand-kit 티어별
+                  </p>
+                  <ul className="space-y-2 text-sm">
+                    {charAttr.byTier.map((t) => {
+                      const tier = getKitTier(
+                        t.tier as "paired" | "season" | "custom"
+                      );
+                      const label = tier?.nameEn ?? t.tier;
+                      const sharePct =
+                        charAttr.totalRevenue > 0
+                          ? (t.revenue / charAttr.totalRevenue) * 100
+                          : 0;
+                      return (
+                        <li
+                          key={t.tier}
+                          className="flex items-center gap-3 text-sm"
+                        >
+                          <span className="w-32 shrink-0 text-amber-200">
+                            {label}
+                          </span>
+                          <span className="text-zinc-500 tabular-nums shrink-0 w-14 text-right">
+                            {t.delivered}/{t.inquiries}
+                          </span>
+                          <span
+                            className={`tabular-nums shrink-0 w-12 text-right ${
+                              t.conversionPct >= 30
+                                ? "text-emerald-300"
+                                : "text-zinc-300"
+                            }`}
+                          >
+                            {t.conversionPct}%
+                          </span>
+                          <div className="flex-1 h-1.5 rounded bg-zinc-800 overflow-hidden">
+                            <div
+                              className="h-full bg-amber-500"
+                              style={{ width: `${sharePct}%` }}
+                            />
+                          </div>
+                          <span className="tabular-nums text-zinc-200 shrink-0 w-28 text-right">
+                            ₩{KRW.format(t.revenue)}
+                          </span>
+                          <span className="tabular-nums text-amber-300 shrink-0 w-28 text-right" title="다음 90일 예상 (run-rate)">
+                            ₩{KRW.format(t.revenue)}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+              <p className="mt-3 text-[11px] text-zinc-500">
+                Total 90일: 인콰이어 {charAttr.totalInquiries}건 · 납품 {charAttr.totalDelivered}건 · 매출 ₩{KRW.format(charAttr.totalRevenue)}{charAttr.unknown > 0 && ` · 미분류 ${charAttr.unknown}건`}
+              </p>
             </section>
           )}
 

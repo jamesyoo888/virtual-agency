@@ -5,13 +5,14 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
 import ModelCard from "@/components/model-card";
-import { TrendingUp, ArrowRight } from "lucide-react";
+import { TrendingUp, ArrowRight, Sparkles } from "lucide-react";
 import {
   INDUSTRY_LABELS,
   INDUSTRY_OPTIONS,
   MOOD_LABELS,
   MOOD_OPTIONS,
 } from "@/lib/tags";
+import { listCharacters, getCharacter } from "@/lib/characters/registry";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -47,8 +48,15 @@ type PopularRow = Model & {
 async function loadTrending(
   limit: number,
   industry: string | null,
-  mood: string | null
+  mood: string | null,
+  characterSlug: string | null
 ): Promise<PopularRow[]> {
+  const character = characterSlug ? getCharacter(characterSlug) : undefined;
+  // Character filter expands to "any model whose industry tags overlap with
+  // the character's targetVerticals". We do this in-memory after fetching a
+  // wider result set so we keep the popularity ordering intact.
+  const characterVerticals = character?.targetVerticals ?? null;
+
   if (!SUPABASE_CONFIGURED) {
     return (devModelStore.list() as Model[])
       .filter((m) => {
@@ -56,15 +64,22 @@ async function loadTrending(
         if (industry && !(m.industry_tags ?? []).includes(industry as never))
           return false;
         if (mood && !(m.mood_tags ?? []).includes(mood as never)) return false;
+        if (
+          characterVerticals &&
+          !(m.industry_tags ?? []).some((t) =>
+            characterVerticals.includes(t as string)
+          )
+        )
+          return false;
         return true;
       })
       .slice(0, limit)
       .map((m) => ({ ...m, view_count_30d: 0, popularity_score: 0 }));
   }
   const supabase = await createClient();
-  // models_with_popularity is the existing view (migration 006) that blends
-  // follower_count + 30d views. We want raw view momentum here, so we sort
-  // by view_count_30d directly. Models with zero views fall off the page.
+  // Fetch wider when a character filter is on so the in-memory overlap pass
+  // still has enough rows to fill `limit` after filtering.
+  const fetchLimit = characterVerticals ? Math.max(limit * 5, 60) : limit;
   let query = supabase
     .from("models_with_popularity")
     .select("*")
@@ -73,27 +88,43 @@ async function loadTrending(
     .gt("view_count_30d", 0);
   if (industry) query = query.contains("industry_tags", [industry]);
   if (mood) query = query.contains("mood_tags", [mood]);
-  const { data } = await query.limit(limit);
-  return (data as PopularRow[]) ?? [];
+  const { data } = await query.limit(fetchLimit);
+  let rows = (data as PopularRow[]) ?? [];
+  if (characterVerticals) {
+    rows = rows.filter((m) =>
+      (m.industry_tags ?? []).some((t) =>
+        characterVerticals.includes(t as string)
+      )
+    );
+  }
+  return rows.slice(0, limit);
 }
 
 export default async function TrendingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ industry?: string; mood?: string }>;
+  searchParams: Promise<{ industry?: string; mood?: string; character?: string }>;
 }) {
   const sp = await searchParams;
   const industry =
     sp.industry && INDUSTRY_LABELS[sp.industry] ? sp.industry : null;
   const mood = sp.mood && MOOD_LABELS[sp.mood] ? sp.mood : null;
-  const models = await loadTrending(12, industry, mood);
+  const characterSlug = sp.character && getCharacter(sp.character) ? sp.character : null;
+  const activeCharacter = characterSlug ? getCharacter(characterSlug) : undefined;
+  const models = await loadTrending(12, industry, mood, characterSlug);
 
-  const buildHref = (next: { industry?: string | null; mood?: string | null }) => {
+  const buildHref = (next: {
+    industry?: string | null;
+    mood?: string | null;
+    character?: string | null;
+  }) => {
     const params = new URLSearchParams();
     const nextIndustry = "industry" in next ? next.industry : industry;
     const nextMood = "mood" in next ? next.mood : mood;
+    const nextCharacter = "character" in next ? next.character : characterSlug;
     if (nextIndustry) params.set("industry", nextIndustry);
     if (nextMood) params.set("mood", nextMood);
+    if (nextCharacter) params.set("character", nextCharacter);
     const qs = params.toString();
     return qs ? `/trending?${qs}` : "/trending";
   };
@@ -194,6 +225,41 @@ export default async function TrendingPage({
             </Link>
           ))}
         </div>
+        <div className="flex flex-wrap items-center gap-2 text-xs mt-3">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 mr-2 inline-flex items-center gap-1">
+            <Sparkles className="w-3 h-3" />
+            캐릭터 추천
+          </span>
+          <Link
+            href={buildHref({ character: null })}
+            className={`px-2.5 py-1 rounded-full border ${
+              !characterSlug
+                ? "border-violet-400/50 text-violet-300 bg-violet-500/10"
+                : "border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600"
+            }`}
+          >
+            전체
+          </Link>
+          {listCharacters().map((c) => (
+            <Link
+              key={c.slug}
+              href={buildHref({ character: c.slug })}
+              className={`px-2.5 py-1 rounded-full border ${
+                characterSlug === c.slug
+                  ? "border-violet-400/50 text-violet-300 bg-violet-500/10"
+                  : "border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600"
+              }`}
+              title={c.targetVerticals.join(" · ")}
+            >
+              {c.name} 추천
+            </Link>
+          ))}
+        </div>
+        {activeCharacter && (
+          <p className="mt-3 text-[11px] text-violet-300/80 leading-relaxed">
+            {activeCharacter.name} 스타일에 어울리는 industry 태그({activeCharacter.targetVerticals.join(", ")}) 매칭 모델만 보이는 중. 매칭 강도가 약하면 다른 캐릭터로 바꿔보세요.
+          </p>
+        )}
       </section>
 
       <section className="px-5 md:px-8 py-12">

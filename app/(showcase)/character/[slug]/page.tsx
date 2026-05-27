@@ -272,12 +272,20 @@ export default async function KrCharacterPage({
               </li>
             ))}
           </ul>
-          <Link
-            href="/character/brand-kits"
-            className="mt-4 inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white"
-          >
-            전체 키트 구성 보기 <ArrowRight className="w-3 h-3" />
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/character/brand-kits"
+              className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white"
+            >
+              전체 키트 구성 보기 <ArrowRight className="w-3 h-3" />
+            </Link>
+            <Link
+              href={`/character/${character.slug}/lookbook`}
+              className="inline-flex items-center gap-1 text-xs text-violet-300 hover:text-violet-100"
+            >
+              {character.name} 분기 룩북 구조 <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
           <p className="mt-3 text-[11px] text-zinc-600 leading-relaxed">
             티어별 산출물·독점성 차이는 브랜드 키트 페이지에서 확인하세요.
             솔로 캠페인은 일별 라이선스로 별도 견적합니다.

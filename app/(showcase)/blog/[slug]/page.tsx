@@ -6,7 +6,8 @@ import {
   listRelatedPosts,
   tagSlug,
 } from "@/lib/blog/posts";
-import { ArrowLeft } from "lucide-react";
+import { getSeriesForPost } from "@/lib/blog/series";
+import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import { blogPostingLd, breadcrumbLd, howToLd, ldScript } from "@/lib/seo/json-ld";
 
 const SITE_URL =
@@ -57,6 +58,9 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   const related = listRelatedPosts(post.slug, 3);
+  const seriesPos = getSeriesForPost(post.slug, "ko");
+  const prevPost = seriesPos?.prevSlug ? getPostBySlug(seriesPos.prevSlug, "ko") : null;
+  const nextPost = seriesPos?.nextSlug ? getPostBySlug(seriesPos.nextSlug, "ko") : null;
 
   const articleLd = blogPostingLd({
     title: post.title,
@@ -135,6 +139,21 @@ export default async function BlogPostPage({
           </p>
         </header>
 
+        {seriesPos && (
+          <div className="mb-10 rounded-lg border border-violet-500/30 bg-violet-500/5 px-4 py-3">
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-violet-300">
+              <BookOpen className="w-3.5 h-3.5" />
+              {seriesPos.series.title}
+              <span className="ml-auto text-violet-200/80 tabular-nums">
+                Part {seriesPos.part} / {seriesPos.total}
+              </span>
+            </div>
+            <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+              {seriesPos.series.description}
+            </p>
+          </div>
+        )}
+
         <div className="space-y-10 prose-invert">
           {post.sections.map((section, idx) => (
             <section
@@ -176,6 +195,45 @@ export default async function BlogPostPage({
               </Link>
             </div>
           </div>
+
+          {seriesPos && (prevPost || nextPost) && (
+            <section className="mt-12">
+              <h3 className="text-xs uppercase tracking-wider text-violet-300 mb-4 inline-flex items-center gap-2">
+                <BookOpen className="w-3.5 h-3.5" />
+                시리즈 다음 글
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {prevPost && (
+                  <Link
+                    href={`/blog/${prevPost.slug}`}
+                    className="rounded-lg border border-zinc-800 hover:border-violet-500/40 hover:bg-violet-500/5 p-4 transition-colors"
+                  >
+                    <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1 inline-flex items-center gap-1">
+                      <ArrowLeft className="w-3 h-3" />
+                      이전 (Part {seriesPos.part - 1})
+                    </p>
+                    <p className="text-sm font-medium text-zinc-200">
+                      {prevPost.title}
+                    </p>
+                  </Link>
+                )}
+                {nextPost && (
+                  <Link
+                    href={`/blog/${nextPost.slug}`}
+                    className="rounded-lg border border-zinc-800 hover:border-violet-500/40 hover:bg-violet-500/5 p-4 transition-colors md:text-right"
+                  >
+                    <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1 inline-flex items-center gap-1 md:flex-row-reverse">
+                      <ArrowRight className="w-3 h-3" />
+                      다음 (Part {seriesPos.part + 1})
+                    </p>
+                    <p className="text-sm font-medium text-zinc-200">
+                      {nextPost.title}
+                    </p>
+                  </Link>
+                )}
+              </div>
+            </section>
+          )}
 
           {related.length > 0 && (
             <section className="mt-12">

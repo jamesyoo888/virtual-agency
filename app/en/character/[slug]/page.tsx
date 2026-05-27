@@ -249,12 +249,20 @@ export default async function CharacterPage({
               </li>
             ))}
           </ul>
-          <Link
-            href="/en/character/brand-kits"
-            className="mt-4 inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white"
-          >
-            See full brand-kit breakdown <ArrowRight className="w-3 h-3" />
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/en/character/brand-kits"
+              className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white"
+            >
+              See full brand-kit breakdown <ArrowRight className="w-3 h-3" />
+            </Link>
+            <Link
+              href={`/en/character/${character.slug}/lookbook`}
+              className="inline-flex items-center gap-1 text-xs text-violet-300 hover:text-violet-100"
+            >
+              {character.name}&rsquo;s quarterly lookbook <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
           <p className="mt-3 text-[11px] text-zinc-600 leading-relaxed">
             Tiers cover paired campaigns with both characters. Solo campaigns
             are quoted on a per-day license — request a custom quote via RFP.

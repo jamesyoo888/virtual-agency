@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Building2, AlertTriangle, Repeat, Flame } from "lucide-react";
+import { Building2, AlertTriangle, Repeat, Flame, Sparkles } from "lucide-react";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -31,6 +31,7 @@ interface ProjectAgg {
   invoice_amount: number | null;
   created_at: string;
   updated_at: string;
+  utm_source: string | null;
 }
 
 interface ClientSummary {
@@ -54,6 +55,8 @@ async function loadSummaries(): Promise<{
   totalRevenue90d: number;
   /** Set of client_ids with no activity in 90+ days (and at least 1 campaign). */
   neglectedIds: Set<string>;
+  /** Set of client_ids whose projects originated from /character/* (utm_source=character). */
+  characterAttributedIds: Set<string>;
   /** At-risk = ≥2 delivered + silent ≥60d. Materialized from project rows
    *  joined to the same clients fetch so the order matches the table. */
   atRiskClients: AtRiskClient[];
@@ -66,6 +69,7 @@ async function loadSummaries(): Promise<{
       totalRevenue: 0,
       totalRevenue90d: 0,
       neglectedIds: new Set(),
+      characterAttributedIds: new Set(),
       atRiskClients: [],
       cohorts: [],
     };
@@ -79,7 +83,7 @@ async function loadSummaries(): Promise<{
       .limit(500),
     supabase
       .from("projects")
-      .select("client_id, status, invoice_amount, created_at, updated_at")
+      .select("client_id, status, invoice_amount, created_at, updated_at, utm_source")
       .order("updated_at", { ascending: false })
       .limit(2000),
   ]);
@@ -166,6 +170,14 @@ async function loadSummaries(): Promise<{
       })
       .map((c) => c.id)
   );
+  // Clients with at least one project tagged utm_source=character — they came
+  // in via /character/[slug] or /character/brand-kits, which is the signal we
+  // want to track for character IP funnel ROI.
+  const characterAttributedIds = new Set(
+    projects
+      .filter((p) => p.utm_source === "character" && p.client_id)
+      .map((p) => p.client_id)
+  );
   const atRiskClients = computeAtRiskClients(deliveredRows, {
     minDelivered: 2,
     silentDays: 60,
@@ -178,6 +190,7 @@ async function loadSummaries(): Promise<{
     totalRevenue,
     totalRevenue90d,
     neglectedIds,
+    characterAttributedIds,
     atRiskClients,
     cohorts,
   };
@@ -330,11 +343,13 @@ export default async function AdminClientsPage({
   const { filter } = await searchParams;
   const showNeglected = filter === "neglected";
   const showAtRisk = filter === "at-risk";
+  const showCharacter = filter === "character-attributed";
   const {
     clients: allClients,
     totalRevenue,
     totalRevenue90d,
     neglectedIds,
+    characterAttributedIds,
     atRiskClients,
     cohorts,
   } = await loadSummaries();
@@ -347,9 +362,12 @@ export default async function AdminClientsPage({
       atRiskClients
         .map((a) => allClients.find((c) => c.id === a.id))
         .filter((c): c is typeof allClients[number] => !!c)
+    : showCharacter
+    ? allClients.filter((c) => characterAttributedIds.has(c.id))
     : allClients;
   const neglectedCount = neglectedIds.size;
   const atRiskCount = atRiskClients.length;
+  const characterCount = characterAttributedIds.size;
 
   const activeClients = allClients.filter((c) => c.campaignCount > 0);
   const repeatClients = allClients.filter((c) => c.campaignCount >= 2);
@@ -410,13 +428,28 @@ export default async function AdminClientsPage({
         <Link
           href="/admin/clients"
           className={`px-3 py-1.5 rounded-md border transition-colors ${
-            !showNeglected && !showAtRisk
+            !showNeglected && !showAtRisk && !showCharacter
               ? "bg-white text-black border-white"
               : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
           }`}
         >
           전체
           <span className="ml-1.5 opacity-60 tabular-nums">{allClients.length}</span>
+        </Link>
+        <Link
+          href="/admin/clients?filter=character-attributed"
+          className={`px-3 py-1.5 rounded-md border transition-colors inline-flex items-center gap-1 ${
+            showCharacter
+              ? "bg-violet-500/20 text-violet-200 border-violet-500/50"
+              : "bg-transparent text-violet-300 border-violet-500/30 hover:border-violet-400 hover:text-violet-200"
+          }`}
+          title="utm_source=character — /character/[slug] 또는 /character/brand-kits 경유 인입 광고주"
+        >
+          <Sparkles className="w-3 h-3" />
+          Character IP 유입
+          {characterCount > 0 && (
+            <span className="opacity-90 tabular-nums">{characterCount}</span>
+          )}
         </Link>
         <Link
           href="/admin/clients?filter=at-risk"
@@ -590,6 +623,14 @@ export default async function AdminClientsPage({
                       {c.campaignCount === 1 && (
                         <span className="ml-1.5 text-[10px] text-emerald-300 border border-emerald-500/30 rounded px-1.5 py-0.5">
                           신규
+                        </span>
+                      )}
+                      {characterAttributedIds.has(c.id) && (
+                        <span
+                          className="ml-1.5 text-[10px] text-violet-300 border border-violet-500/30 rounded px-1.5 py-0.5 bg-violet-500/10"
+                          title="utm_source=character — /character/* 경유"
+                        >
+                          ★ Char
                         </span>
                       )}
                     </p>

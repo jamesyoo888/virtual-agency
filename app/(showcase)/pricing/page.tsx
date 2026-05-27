@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { BRAND_KIT_TIERS, formatKrw } from "@/lib/characters/brand-kits";
 
 export const dynamic = "force-dynamic";
 
@@ -258,6 +259,47 @@ export default async function PricingPage() {
               </article>
             ))}
           </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto mt-16">
+          <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-violet-300 mb-3 inline-flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5" />
+            캐릭터 IP brand-kit
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">
+            자체 캐릭터로 분기 단위 brand-kit
+          </h2>
+          <p className="text-zinc-400 mb-8 leading-relaxed max-w-2xl">
+            Yuna 와 Ren 페어 캐릭터로 분기 brand-kit 을 구성하면, 매 캠페인마다 새 모델을 골라야 하는 카탈로그식 워크플로 대신, 같은 얼굴 · 같은 styling DNA 로 시즌이 묶입니다. 3 티어로 진입 비용을 단계화했습니다.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {BRAND_KIT_TIERS.map((tier) => (
+              <article
+                key={tier.slug}
+                className="rounded-2xl border border-violet-500/30 bg-violet-500/5 p-6 flex flex-col"
+              >
+                <p className="text-[10px] uppercase tracking-[0.3em] text-violet-300">
+                  {tier.characters}
+                </p>
+                <h3 className="text-base font-semibold mt-1 mb-3">
+                  {tier.nameKo}
+                </h3>
+                <p className="text-2xl font-bold tabular-nums mb-1 text-violet-100">
+                  {formatKrw(tier.krw, tier.startingAt)}
+                </p>
+                <p className="text-[11px] text-zinc-500 mb-4">/ 분기 · +VAT</p>
+                <Link
+                  href={`/character/brand-kits?utm_source=character&utm_campaign=brand_kit_${tier.slug}`}
+                  className="mt-auto inline-flex items-center justify-center gap-1 text-xs rounded-md border border-violet-500/40 px-3 py-1.5 text-violet-200 hover:bg-violet-500/10"
+                >
+                  {tier.nameKo} 자세히 <ArrowRight className="w-3 h-3" />
+                </Link>
+              </article>
+            ))}
+          </div>
+          <p className="text-[11px] text-zinc-500 leading-relaxed max-w-3xl">
+            카탈로그 라이선스(상단)는 모델 단위, brand-kit(하단)은 캐릭터 + 분기 묶음입니다. 캠페인이 시즌 단위로 반복되거나 같은 얼굴을 매번 쓰고 싶다면 brand-kit, 단발성 다양성이 필요하면 카탈로그가 맞습니다.
+          </p>
         </div>
 
         <div className="max-w-5xl mx-auto">

@@ -1,5 +1,7 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { BRAND_KIT_TIERS, formatUsd } from "@/lib/characters/brand-kits";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -199,6 +201,41 @@ export default function EnPricingPage() {
             ]}
             use="Anchor talent for a global product launch — locked competitor-out for the launch window."
           />
+        </div>
+
+        <div className="mb-16">
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight mb-2 inline-flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-300" />
+            Character IP brand-kits
+          </h2>
+          <p className="text-sm text-zinc-500 mb-6 max-w-2xl leading-relaxed">
+            Catalog licensing (above) is per-model, per-day. Brand-kits (below) bundle Yuna + Ren under shared styling DNA for an entire quarter — pick a kit when you need season-over-season consistency instead of one-off variety.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {BRAND_KIT_TIERS.map((tier) => (
+              <article
+                key={tier.slug}
+                className="rounded-2xl border border-violet-500/30 bg-violet-500/5 p-6 flex flex-col"
+              >
+                <p className="text-[10px] uppercase tracking-[0.3em] text-violet-300">
+                  {tier.characters}
+                </p>
+                <h3 className="text-base font-semibold mt-1 mb-3">
+                  {tier.nameEn}
+                </h3>
+                <p className="text-2xl font-bold tabular-nums mb-1 text-violet-100">
+                  {formatUsd(tier.usd, tier.startingAt)}
+                </p>
+                <p className="text-[11px] text-zinc-500 mb-4">/ quarter</p>
+                <Link
+                  href={`/en/character/brand-kits?utm_source=character&utm_campaign=brand_kit_${tier.slug}`}
+                  className="mt-auto inline-flex items-center justify-center gap-1 text-xs rounded-md border border-violet-500/40 px-3 py-1.5 text-violet-200 hover:bg-violet-500/10"
+                >
+                  {tier.nameEn} details <ArrowRight className="w-3 h-3" />
+                </Link>
+              </article>
+            ))}
+          </div>
         </div>
 
         <h2 className="text-xl md:text-2xl font-semibold tracking-tight mb-3">

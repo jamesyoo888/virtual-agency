@@ -1,0 +1,240 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  ArrowLeft,
+  Camera,
+  Palette,
+  Lightbulb,
+  Shirt,
+  Construction,
+} from "lucide-react";
+import { CHARACTERS, getCharacter, type CharacterSlug } from "@/lib/characters/registry";
+import { lookbookForCharacter } from "@/lib/characters/lookbook";
+import { breadcrumbLd, ldScript } from "@/lib/seo/json-ld";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
+
+export const revalidate = 3600;
+
+export function generateStaticParams(): Array<{ slug: CharacterSlug }> {
+  return CHARACTERS.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const character = getCharacter(slug);
+  if (!character) return { title: "Lookbook — Virtual Agency" };
+  const title = `${character.name} Lookbook — Virtual Agency`;
+  const description = `${character.name}'s quarterly lookbook structure — ${
+    lookbookForCharacter(character.slug).length
+  } concept sheets with mood, wardrobe, lighting and delivery counts.`;
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${SITE_URL}/en/character/${character.slug}/lookbook`,
+      languages: {
+        en: `${SITE_URL}/en/character/${character.slug}/lookbook`,
+        ko: `${SITE_URL}/character/${character.slug}/lookbook`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${SITE_URL}/en/character/${character.slug}/lookbook`,
+      locale: "en_US",
+      type: "website",
+    },
+  };
+}
+
+export default async function EnCharacterLookbookPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const character = getCharacter(slug);
+  if (!character) notFound();
+  const concepts = lookbookForCharacter(character.slug);
+
+  const crumbsLd = breadcrumbLd([
+    { name: "Home", url: `${SITE_URL}/en` },
+    { name: "Characters", url: `${SITE_URL}/en/character` },
+    { name: character.name, url: `${SITE_URL}/en/character/${character.slug}` },
+    { name: "Lookbook", url: `${SITE_URL}/en/character/${character.slug}/lookbook` },
+  ]);
+
+  const totalHero = concepts.reduce((s, c) => s + c.heroShots, 0);
+  const totalSupporting = concepts.reduce((s, c) => s + c.supportingShots, 0);
+
+  return (
+    <div className="min-h-screen bg-black text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(crumbsLd) }}
+      />
+      <article className="max-w-4xl mx-auto px-6 py-16 md:py-24">
+        <Link
+          href={`/en/character/${character.slug}`}
+          className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 mb-8"
+        >
+          <ArrowLeft className="w-3 h-3" /> Back to {character.name}
+        </Link>
+
+        <header className="mb-10">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-violet-300 mb-3">
+            Lookbook — quarterly concept structure
+          </p>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+            {character.name}&rsquo;s quarterly lookbook
+          </h1>
+          <p className="text-zinc-400 mt-3 leading-relaxed">
+            Exactly what ships in a quarterly brand-kit — mood, wardrobe, lighting recipes, and delivered shot counts per concept sheet. Production assets render after the brand-kit contract; this page shows the structure so you can decide before commissioning.
+          </p>
+        </header>
+
+        <section className="mb-10 rounded-xl border border-amber-500/30 bg-amber-500/5 p-5">
+          <div className="flex items-start gap-3">
+            <Construction className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-amber-100">
+                Assets render after the kit contract
+              </p>
+              <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                This page intentionally shows concept structure only. Finished shots are rendered after the brand-kit contract starts and delivered into the client workroom — we review concepts and lock changes together before production begins.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+          <Stat label="Concept sheets" value={concepts.length.toString()} hint="per quarter" />
+          <Stat label="Hero shots" value={totalHero.toString()} hint="total" />
+          <Stat label="Supporting" value={totalSupporting.toString()} hint="total" />
+          <Stat
+            label="Total delivery"
+            value={(totalHero + totalSupporting).toString()}
+            hint="hero + supporting"
+          />
+        </section>
+
+        <div className="space-y-8">
+          {concepts.map((c, idx) => (
+            <section
+              key={c.id}
+              id={c.id}
+              className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-6 scroll-mt-20"
+            >
+              <div className="flex items-baseline gap-3 mb-4">
+                <span className="text-[10px] uppercase tracking-wider text-zinc-500 tabular-nums">
+                  Concept {String(idx + 1).padStart(2, "0")}
+                </span>
+                <h2 className="text-xl font-semibold">{c.titleEn}</h2>
+              </div>
+              <p className="text-sm text-zinc-300 leading-relaxed mb-5">
+                {c.briefEn}
+              </p>
+              <ul className="space-y-3 text-sm">
+                <Row
+                  icon={<Palette className="w-3.5 h-3.5 text-violet-300" />}
+                  label="Mood"
+                  value={c.mood.join(" · ")}
+                />
+                <Row
+                  icon={<Shirt className="w-3.5 h-3.5 text-violet-300" />}
+                  label="Wardrobe"
+                  value={c.wardrobeEn}
+                />
+                <Row
+                  icon={<Lightbulb className="w-3.5 h-3.5 text-violet-300" />}
+                  label="Lighting"
+                  value={c.lighting}
+                />
+                <Row
+                  icon={<Camera className="w-3.5 h-3.5 text-violet-300" />}
+                  label="Delivery"
+                  value={`Hero ${c.heroShots} · Supporting ${c.supportingShots}`}
+                />
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        <footer className="mt-16 pt-8 border-t border-zinc-900">
+          <div className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40">
+            <p className="text-sm text-zinc-300">
+              Commission this quarter&rsquo;s brand-kit
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                href={`/en/rfp?character=${character.slug}&utm_source=character&utm_campaign=character_${character.slug}`}
+                className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
+              >
+                Send a brief
+              </Link>
+              <Link
+                href="/en/character/brand-kits"
+                className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
+              >
+                Brand-kit tiers
+              </Link>
+              <Link
+                href={`/en/character/${character.slug}`}
+                className="inline-flex items-center gap-1 text-sm rounded-md border border-zinc-700 px-3 py-1.5 hover:bg-zinc-900"
+              >
+                {character.name}&rsquo;s profile
+              </Link>
+            </div>
+          </div>
+        </footer>
+      </article>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+}) {
+  return (
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+      <p className="text-[10px] uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="mt-1 text-xl font-semibold tabular-nums text-violet-200">
+        {value}
+      </p>
+      <p className="mt-0.5 text-[10px] text-zinc-500">{hint}</p>
+    </div>
+  );
+}
+
+function Row({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <li className="flex items-start gap-3">
+      <span className="mt-0.5 shrink-0">{icon}</span>
+      <span className="w-20 shrink-0 text-[11px] uppercase tracking-wider text-zinc-500">
+        {label}
+      </span>
+      <span className="text-zinc-300">{value}</span>
+    </li>
+  );
+}

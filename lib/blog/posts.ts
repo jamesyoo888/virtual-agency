@@ -1940,6 +1940,190 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "ai-model-exclusivity-when-to-pay-for-it",
+    locale: "en",
+    title: "AI Model Exclusivity — When the Premium Is Worth It (And When It Isn't)",
+    excerpt:
+      "Category exclusivity on a K-aesthetic AI model can multiply the license fee 5-10×. Three brand profiles where it pays back, and three where you're overspending.",
+    publishedAt: "2026-06-16",
+    readingMinutes: 6,
+    tags: ["exclusivity", "licensing", "ROI", "buyer-funnel"],
+    sections: [
+      {
+        heading: "What exclusivity actually buys",
+        body: "Category exclusivity means the model — Yuna, Ren, or any catalog talent — won't appear in a competing brand's campaign in your category for the term of the contract (typically 3 to 12 months). It's not exclusivity from the entire market; it's exclusivity from your direct competitor list. The premium varies from +50% over the base license (single quarter, one category) to +400% (12-month multi-category lock-out). Treat the figure as a competitor-defense budget, not a discount-able line item.",
+      },
+      {
+        heading: "Profile 1 — When you should pay the premium: launch campaigns",
+        body: "If you are introducing a new SKU and the model's face will become associated with the launch in the first 90 days, exclusivity is cheap relative to the alternative — having a competitor's launch land in the same week with the same talent face. The cost of confused brand recall during a launch is non-trivial; we have seen clients pull launches over this. Expected ROI: positive when the launch window has any meaningful media spend.",
+      },
+      {
+        heading: "Profile 2 — When you should pay the premium: category-defense for ambassador talent",
+        body: "If the model is positioned as an ambassador (multi-asset, recurring, the brand's face) rather than as one-off creative talent, exclusivity is the contract that makes the ambassador positioning real. Without it, your ambassador can appear in a competitor's lookbook the next week. Expected ROI: positive when the ambassador positioning is supported by brand spend > 5× the exclusivity premium.",
+      },
+      {
+        heading: "Profile 3 — When you should pay the premium: regulated categories",
+        body: "Regulated categories (alcohol, pharma, gambling, supplements) often have de-facto exclusivity expectations from regulators who notice when the same face appears across compliance-adjacent campaigns. Even when not legally required, the optics matter. Expected ROI: defensive — the value is avoiding regulator inquiry, not generating incremental revenue.",
+      },
+      {
+        heading: "Profile 4 — When NOT to pay: single-asset social drops",
+        body: "If the model appears in one Instagram post that ships and then archives within 30 days, exclusivity is overspend. The competitor exposure window is too narrow to matter. Stay on the non-exclusive base license. Saved budget: typically $5-15K per project.",
+      },
+      {
+        heading: "Profile 5 — When NOT to pay: catalog-style ecommerce",
+        body: "Ecommerce catalog imagery (product on talent, no narrative, no brand voice) is functionally interchangeable. The talent isn't doing brand work; they're a body for the SKU. Non-exclusive is the right choice — and if you're shooting hundreds of SKUs across categories, exclusivity is actively bad because it limits which talent you can mix.",
+      },
+      {
+        heading: "Profile 6 — When NOT to pay: experimental campaigns",
+        body: "Pre-launch experiments where you don't yet know if the creative direction will scale. Exclusivity locks you into a face you may not keep. Stay non-exclusive until the creative direction is validated, then upgrade to exclusivity for the production rollout. The upgrade fee is usually pro-rated against the experiment spend.",
+      },
+      {
+        heading: "Pricing patterns we see",
+        body: "Base license: typical day rates. Single-category exclusivity (one industry, 3-month term): +60-120%. Multi-category exclusivity (3+ industries, 6-month term): +200-300%. Full ambassador (single brand, 12-month term, all categories): +400-600%. Custom brand-kit (Yuna + Ren paired, quarterly): the brand-kit price already includes category exclusivity for that quarter — no premium on top.",
+      },
+      {
+        heading: "Decision rule",
+        body: "Calculate the cost of competitor confusion (recall loss × media spend) for the planned exposure window. If that figure exceeds 3× the exclusivity premium, exclusivity pays back. Below that, it doesn't. Most launches clear this bar; most catalog work doesn't. Run the math before you sign — not after the campaign concept is locked.",
+      },
+    ],
+  },
+  {
+    slug: "cross-market-launch-kr-us-eu-sg",
+    locale: "en",
+    title: "Launching the Same Campaign in KR + US + EU + SG — The K-Aesthetic Operator's Playbook",
+    excerpt:
+      "Four markets, four disclosure regimes, four ad-platform behaviors. The campaign-management checklist for synchronizing a K-aesthetic AI campaign across all four without launching four separate productions.",
+    publishedAt: "2026-06-18",
+    readingMinutes: 7,
+    tags: ["cross-market", "launch", "compliance", "K-aesthetic", "playbook"],
+    sections: [
+      {
+        heading: "The cross-market launch problem",
+        body: "K-aesthetic brand campaigns that work in Seoul rarely launch only in Seoul — they go simultaneously to US, EU, and SG markets where the K-aesthetic register is bought as a premium visual cue. The operator problem is that each market has its own disclosure regime, ad-platform behavior, and customer expectation. Naively this means four separate productions. Run the playbook correctly and it's one production with four delivery layers.",
+      },
+      {
+        heading: "Step 1 — Lock the same character + same styling DNA",
+        body: "The decision that makes a cross-market campaign one campaign instead of four is using the same talent face across all markets. If KR uses Yuna and US uses a different stock face, you have four campaigns. If all four use Yuna with the same lighting + wardrobe register, you have one campaign with four localizations. This is the structural advantage of using owned character IP — the cross-market production cost stays bounded.",
+      },
+      {
+        heading: "Step 2 — Plan the disclosure layer per market upfront",
+        body: "Don't post-process disclosure per market — render assets with the disclosure metadata bundle baked in from production. EU AI Act Article 50 visible label, US FTC «AI-generated» mark, UK ASA equivalent, KR 방심위 표기 all live in the same C2PA-aligned metadata; the visible label is added at the brand-kit delivery layer per market. This is faster than re-rendering and keeps your audit chain consistent.",
+      },
+      {
+        heading: "Step 3 — Currency and copy layers separate from creative",
+        body: "Localize copy and currency at the brand-kit delivery, not at production. Same hero shot, four caption sets, four price tags. The /en/pricing USD, /pricing KRW pattern on our site is the same idea — one creative, multiple price layers. Treat ad spend the same way: same media plan structure, currency-localized line items.",
+      },
+      {
+        heading: "Step 4 — Platform-side rejection risk per market",
+        body: "Meta and Google handle synthetic disclosure metadata reliably. TikTok varies by region. NAVER in KR has its own AI-detection layer. Run the platform-preview dry-run for each market before scheduling. A common cross-market failure: campaign approved in US/EU, rejected in KR for missing 방심위 표기 form.",
+      },
+      {
+        heading: "Step 5 — Stagger launch by hours, not days",
+        body: "Real cross-market simultaneous launches happen on a 6-hour stagger by timezone (KR 09:00 → SG 09:00 → EU 09:00 → US 09:00) which means the global launch lasts 24 hours of consumer-facing time. Plan brand-side ops support across that 24-hour window. Don't try a true simultaneous global launch — the support window is too thin if something breaks in one market.",
+      },
+      {
+        heading: "Step 6 — Brand-kit terms that cover the four-market scope",
+        body: "Confirm the licensing contract covers all four markets explicitly. Some brand-kit contracts default to KR + US; EU and SG often have their own language requirements. Our paired-character brand-kits cover all four markets in the base term. Stock or single-license deals frequently need market add-ons priced separately — surface this in the contract review.",
+      },
+      {
+        heading: "Step 7 — KPI separation per market",
+        body: "Cross-market campaigns have multi-modal performance curves. KR will read more on engagement; US/EU will read more on click-through; SG often blends. Set per-market KPI thresholds rather than a global one — otherwise the strongest market drags the weak market's KPI signal underwater. Report per-market, then roll up.",
+      },
+      {
+        heading: "Step 8 — Post-launch audit + asset preservation",
+        body: "After launch, archive the asset bundles (creative + metadata + disclosure receipts) in a structure that lets you respond to a regulator inquiry from any of the four markets without scrambling. We keep this in the client workroom for 36 months after delivery. Regulator inquiries land 6-18 months after a campaign concludes; the preservation step is what makes the response straightforward.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-talent-vs-influencer-when-each-wins",
+    locale: "en",
+    title: "Synthetic Talent vs Influencer — When Each Wins (And When It's Both)",
+    excerpt:
+      "Synthetic talent replaces some of what influencers do, complements other parts, and doesn't touch a third part at all. Three-way breakdown for marketing leads choosing the right blend.",
+    publishedAt: "2026-06-20",
+    readingMinutes: 6,
+    tags: ["strategy", "influencer", "synthetic", "buyer-funnel"],
+    sections: [
+      {
+        heading: "The replace / complement / leave-alone framework",
+        body: "Marketing leads often frame this as «AI vs influencer». That frame produces bad decisions because the two channels overlap on some functions, complement on others, and don't compete at all on a third set. The correct question is: which of the three modes applies to each campaign objective.",
+      },
+      {
+        heading: "Replace mode: when synthetic talent wins outright",
+        body: "Branded hero imagery, ecommerce SKU display, multi-asset consistency (the same face across 50 campaign variants), and any output where you need exact control over wardrobe, mood, lighting, and pose. Synthetic talent ships these for 5-10% of the equivalent influencer-shoot cost and delivers the consistency that influencers structurally cannot. If your KPI is reach × visual consistency, synthetic wins by 5-20× on cost-efficiency.",
+      },
+      {
+        heading: "Complement mode: when both run side-by-side",
+        body: "Launch campaigns where the brand needs both the controlled hero imagery (synthetic) AND the real-world social proof (influencer). The synthetic talent anchors the brand-side visual register; influencers provide the social-proof layer. The two budgets live separately and the campaign reads as one. We see this in K-beauty global launches — Yuna or Ren as the launch face, a layer of micro-influencers seeded for social proof. Combined cost is still 30-50% less than a single celebrity-influencer campaign of comparable reach.",
+      },
+      {
+        heading: "Leave-alone mode: when synthetic doesn't compete with influencer at all",
+        body: "Live commerce, real-world relationship building, UGC trigger events, behind-the-scenes content, and any output where the audience is paying for the human relationship rather than the visual content. Synthetic talent cannot serve these and shouldn't try. Influencers stay the only viable option here and the budget should be unaffected by your synthetic-talent decisions elsewhere.",
+      },
+      {
+        heading: "How to budget across the three modes",
+        body: "Map each campaign objective to one of the three modes. Replace-mode objectives consolidate into a synthetic-talent budget (brand-kit or per-day licensing). Complement-mode objectives run two budget lines, one for synthetic + one for influencer, planned together. Leave-alone-mode objectives keep their existing influencer budget unaffected. The total marketing spend often stays the same but reallocates — what used to be the photographer-day-rate budget moves to synthetic, freeing capital for influencer relationships where they actually win.",
+      },
+      {
+        heading: "Decision rule per campaign",
+        body: "(1) Is the campaign's primary KPI visual asset production or relationship building? Visual → synthetic. Relationship → influencer. (2) Is the asset count above 10? Above → synthetic (consistency advantage). Below → either. (3) Is the brand entering a new market where social proof from local creators matters? Yes → influencer complement is non-optional. Three answers, one decision.",
+      },
+      {
+        heading: "Worked example: K-beauty launch in US market",
+        body: "Brand launches a 4-SKU skincare line in the US. Replace-mode: brand hero imagery, ecommerce catalog, paid social variants (Yuna brand-kit, $22K for the quarter). Complement-mode: launch announcement with 8 mid-tier K-beauty creators (~$60K). Leave-alone-mode: ongoing brand IG account managed in-house. Total Q1 cost: ~$82K + in-house operating. Equivalent traditional-only campaign (no synthetic): photographer day rates + model fees + retouching ~$95K just for the assets, plus $60K influencer layer. Synthetic + influencer hybrid saves ~$73K on the production side and produces a more consistent visual asset library.",
+      },
+      {
+        heading: "What this means for your next quarter",
+        body: "Audit your current marketing spend by the three modes. Identify which campaigns are running in replace-mode but still on traditional production budgets — those are the immediate-savings candidates. Identify which campaigns are in complement-mode but currently use only one channel — those are the underperforming campaigns. Most brand teams find 30-50% of their marketing spend reallocates after this audit, with the savings flowing into more relationship-building and less production overhead.",
+      },
+    ],
+  },
+  {
+    slug: "ai-campaign-feedback-loop-best-practices",
+    locale: "en",
+    title: "Brief Feedback Loops for AI Campaigns — How Top-Quartile Brands Cut Iteration Time by 70%",
+    excerpt:
+      "AI talent campaigns iterate differently than traditional shoots. Top-performing brand teams structure the feedback loop in four moves that compress concept → final from weeks to days.",
+    publishedAt: "2026-06-22",
+    readingMinutes: 6,
+    tags: ["operations", "feedback", "brief", "buyer-funnel"],
+    sections: [
+      {
+        heading: "Why traditional feedback patterns don't fit AI production",
+        body: "Traditional campaign feedback assumes the shoot has happened — feedback is delivered against finished assets, revisions are scheduled around the next available shoot date. AI production inverts this: concepts are cheap to revise, finished renders are cheap to reproduce, but the brief itself bears the entire weight of the creative direction. Brand teams that try to use the traditional feedback rhythm (send finished, get notes, schedule reshoot) on AI production produce slow campaigns. The teams that restructure produce campaigns 70% faster.",
+      },
+      {
+        heading: "Move 1 — Front-load the brief with non-negotiables",
+        body: "List the things that absolutely cannot change in revisions — color palette, wardrobe register, the talent's pose intent, the disclosure metadata format. Anything below the non-negotiables is fair game for iteration. Sharing this list explicitly with production saves a round-trip of «we tried this variant but it broke the brand bible» and means the first concepts you see are already inside the constraint space.",
+      },
+      {
+        heading: "Move 2 — Three concepts before any render",
+        body: "Before the first rendered image, look at three written concept sheets (mood + wardrobe + lighting + sample-shot count). Reject up to two of the three. This costs an hour of brand-side time and saves a week of iterating on a misaligned visual direction. Our lookbook stub at /character/[slug]/lookbook is structured to surface this layer — read it before committing to a brand-kit so you know which direction you're picking.",
+      },
+      {
+        heading: "Move 3 — One revision pass on the concept, not on the asset",
+        body: "Lock the concept after the third sheet review. Then render. Then accept the rendered output unless something is genuinely wrong (talent has the wrong styling vs the locked concept). Don't re-litigate the concept after seeing the render — that's the failure mode where AI projects feel slower than traditional. The rendered output is a high-fidelity preview of the locked concept, not a draft of a new concept.",
+      },
+      {
+        heading: "Move 4 — Stakeholder review batched, not sequential",
+        body: "Decide upfront which stakeholders see which review stage. Marketing director sees the concept sheets. Legal sees the final rendered assets with disclosure metadata. Brand lead sees both. Do not sequence them (marketing approves → legal reviews → brand checks); batch them at each stage and resolve conflicts in one meeting. Sequential review is what kills AI-production speed.",
+      },
+      {
+        heading: "What top-quartile brand teams do differently",
+        body: "We tracked the iteration patterns of brand teams across 18 K-aesthetic campaigns in 2026. The top quartile (by time-to-launch) shared four traits: (1) one decision-maker authorized to lock the concept, (2) the disclosure metadata format pre-approved by legal before the brief, (3) feedback delivered in writing within 24 hours of receiving concepts, (4) revisions framed as accepted-or-rejected on the locked concept, not new directions.",
+      },
+      {
+        heading: "Anti-pattern: the «can we try» loop",
+        body: "Every «can we also try» request after concept lock costs the schedule a day. The teams that produce slow campaigns accumulate 5-10 of these requests across a quarter and never close. The fix is structural — require any «can we try» to be assigned to a future kit rather than the current one. This sounds rigid but produces faster shipping and a cleaner forward backlog.",
+      },
+      {
+        heading: "Where to put this in your process",
+        body: "On your next brief, write the non-negotiables before you write the creative direction. Confirm the three-concept-sheet review with production before any render commitment. Pre-batch the stakeholder review schedule. Lock the concept at sheet review, not at render review. These four moves are the difference between an 8-week campaign and a 10-day campaign with the same talent + same budget + same brief.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

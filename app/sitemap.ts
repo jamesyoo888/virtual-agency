@@ -210,6 +210,12 @@ export default async function sitemap(
             changeFrequency: "weekly" as const,
             priority: 0.8,
           })),
+          ...listCharacters().map((c) => ({
+            url: `${SITE_URL}/en/character/${c.slug}/lookbook`,
+            lastModified: now,
+            changeFrequency: "monthly" as const,
+            priority: 0.6,
+          })),
           ...INDUSTRY_OPTIONS.map((o) => ({
             url: `${SITE_URL}/en/explore/${o.value}`,
             lastModified: now,
@@ -471,6 +477,18 @@ export default async function sitemap(
               languages: {
                 ko: `${SITE_URL}/character/${c.slug}`,
                 en: `${SITE_URL}/en/character/${c.slug}`,
+              },
+            },
+          })),
+          ...listCharacters().map((c) => ({
+            url: `${SITE_URL}/character/${c.slug}/lookbook`,
+            lastModified: now,
+            changeFrequency: "monthly" as const,
+            priority: 0.6,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/character/${c.slug}/lookbook`,
+                en: `${SITE_URL}/en/character/${c.slug}/lookbook`,
               },
             },
           })),
