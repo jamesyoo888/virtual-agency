@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, BookOpen, ArrowRight } from "lucide-react";
+import { ArrowLeft, BookOpen, ArrowRight, Sparkles } from "lucide-react";
 import { listSeries } from "@/lib/blog/series";
 import { getPostBySlug } from "@/lib/blog/posts";
+import { getCharacter } from "@/lib/characters/registry";
 import { breadcrumbLd, itemListLd, ldScript } from "@/lib/seo/json-ld";
+
+const SERVICE_HREF_EN: Record<string, string> = {
+  "brand-kit": "/en/character/brand-kits",
+  lookbook: "/en/character",
+  matching: "/en/match",
+  rfp: "/en/rfp",
+  "compliance-audit": "/en/legal/ai-disclosure",
+};
+
+const SERVICE_LABEL_EN: Record<string, string> = {
+  "brand-kit": "Browse brand-kit tiers",
+  lookbook: "View character lookbooks",
+  matching: "Start matching",
+  rfp: "Send a brief",
+  "compliance-audit": "AI disclosure guide",
+};
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -134,6 +151,56 @@ export default async function EnBlogSeriesPage({
             </li>
           ))}
         </ol>
+
+        {(series.relatedCharacterSlug || series.relatedService) && (
+          <aside className="mt-14 pt-8 border-t border-zinc-900 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {series.relatedCharacterSlug &&
+              (() => {
+                const character = getCharacter(series.relatedCharacterSlug);
+                if (!character) return null;
+                return (
+                  <Link
+                    href={`/en/character/${character.slug}`}
+                    className="rounded-xl border border-violet-900/50 bg-violet-900/5 p-5 hover:border-violet-700 transition-colors"
+                  >
+                    <p className="text-[10px] uppercase tracking-wider text-violet-300 mb-2 inline-flex items-center gap-2">
+                      <Sparkles className="w-3 h-3" /> Related character
+                    </p>
+                    <p className="text-base font-semibold mb-1">
+                      {character.name}
+                    </p>
+                    <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2">
+                      The owned-character IP this series applies to. See the persona,
+                      lighting recipe, and licensing options.
+                    </p>
+                    <p className="mt-3 text-xs text-violet-300 inline-flex items-center gap-1">
+                      {character.name}&rsquo;s profile <ArrowRight className="w-3 h-3" />
+                    </p>
+                  </Link>
+                );
+              })()}
+            {series.relatedService && SERVICE_HREF_EN[series.relatedService] && (
+              <Link
+                href={SERVICE_HREF_EN[series.relatedService]}
+                className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 hover:border-zinc-700 transition-colors"
+              >
+                <p className="text-[10px] uppercase tracking-wider text-zinc-400 mb-2">
+                  Related service
+                </p>
+                <p className="text-base font-semibold mb-1">
+                  {SERVICE_LABEL_EN[series.relatedService] ??
+                    series.relatedService}
+                </p>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  The next step after reading — book the actual campaign or learn more.
+                </p>
+                <p className="mt-3 text-xs text-zinc-200 inline-flex items-center gap-1">
+                  Go <ArrowRight className="w-3 h-3" />
+                </p>
+              </Link>
+            )}
+          </aside>
+        )}
       </main>
     </div>
   );

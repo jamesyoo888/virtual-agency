@@ -70,4 +70,28 @@ describe("blog series registry", () => {
     if (!enOnlySlug) return;
     expect(getSeriesForPost(enOnlySlug, "ko")).toBeNull();
   });
+
+  it("character-ip series in both locales declares relatedCharacterSlug", () => {
+    for (const series of BLOG_SERIES) {
+      if (series.id !== "character-ip") continue;
+      expect(
+        series.relatedCharacterSlug,
+        `character-ip (${series.locale}) must point at a character`
+      ).toBeDefined();
+    }
+  });
+
+  it("every declared relatedService matches the known enum", () => {
+    const allowed = new Set([
+      "brand-kit",
+      "lookbook",
+      "matching",
+      "rfp",
+      "compliance-audit",
+    ]);
+    for (const series of BLOG_SERIES) {
+      if (!series.relatedService) continue;
+      expect(allowed.has(series.relatedService)).toBe(true);
+    }
+  });
 });

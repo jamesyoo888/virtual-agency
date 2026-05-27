@@ -27,6 +27,23 @@ export interface BlogSeries {
   description: string;
   /** Ordered list of post slugs, intro → advanced. */
   slugs: string[];
+  /**
+   * Character slug this series leans on most heavily — series detail page
+   * surfaces a deep-link card so a reader who's invested in the topic can
+   * also browse the related character profile / brand-kit options.
+   */
+  relatedCharacterSlug?: string;
+  /**
+   * Service detail anchor (e.g. "brand-kit", "lookbook", "matching") used to
+   * deep-link a CTA on the series landing. Optional — many series have no
+   * single matching service.
+   */
+  relatedService?:
+    | "brand-kit"
+    | "lookbook"
+    | "matching"
+    | "rfp"
+    | "compliance-audit";
 }
 
 export const BLOG_SERIES: BlogSeries[] = [
@@ -42,6 +59,7 @@ export const BLOG_SERIES: BlogSeries[] = [
       "k-aesthetic-rfp-budget-bands-usd",
       "ai-campaign-feedback-loop-best-practices",
     ],
+    relatedService: "rfp",
   },
   {
     id: "character-ip",
@@ -55,6 +73,8 @@ export const BLOG_SERIES: BlogSeries[] = [
       "ai-model-exclusivity-when-to-pay-for-it",
       "cross-market-launch-kr-us-eu-sg",
     ],
+    relatedCharacterSlug: "yuna",
+    relatedService: "brand-kit",
   },
   {
     id: "compliance",
@@ -67,6 +87,7 @@ export const BLOG_SERIES: BlogSeries[] = [
       "eu-ai-act-article-50-for-brand-marketers",
       "synthetic-campaign-pre-launch-compliance-checklist",
     ],
+    relatedService: "compliance-audit",
   },
   {
     id: "rfp-funnel",
@@ -80,6 +101,7 @@ export const BLOG_SERIES: BlogSeries[] = [
       "k-aesthetic-rfp-budget-bands-krw-ko",
       "ai-virtual-model-contract-checklist-korea",
     ],
+    relatedService: "rfp",
   },
   {
     id: "character-ip",
@@ -92,6 +114,8 @@ export const BLOG_SERIES: BlogSeries[] = [
       "paired-character-kits-vs-single-face-ko",
       "owned-character-as-brand-moat-ko",
     ],
+    relatedCharacterSlug: "yuna",
+    relatedService: "brand-kit",
   },
   {
     id: "compliance",
@@ -104,6 +128,7 @@ export const BLOG_SERIES: BlogSeries[] = [
       "ai-content-disclosure-compliance-2026",
       "synthetic-campaign-pre-launch-compliance-checklist-ko",
     ],
+    relatedService: "compliance-audit",
   },
 ];
 

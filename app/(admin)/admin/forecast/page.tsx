@@ -6,8 +6,10 @@ import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import { loadSlowOpenProjects } from "@/lib/analytics/slow-open-projects";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { getCharacter } from "@/lib/characters/registry";
 import { getKitTier } from "@/lib/characters/brand-kits";
+import { getPostBySlug } from "@/lib/blog/posts";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +25,13 @@ const STAGE_LABEL: Record<string, string> = {
 };
 
 export default async function ForecastPage() {
-  const [r, velocity, stageTiming, slowOpen, charAttr] = await Promise.all([
+  const [r, velocity, stageTiming, slowOpen, charAttr, blogAttr] = await Promise.all([
     loadForecast(),
     loadPipelineVelocity(90),
     loadStageTiming(90),
     loadSlowOpenProjects(5),
     loadCharacterAttribution(90),
+    loadBlogAttribution(90),
   ]);
 
   return (
@@ -657,6 +660,86 @@ export default async function ForecastPage() {
               )}
               <p className="mt-3 text-[11px] text-zinc-500">
                 Total 90일: 인콰이어 {charAttr.totalInquiries}건 · 납품 {charAttr.totalDelivered}건 · 매출 ₩{KRW.format(charAttr.totalRevenue)}{charAttr.unknown > 0 && ` · 미분류 ${charAttr.unknown}건`}
+              </p>
+            </section>
+          )}
+
+          {blogAttr.totalInquiries > 0 && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 mb-6">
+              <div className="flex items-baseline justify-between mb-4 flex-wrap gap-3">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-200">
+                  블로그 글 → 인콰이어 (90일)
+                </h2>
+                <p className="text-[11px] text-zinc-500 tabular-nums">
+                  referrer=/blog/[slug] 추적 · {blogAttr.totalInquiries}건 · 납품 {blogAttr.totalDelivered}건 ·{" "}
+                  <span className="text-emerald-300">
+                    ₩{KRW.format(blogAttr.totalRevenue)}
+                  </span>
+                </p>
+              </div>
+              {(() => {
+                const top = blogAttr.bySlug.slice(0, 10);
+                const maxInq = Math.max(1, ...top.map((b) => b.inquiries));
+                return (
+                  <ul className="space-y-2 text-sm">
+                    {top.map((b) => {
+                      const post =
+                        getPostBySlug(b.slug, b.locale) ??
+                        getPostBySlug(b.slug, "ko") ??
+                        getPostBySlug(b.slug, "en");
+                      const title = post?.title ?? b.slug;
+                      const analyticsHref = `/admin/blog-analytics/${encodeURIComponent(
+                        b.slug
+                      )}?window=90`;
+                      const widthPct = (b.inquiries / maxInq) * 100;
+                      return (
+                        <li
+                          key={`${b.locale}:${b.slug}`}
+                          className="grid grid-cols-12 gap-3 items-center"
+                        >
+                          <div className="col-span-6 min-w-0">
+                            <Link
+                              href={analyticsHref}
+                              className="block truncate text-zinc-200 hover:text-white"
+                              title={title}
+                            >
+                              <span className="mr-1.5 inline-block text-[9px] uppercase tracking-wider rounded px-1 py-0.5 bg-zinc-800 text-zinc-400">
+                                {b.locale.toUpperCase()}
+                              </span>
+                              {title}
+                            </Link>
+                          </div>
+                          <div className="col-span-3 h-2 rounded bg-zinc-900 overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-500"
+                              style={{ width: `${widthPct}%` }}
+                            />
+                          </div>
+                          <span className="col-span-3 text-right text-xs text-zinc-300 tabular-nums">
+                            {b.inquiries}{" "}
+                            <span
+                              className={
+                                b.conversionPct >= 30
+                                  ? "text-emerald-400"
+                                  : "text-zinc-500"
+                              }
+                            >
+                              {b.conversionPct}%
+                            </span>
+                            {b.revenue > 0 && (
+                              <span className="ml-2 text-emerald-300">
+                                ₩{KRW.format(b.revenue)}
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                );
+              })()}
+              <p className="mt-3 text-[11px] text-zinc-600">
+                referrer 가 블로그 글이었던 RFP/인콰이어. 어떤 글이 매출로 직결되는지 = 콘텐츠 ROI 시그널. /admin/blog-analytics 에서 view 추세 + referrer 분석으로 drill-down.
               </p>
             </section>
           )}

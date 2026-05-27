@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Briefcase, Link2, BookOpen } from "lucide-react";
+import { Briefcase, Link2, BookOpen, TrendingUp, Sparkles } from "lucide-react";
+import { loadAgentAttribution } from "@/lib/analytics/agent-attribution";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -51,6 +52,18 @@ export default async function AgentDashboardPage() {
   // utm_campaign carries the agent's id; pre-built link saves the partner
   // from constructing it. Same pattern as the Wave 25 referral flow.
   const referralLink = `${SITE_URL}/?utm_source=agent&utm_campaign=${client.id}`;
+  const attribution = await loadAgentAttribution(client.id, 90);
+  const commissionEstimate = Math.round(attribution.totalRevenue * 0.15);
+  const characterPct =
+    attribution.totalInquiries > 0
+      ? Math.round(
+          (attribution.characterFunnel / attribution.totalInquiries) * 100
+        )
+      : 0;
+  const blogPct =
+    attribution.totalInquiries > 0
+      ? Math.round((attribution.blogFunnel / attribution.totalInquiries) * 100)
+      : 0;
 
   return (
     <main className="max-w-3xl mx-auto p-8">
@@ -81,6 +94,98 @@ export default async function AgentDashboardPage() {
           Inquiries arriving via this link are attributed to your account.
           Commission settles monthly on delivered projects.
         </p>
+      </section>
+
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp className="w-4 h-4 text-emerald-400" />
+          <p className="text-sm font-medium text-zinc-200">
+            Last 90 days · your referrals
+          </p>
+        </div>
+        {attribution.totalInquiries === 0 ? (
+          <p className="text-xs text-zinc-500 leading-relaxed">
+            No referrals captured yet. Share the link above — once an inquiry
+            arrives via your code we&rsquo;ll surface inquiry / delivery / revenue
+            and commission estimate here.
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="rounded-lg border border-zinc-800 bg-black/30 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                Inquiries
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums">
+                {attribution.totalInquiries}
+              </p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 bg-black/30 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                Delivered
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums text-emerald-300">
+                {attribution.totalDelivered}
+              </p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 bg-black/30 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                Revenue (delivered)
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums text-emerald-300">
+                ₩{attribution.totalRevenue.toLocaleString("ko-KR")}
+              </p>
+            </div>
+            <div className="rounded-lg border border-emerald-900/50 bg-emerald-900/10 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-emerald-400">
+                Commission est. (15%)
+              </p>
+              <p className="mt-1 text-xl font-semibold tabular-nums text-emerald-200">
+                ₩{commissionEstimate.toLocaleString("ko-KR")}
+              </p>
+            </div>
+          </div>
+        )}
+        {attribution.totalInquiries > 0 && (
+          <div className="mt-4 pt-4 border-t border-zinc-800">
+            <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3 inline-flex items-center gap-2">
+              <Sparkles className="w-3 h-3 text-violet-300" /> Funnel overlap
+            </p>
+            <div className="grid grid-cols-2 gap-3 text-xs text-zinc-300">
+              <div>
+                <p className="text-zinc-500">Touched a character page</p>
+                <p className="mt-1 tabular-nums">
+                  {attribution.characterFunnel} of {attribution.totalInquiries}{" "}
+                  ·{" "}
+                  <span
+                    className={
+                      characterPct >= 25 ? "text-violet-300" : "text-zinc-500"
+                    }
+                  >
+                    {characterPct}%
+                  </span>
+                </p>
+              </div>
+              <div>
+                <p className="text-zinc-500">Touched a blog post</p>
+                <p className="mt-1 tabular-nums">
+                  {attribution.blogFunnel} of {attribution.totalInquiries} ·{" "}
+                  <span
+                    className={
+                      blogPct >= 25 ? "text-emerald-300" : "text-zinc-500"
+                    }
+                  >
+                    {blogPct}%
+                  </span>
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 text-[11px] text-zinc-500 leading-relaxed">
+              Higher percentages mean your prospects browsed our owned-IP or
+              blog content before inquiring — useful if you want to lead with
+              character / case-study materials in pitch decks.
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 mb-6">
