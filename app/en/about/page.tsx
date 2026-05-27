@@ -104,6 +104,29 @@ export default function EnAboutPage() {
           </li>
         </ul>
 
+        <h2 className="text-xl font-semibold mb-3">Owned IP — the K-aesthetic moat</h2>
+        <p className="text-zinc-400 text-sm leading-relaxed mb-3">
+          Virtual Agency builds and owns its own K-aesthetic characters —
+          Yuna (cool minimalist editorial) and Ren (K-pop visual register
+          for fragrance and watches). Both are designed to share a styling
+          DNA so a brand can license one face, the pair, or a multi-face
+          kit and the campaign reads as one consistent story across markets
+          and quarters.
+        </p>
+        <p className="text-zinc-400 text-sm leading-relaxed mb-12">
+          Brands that need K-aesthetic credibility without re-casting every
+          season license a character. NL/US competitors who don't ship from
+          inside the Korean visual register can't replicate this layer — it
+          is the IP moat behind the studio.{" "}
+          <Link
+            href="/en/character"
+            className="underline hover:text-white"
+          >
+            See the roster
+          </Link>
+          .
+        </p>
+
         <h2 className="text-xl font-semibold mb-3">Infrastructure</h2>
         <p className="text-zinc-400 text-sm leading-relaxed mb-12">
           We run a self-hosted Supabase stack for data, a private GPU cluster

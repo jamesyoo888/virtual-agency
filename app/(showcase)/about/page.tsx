@@ -126,6 +126,27 @@ export default function AboutPage() {
         </section>
 
         <section className="mb-14">
+          <h2 className="text-xl font-semibold mb-4">자체 IP — K-aesthetic 모트</h2>
+          <p className="text-sm text-zinc-400 leading-relaxed mb-3">
+            Virtual Agency 는 자체 K-aesthetic 캐릭터를 직접 설계하고
+            소유합니다. 유나(쿨 미니멀 에디토리얼)와 렌(향수·시계 광고용 K-pop
+            비주얼 레지스터). 두 캐릭터는 동일한 스타일링 DNA로 설계되어 있어
+            브랜드가 솔로·페어·멀티 페이스 키트 중 어떤 형태로 라이선스해도
+            캠페인이 시즌과 시장을 가로질러 같은 톤으로 읽힙니다.
+          </p>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            매 시즌 새로 캐스팅하지 않고 K-aesthetic 신뢰도를 유지하고 싶은
+            브랜드가 캐릭터를 라이선스합니다. 한국 비주얼 레지스터 내부에서
+            출발하지 않은 NL/US 경쟁자는 이 층을 복제하기 어렵습니다 —
+            스튜디오의 IP 모트입니다.{" "}
+            <Link href="/character" className="underline hover:text-white">
+              캐릭터 로스터 보기
+            </Link>
+            .
+          </p>
+        </section>
+
+        <section className="mb-14">
           <h2 className="text-xl font-semibold mb-4">자체 인프라</h2>
           <p className="text-sm text-zinc-400 leading-relaxed mb-4">
             외부 API 만으로 운영하는 에이전시는 가격·납기·품질에서
