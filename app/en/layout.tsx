@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ldScript, siteNavigationLd } from "@/lib/seo/json-ld";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://virtual-agency-murex.vercel.app";
@@ -164,8 +165,27 @@ export default function EnLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const navLd = siteNavigationLd([
+    { name: "Home", url: `${SITE_URL}/en` },
+    { name: "Pricing", url: `${SITE_URL}/en/pricing` },
+    { name: "Services", url: `${SITE_URL}/en/services` },
+    { name: "Characters", url: `${SITE_URL}/en/character` },
+    { name: "Brand kits", url: `${SITE_URL}/en/character/brand-kits` },
+    { name: "Compare Yuna vs Ren", url: `${SITE_URL}/en/character/compare` },
+    { name: "AI Match", url: `${SITE_URL}/en/match` },
+    { name: "RFP", url: `${SITE_URL}/en/rfp` },
+    { name: "About", url: `${SITE_URL}/en/about` },
+    { name: "Blog", url: `${SITE_URL}/en/blog` },
+    { name: "Case studies", url: `${SITE_URL}/en/cases` },
+    { name: "FAQ", url: `${SITE_URL}/en/faq` },
+    { name: "Press", url: `${SITE_URL}/en/press` },
+  ]);
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(navLd) }}
+      />
       {children}
       <EnFooter />
     </>
