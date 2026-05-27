@@ -396,6 +396,18 @@ export default async function sitemap(
               },
             },
           },
+          {
+            url: `${SITE_URL}/character/brand-kits`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.7,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/character/brand-kits`,
+                en: `${SITE_URL}/en/character/brand-kits`,
+              },
+            },
+          },
           ...listCharacters().map((c) => ({
             url: `${SITE_URL}/character/${c.slug}`,
             lastModified: now,

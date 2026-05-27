@@ -118,7 +118,7 @@ export default function KrCharactersIndex() {
             있습니다.
           </p>
           <Link
-            href="/en/character/brand-kits"
+            href="/character/brand-kits"
             className="inline-flex items-center gap-1 text-sm rounded-md bg-white text-black px-3 py-1.5 hover:bg-zinc-200"
           >
             페어 브랜드 키트 보기 <ArrowRight className="w-3 h-3" />
