@@ -1412,6 +1412,106 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "rfp-brief-checklist-k-aesthetic-campaign",
+    locale: "en",
+    title: "The RFP Brief Checklist for K-Aesthetic Campaigns (Save This)",
+    excerpt:
+      "A 9-item brief checklist global brands use to get a usable K-aesthetic concept on the first turn. Tone words, palette, lighting, deliverables, disclosure — covered.",
+    publishedAt: "2026-06-01",
+    readingMinutes: 6,
+    tags: ["brief", "RFP", "K-aesthetic", "operations", "checklist"],
+    sections: [
+      {
+        heading: "Why most K-aesthetic briefs come back wrong",
+        body: "When a K-aesthetic concept misses on the first pass, the cause is almost always the brief, not the studio. Briefs that lead with «make it Korean» get cosplay. Briefs that lead with tone, palette, and use case get K-aesthetic. This checklist forces the brief into the second shape.",
+      },
+      {
+        heading: "1. Three locked tone words",
+        body: "Pick three adjectives the campaign must hit and nothing else. Example: «cool, restrained, premium». Three is the upper bound — five becomes contradictory in practice. Lock them at the top of the brief so the creative team has a clear truth test.",
+      },
+      {
+        heading: "2. One locked palette",
+        body: "Either cool minimal (gray-blue + cream + sage), warm dewy (peach + ivory + amber), or editorial mono (black + ash + one accent). Mixing reads as off-brand within the K-aesthetic register. Pick one and write the hex codes inline.",
+      },
+      {
+        heading: "3. One lighting recipe",
+        body: "Soft glass-skin key (5500K, low-contrast fill), directional cool key (deeper shadow fall), or warm dewy (golden hour-leaning warm amber). Pick one, attach one reference image. The recipe is more diagnostic than wardrobe — get this wrong and nothing else recovers.",
+      },
+      {
+        heading: "4. Use case per deliverable",
+        body: "PDP hero · Instagram carousel · Reels 9:16 · OOH 4K · email banner — list every surface the asset will appear on. K-aesthetic compositions optimized for PDP fail on Reels and vice versa; the brief decides the crop intent up front.",
+      },
+      {
+        heading: "5. Markets and disclosure scope",
+        body: "List every market the campaign runs in (Korea, US, EU, UK, SG). Each has its own AI-content disclosure obligation. The brief names the markets so the disclosure metadata is correct on delivery — not bolted on post-launch.",
+      },
+      {
+        heading: "6. Cast scope (solo vs paired vs series)",
+        body: "Solo: one face, one campaign. Paired: two faces sharing a styling DNA across a season. Series: a recurring cast across multiple drops. The brief picks the scope so pricing and exclusivity decisions are not deferred to the contract round.",
+      },
+      {
+        heading: "7. Exclusivity preference",
+        body: "Non-exclusive (default), category-exclusive (your competitors locked out for the quarter), or full-exclusive (every market). Cost scales accordingly. State the preference up front so the proposal lands in the right shape.",
+      },
+      {
+        heading: "8. Reference images (max 3) + anti-references (max 3)",
+        body: "Three references that capture the target and three that show what to avoid. Anti-references prevent the common drift toward whichever K-aesthetic reference is most viral that month. Cap at three on each side to keep the signal clean.",
+      },
+      {
+        heading: "9. Timeline + decision-maker contact",
+        body: "Brief date, target first-draft date, final delivery date, and the single person who can approve the brief and the deliverable. Without (9), the brief loops in revision while the campaign date slides.",
+      },
+      {
+        heading: "Where this checklist lives",
+        body: "We ship a fillable Markdown version on /en/brief-template — copy it into your RFP and you have a brief that lands in the right shape on the first turn.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-talent-roi-vs-photographer-day-rate",
+    locale: "en",
+    title: "Synthetic Talent ROI vs Photographer Day-Rate: The Honest Math",
+    excerpt:
+      "Real numbers across one PDP campaign, one OOH push, and one quarter-long brand kit. Where synthetic wins on ROI, where photographers still win, and how to budget for the hybrid most brands actually need.",
+    publishedAt: "2026-06-02",
+    readingMinutes: 8,
+    tags: ["ROI", "pricing", "operations", "strategy"],
+    sections: [
+      {
+        heading: "Three campaign shapes to compare",
+        body: "We modeled three shapes across the same brand brief — PDP catalog refresh (60 SKUs), seasonal OOH (5 markets), and quarter-long brand kit (PDP + social + OOH + email). The same shapes are how most global brand teams actually budget, so the comparison maps cleanly onto how a CFO asks the question.",
+      },
+      {
+        heading: "Shape 1 — PDP catalog refresh (60 SKUs)",
+        body: "Traditional path: photographer day-rate ($4-8K), one location ($1-3K), one model day-rate ($2-5K plus retouch), 60 SKU edit pipeline ($3-6K). Range $10-22K, typical $15K. Synthetic path: $300-600/day base × roughly two days of generation and revision plus retouch QA. Range $1-2K. ROI lead is roughly 7-10× on this shape, almost entirely because the photographer team scales nonlinearly in SKU count.",
+      },
+      {
+        heading: "Shape 2 — Seasonal OOH (5 markets)",
+        body: "Traditional path: one shoot day, hero retouch, market-specific localization ($2-4K per market), licensing per market. Range $20-40K. Synthetic path: $300-600/day × 3 days of concept lock and per-market generation and disclosure metadata. Range $2-4K. The complication: OOH still benefits from a real location anchor for credibility cues — many brands run a hybrid here, with a real establishing shot and synthetic talent in the foreground. Hybrid is $8-15K, still a 2-3× cost lead.",
+      },
+      {
+        heading: "Shape 3 — Quarter-long brand kit",
+        body: "Traditional path: ambassador deal ($25-75K per quarter for a mid-tier face), shoot days for activation, asset library development. Range $50-120K per quarter. Synthetic path: paired brand kit ($8.5K-$22K per quarter for Yuna + Ren). ROI lead is 4-7×. The differentiator at this shape is consistency, not cost — synthetic talent never has a scheduling conflict, never ages out of the campaign, and gives you the same face across every market.",
+      },
+      {
+        heading: "Where photographers still win",
+        body: "Three categories. (1) Documentary-style brand storytelling that needs real location credibility. (2) Editorial work where the cultural signal is the photographer's signature, not the face. (3) Talent-led campaigns where the human ambassador's own audience is the reach. In these cases, the photographer day-rate is the entry ticket and synthetic doesn't compete.",
+      },
+      {
+        heading: "Where the hybrid pays off",
+        body: "Most global brand teams find the answer is not all-or-nothing. The hybrid most brands settle on: photographer day-rate for one or two hero anchors per quarter, synthetic talent for the catalog refresh, market localization, and surface adaptations. Total cost lands 40-60% below traditional-only, with the photographer brand cues preserved.",
+      },
+      {
+        heading: "The CFO question",
+        body: "Most CFOs do not ask whether synthetic is cheaper — they ask whether the cost lead survives at brand-trust-equivalent quality. The honest answer: at PDP and OOH localization, yes, easily. At brand storytelling, often no. Budget accordingly: synthetic for the scale layer, photographer for the trust layer.",
+      },
+      {
+        heading: "Three line items to add to your next budget",
+        body: "(1) Synthetic concept lock — $1-2K per concept. (2) Per-market generation pass — $300-600 per market. (3) Disclosure metadata QA — bundled with delivery. These three line items are what we see most often missing in first-pass synthetic budgets, and they are also the cheapest items in the stack.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
