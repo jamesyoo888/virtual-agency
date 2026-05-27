@@ -4,6 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
 import { listAnchorCases } from "@/lib/cases/anchor-cases";
 import { listCharacters } from "@/lib/characters/registry";
+import { listSeries } from "@/lib/blog/series";
 import { INDUSTRY_OPTIONS, MOOD_OPTIONS, GENRE_OPTIONS } from "@/lib/tags";
 
 const SITE_URL =
@@ -215,6 +216,12 @@ export default async function sitemap(
             lastModified: now,
             changeFrequency: "monthly" as const,
             priority: 0.6,
+          })),
+          ...listSeries("en").map((s) => ({
+            url: `${SITE_URL}/en/blog/series/${s.id}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.7,
           })),
           ...INDUSTRY_OPTIONS.map((o) => ({
             url: `${SITE_URL}/en/explore/${o.value}`,
@@ -489,6 +496,18 @@ export default async function sitemap(
               languages: {
                 ko: `${SITE_URL}/character/${c.slug}/lookbook`,
                 en: `${SITE_URL}/en/character/${c.slug}/lookbook`,
+              },
+            },
+          })),
+          ...listSeries("ko").map((s) => ({
+            url: `${SITE_URL}/blog/series/${s.id}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.7,
+            alternates: {
+              languages: {
+                ko: `${SITE_URL}/blog/series/${s.id}`,
+                en: `${SITE_URL}/en/blog/series/${s.id}`,
               },
             },
           })),

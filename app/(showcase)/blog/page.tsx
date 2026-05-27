@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
+import { listSeries } from "@/lib/blog/series";
 import { itemListLd, ldScript } from "@/lib/seo/json-ld";
-import { ArrowRight, Rss } from "lucide-react";
+import { ArrowRight, Rss, BookOpen } from "lucide-react";
 
 export const revalidate = 3600;
 
@@ -17,6 +18,7 @@ export const metadata = {
 export default function BlogIndexPage() {
   const posts = listPosts();
   const tags = listTags();
+  const series = listSeries("ko");
 
   const ld = itemListLd(
     "Virtual Agency 블로그",
@@ -66,6 +68,34 @@ export default function BlogIndexPage() {
             </div>
           )}
         </header>
+
+        {series.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-[10px] uppercase tracking-[0.3em] text-violet-300 mb-4 inline-flex items-center gap-2">
+              <BookOpen className="w-3.5 h-3.5" />
+              테마별 시리즈
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {series.map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/blog/series/${s.id}`}
+                  className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-4 hover:border-violet-400/50 hover:bg-violet-500/10 transition-colors group"
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-violet-300 tabular-nums">
+                    {s.slugs.length}편
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-zinc-100 group-hover:text-white">
+                    {s.title}
+                  </p>
+                  <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed line-clamp-2">
+                    {s.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <ul className="space-y-8 border-t border-zinc-900">
           {posts.map((post) => (

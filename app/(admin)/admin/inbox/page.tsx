@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Inbox, Download, Flame } from "lucide-react";
+import { Inbox, Download, Flame, Sparkles } from "lucide-react";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
 import InboxSearch from "@/components/inbox-search";
@@ -484,6 +484,15 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                       >
                         {leadTier === "hot" && <Flame className="w-3 h-3" />}
                         {TIER_LABEL_KO[leadTier]}
+                      </span>
+                    )}
+                    {p.utm_source === "character" && (
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border bg-violet-500/15 text-violet-200 border-violet-500/30"
+                        title={`Character IP 유입 — ${p.utm_campaign ?? "campaign 미상"}`}
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        Char
                       </span>
                     )}
                     <span

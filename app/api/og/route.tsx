@@ -5,6 +5,7 @@ import { devModelStore } from "@/lib/dev-store";
 import { getPostBySlug, listPostsByTag } from "@/lib/blog/posts";
 import { INDUSTRY_LABELS, MOOD_LABELS, GENRE_LABELS } from "@/lib/tags";
 import { getCharacter } from "@/lib/characters/registry";
+import { listSeries } from "@/lib/blog/series";
 import type { Model } from "@/types";
 
 export const runtime = "nodejs";
@@ -121,6 +122,8 @@ export async function GET(request: Request) {
   const isCharacterCompare = searchParams.get("character_compare") === "1";
   const isGlossary = searchParams.get("glossary") === "1";
   const isEnGlossary = searchParams.get("en_glossary") === "1";
+  const series = searchParams.get("series");
+  const enSeries = searchParams.get("en_series");
 
   if (isEnHome) {
     return bigCard(
@@ -250,6 +253,16 @@ export async function GET(request: Request) {
       "K-aesthetic & synthetic talent — 14 terms",
       "Glass skin, styling DNA, brand kit, disclosure metadata, category exclusivity. The vocabulary that buyers and compliance reviewers actually use."
     );
+  }
+  if (enSeries) {
+    const s = listSeries("en").find((x) => x.id === enSeries);
+    if (s) {
+      return bigCard(
+        "VIRTUAL AGENCY · BLOG SERIES",
+        s.title,
+        `${s.slugs.length} posts · ${s.description}`
+      );
+    }
   }
 
   // Static-card surfaces first — these never need a DB read.
@@ -395,6 +408,16 @@ export async function GET(request: Request) {
       "K-aesthetic · 합성 모델 14 용어",
       "글래스 스킨, 스타일링 DNA, 브랜드 키트, 디스클로저 메타데이터, 카테고리 독점. 브리프·견적·컴플라이언스 검토 시 필요한 어휘."
     );
+  }
+  if (series) {
+    const s = listSeries("ko").find((x) => x.id === series);
+    if (s) {
+      return bigCard(
+        "VIRTUAL AGENCY · 블로그 시리즈",
+        s.title,
+        `${s.slugs.length}편 · ${s.description}`
+      );
+    }
   }
   if (isAbout) {
     return bigCard(
