@@ -29,6 +29,7 @@ import {
 } from "@/lib/analytics/client-retention";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { loadBlogViews } from "@/lib/analytics/blog-views";
 import AdminCopySummary from "@/components/admin-copy-summary";
 import DailyRevenueSparkline, {
   DailyCountSparkline,
@@ -430,6 +431,7 @@ export default async function AdminHomePage() {
     stuck,
     velocity,
     characterAttribution30d,
+    blogViews30d,
   ] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
@@ -446,6 +448,7 @@ export default async function AdminHomePage() {
     loadStuckPipeline(),
     loadPipelineVelocity(90),
     loadCharacterAttribution(30),
+    loadBlogViews(30),
   ]);
   const wow = wowDaily.wow;
   const dailyRevenue = wowDaily.daily;
@@ -707,33 +710,61 @@ export default async function AdminHomePage() {
         );
       })()}
 
-      {characterAttribution30d.totalInquiries > 0 && (
-        <Link
-          href="/admin/analytics"
-          className="block rounded-xl border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 transition-colors p-5"
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-wider text-zinc-500">
-              캐릭터 페이지 → 문의 (30일)
-            </p>
-            <Sparkles className="w-4 h-4 text-violet-300" />
-          </div>
-          <p className="mt-3 text-2xl font-bold tabular-nums text-violet-100">
-            {characterAttribution30d.totalInquiries}
-            <span className="text-sm text-violet-300/60 ml-2">건</span>
-          </p>
-          <p className="mt-1 text-[11px] text-zinc-400 tabular-nums">
-            납품 {characterAttribution30d.totalDelivered} ·{" "}
-            {characterAttribution30d.totalRevenue > 0 ? (
-              <span className="text-emerald-300">
-                ₩{characterAttribution30d.totalRevenue.toLocaleString("ko-KR")}
-              </span>
-            ) : (
-              <span className="text-zinc-500">대기 중</span>
-            )}
-            {" "}· utm_source=character → /admin/analytics
-          </p>
-        </Link>
+      {(characterAttribution30d.totalInquiries > 0 || blogViews30d.total > 0) && (
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {characterAttribution30d.totalInquiries > 0 && (
+            <Link
+              href="/admin/analytics"
+              className="block rounded-xl border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 transition-colors p-5"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
+                  캐릭터 페이지 → 문의 (30일)
+                </p>
+                <Sparkles className="w-4 h-4 text-violet-300" />
+              </div>
+              <p className="mt-3 text-2xl font-bold tabular-nums text-violet-100">
+                {characterAttribution30d.totalInquiries}
+                <span className="text-sm text-violet-300/60 ml-2">건</span>
+              </p>
+              <p className="mt-1 text-[11px] text-zinc-400 tabular-nums">
+                납품 {characterAttribution30d.totalDelivered} ·{" "}
+                {characterAttribution30d.totalRevenue > 0 ? (
+                  <span className="text-emerald-300">
+                    ₩{characterAttribution30d.totalRevenue.toLocaleString("ko-KR")}
+                  </span>
+                ) : (
+                  <span className="text-zinc-500">대기 중</span>
+                )}
+                {" "}· utm_source=character
+              </p>
+            </Link>
+          )}
+          {blogViews30d.total > 0 && (
+            <Link
+              href="/admin/analytics"
+              className="block rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors p-5"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
+                  블로그 조회 (30일)
+                </p>
+                <Sparkles className="w-4 h-4 text-emerald-300" />
+              </div>
+              <p className="mt-3 text-2xl font-bold tabular-nums text-emerald-100">
+                {blogViews30d.total.toLocaleString()}
+                <span className="text-sm text-emerald-300/60 ml-2">건</span>
+              </p>
+              <p className="mt-1 text-[11px] text-zinc-400 tabular-nums">
+                KR {blogViews30d.totalKo} · EN {blogViews30d.totalEn}
+                {blogViews30d.bySlug.length > 0 && (
+                  <> · 1위 {blogViews30d.bySlug[0].total}회</>
+                )}
+                {" "}· /admin/analytics
+              </p>
+            </Link>
+          )}
+        </section>
       )}
 
       {mtd.mtdRevenue > 0 || mtd.priorMonthTotal > 0 ? (
