@@ -2,12 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Inbox, Download, Flame, Sparkles } from "lucide-react";
+import { Inbox, Download, Flame, Sparkles, BookOpen } from "lucide-react";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
 import InboxSearch from "@/components/inbox-search";
 import InboxBulkBar from "@/components/inbox-bulk-bar";
 import { computeLeadScore, TIER_LABEL_KO, TIER_TONE } from "@/lib/analytics/lead-score";
+import { parseBlogReferrer } from "@/lib/analytics/blog-attribution";
 
 export const dynamic = "force-dynamic";
 
@@ -501,6 +502,24 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                         Char
                       </span>
                     )}
+                    {(() => {
+                      // Surface blog-attributed inquiries with an emerald chip
+                      // — mirrors the violet Char chip pattern. Tie-breaker:
+                      // if utm_source is already "character", skip so the row
+                      // doesn't carry two competing source chips.
+                      if (p.utm_source === "character") return null;
+                      const blog = parseBlogReferrer(p.referrer);
+                      if (!blog) return null;
+                      return (
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border bg-emerald-500/15 text-emerald-200 border-emerald-500/30"
+                          title={`블로그 글 경유 — ${blog.locale.toUpperCase()}/${blog.slug}`}
+                        >
+                          <BookOpen className="w-3 h-3" />
+                          Blog
+                        </span>
+                      );
+                    })()}
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${
                         STATUS_TONE[p.status] ?? "bg-zinc-800 text-zinc-400 border-zinc-700"

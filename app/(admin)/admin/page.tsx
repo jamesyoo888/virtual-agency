@@ -30,6 +30,7 @@ import {
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadBlogViews } from "@/lib/analytics/blog-views";
+import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import AdminCopySummary from "@/components/admin-copy-summary";
 import DailyRevenueSparkline, {
   DailyCountSparkline,
@@ -50,6 +51,7 @@ import {
   AlertTriangle,
   Timer,
   Sparkles,
+  BookOpen,
 } from "lucide-react";
 
 const STAGE_LABELS_KO: Record<string, string> = {
@@ -432,6 +434,7 @@ export default async function AdminHomePage() {
     velocity,
     characterAttribution30d,
     blogViews30d,
+    blogAttribution30d,
   ] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
@@ -449,6 +452,7 @@ export default async function AdminHomePage() {
     loadPipelineVelocity(90),
     loadCharacterAttribution(30),
     loadBlogViews(30),
+    loadBlogAttribution(30),
   ]);
   const wow = wowDaily.wow;
   const dailyRevenue = wowDaily.daily;
@@ -710,8 +714,10 @@ export default async function AdminHomePage() {
         );
       })()}
 
-      {(characterAttribution30d.totalInquiries > 0 || blogViews30d.total > 0) && (
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {(characterAttribution30d.totalInquiries > 0 ||
+        blogViews30d.total > 0 ||
+        blogAttribution30d.totalInquiries > 0) && (
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {characterAttribution30d.totalInquiries > 0 && (
             <Link
               href="/admin/analytics"
@@ -740,9 +746,37 @@ export default async function AdminHomePage() {
               </p>
             </Link>
           )}
-          {blogViews30d.total > 0 && (
+          {blogAttribution30d.totalInquiries > 0 && (
             <Link
               href="/admin/analytics"
+              className="block rounded-xl border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 transition-colors p-5"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
+                  블로그 → 문의 (30일)
+                </p>
+                <BookOpen className="w-4 h-4 text-cyan-300" />
+              </div>
+              <p className="mt-3 text-2xl font-bold tabular-nums text-cyan-100">
+                {blogAttribution30d.totalInquiries}
+                <span className="text-sm text-cyan-300/60 ml-2">건</span>
+              </p>
+              <p className="mt-1 text-[11px] text-zinc-400 tabular-nums">
+                납품 {blogAttribution30d.totalDelivered} ·{" "}
+                {blogAttribution30d.totalRevenue > 0 ? (
+                  <span className="text-emerald-300">
+                    ₩{blogAttribution30d.totalRevenue.toLocaleString("ko-KR")}
+                  </span>
+                ) : (
+                  <span className="text-zinc-500">대기 중</span>
+                )}
+                {" "}· referrer=/blog/*
+              </p>
+            </Link>
+          )}
+          {blogViews30d.total > 0 && (
+            <Link
+              href="/admin/blog-analytics"
               className="block rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors p-5"
             >
               <div className="flex items-center justify-between">
@@ -760,7 +794,7 @@ export default async function AdminHomePage() {
                 {blogViews30d.bySlug.length > 0 && (
                   <> · 1위 {blogViews30d.bySlug[0].total}회</>
                 )}
-                {" "}· /admin/analytics
+                {" "}· /admin/blog-analytics
               </p>
             </Link>
           )}

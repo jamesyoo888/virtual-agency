@@ -18,6 +18,7 @@ import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadBlogViews } from "@/lib/analytics/blog-views";
+import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -52,6 +53,7 @@ const KINDS = new Set([
   "pipeline-velocity",
   "character-attribution",
   "blog-engagement",
+  "blog-attribution",
 ]);
 
 export async function GET(
@@ -1244,6 +1246,50 @@ export async function GET(
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(
           "character-attribution"
+        )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "blog-attribution") {
+    // Symmetric to character-attribution: aggregates inquiries / delivered /
+    // revenue by the blog post each lead came from (parsed from the
+    // referrer URL on the projects table). Two-column metric/value layout
+    // so spreadsheet ops match the rest of the analytics exports.
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 90;
+    const report = await loadBlogAttribution(windowDays);
+    const rows: { metric: string; value: string }[] = [
+      { metric: "window_days", value: String(report.windowDays) },
+      { metric: "total_inquiries", value: String(report.totalInquiries) },
+      { metric: "total_delivered", value: String(report.totalDelivered) },
+      { metric: "total_revenue_krw", value: String(report.totalRevenue) },
+      ...report.bySlug.flatMap((b) => [
+        {
+          metric: `${b.locale}_${b.slug}_inquiries`,
+          value: String(b.inquiries),
+        },
+        {
+          metric: `${b.locale}_${b.slug}_delivered`,
+          value: String(b.delivered),
+        },
+        {
+          metric: `${b.locale}_${b.slug}_revenue_krw`,
+          value: String(b.revenue),
+        },
+        {
+          metric: `${b.locale}_${b.slug}_conversion_pct`,
+          value: String(b.conversionPct),
+        },
+      ]),
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "blog-attribution"
         )}"`,
         "Cache-Control": "no-store",
       },

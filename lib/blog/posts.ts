@@ -2584,6 +2584,278 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "character-maintenance-playbook-quarterly-refresh",
+    locale: "en",
+    title: "Character maintenance playbook — what happens after launch",
+    excerpt:
+      "Synthetic characters don't ship «and forget.» A quarter-by-quarter operational rhythm for keeping a character on-brand, on-recipe, and on-disclosure across markets.",
+    publishedAt: "2026-07-12",
+    readingMinutes: 8,
+    tags: ["playbook", "maintenance", "character", "operations"],
+    sections: [
+      {
+        heading: "Why maintenance is the gap",
+        body: "Most «AI character» writing covers concept, launch, and the first campaign. The next two years — the part that actually decides whether the character pays back — is poorly documented. This is what we run for clients on Season Anchor and Custom tiers, and what we suggest for buyers running their own. The TL;DR: characters drift when nobody is responsible for them. Pick an owner and pick a rhythm before the launch dust settles.",
+      },
+      {
+        heading: "The four maintenance surfaces",
+        body: "Every quarter, four things need a look. (1) Recipe — has the look drifted? Render 4 reference frames and diff against the locked recipe vector. (2) Wardrobe and supporting assets — has Q+1 already scheduled its refresh, or are we stretching Q+0 assets too thin? (3) Disclosure metadata — has any of the four markets shifted requirements? (4) Audience reception — engagement holding or fading? Each one has a different fix; conflating them is the most common mistake we see.",
+      },
+      {
+        heading: "Q+1 — first refresh checkpoint",
+        body: "90 days post-launch. The audience now reads the character as a recurring face. Two questions: does the character need new wardrobe/contexts (almost always yes), or does the recipe need an adjustment (usually no — if engagement is steady, leave the recipe alone). Standard Q+1 refresh: 6-10 new wardrobe variants, 1-2 new lighting contexts, same recipe vector. Cost: roughly 12-18% of the original brand-kit. If engagement has plateaued, the fix is contexts, not the character.",
+      },
+      {
+        heading: "Q+2 — the «freshness» trap",
+        body: "Six months post-launch is when the creative team starts pushing for a refresh «to keep things fresh.» Push back on this; the request usually comes from creative-team boredom, not audience signal. The audience hasn't seen the character nearly as much as the team has. Pull the engagement curve. If it's still tracking, the right move is wardrobe and context, not recipe drift. If engagement has fallen 20%+ from launch baseline (controlled for category seasonality), then yes — but redesign deliberately, not impulsively.",
+      },
+      {
+        heading: "Q+3 — disclosure pipeline audit",
+        body: "By month 9, at least one of the four major markets (EU AI Act, FTC, UK ASA, KCSC) has updated its requirements — statistically, this is what happens. Walk through the disclosure-metadata schema; verify each market's required fields are still present and correctly formatted. Most failures here come from a third-party platform changing its alt-text length cap, breaking the disclosure carrier. We've seen this with TikTok, Instagram, and Naver in the past 12 months. Audit the carrier, not just the metadata.",
+      },
+      {
+        heading: "Q+4 — the IP renewal decision",
+        body: "One year post-launch. Time to look at the full P&L: did the character pay back the brand-kit investment? Standard mature characters do, with caveats. If yes: renew, plan a Q+5 brand-kit refresh (~25% of original cost), schedule the next year. If marginal: keep the character but downsize the asset pipeline; cheaper supporting renders, less localization investment. If no: archive the character but keep the recipe vector — it's an asset on the books, even if it's resting. Don't delete; the cost of regenerating is much higher than the cost of storing.",
+      },
+      {
+        heading: "Recipe drift and how it actually happens",
+        body: "Three vectors. (1) Creative team requests slightly different palettes for a special campaign; the «special» version leaks into production. (2) A new render engine version is rolled out and produces marginally different output for the same prompt; the diff is small enough to not be obvious frame-by-frame but visible at scale. (3) Localization layers stack on each other and the cumulative drift exceeds the per-layer threshold. Fix: lock the recipe vector with a similarity floor (we use 92%) and reject below that automatically. The system catches all three drifts before delivery.",
+      },
+      {
+        heading: "Who owns the character internally",
+        body: "We strongly recommend a single owner on the brand side, not a committee. The owner has authority to approve recipe changes, reject ad-hoc creative requests that would drift the character, and sign off on Q+N refresh budgets. Without a single owner, characters drift fastest — five stakeholders each push the look one click in their preferred direction and within a year the character is unrecognizable. The owner doesn't have to be senior; they have to be empowered to say «no, that's not on-brand for this character.»",
+      },
+      {
+        heading: "When to retire a character",
+        body: "Three honest reasons to retire. (1) Brand strategy has shifted; the character no longer represents the brand's audience or positioning. (2) The character has carried 18+ months of campaigns and the engagement curve has fully decayed; the audience is signaling fatigue. (3) A new flagship character (often paired or themed) is ready to take over and the brand needs the bandwidth. Bad reasons: «we want something fresh» (use refresh), «we're tired of seeing it» (you are not the audience), «the agency wants to redesign» (their incentives don't match yours). Retirement is fine; we just want it to come from real signal.",
+      },
+    ],
+  },
+  {
+    slug: "why-we-reject-rfps-common-patterns",
+    locale: "en",
+    title: "Why we reject RFPs — five patterns we see weekly",
+    excerpt:
+      "We turn down 30-40% of inbound RFPs. The patterns are predictable. Reading this lets buyers fix the upstream issue before submitting, raising the odds of a fast yes.",
+    publishedAt: "2026-07-15",
+    readingMinutes: 6,
+    tags: ["RFP", "buyer-funnel", "process", "honesty"],
+    sections: [
+      {
+        heading: "Why publish this",
+        body: "Buyers ask us privately why their RFP went unanswered or got a polite no. Sharing the patterns is more useful than answering one at a time. The five reasons below cover ~85% of our rejections. If your RFP fits any of them, fix it before sending — we'd much rather have a clean RFP we can say yes to than a fuzzy one we have to decline.",
+      },
+      {
+        heading: "Pattern 1 — budget mismatch with scope",
+        body: "Most common. The RFP requests 60 hero assets, 4 markets, exclusivity, and full disclosure metadata at a budget that supports ~12 assets in a single market. We can't shrink to that — quality and compliance would suffer. We don't try to upsell here; we tell the buyer the budget supports a single-market launch with 12-15 assets, or asks them to expand the budget to match the cross-market scope. Either path is fine; the unfixed RFP isn't. To diagnose: divide budget by asset count. Under $1.5K/asset cross-market = likely undersized.",
+      },
+      {
+        heading: "Pattern 2 — vague brief, vague success criteria",
+        body: "«Make us a K-aesthetic campaign that performs well.» We read this RFP and have no way to estimate scope. What does «performs well» mean — reach? Conversion? Recall? What's the channel mix? Which market? What's the existing brand identity? Vague briefs lead to vague proposals, vague proposals lead to scope creep, and scope creep poisons the relationship. We decline these unless the buyer is open to a paid scoping session ($1.5K, 90 minutes) that produces a usable brief. The investment pays back 8-12× in clarity.",
+      },
+      {
+        heading: "Pattern 3 — likeness conflicts",
+        body: "Buyer wants the synthetic character to «look like [specific celebrity]» or «like our previous campaign with [influencer].» We can't do this. The character has to be its own creative — too close a likeness creates legal risk for both sides, and we run face-similarity audits explicitly to avoid it. If the buyer's underlying need is «we want a familiar feel,» the right reframe is the brand-positioning the celebrity carries, not the celebrity's face. Sometimes the buyer accepts that reframe and we proceed; sometimes they don't, and that's fine — we decline cleanly.",
+      },
+      {
+        heading: "Pattern 4 — disclosure resistance",
+        body: "Some buyers want the campaign to look entirely «human-made» and resist the disclosure metadata that EU AI Act, FTC, UK ASA, and KCSC require. We don't run campaigns without disclosure — full stop. The legal exposure is asymmetric (massive downside, no upside), and our reputation is built on shipping clean. The compromise we offer: disclosure can be tasteful — small text in alt-text, metadata in C2PA, a single line in campaign captions. We don't insist on neon banners. But we won't ship without it. If the buyer can't accept that, we decline.",
+      },
+      {
+        heading: "Pattern 5 — single-stakeholder confusion",
+        body: "The RFP comes from one stakeholder (often marketing) but the decision involves three others (legal, brand, finance) who haven't been looped in. We can spot this early because the requirements wobble between revisions of the RFP. We decline these because they predict scope churn in production — every other week, a previously-silent stakeholder surfaces with new requirements. Better to ask the buyer to align internally first. We offer a 45-min stakeholder-alignment call at no cost; about 60% of buyers find this useful.",
+      },
+      {
+        heading: "What a clean RFP looks like",
+        body: "Five fields that make the difference. (1) Specific scope: number of hero/supporting assets, markets, channels. (2) Specific success criteria: «conversion lift vs prior campaign,» «recall above 35%,» whatever it is. (3) Brand assets we can reference (existing creative, palette, tone-of-voice samples). (4) Disclosure stance: which markets we're shipping to and acknowledgment that disclosure will be present. (5) Internal alignment: confirmation that legal/brand/finance have signed off on the budget and scope. RFPs with all five fields turn into proposals within 48 hours.",
+      },
+      {
+        heading: "The rejection-to-yes path",
+        body: "About 25% of our initial rejections turn into yeses after the buyer fixes the upstream issue. The most common path: the buyer expands the budget to match the scope they actually want, or contracts the scope to match the budget they actually have. Either is fine. Our goal isn't to maximize closed deals; it's to ship campaigns we're proud of. The cleanest RFPs make that easy. We'd rather decline today and reopen in three weeks with a workable brief than start a project that's structurally compromised on day one.",
+      },
+    ],
+  },
+  {
+    slug: "post-launch-metrics-which-numbers-actually-matter",
+    locale: "en",
+    title: "Post-launch metrics deep dive — which numbers actually matter",
+    excerpt:
+      "By Day 60, your character has data. Most teams measure the wrong things. The four metrics that separate signal from noise, with realistic baselines.",
+    publishedAt: "2026-07-18",
+    readingMinutes: 7,
+    tags: ["measurement", "post-launch", "buyer-funnel", "operations"],
+    sections: [
+      {
+        heading: "Why measurement gets harder, not easier",
+        body: "Pre-launch, the metrics question is simple: budget, schedule, deliverables. Post-launch the question becomes «is this working?» — and the most common failure mode is measuring things that move every day but don't tell you anything about whether the character is actually paying back. This guide is the framework we use with Season Anchor and Custom-tier clients at Day 60 and Day 90 reviews. Four metrics; ignore the rest until these are clean.",
+      },
+      {
+        heading: "Metric 1 — assisted conversion lift vs control",
+        body: "The honest top-line. Compare the 30 days immediately following the character's first major campaign drop to a matched 30-day window before. Match on category seasonality (compare Q3 to Q3 of last year, not Q3 to Q2 of this year if your category has strong seasonal swing). If conversion is up 12%+ over the control window and the rest of your marketing was constant, the character is contributing. Under 6%? You don't have a signal yet — wait another 30 days. Over 25%? Be skeptical and look for confounds; we've seen this number be artificially high three times and twice it was a measurement bug, not real lift.",
+      },
+      {
+        heading: "Metric 2 — share of voice on relevant terms",
+        body: "Run a tool of choice (Brandwatch, Sprinklr, even a manual SERP audit) and check whether the character is showing up in conversations / search results around the category. The goal isn't celebrity-level recognition; it's «mentioned without being the headline.» For a paired character at Day 60, we'd expect ~80-150 organic mentions across major social platforms in a mid-sized brand's category. Under 30 = either the launch wasn't promoted enough (most common) or the character isn't resonating (second most common). The fix differs.",
+      },
+      {
+        heading: "Metric 3 — recognizability score (audience study)",
+        body: "Run a small panel survey (n=200-400) of your target audience. Show three images: your character, a generic synthetic talent placeholder, and an irrelevant control. Ask «have you seen any of these in our brand's content?» At Day 60 for a properly launched character, expect 35-50% recognition. Under 20% = the audience hasn't seen the character enough times yet (frequency cap your media spend lower; the character needs more touches). Over 65% = surprisingly fast; lean into it with the next campaign quickly.",
+      },
+      {
+        heading: "Metric 4 — content velocity ratio",
+        body: "This is the leading indicator most teams ignore. Compare your content output rate per week to the same metric for the 90 days before character launch. The character should be lifting velocity 1.4-2.2× because the cost of incremental assets is dramatically lower. If you're shipping at the same rate or slower, you haven't operationalized the character correctly — review the asset pipeline and the brand-kit registry. Velocity is the metric that proves the synthetic-talent economics are working, more than per-campaign performance.",
+      },
+      {
+        heading: "Metrics that look important but aren't",
+        body: "Engagement rate on individual posts — too noisy, dominated by platform algorithm changes and time-of-day effects. Comment sentiment — interesting but slow to read for clarity, and easily skewed by a vocal minority. Follower growth — the wrong metric for character-driven campaigns; the audience follows the brand, not the character. Cost per asset — almost always falls with synthetic talent, but the falling cost isn't the win; the win is the new things you can do because cost fell. Don't celebrate the input metric; celebrate the output you bought with it.",
+      },
+      {
+        heading: "The 90-day P&L conversation",
+        body: "By Day 90, you should be able to answer: «what did this character earn us, and what did it cost?» Earnings = assisted conversion lift in dollar/won terms over the matched control window. Cost = brand-kit license + supporting asset production + media spend incremental to the character. The ratio matters; 2× is acceptable, 3-4× is good, 5×+ is a clear keep. Under 1.5× by Day 90 is a signal to either change the operationalization (probably velocity and disclosure-metadata pipeline) or to wind down the character at Q+2.",
+      },
+      {
+        heading: "What we measure for ourselves",
+        body: "Honest transparency: we measure the same four metrics for Yuna and Ren that we recommend for clients. At Day 60 Yuna was at +14% assisted conversion lift, ~120 organic mentions across categories, 41% recognition on the K-aesthetic buyer panel, content velocity 1.7×. Ren lagged on recognition (32%) but led on velocity (1.9×) because the noir/directional aesthetic flexed across more campaign shapes than glass-skin. Q+1 refresh raised Ren's recognition to 44%. The framework works on the agency's own characters; it should work on yours.",
+      },
+    ],
+  },
+  {
+    slug: "ai-disclosure-metadata-schema-cross-market",
+    locale: "en",
+    title: "The cross-market AI disclosure metadata schema we ship",
+    excerpt:
+      "The actual JSON schema we use to embed AI disclosure metadata that satisfies EU AI Act, FTC, UK ASA, and Korea KCSC simultaneously. Reference implementation for in-house teams.",
+    publishedAt: "2026-07-21",
+    readingMinutes: 6,
+    tags: ["compliance", "disclosure", "engineering", "cross-market"],
+    sections: [
+      {
+        heading: "Why publish the schema",
+        body: "Buyers building their own character pipelines ask us how to structure disclosure metadata so a single asset satisfies four regulators without duplicating work. We've spent ~6 months iterating ours. The answer is a single JSON envelope with market-keyed sections, embedded in C2PA-compliant content credentials. Below is the production schema we ship today. Take it, adapt it; we'd rather have an interoperable industry than a proprietary one.",
+      },
+      {
+        heading: "The top-level envelope",
+        body: "The root object carries `generator` (synthesizer identifier + version), `synthesized_at` (ISO-8601 UTC), `subject_kind` (always `synthetic_character` for our use), `subject_id` (stable character identifier — `yuna_v3` or `ren_v2`), and a `markets` object keyed by ISO market codes. Every market section can override or add fields; the root is the default. The `subject_id` is the single piece that lets a downstream regulator confirm «this is the same character across these 200 assets,» which the EU AI Act increasingly cares about for «high-frequency» synthetic content.",
+      },
+      {
+        heading: "EU section — Article 50 compliance",
+        body: "`markets.EU` carries `notice_text` (the human-readable disclosure label, EN by default with a `locales` object for translations), `notice_placement` (`alt_text` | `caption` | `corner_badge` — must be at least one), and `risk_category` (`limited` for our character work; `high` is reserved for biometric and certain medical applications and would require separate handling). The EU AI Act Article 50 requires «clear and distinguishable» disclosure for synthetic content; the placement field codifies which surface carries it on which platform.",
+      },
+      {
+        heading: "US section — FTC + state-level",
+        body: "`markets.US` carries `material_connection` (true if there's a sponsorship layered on the synthetic content), `disclosure_text` (matching FTC guidance language — we use «AI-generated for [BrandName]»), and `accessibility_mode` (`prominent` | `inline`). California's AB 730 / AB 853 around synthetic media has additional carve-outs for political content; we don't handle that, but we set a `political_content` boolean to `false` so downstream auditors can confirm scope. For commercial brand work, prominent inline disclosure satisfies both federal and state-level requirements.",
+      },
+      {
+        heading: "UK section — ASA + CAP Code",
+        body: "`markets.UK` carries `cap_compliance` (always true for synthetic talent in advertising), `disclosure_text` (UK English variant), and a `regulator_category` field that maps to ASA's product-category taxonomy (beauty, fashion, jewelry, etc.). The CAP Code is more category-aware than the other regimes; the field lets a regulator's bot crawl assets and immediately route to the relevant section. We populate this from the campaign brief at production time, not at runtime.",
+      },
+      {
+        heading: "Korea section — KCSC + KMOEL",
+        body: "`markets.KR` is the most prescriptive. Carries `notice_text_ko` (mandatory Korean-script disclosure), `notice_placement_inline` (KCSC requires inline disclosure for any advertising with a synthetic likeness — alt-text-only doesn't qualify), `business_id` (the advertiser's Korean business registration number — we don't generate this; the buyer supplies), and `category_warning` (a boolean flag for regulated categories like cosmetics, medical, finance). Korea also requires disclosure to be parseable by Korean-language regulator tooling; we test against a simulated KCSC parser before each release.",
+      },
+      {
+        heading: "C2PA carrier — embedding the envelope",
+        body: "The schema rides inside a C2PA content credential — specifically as a custom assertion at `urn:uuid:[issuer]:synthetic-character-disclosure-v3`. C2PA is the only carrier we've found that survives most social platforms' re-encoding without losing the metadata. Where C2PA isn't supported (some legacy ad networks, some Korean DSPs), we duplicate the envelope into alt-text and into a JSON-LD blob in the caption. Redundant by design — losing disclosure metadata is a regulatory event, so we accept the redundancy cost.",
+      },
+      {
+        heading: "Versioning and forward compatibility",
+        body: "The schema version sits at the envelope root (`schema_version: \"3.1\"`). When a regulator changes requirements, we bump the minor version, add the new field, and tag affected assets for re-disclosure. Backward compatibility: all readers must tolerate unknown fields without failing — this is the only way the schema can evolve without breaking historical content. We've been on v3.x for 8 months; expect a v4 within the next 6 months as the EU AI Act Article 50 implementing acts ship.",
+      },
+    ],
+  },
+  {
+    slug: "ai-character-engineering-case-study-yuna-ren-ko",
+    locale: "ko",
+    title: "Yuna와 Ren을 어떻게 만들었나 — AI 캐릭터 엔지니어링 케이스 스터디",
+    excerpt:
+      "우리 자체 페어 캐릭터 IP 를 만든 과정 — 시도한 것, 실패한 것, 프로덕션 등급 합성 talent IP를 실제로 출하하는 데 드는 비용에 대한 솔직한 기록.",
+    publishedAt: "2026-07-24",
+    readingMinutes: 9,
+    tags: ["케이스 스터디", "캐릭터", "엔지니어링", "K-에스테틱"],
+    sections: [
+      {
+        heading: "왜 이 글을 공개하는가",
+        body: "AI 캐릭터에 대한 글은 대부분 마케팅 포장이거나 기술 자랑입니다. 우리는 다르게 씁니다 — 광고주들이 «우리가 직접 캐릭터를 만들면 안 되나요?» 라고 묻고, 솔직한 답은 «됩니다, 하지만 마케팅이 들리는 것보다 더 어렵고 비쌉니다» 입니다. 이 글은 우리에게 프로덕션 등급 페어 캐릭터 IP를 출하한다는 게 어떤 모습이었는지 적은 기록입니다. 일부는 불편한 내용 — 그래도 포함합니다.",
+      },
+      {
+        heading: "전략적 선택 — 솔로 아닌 페어",
+        body: "대부분의 팀은 1 캐릭터로 런칭합니다. 우리는 2개 (Yuna + Ren) 로 런칭했습니다 — 페어 IP가 솔로가 못 만드는 브랜드 모트를 만든다는 우리 계산 때문. 커플 내러티브, 크로스젠더 캐스팅 유연성, «하나의 톤, 두 얼굴» 이 더 다양한 캠페인 형태로 확장. 트레이드오프: 개발 비용 대략 2배, validation 작업이 거의 사분면 확장 (두 캐릭터 사이 일관성 audit 필요), 디자인 외 buyer 에게 마케팅 스토리 전달이 어렵습니다. 다시 해도 같은 선택.",
+      },
+      {
+        heading: "초기 시도들 — 무엇이 잘못되었나",
+        body: "Yuna의 초기 생성에는 반복되는 문제가 있었습니다: K-뷰티용 팔레트와 라이팅을 락인하면 제품 포토그래피에서는 잘 나오는데 모션 / 비디오 프레임에서 깨졌습니다. 추적에 6주 — 림 라이트 레시피가 문제. 데이라이트 specular 하이라이트가 모션으로 번역되면서 인공적으로 읽히는 후광 효과가 되었습니다. 교훈: 락인 선언 전에 모션 대비 레시피 검증. 우리가 지금 따르는 룰: 모든 캐릭터 레시피는 프로덕션 어셋 진입 전 5초 비디오 테스트 통과 필수.",
+      },
+      {
+        heading: "Ren의 일관성 도전",
+        body: "Ren의 «방향성/누아르 지향» 미학은 Yuna의 글래스 스킨보다 어려웠습니다. 글래스 스킨은 명확한 시각 시그니처 (쿨 키 + 저대비 필 + 따뜻한 림). 누아르는 독립적으로 drift 할 수 있는 시그니처 조각들 (그림자 깊이, 엣지 대비, 헤어 라이트 각도). 3개월 동안 캠페인용으로 신뢰성 있게 Ren을 출하할 수 없었습니다. 해결: 납품 전에 생성 프레임을 레퍼런스 레시피 벡터에 점수 매겨 92% 유사도 미만이면 자동 reject 하는 일관성 체크 구축. 일관성 없는 Ren 컷 12개를 클라이언트에게 출하해보기 전까진 over-engineering 같지만, 한 번 겪고 나면 다릅니다.",
+      },
+      {
+        heading: "프로젝트를 거의 죽일 뻔한 audit",
+        body: "런칭 6주 전에 face-similarity audit (생성 프레임을 공개 데이터셋과 매칭해 두 캐릭터가 실제 인물과 우연히 유사하지 않은지 확인) 을 돌렸습니다. 초기 Ren 베리언트 하나가 공인 인물과 87% 유사도 — 출하 불가능한 수준. 40+ 시간 작업을 폐기하고 캐릭터를 다시 앵커링해야 했습니다. 지금은 새 캐릭터의 6주차가 아니라 1주차에 이 audit 을 돌립니다. 비용: 렌더링 컴퓨트 약 ₩4M; 절감: 재앙적 법적·평판 리스크.",
+      },
+      {
+        heading: "로컬라이제이션 surprise",
+        body: "«캐릭터는 캐릭터; 로컬라이제이션은 단지 카피일 뿐» 이라고 가정했습니다. 아니었습니다. EU 캠페인은 US/UK 와 다른 디스클로저 메타데이터 필드 필요; 한국 방심위는 한국어 출처 텍스트 inline 요구; 싱가포르는 다른 디스클로저 cadence 요구사항. 이를 어셋 파이프라인에 빌드하는 데 3주 추가. 이걸 디자인할 올바른 시점은 시작 시점; 우리는 어렵게 배웠습니다. 본인 캐릭터를 만든다면 첫 헤로 컷 생성 전에 디스클로저 메타데이터 스키마를 스케치하세요.",
+      },
+      {
+        heading: "실제 비용 — 풀 로드",
+        body: "두 캐릭터 모두 컨셉부터 런칭까지의 솔직한 숫자: 약 ₩180M. 분해: 약 ₩65M 컴퓨트 (렌더 + 이터레이션 + validation 사이클), 약 ₩58M 크리에이티브 인건비 (컨셉 락인, 레시피 개발, 모션 테스트, audit 대응), 약 ₩26M 법적 검토 (face-similarity audit, 멀티 마켓 디스클로저 디자인, 규제 사전 검토), 약 ₩19M 플랫폼 엔지니어링 (일관성 스코어링 시스템, 로컬라이제이션 메타데이터 파이프라인), 약 ₩13M 단일 캐릭터 타임라인 대비 6개월 지연 기회비용. 1 캐릭터를 런칭하는 브랜드는 이 수치의 ~60% 를 비슷한 스코프로 기대하면 됩니다.",
+      },
+      {
+        heading: "본인 캐릭터를 만들어야 하나",
+        body: "3 필터: (1) 캐릭터가 운반해야 하는 브랜드 정체성 10년+ 가 필요한가? Build. (2) 규제 검토가 상시인 카테고리 (제약, 금융, 주류, 규제 화장품)? Build — 디스클로저 파이프라인이 자체일 때 더 유리. (3) 그 외? Brand Kit 라이선스. 비용 차이는 대략 8-12배, 시간 차이는 6개월 vs 2주. 우리는 단일 캠페인이 아니라 회사 lifetime 동안 보유할 IP로 필요했기 때문에 직접 만들었습니다. 대부분의 buyer 는 그 필요가 없습니다; 산수가 안 받쳐줍니다. 개발 예산 승인 전에 사내에서 그것에 솔직하세요.",
+      },
+      {
+        heading: "다음에 우리가 출판할 것",
+        body: "3개의 후속 케이스 스터디 작업 중: 클라이언트 브랜드와의 첫 페어 캠페인 (동의 시), Yuna의 크로스 마켓 런칭 retrospective (KR/US/EU 순서), 우리가 지금 모든 캐릭터 런칭에 쓰는 로컬라이제이션 메타데이터 스키마. 어떤 것이 유용할지 contact 폼에서 알려주세요 — 실제 buyer 가 읽고 싶어하는 것을 우선합니다.",
+      },
+    ],
+  },
+  {
+    slug: "brand-kit-roi-worked-example-paired-vs-solo-ko",
+    locale: "ko",
+    title: "Brand-kit ROI 워크 예시 — 페어 vs 솔로 (실제 KRW 수치)",
+    excerpt:
+      "K-뷰티 4-SKU 미국 런칭에서 Paired Editorial brand-kit (₩11M) vs 솔로 라이선스 (시리즈 ₩28M) vs 인하우스 빌드 (₩180M) 를 솔직하게 비교.",
+    publishedAt: "2026-07-27",
+    readingMinutes: 8,
+    tags: ["ROI", "예산", "buyer-funnel", "brand-kit"],
+    sections: [
+      {
+        heading: "왜 워크 예시인가",
+        body: "Brand-kit 티어 (Paired Editorial ₩11M / Season Anchor ₩28M / Custom ₩65M+) 의 가격표를 보여줘도 buyer 는 «우리한테 맞는 게 어느 것인가요?» 라고 묻습니다. 답은 캠페인에 따라 다릅니다. 이 글은 실제 K-뷰티 4-SKU 미국 런칭에 세 옵션을 실제 KRW 수치로 솔직히 적용해 ROI 를 어떻게 비교하는지 보여줍니다. 이 패턴을 본인 캠페인에 옮기면 RFP 보내기 전에 정답이 어느 쪽인지 알 수 있습니다.",
+      },
+      {
+        heading: "캠페인 세팅 (모든 비교의 공통)",
+        body: "광고주: 한국 K-뷰티 브랜드, 미국 시장 런칭 (LA + 뉴욕 메트로 메인). 스코프: 4 SKU (세럼·앰풀·크림·립밤), 헤로 컷 4개 + 카테고리당 서포팅 12개 = 총 약 52 어셋. 시즌: 8주 런칭 + 12주 sustain = 20주. 미디어 예산: ₩200M (어셋 비용과 별개). 독점 필요성: yes (K-뷰티 카테고리, 12주 런칭 윈도우 동안 경쟁사 노출 방지).",
+      },
+      {
+        heading: "옵션 A — Paired Editorial brand-kit (₩11M)",
+        body: "Yuna + Ren 페어 라이선스, 8주 카테고리 독점 (런칭 윈도우만), 4 SKU × 13 어셋 = ~52 어셋 커버. 추가 비용: 디스클로저 메타데이터 (포함), 로컬라이제이션 (미국 단일, 추가 비용 없음), 컬러 그레이드 패스 ₩1.2M (브랜드 팔레트 매칭). 총 어셋 비용: ₩12.2M. 미디어 ₩200M 위에 어셋 ₩12.2M = 총 ₩212.2M. 어셋 비용은 미디어의 6% — 합리적 비율.",
+      },
+      {
+        heading: "옵션 B — 시리즈 라이선스 솔로 캐릭터 (₩28M)",
+        body: "단일 합성 캐릭터 (Yuna 또는 다른 캐릭터) 시리즈 라이선스, 12주 카테고리 독점, 같은 52 어셋. 추가 비용: 디스클로저 (포함), 로컬라이제이션 (포함), 컬러 그레이드 ₩1.5M, 일관성 audit ₩2M (12주 동안 단일 캐릭터의 drift 위험이 높아 추가). 총 어셋 비용: ₩31.5M. 미디어 ₩200M 위에 어셋 ₩31.5M = 총 ₩231.5M. 어셋 비용은 미디어의 15.8% — 합리적 비율의 상단.",
+      },
+      {
+        heading: "옵션 C — 인하우스 캐릭터 빌드 (₩180M)",
+        body: "자체 페어 캐릭터 컨셉부터 런칭까지 빌드 (Yuna + Ren 빌드 비용에서 본 수치 사용). 컴퓨트 ~₩65M, 크리에이티브 ~₩58M, 법적 ~₩26M, 플랫폼 ~₩19M, 지연 기회비용 ~₩13M, 어셋 제작 (캐릭터 위) ~₩15M. 총 어셋 비용: 약 ₩195M. 미디어 ₩200M 위에 어셋 ₩195M = 총 ₩395M. 어셋 비용은 미디어의 97.5% — 단일 캠페인에는 비합리적이지만 다년간 자산이면 다릅니다.",
+      },
+      {
+        heading: "ROI 차이를 만드는 변수",
+        body: "단일 캠페인 ROI 만 보면 옵션 A 가 명확한 승자 (어셋 비용 가장 낮음, 미디어 효율 가장 높음). 옵션 C 는 18-36개월 동안 캐릭터를 재사용할 때만 산수가 받쳐줍니다 — Q+1 ~ Q+8 의 새 캠페인이 각각 ₩15-25M 의 어셋 비용으로 받쳐주면 총 어셋 비용이 단일 캠페인 옵션 A 의 8 회 분과 같아집니다. 18개월에 새 캠페인 8+ 회 = 옵션 C 손익분기. 그 미만이면 옵션 A. 옵션 B 는 단일 시장 12주+ 의 강한 독점 필요성이 있는 경우.",
+      },
+      {
+        heading: "산수가 깨지는 시나리오",
+        body: "옵션 A가 작동하지 않는 두 케이스: (1) 카테고리가 매우 규제되어 (의료 화장품 등) 분기당 디스클로저 변경이 잦은 경우 — 옵션 C 의 자체 파이프라인이 운영 비용을 낮춥니다. (2) 광고주가 «절대적으로 우리만의 얼굴» 을 요구하는 경우 (보통 IP/이사회 의사결정) — 산수와 무관하게 옵션 C. 옵션 B가 작동하지 않는 케이스: 캠페인이 4주 이하 — 솔로 시리즈 라이선스가 8주 카테고리 독점을 포함하므로, 4주 캠페인은 옵션 A 의 페어 라이선스 8주 독점이 더 우월.",
+      },
+      {
+        heading: "RFP 보내기 전 의사결정 트리",
+        body: "(1) 캠페인이 12주 미만이고 단일 시장인가? Yes → 옵션 A. (2) 12주+ 또는 4 시장 cross-market 이고 강한 독점 필요한가? Yes → 옵션 B. (3) 캐릭터를 18개월+ 동안 모든 캠페인에 재사용할 다년 약속이 있는가, 그리고 카테고리가 규제이거나 IP 가 보드 요구사항인가? Yes → 옵션 C. 셋 다 No 면 옵션 A. 이 트리는 광고주 60+ 명과의 실제 산수에서 ~85% 의 정답을 줍니다. 본인 케이스가 나머지 15% 인지 검증하고 싶으면 contact 폼에서 알려주세요 — 1시간 무상 sizing 콜.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

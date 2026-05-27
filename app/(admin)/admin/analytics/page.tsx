@@ -547,6 +547,12 @@ export default async function AnalyticsPage({
                   ₩{blogAttribution.totalRevenue.toLocaleString("ko-KR")}
                 </span>
               </p>
+              <Link
+                href={`/api/admin/exports/blog-attribution?window=${windowDays}`}
+                className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+              >
+                CSV
+              </Link>
             </div>
           </div>
           {(() => {

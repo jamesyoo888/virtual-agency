@@ -218,10 +218,14 @@ export default async function sitemap(
             priority: 0.6,
           })),
           ...listSeries("en").map((s) => ({
+            // Curated blog series are top-of-funnel landing surfaces — they
+            // bundle 3+ buyer-funnel posts and convert better than tag pages.
+            // changefreq=daily + priority=0.8 puts them above tag pages and
+            // alongside character detail pages in crawl frequency.
             url: `${SITE_URL}/en/blog/series/${s.id}`,
             lastModified: now,
-            changeFrequency: "weekly" as const,
-            priority: 0.7,
+            changeFrequency: "daily" as const,
+            priority: 0.8,
           })),
           ...INDUSTRY_OPTIONS.map((o) => ({
             url: `${SITE_URL}/en/explore/${o.value}`,
@@ -502,8 +506,8 @@ export default async function sitemap(
           ...listSeries("ko").map((s) => ({
             url: `${SITE_URL}/blog/series/${s.id}`,
             lastModified: now,
-            changeFrequency: "weekly" as const,
-            priority: 0.7,
+            changeFrequency: "daily" as const,
+            priority: 0.8,
             alternates: {
               languages: {
                 ko: `${SITE_URL}/blog/series/${s.id}`,
