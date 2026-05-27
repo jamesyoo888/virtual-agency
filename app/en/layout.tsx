@@ -79,6 +79,11 @@ function EnFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/en/character/compare" className="hover:text-white">
+                Compare Yuna vs Ren
+              </Link>
+            </li>
+            <li>
               <Link href="/en/about" className="hover:text-white">
                 About
               </Link>

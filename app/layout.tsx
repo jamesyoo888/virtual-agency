@@ -71,6 +71,7 @@ export default async function RootLayout({
     { name: "AI 매칭", url: `${SITE_URL}/match` },
     { name: "캐릭터", url: `${SITE_URL}/character` },
     { name: "브랜드 키트", url: `${SITE_URL}/character/brand-kits` },
+    { name: "캐릭터 비교", url: `${SITE_URL}/character/compare` },
     { name: "서비스", url: `${SITE_URL}/services` },
     { name: "가격", url: `${SITE_URL}/pricing` },
     { name: "사례", url: `${SITE_URL}/cases` },

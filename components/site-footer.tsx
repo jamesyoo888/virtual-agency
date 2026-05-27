@@ -89,6 +89,11 @@ export default function SiteFooter() {
                 브랜드 키트
               </Link>
             </li>
+            <li>
+              <Link href="/character/compare" className="hover:text-white">
+                캐릭터 비교
+              </Link>
+            </li>
           </ul>
         </div>
 
