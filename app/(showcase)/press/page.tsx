@@ -115,6 +115,27 @@ export default async function PressPage() {
         </section>
 
         <section className="mb-16">
+          <h2 className="text-xl font-semibold mb-4">최근 보도자료</h2>
+          <Link
+            href="/press/character-launch"
+            className="block rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 hover:border-zinc-600 transition-colors"
+          >
+            <p className="text-xs text-zinc-500 mb-1">2026년 5월 27일</p>
+            <p className="text-sm font-semibold text-zinc-100 leading-snug">
+              Virtual Agency, 글로벌 브랜드용 자체 K-aesthetic 합성 모델
+              «Yuna» «Ren» 라인업 공개
+            </p>
+            <p className="mt-2 text-xs text-zinc-400">
+              자체 설계 캐릭터 IP · 분기 단위 페어 브랜드 키트 · 4 시장
+              disclosure 컴플라이언스 파이프라인
+            </p>
+            <span className="mt-3 inline-flex items-center gap-1 text-xs text-zinc-400">
+              릴리스 전문 <ArrowRight className="w-3 h-3" />
+            </span>
+          </Link>
+        </section>
+
+        <section className="mb-16">
           <h2 className="text-xl font-semibold mb-4">한 줄 소개</h2>
           <blockquote className="border-l-2 border-zinc-700 pl-4 text-zinc-300 italic">
             “촬영장 없이, 일 단위로 컨셉이 바뀌는 모델. Virtual Agency 는

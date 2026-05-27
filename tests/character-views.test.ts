@@ -62,4 +62,47 @@ describe("aggregateCharacterViews", () => {
     ]);
     expect(summary.total).toBe(0);
   });
+
+  it("returns a dense daily series sized to the window (zero-fill on no-data days)", () => {
+    const summary = aggregateCharacterViews([], 30);
+    expect(summary.daily).toHaveLength(30);
+    expect(summary.daily.every((d) => d.count === 0)).toBe(true);
+    // sorted oldest → newest
+    expect(summary.daily[0].date < summary.daily[29].date).toBe(true);
+  });
+
+  it("buckets created_at into the right day", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const summary = aggregateCharacterViews(
+      [
+        {
+          model: "character:yuna",
+          metadata: { locale: "ko" },
+          created_at: `${today}T08:00:00Z`,
+        },
+        {
+          model: "character:yuna",
+          metadata: { locale: "ko" },
+          created_at: `${today}T18:00:00Z`,
+        },
+      ],
+      7
+    );
+    const last = summary.daily[summary.daily.length - 1];
+    expect(last.date).toBe(today);
+    expect(last.count).toBe(2);
+  });
+
+  it("daily series drops rows outside the window (defensive — loader's gte should also gate)", () => {
+    const stale = "2020-01-01T00:00:00Z";
+    const summary = aggregateCharacterViews(
+      [{ model: "character:yuna", metadata: { locale: "ko" }, created_at: stale }],
+      7
+    );
+    // Aggregate totals still count the row (the loader is responsible for
+    // the SQL gte gate). The daily series ignores it because the date isn't
+    // in the window's emptyDailySeries map.
+    expect(summary.total).toBe(1);
+    expect(summary.daily.every((d) => d.count === 0)).toBe(true);
+  });
 });

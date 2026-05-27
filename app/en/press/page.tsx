@@ -136,6 +136,27 @@ export default async function EnPressPage() {
         </section>
 
         <section className="mb-16">
+          <h2 className="text-xl font-semibold mb-4">Latest release</h2>
+          <Link
+            href="/en/press/character-launch"
+            className="block rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 hover:border-zinc-600 transition-colors"
+          >
+            <p className="text-xs text-zinc-500 mb-1">May 27, 2026</p>
+            <p className="text-sm font-semibold text-zinc-100 leading-snug">
+              Virtual Agency Launches Owned K-Aesthetic Synthetic Talent
+              Lineup «Yuna» and «Ren» for Global Brands
+            </p>
+            <p className="mt-2 text-xs text-zinc-400">
+              Owned K-aesthetic IP · quarterly paired brand kits · 4-market
+              disclosure compliance pipeline.
+            </p>
+            <span className="mt-3 inline-flex items-center gap-1 text-xs text-zinc-400">
+              Full release →
+            </span>
+          </Link>
+        </section>
+
+        <section className="mb-16">
           <h2 className="text-xl font-semibold mb-4">One-line</h2>
           <blockquote className="border-l-2 border-zinc-700 pl-4 text-zinc-300 italic">
             &laquo;The production layer for K-aesthetic. Cast in 24 hours,

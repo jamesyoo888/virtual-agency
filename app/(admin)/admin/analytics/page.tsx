@@ -193,6 +193,30 @@ export default async function AnalyticsPage({
               {characterViews.totalEn.toLocaleString()}
             </p>
           </div>
+          {(() => {
+            const peak = Math.max(1, ...characterViews.daily.map((d) => d.count));
+            return (
+              <div className="flex items-end gap-px h-16 mb-5">
+                {characterViews.daily.map((d) => {
+                  const heightPct = (d.count / peak) * 100;
+                  return (
+                    <div
+                      key={d.date}
+                      title={`${d.date} — ${d.count}건`}
+                      className="flex-1 flex flex-col justify-end"
+                    >
+                      <div
+                        className={`w-full rounded-sm ${
+                          d.count > 0 ? "bg-violet-500/70" : "bg-zinc-900"
+                        }`}
+                        style={{ height: `${Math.max(2, heightPct)}%` }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
           {characterViews.bySlug.length === 0 ? (
             <p className="text-xs text-zinc-500">
               아직 캐릭터 페이지 조회 데이터가 없습니다 (bot 제외 / 1시간 dedup).
