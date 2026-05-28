@@ -39,6 +39,8 @@ const fixture: AdminWeeklySummary = {
   blogAttributedRevenueKrw: 6_500_000,
   pricingCalculatorAttributedInquiries: 5,
   pricingCalculatorAttributedRevenueKrw: 14_000_000,
+  agentAttributedInquiries: 2,
+  agentAttributedRevenueKrw: 9_000_000,
   newPostsKo: 2,
   newPostsEn: 1,
   newPostsSample: [
@@ -198,6 +200,23 @@ describe("formatAdminSummaryText", () => {
       pricingCalculatorAttributedRevenueKrw: 0,
     };
     expect(formatAdminSummaryText(quiet)).not.toMatch(/가격 계산기/);
+  });
+
+  it("includes agent-attribution line with revenue + 15% commission estimate", () => {
+    const out = formatAdminSummaryText(fixture);
+    expect(out).toMatch(/에이전트 referral → 문의 \(30일\): 2건/);
+    expect(out).toMatch(/매출 ₩9,000,000/);
+    // 15% of 9,000,000 = 1,350,000
+    expect(out).toMatch(/15% 커미션 ≈ ₩1,350,000/);
+  });
+
+  it("omits agent-attribution line entirely when inquiries=0", () => {
+    const quiet: AdminWeeklySummary = {
+      ...fixture,
+      agentAttributedInquiries: 0,
+      agentAttributedRevenueKrw: 0,
+    };
+    expect(formatAdminSummaryText(quiet)).not.toMatch(/에이전트 referral/);
   });
 
   it("includes new-posts line with KR + EN counts + top 3 titles", () => {

@@ -62,6 +62,70 @@ export async function loadAgentAttribution(
   return aggregateAgentAttribution(agentId, (data ?? []) as RawRow[], windowDays);
 }
 
+/**
+ * Window-wide agent referral aggregate — what every agent combined brought
+ * in. Mirrors the loadCharacterAttribution / loadBlogAttribution /
+ * loadPricingCalculatorAttribution shape so the admin weekly digest +
+ * /admin/analytics card can render it symmetrically.
+ */
+export interface AllAgentAttribution {
+  windowDays: number;
+  totalInquiries: number;
+  totalDelivered: number;
+  totalRevenue: number;
+}
+
+export async function loadAllAgentAttribution(
+  windowDays = 30
+): Promise<AllAgentAttribution> {
+  const empty: AllAgentAttribution = {
+    windowDays,
+    totalInquiries: 0,
+    totalDelivered: 0,
+    totalRevenue: 0,
+  };
+  if (!SUPABASE_CONFIGURED) return empty;
+
+  const supabase = await createClient();
+  const since = new Date(
+    Date.now() - windowDays * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select("status, invoice_amount")
+    .eq("utm_source", "agent")
+    .gte("created_at", since)
+    .limit(5000);
+
+  if (error) {
+    console.warn("[agent-attribution] read failed:", error.message);
+    return empty;
+  }
+
+  let totalDelivered = 0;
+  let totalRevenue = 0;
+  for (const r of (data ?? []) as {
+    status: string | null;
+    invoice_amount: number | string | null;
+  }[]) {
+    if (r.status === "delivered") {
+      totalDelivered += 1;
+      const amt =
+        typeof r.invoice_amount === "string"
+          ? Number.parseFloat(r.invoice_amount) || 0
+          : r.invoice_amount ?? 0;
+      totalRevenue += amt;
+    }
+  }
+  return {
+    windowDays,
+    totalInquiries: data?.length ?? 0,
+    totalDelivered,
+    totalRevenue,
+  };
+}
+
 export function aggregateAgentAttribution(
   agentId: string,
   rows: RawRow[],

@@ -12,6 +12,7 @@ import { loadStageTiming, type TimedStage } from "@/lib/analytics/stage-timing";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
+import { loadAllAgentAttribution } from "@/lib/analytics/agent-attribution";
 import { listPosts, postLocale, type BlogPost } from "@/lib/blog/posts";
 
 /**
@@ -69,6 +70,10 @@ export interface AdminWeeklySummary {
   pricingCalculatorAttributedInquiries: number;
   /** 30d delivered revenue from pricing-calculator-attributed projects. */
   pricingCalculatorAttributedRevenueKrw: number;
+  /** 30d agent-referral inquiry count (utm_source=agent — 15% commission flow). */
+  agentAttributedInquiries: number;
+  /** 30d delivered revenue from agent-attributed projects. */
+  agentAttributedRevenueKrw: number;
   /** Blog posts published within the last 7 days (operator content velocity). */
   newPostsKo: number;
   newPostsEn: number;
@@ -112,6 +117,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       characterAttribution,
       blogAttribution,
       pricingCalcAttribution,
+      agentAttribution,
     ] = await Promise.all([
       supabase
         .from("projects")
@@ -165,6 +171,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       loadCharacterAttribution(30),
       loadBlogAttribution(30),
       loadPricingCalculatorAttribution(30),
+      loadAllAgentAttribution(30),
     ]);
 
     const searchAgg = aggregateSearchRows(
@@ -243,6 +250,8 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       blogAttributedRevenueKrw: blogAttribution.totalRevenue,
       pricingCalculatorAttributedInquiries: pricingCalcAttribution.totalInquiries,
       pricingCalculatorAttributedRevenueKrw: pricingCalcAttribution.totalRevenue,
+      agentAttributedInquiries: agentAttribution.totalInquiries,
+      agentAttributedRevenueKrw: agentAttribution.totalRevenue,
       ...summarizeNewPosts(),
     };
   } catch (err) {
@@ -370,6 +379,15 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
       `가격 계산기 → 문의 (30일): ${s.pricingCalculatorAttributedInquiries}건${revPart}`
     );
   }
+  if (s.agentAttributedInquiries > 0) {
+    const revPart =
+      s.agentAttributedRevenueKrw > 0
+        ? ` · 매출 ₩${s.agentAttributedRevenueKrw.toLocaleString("ko-KR")} · 15% 커미션 ≈ ₩${Math.round(s.agentAttributedRevenueKrw * 0.15).toLocaleString("ko-KR")}`
+        : "";
+    lines.push(
+      `에이전트 referral → 문의 (30일): ${s.agentAttributedInquiries}건${revPart}`
+    );
+  }
   const newPostsTotal = s.newPostsKo + s.newPostsEn;
   if (newPostsTotal > 0) {
     lines.push(
@@ -492,6 +510,18 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
               `${s.pricingCalculatorAttributedInquiries}건${
                 s.pricingCalculatorAttributedRevenueKrw > 0
                   ? ` · ₩${s.pricingCalculatorAttributedRevenueKrw.toLocaleString("ko-KR")}`
+                  : ""
+              }`
+            )
+          : ""
+      }
+      ${
+        s.agentAttributedInquiries > 0
+          ? stat(
+              "에이전트 attribut (30d)",
+              `${s.agentAttributedInquiries}건${
+                s.agentAttributedRevenueKrw > 0
+                  ? ` · ₩${s.agentAttributedRevenueKrw.toLocaleString("ko-KR")}`
                   : ""
               }`
             )
