@@ -9,6 +9,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { canEmailClient } from "@/lib/preferences";
 import { trackConversion } from "@/lib/experiments-track";
 import { enforceRateLimit } from "@/lib/api/rate-limit";
+import { stripSelfAgentAttribution } from "@/lib/analytics/attribution-guards";
 
 function clientIpFrom(request: Request): string {
   const xff = request.headers.get("x-forwarded-for");
@@ -80,6 +81,17 @@ export async function POST(request: Request) {
     .filter(Boolean)
     .join("\n");
 
+  // Self-referral guard: an agent submitting an inquiry through their own
+  // referral link would inflate their 15% commission attribution. We strip
+  // utm_source/utm_campaign in that case — the inquiry still lands, just
+  // without the agent attribution. Mirrors the existing referral-source
+  // self-loop guard further down where utm_campaign !== user.id is enforced.
+  const { cleanedUtmSource, cleanedUtmCampaign } = stripSelfAgentAttribution({
+    utmSource: utm_source ?? null,
+    utmCampaign: utm_campaign ?? null,
+    userId: user.id,
+  });
+
   const { data: project, error } = await supabase
     .from("projects")
     .insert({
@@ -88,9 +100,9 @@ export async function POST(request: Request) {
       title,
       brief: composedBrief || null,
       status: "inquiry",
-      utm_source: utm_source || null,
+      utm_source: cleanedUtmSource,
       utm_medium: utm_medium || null,
-      utm_campaign: utm_campaign || null,
+      utm_campaign: cleanedUtmCampaign,
       referrer: referrer || null,
     })
     .select("id, title")
