@@ -415,6 +415,36 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     },
     relatedPostSlug: "total-campaign-cost-decomposition",
   },
+  {
+    slug: "tier-upgrade-trigger",
+    category: "commercial",
+    ko: {
+      term: "티어 업그레이드 트리거 (Tier upgrade trigger)",
+      definition:
+        "광고주가 paired → season → custom 으로 옮겨야 하는 신호 (캠페인 16 주 이상 연장, 다시장 확장, 분기 캐던스, 카테고리 독점 경합, 브랜드 보이스 미스핏, 6+ SKU 동시 출범). 「예산이 늘었다」가 아니라 「캠페인 형태가 바뀌었다」가 진짜 트리거. 신호 없이 미리 업티어하면 옵셔널리티 낭비.",
+    },
+    en: {
+      term: "Tier upgrade trigger",
+      definition:
+        "A documented signal that the campaign shape has outgrown the current brand-kit tier — campaign extending past 16 weeks, cross-market expansion, quarterly cadence, category exclusivity contested, brand voice misfit, or 6+ SKU rollout. «More budget» is not a trigger; «different campaign shape» is. Upgrading without a trigger wastes optionality.",
+    },
+    relatedPostSlug: "brand-kit-upgrade-path-when-to-move-tiers",
+  },
+  {
+    slug: "acceptance-qa",
+    category: "workflow",
+    ko: {
+      term: "납품 검수 (Acceptance QA)",
+      definition:
+        "광고주가 인보이스 결제 전 직접 실행하는 검수 단계 — 얼굴 일관성·손/제품 접점·의상 컨티뉴이티·디스클로저 메타데이터·포맷 커버리지·라이선스 스코프·소스 어테스테이션·리비전 속도 SLA. 벤더가 흐릿하게 둔 «approve and ship» 단계를 광고주 측에서 구조화한 게이트로 바꿔 결제 후 후회를 줄이는 buyer-side 안전망.",
+    },
+    en: {
+      term: "Acceptance QA",
+      definition:
+        "The buyer-controlled verification step before invoice payment — face consistency, hand/product contact points, wardrobe continuity, disclosure metadata, format coverage, license scope, source attestation, revision velocity SLA. Converts the vendor's vague «approve and ship» step into a structured gate, reducing post-payment regret. A buyer-side safety net the vendor benefits from too (clearer acceptance = faster sign-off).",
+    },
+    relatedPostSlug: "synthetic-talent-qa-checklist-before-paying",
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {
