@@ -10,6 +10,7 @@ import { loadBlogViews } from "@/lib/analytics/blog-views";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { loadCharacterViews } from "@/lib/analytics/character-views";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -233,6 +234,7 @@ export default async function AdminHealthPage() {
     blogAttr30d,
     charViews30d,
     charAttr30d,
+    pricingCalc30d,
   ] = await Promise.all([
       loadPulse(),
       summarizeUsage(),
@@ -248,6 +250,7 @@ export default async function AdminHealthPage() {
       loadBlogAttribution(30),
       loadCharacterViews(30),
       loadCharacterAttribution(30),
+      loadPricingCalculatorAttribution(30),
     ]);
 
   // Bottleneck = slowest stage's median exceeds 14d. We check the SLOWEST
@@ -462,6 +465,25 @@ export default async function AdminHealthPage() {
             ).toFixed(2)}%)`,
       runbook:
         "트래픽은 있는데 attribution 인콰이어가 없으면 (1) /character/[slug] CTA 가 utm_source=character 를 떨어트리지 않거나 (2) /rfp · /match 폼이 utm_source 를 보존 안 함. /admin/analytics 캐릭터 funnel 카드 + /admin/inbox 의 ★ Char 칩 카운트 대조. 최근 character detail 페이지 변경분 점검.",
+    },
+    {
+      // Pricing-calculator funnel gate. There's no view tracking on
+      // /pricing-calculator yet, so we use blog 30d views as a coarse site-
+      // activity proxy: if the site is getting real traffic (≥500 30d blog
+      // views) but the calculator funnel produced 0 inquiries, the CTA chain
+      // (/character/* card → /pricing-calculator → /rfp) is likely broken.
+      // Below the threshold the sample is too small to draw conclusions.
+      label: "가격 계산기 → 인콰이어 전환",
+      ok:
+        blogViews30d.total < 500 || pricingCalc30d.totalInquiries > 0,
+      detail:
+        blogViews30d.total < 500
+          ? `사이트 트래픽 (30d 블로그 조회) ${blogViews30d.total} — 표본 부족 (500+ 부터 측정)`
+          : pricingCalc30d.totalInquiries === 0
+          ? `30d 블로그 조회 ${blogViews30d.total.toLocaleString()} · 계산기 utm_source 인콰이어 0`
+          : `30d 계산기 인콰이어 ${pricingCalc30d.totalInquiries} · 납품 ${pricingCalc30d.totalDelivered} · ₩${pricingCalc30d.totalRevenue.toLocaleString("ko-KR")}`,
+      runbook:
+        "트래픽은 있는데 계산기 attribution 이 0이면: (1) /character/[slug] 의 emerald 캐릭터 예산 카드가 사라졌거나 (2) /pricing-calculator 의 RFP CTA 가 utm_source=pricing-calculator 를 떨어트리지 않거나 (3) /rfp 폼이 utm_source 를 projects 행에 보존하지 않음. 가장 흔한 원인은 (1). 캐릭터 상세 페이지 KR/EN 두 라우트 모두 카드 노출 확인 → 클릭 시 URL 의 utm_source 확인 → 인콰이어 제출 후 projects.utm_source 컬럼 확인.",
     },
     {
       // Blog conversion gate — high views but no attributed inquiries means

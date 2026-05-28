@@ -17,6 +17,7 @@ import {
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
+import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
 import { loadBlogViews } from "@/lib/analytics/blog-views";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 
@@ -54,6 +55,7 @@ const KINDS = new Set([
   "character-attribution",
   "blog-engagement",
   "blog-attribution",
+  "pricing-calculator-attribution",
 ]);
 
 export async function GET(
@@ -1246,6 +1248,41 @@ export async function GET(
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(
           "character-attribution"
+        )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "pricing-calculator-attribution") {
+    // Symmetric to character-attribution: aggregates inquiries / delivered /
+    // revenue / conversion-% by recommended path (license_daily,
+    // paired_editorial, season_anchor, custom_build, traditional_competitive).
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 30;
+    const report = await loadPricingCalculatorAttribution(windowDays);
+    const rows: { metric: string; value: string }[] = [
+      { metric: "window_days", value: String(report.windowDays) },
+      { metric: "total_inquiries", value: String(report.totalInquiries) },
+      { metric: "total_delivered", value: String(report.totalDelivered) },
+      { metric: "total_revenue_krw", value: String(report.totalRevenue) },
+      { metric: "unknown_campaign", value: String(report.unknown) },
+      ...report.byPath.flatMap((p) => [
+        { metric: `path_${p.path}_inquiries`, value: String(p.inquiries) },
+        { metric: `path_${p.path}_delivered`, value: String(p.delivered) },
+        { metric: `path_${p.path}_revenue_krw`, value: String(p.revenue) },
+        {
+          metric: `path_${p.path}_conversion_pct`,
+          value: String(p.conversionPct),
+        },
+      ]),
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "pricing-calculator-attribution"
         )}"`,
         "Cache-Control": "no-store",
       },

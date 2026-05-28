@@ -613,19 +613,27 @@ export default async function AnalyticsPage({
               <h2 className="text-sm font-semibold uppercase tracking-wider text-emerald-200">
                 가격 계산기 → 문의 ({windowDays}일)
               </h2>
-              <p className="text-xs text-zinc-500 tabular-nums">
-                utm_source=pricing-calculator · 총{" "}
-                {pricingCalc.totalInquiries}건 · 납품{" "}
-                {pricingCalc.totalDelivered}건 ·{" "}
-                <span className="text-emerald-300">
-                  ₩{pricingCalc.totalRevenue.toLocaleString("ko-KR")}
-                </span>
-                {pricingCalc.unknown > 0 && (
-                  <span className="ml-2 text-zinc-600">
-                    · 미분류 {pricingCalc.unknown}
+              <div className="flex items-center gap-3 text-xs">
+                <p className="text-zinc-500 tabular-nums">
+                  utm_source=pricing-calculator · 총{" "}
+                  {pricingCalc.totalInquiries}건 · 납품{" "}
+                  {pricingCalc.totalDelivered}건 ·{" "}
+                  <span className="text-emerald-300">
+                    ₩{pricingCalc.totalRevenue.toLocaleString("ko-KR")}
                   </span>
-                )}
-              </p>
+                  {pricingCalc.unknown > 0 && (
+                    <span className="ml-2 text-zinc-600">
+                      · 미분류 {pricingCalc.unknown}
+                    </span>
+                  )}
+                </p>
+                <Link
+                  href={`/api/admin/exports/pricing-calculator-attribution?window=${windowDays}`}
+                  className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                >
+                  CSV
+                </Link>
+              </div>
             </div>
             <p className="text-[11px] text-zinc-500 mb-3">
               계산기가 추천한 path 별로 인콰이어 분포. paired/season 비중이 크면
