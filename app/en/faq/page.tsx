@@ -226,6 +226,72 @@ const FAQ: QA[] = [
     aText:
       "Internal SLA: median 4 hours, p90 12 hours for the first reply. Inquiries past 24 hours trigger an automatic follow-up.",
   },
+  {
+    q: "How does the pricing calculator decide a number from 4 inputs?",
+    a: (
+      <p>
+        The{" "}
+        <Link
+          href="/en/pricing-calculator"
+          className="underline hover:text-white"
+        >
+          calculator
+        </Link>{" "}
+        takes asset count, season weeks, market count, and exclusivity. More
+        inputs would invite spurious precision (forcing a buyer to choose
+        «moody» vs «cinematic» typically makes them give up); fewer would miss
+        real cost drivers. Real quotes land within ±20% of the calculator
+        range — about ⅔ of campaigns settle inside that band. If your scope
+        itself is ambiguous, fill out a fuller brief at /en/rfp for a tighter
+        quote.
+      </p>
+    ),
+    aText:
+      "The calculator takes 4 inputs (assets, season weeks, market count, exclusivity). Real quotes land within ±20% of the calculator range — about two-thirds of campaigns settle inside that band.",
+  },
+  {
+    q: "What do the 5 recommended paths mean — license vs paired vs season vs custom?",
+    a: (
+      <p>
+        The calculator maps your 4 inputs to one of five paths: (1)
+        Traditional competitive — scope too small for synthetic ROI to beat a
+        traditional shoot (we recommend you skip us). (2) License daily —
+        per-day license + per-asset. Best for short single-market campaigns.
+        (3){" "}
+        <Link
+          href="/en/character/brand-kits"
+          className="underline hover:text-white"
+        >
+          Paired editorial brand-kit
+        </Link>
+        {" "}— 30-60 assets, single market, quarterly, with 8-week category
+        exclusivity. (4) Season anchor brand-kit — more assets, cross-market,
+        full-quarter category exclusivity. (5) Custom build — own character
+        IP development (18-36-month amortization). The most common mistake:
+        requesting custom build for a single quarterly campaign — the math
+        doesn&rsquo;t work.
+      </p>
+    ),
+    aText:
+      "The calculator maps 4 inputs to one of 5 paths: Traditional competitive, License daily, Paired editorial brand-kit, Season anchor brand-kit, Custom build. Each path has different unit economics.",
+  },
+  {
+    q: "Can the calculator estimate diverge from the actual RFP quote?",
+    a: (
+      <p>
+        Within ±20%, yes. Reasons it diverges more: (1) more than the default
+        2 revisions per asset, (2) a deeply custom aesthetic that doesn&rsquo;t
+        align with Yuna or Ren&rsquo;s existing register, (3) regulated
+        categories (pharma, finance, alcohol) needing pre-launch legal
+        review, (4) bonus media — added asset rounds after launch. The
+        calculator estimates only assets + licensing + disclosure +
+        localization; media budget is separate (usually 70-85% of total
+        campaign cost).
+      </p>
+    ),
+    aText:
+      "Within ±20%, yes. Larger divergence comes from extra revisions, deeply custom aesthetics, regulated categories, or bonus media. The calculator estimates only assets + licensing + disclosure + localization; media is separate.",
+  },
 ];
 
 export default function EnFAQPage() {

@@ -385,6 +385,36 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
         "How quickly additional shots ship within a single campaign. A real-model + studio + HMUA + assistant chain runs 5-15 days per refresh; a synthetic character with locked recipe/wardrobe/cast turns shots in 4-48h. The single dimension SNS-paced advertisers value most.",
     },
   },
+  {
+    slug: "recommended-path",
+    category: "commercial",
+    ko: {
+      term: "권장 path (Recommended path)",
+      definition:
+        "가격 계산기가 4 입력 (어셋 수·시즌·시장·독점) 을 매핑한 5 캠페인 구조 중 하나 — Traditional competitive, License daily, Paired editorial brand-kit, Season anchor brand-kit, Custom build. 각 path 는 다른 unit economics 와 라이선스 구조. buyer 의 스코프에 맞는 path 를 사전 판단해 over-buying / under-scoping 방지.",
+    },
+    en: {
+      term: "Recommended path",
+      definition:
+        "One of five campaign structures the pricing calculator maps your 4 inputs (assets, season weeks, markets, exclusivity) onto — Traditional competitive, License daily, Paired editorial brand-kit, Season anchor brand-kit, or Custom build. Each path has different unit economics and licensing structure; the recommendation prevents both over-buying and under-scoping.",
+    },
+    relatedPostSlug: "inside-the-pricing-calculator-4-inputs",
+  },
+  {
+    slug: "asset-to-media-ratio",
+    category: "commercial",
+    ko: {
+      term: "어셋 대 미디어 비율 (Asset-to-media ratio)",
+      definition:
+        "캠페인의 어셋 + 라이선스 비용 대비 미디어 예산 비율. 건강한 비율은 1:3 ~ 1:5 — 그 아래면 over-production (제작 어셋의 60% 가 실제 운영 안 됨), 위면 under-production (미디어가 5 어셋을 반복 노출해 fatigue + CPM creep). 가격 계산기로 어셋 견적 후 미디어 예산을 역산할 때 사용.",
+    },
+    en: {
+      term: "Asset-to-media ratio",
+      definition:
+        "The ratio of your asset + licensing budget to your media buy. A healthy band is 1:3 to 1:5 — below that, you're over-producing (60% of assets won't actually run); above it, you're under-producing (media fatigue and CPM creep from rotating only 5 assets). Useful for reverse-deriving media budget from a calculator estimate.",
+    },
+    relatedPostSlug: "total-campaign-cost-decomposition",
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {

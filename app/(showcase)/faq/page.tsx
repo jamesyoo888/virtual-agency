@@ -301,6 +301,62 @@ const FAQ: QA[] = [
     aText:
       "내부 SLA: 첫 이메일 회신 중앙값 4시간, p90 12시간 이내 1차 응답입니다. 24시간 초과 시 자동 follow-up 메일 + admin dashboard의 stale 카운터에 노출되어 우선 처리됩니다.",
   },
+  {
+    q: "가격이 4 입력만으로 어떻게 결정되나요? (계산기 정확도)",
+    a: (
+      <p>
+        <Link href="/pricing-calculator" className="underline hover:text-white">
+          /pricing-calculator
+        </Link>
+        는 어셋 수·시즌 주·시장 수·독점 4 입력만 받습니다. 더 많이
+        물으면 spurious precision (예: «moody» 와 «cinematic» 사이 결정을
+        강요하면 buyer 가 그냥 포기); 더 적게 물으면 실제 비용 동인 놓침.
+        실제 견적은 계산기 범위의 ±20% 안에 떨어집니다. 캠페인 ⅔ 가 본
+        견적 범위 안에 안착. 스코프 자체가 모호하면 RFP 폼에 더 자세한
+        브리프 작성 시 더 정확한 견적 가능합니다.
+      </p>
+    ),
+    aText:
+      "/pricing-calculator 는 어셋 수·시즌 주·시장 수·독점 4 입력만 받습니다. 실제 견적은 계산기 범위의 ±20% 안에 떨어집니다. 캠페인 ⅔ 가 본 견적 범위 안에 안착.",
+  },
+  {
+    q: "계산기의 «권장 path» 가 의미하는 것 — license vs paired vs season vs custom?",
+    a: (
+      <p>
+        계산기가 4 입력을 5 path 중 하나로 매핑합니다: (1) Traditional
+        competitive — 합성 talent ROI 가 안 받쳐줄 정도로 작은 스코프 (우리를
+        skip 권장). (2) License daily — 일당 라이선스 + 어셋당 비용. 단기 단일
+        시장에 최적. (3){" "}
+        <Link
+          href="/character/brand-kits"
+          className="underline hover:text-white"
+        >
+          Paired editorial brand-kit
+        </Link>
+        {" "}— 30-60 어셋, 단일 시장, 분기, 8 주 카테고리 독점 포함. (4) Season
+        anchor brand-kit — 더 많은 어셋, cross-market, 분기 전체 독점. (5)
+        Custom build — 자체 캐릭터 IP 개발 (18-36개월 amortization). 가장 흔한
+        실수: 단일 분기 캠페인에 custom 요청 — 산수 안 맞음.
+      </p>
+    ),
+    aText:
+      "계산기는 4 입력을 5 path 중 하나로 매핑: Traditional competitive · License daily · Paired editorial brand-kit · Season anchor brand-kit · Custom build. 각 path 는 다른 unit economics.",
+  },
+  {
+    q: "계산기 견적과 실제 RFP 견적이 다를 수 있나요?",
+    a: (
+      <p>
+        ±20% 차이 안에 들어옵니다 — 그 이상으로 벗어나는 이유: (1) 어셋 별
+        리비전 횟수가 디폴트 2 회보다 많음, (2) 깊게 커스텀 한 미학 (Yuna/Ren
+        의 기존 register 와 안 맞음), (3) 규제 카테고리 (제약·금융·주류) 의
+        법적 사전 검토 추가, (4) 보너스 미디어 (캠페인 후 별도 자산 추가
+        라운드). 계산기는 어셋 + 라이선스 + 디스클로저 + 로컬라이제이션만
+        견적; 미디어 예산은 별도 (보통 캠페인 총비용의 70-85%).
+      </p>
+    ),
+    aText:
+      "±20% 차이 안에 들어옵니다. 이상 벗어나는 이유: 리비전 추가, 깊게 커스텀 미학, 규제 카테고리, 보너스 미디어. 계산기는 어셋 + 라이선스 + 디스클로저 + 로컬라이제이션만 견적; 미디어 예산 별도.",
+  },
 ];
 
 export default function FAQPage() {
