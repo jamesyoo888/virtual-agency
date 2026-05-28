@@ -2856,6 +2856,94 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "inside-the-pricing-calculator-4-inputs",
+    locale: "en",
+    title: "Inside the pricing calculator — what 4 inputs reveal about your campaign",
+    excerpt:
+      "Why we built a 4-input calculator instead of publishing a price list. How asset count, season weeks, market count, and exclusivity move buyers across 5 different campaign paths.",
+    publishedAt: "2026-07-28",
+    readingMinutes: 7,
+    tags: ["pricing", "calculator", "RFP", "buyer-guide"],
+    sections: [
+      {
+        heading: "Why a calculator, not a price list",
+        body: "When a buyer asks «what does a K-aesthetic AI campaign cost?», there is no single number. The real range we see across deals runs from ₩5M to ₩240M+ — a 50x spread driven by inputs the buyer often doesn't realize matter. A price list anchored at the median misleads everyone: low-spec buyers think we're expensive, high-spec buyers think we're cheap. So we built a 4-input calculator that returns a recommended path and a price range, not a number. The 4 inputs are deliberately coarse. More inputs invite spurious precision (a buyer who has to choose between «moody» and «cinematic» moods just gives up); fewer inputs miss the genuine cost drivers. Through testing with ~25 buyers, 4 was the sweet spot.",
+      },
+      {
+        heading: "Input 1 — asset count",
+        body: "How many deliverable images / video frames the campaign needs across all sizes and formats. This is the most direct cost driver: synthetic talent unit economics improve dramatically with volume because the character recipe is the fixed cost. A 5-asset campaign and a 50-asset campaign on the same character cost roughly the same setup — only the per-asset render layer scales. Buyers consistently underestimate this number. A typical «small» campaign that started as «10 hero shots» usually expands to ~35-40 once you count format variants (1:1 PDP / 9:16 reels / 4:5 IG / 16:9 hero / OOH wide), market variants, and the supporting shot tail. We default the slider to 40 because that's the median we see; if your real number is 80+ you're already at brand-kit floor economics.",
+      },
+      {
+        heading: "Input 2 — season weeks",
+        body: "How long the campaign must run, in weeks. This isn't about asset delivery — that's a few days regardless. It's about how long the character must stay «live» in the market without competing campaigns using the same likeness. Below 8 weeks we treat as a license tier (daily rate + per-asset). 8-24 weeks lines up with our paired editorial brand-kit (which includes an 8-week category-exclusive window). 24+ weeks moves to the season anchor or custom build paths. Buyers often default to «as long as possible» here, but every extra week beyond 12 increases the price meaningfully because we're holding the character off other campaigns in your category. If you only really need the work live for 4 weeks, say so — it cuts cost by roughly 30%.",
+      },
+      {
+        heading: "Input 3 — market count",
+        body: "Number of markets the work ships to (KR, US, EU, SG count as 4). The calculator treats each additional market as a localization layer — disclosure metadata localization (each market has different label requirements; see our cross-market disclosure schema post), language-specific alt-text and captions, market-specific contractual reviews. The synthetic talent itself doesn't get more expensive across markets, but the disclosure + legal layer does. We budget ₩1.5M-3.5M per extra market. A traditional shoot scales far worse across markets (typically +60-80% per market because crews, models, and post all re-cost), so the synthetic-vs-traditional gap widens as you add markets. Single-market campaigns are where synthetic talent's economics are tightest vs alternatives.",
+      },
+      {
+        heading: "Input 4 — exclusivity (boolean)",
+        body: "Does the campaign need category exclusivity over its live window? If yes, the character can't appear in competing brands' campaigns in the same category during your contracted period. This is the most expensive flag in the calculator — toggling it on under the license tier roughly doubles the estimate. Under our brand-kit tiers, exclusivity is included for the contracted period, which is one reason mid-scope campaigns favor paired editorial over stacking license + exclusivity uplift. The trap to watch: buyers default to «yes» reflexively because exclusivity feels safer. But if your category is wide (e.g. «beauty» rather than «fragrance for women 25-34»), you're paying for a constraint that doesn't actually bite. We'd rather scope exclusivity to the subcategory than blanket the entire vertical.",
+      },
+      {
+        heading: "The 5 paths the calculator returns",
+        body: "Given the 4 inputs, the calculator picks one of 5 recommended paths: (1) Traditional shoot competitive — small + short + single-market + no exclusivity (synthetic ROI doesn't beat traditional here, we recommend you skip us). (2) License daily — small-to-mid asset count, short window, single market. (3) Paired editorial brand-kit — mid asset count (30-60), single market, quarter-long. (4) Season anchor brand-kit — bigger volume, cross-market, longer window with exclusivity. (5) Custom build — multi-year IP development with own characters. Each path has different unit economics. The most common buyer mistake is requesting custom build for a single quarterly campaign — the math doesn't work (we wrote about that in the «engineering case study»).",
+      },
+      {
+        heading: "What's NOT in the estimate",
+        body: "The calculator returns assets + licensing + disclosure metadata + localization layer. It explicitly excludes: (a) media budget — for most campaigns this is 70-85% of total spend; the calculator only sizes the asset side, not the buy side. (b) Legal review beyond standard disclosure — face-similarity audits, multi-market compliance reviews for regulated categories (alcohol, pharma, finance) add ₩5-15M. (c) Photographic style direction beyond our default recipes — if you need a deeply custom aesthetic that doesn't match Yuna or Ren's existing register, that's a brief-led conversation, not a sliders-led one. Buyers sometimes see the calculator number, assume that's the total campaign cost, and then panic when media + legal add 10x. The calculator caveats footer says this; we say it again here.",
+      },
+      {
+        heading: "How to use the calculator before an RFP",
+        body: "Three uses: (1) Sanity check — does your internal budget come within ±20% of the calculator's range? If yes, your scope is reasonable. If you're 3x above, you may be over-buying; 3x below, you may be under-scoping. (2) Iterate inputs — try toggling exclusivity off, reducing weeks, splitting markets into phases. The calculator gives you the cost lever on each. (3) Use the «Send brief» CTA — when you click through to the RFP form, the calculator pre-fills your duration, message, and exclusivity flags, and tags the submission with a utm_campaign matching the recommended path. Internally that tells us within seconds whether you're a license, paired, season, or custom buyer — and we route the inquiry to the right team. Faster response, better-aimed first proposal.",
+      },
+    ],
+  },
+  {
+    slug: "total-campaign-cost-decomposition",
+    locale: "en",
+    title: "Total campaign cost decomposition — what's NOT in your synthetic talent quote",
+    excerpt:
+      "Buyers see our quote and assume that's the campaign budget. It's typically 15-30% of the total. Here's where the other 70-85% goes — media, legal, localization, agency margin — so you can plan the full P&L.",
+    publishedAt: "2026-07-29",
+    readingMinutes: 6,
+    tags: ["pricing", "buyer-guide", "campaign-planning", "compliance"],
+    sections: [
+      {
+        heading: "Why this post exists",
+        body: "Every quarter, several inquiries arrive with the same pattern: «We have ₩30M for the whole campaign — can you do it?» When we ask what «the whole campaign» includes, the buyer realizes our quote is the asset + licensing side only, and they hadn't budgeted media or legal yet. Total campaign cost is rarely 1x our quote. For typical mid-scope work, it's 5-7x. This post breaks down where the rest of the budget goes so buyers can plan the full P&L before they negotiate with us — or before they're surprised by a ₩200M media bill on a ₩30M production.",
+      },
+      {
+        heading: "Asset + licensing — usually 15-30% of total",
+        body: "This is what our pricing calculator estimates. For a mid-scope cross-market campaign (40 assets, 12 weeks, 2 markets, category-exclusive), the calculator returns roughly ₩22M-35M. That covers character licensing, asset generation, revisions, AI disclosure metadata across markets, and our project management. It does not include any media spend, paid placement, or post-launch optimization. Think of this slice as «getting the campaign ready to run» — not «running it.»",
+      },
+      {
+        heading: "Media buy — usually 50-75% of total",
+        body: "This is the budget you put against ad platforms (Meta, TikTok, YouTube, Naver, Kakao, regional networks). For an export-oriented K-beauty brand launching in the US, a 12-week campaign with reasonable reach targets typically requires ₩50M-200M of media spend. The buy is driven by your reach goals (CPM × impressions), not by the cost of producing the assets. Two common patterns to avoid: (a) over-producing assets relative to media spend — 60 assets for ₩20M media is wasted creative; only the top 5-8 will actually run. (b) Under-producing — ₩100M media against 5 assets gives you no rotation, leading to fatigue and CPM creep by week 4. We help buyers right-size the asset-to-media ratio; ask in the RFP if you want our breakdown.",
+      },
+      {
+        heading: "Legal + compliance review — usually 3-8% of total",
+        body: "Beyond the standard disclosure metadata we ship by default, regulated-category brands need a face-similarity audit before launch (~₩4-8M for an external audit, typically faster turnaround than a regulator-triggered post-launch challenge), category-specific compliance review for cosmetics, medical, financial, or alcohol claims (~₩5-15M depending on market count), and contractual review for any usage extending past the licensed window. For un-regulated lifestyle / fashion / accessories work, this can be ₩0 — your in-house legal team handles standard reviews. The default assumption should be 5% of total budget, ringfenced; reallocate if you genuinely don't need it.",
+      },
+      {
+        heading: "Localization — usually 5-12% of total",
+        body: "Each market beyond your home market adds copy translation, market-specific captions, locally-relevant references (cultural ones, like seasonal calendars or referenced colorways), and platform-specific aspect ratios. For a US/EU/SG cross-market launch from KR, budget ~₩8-20M of localization above what we deliver on the asset side. Some brands push this onto their local agencies in-market; others keep it centralized. Either model works; what kills campaigns is assuming localization is «just translation» — it's translation + cultural adaptation + platform reformatting + per-market legal review of copy claims.",
+      },
+      {
+        heading: "Agency margin / project management — usually 0-15% of total",
+        body: "If you're working with us direct (no buying-side agency), there's no margin layer above our quote. If your media is bought through an agency, expect 8-15% agency margin on the media buy (industry standard). If you're using an integrated agency for creative direction beyond what we provide, that's an additional ~10% on the creative side. Buyers underestimate this when comparing «our quote» to a traditional shoot agency's quote — the agency quote often bundles margin into the line items invisibly. Ask for transparent line-item billing if you want apples-to-apples comparisons.",
+      },
+      {
+        heading: "Hidden costs we see catch buyers",
+        body: "Three that consistently bite: (1) Asset versioning past launch — the original quote covers v1 deliverables; if your seasonal campaign shifts in week 6, that's a v2 round that wasn't budgeted. We see ~30% of campaigns need a v2; budget ~15% of original asset cost as a contingency. (2) Storage and rights renewal — most brands store master assets internally; some agencies retain originals and charge for re-licensing. Confirm in the contract which model applies. (3) Post-launch performance optimization — running A/B tests on asset variants is included in our default workflow, but additional asset rounds based on performance data are a v2 (see #1). Plan for these by default rather than negotiating them mid-campaign.",
+      },
+      {
+        heading: "How to use this when budgeting",
+        body: "Rough rule: if you have a fixed campaign budget, allocate ~20% to assets + licensing (use our calculator to validate this fits the scope you actually need), ~60% to media, ~5% to legal/compliance, ~10% to localization, ~5% contingency. If the asset slice forces you to compromise scope (fewer assets than you really need), the campaign is undercapitalized — increase total budget or reduce ambition. If you have a fixed asset budget but flexible media, our calculator's recommended path lets you reason backward: «paired editorial returns ₩22M; that means I should have ₩50-100M of media against it for the asset-to-media ratio to make sense.» Either direction, the calculator is the production anchor; this post is the rest of the P&L.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
