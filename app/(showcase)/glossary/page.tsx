@@ -128,9 +128,9 @@ export default function KrGlossaryPage() {
                     <dd className="mt-2 text-sm text-zinc-400 leading-relaxed">
                       {t.ko.definition}
                     </dd>
-                    {t.relatedPostSlug && (
+                    {(t.relatedPostSlugKo ?? t.relatedPostSlug) && (
                       <Link
-                        href={`/blog/${t.relatedPostSlug}`}
+                        href={`/blog/${t.relatedPostSlugKo ?? t.relatedPostSlug}`}
                         className="mt-2 inline-block text-xs text-zinc-500 hover:text-zinc-300 underline"
                       >
                         관련 블로그 →

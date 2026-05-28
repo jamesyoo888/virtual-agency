@@ -3,20 +3,20 @@ import { characterFaqKo, characterFaqEn } from "@/lib/characters/faq";
 import { getCharacter } from "@/lib/characters/registry";
 
 describe("character FAQ (KR + EN)", () => {
-  it("KR FAQ surfaces 6 entries per character — covers solo, market, exclusivity, IP, preview, disclosure", () => {
+  it("KR FAQ surfaces 7 entries per character — covers solo, market, exclusivity, IP, preview, disclosure, acceptance QA", () => {
     const yuna = getCharacter("yuna")!;
     const faq = characterFaqKo(yuna);
-    expect(faq).toHaveLength(6);
+    expect(faq).toHaveLength(7);
     for (const e of faq) {
       expect(e.question.length).toBeGreaterThan(0);
       expect(e.answer.length).toBeGreaterThan(40);
     }
   });
 
-  it("EN FAQ surfaces 6 entries per character", () => {
+  it("EN FAQ surfaces 7 entries per character", () => {
     const ren = getCharacter("ren")!;
     const faq = characterFaqEn(ren);
-    expect(faq).toHaveLength(6);
+    expect(faq).toHaveLength(7);
     for (const e of faq) {
       expect(e.question.length).toBeGreaterThan(0);
       expect(e.answer.length).toBeGreaterThan(40);
@@ -47,11 +47,21 @@ describe("character FAQ (KR + EN)", () => {
     const yuna = getCharacter("yuna")!;
     const ko = characterFaqKo(yuna);
     const en = characterFaqEn(yuna);
-    const koLast = ko[ko.length - 1].answer;
-    const enLast = en[en.length - 1].answer;
-    expect(koLast).toMatch(/EU AI Act/);
-    expect(koLast).toMatch(/FTC/);
-    expect(enLast).toMatch(/EU AI Act/);
-    expect(enLast).toMatch(/FTC/);
+    const koCompliance = ko.find((e) => e.answer.includes("EU AI Act"))!;
+    const enCompliance = en.find((e) => e.answer.includes("EU AI Act"))!;
+    expect(koCompliance.answer).toMatch(/FTC/);
+    expect(enCompliance.answer).toMatch(/FTC/);
+  });
+
+  it("Acceptance QA entry references the published checklist post (KR + EN)", () => {
+    const yuna = getCharacter("yuna")!;
+    const ko = characterFaqKo(yuna);
+    const en = characterFaqEn(yuna);
+    const koQa = ko.find((e) =>
+      e.question.includes("결제") || e.question.includes("검수")
+    );
+    const enQa = en.find((e) => e.question.toLowerCase().includes("verify"));
+    expect(koQa?.answer).toMatch(/qa-checklist-ko/);
+    expect(enQa?.answer).toMatch(/qa-checklist-before-paying/);
   });
 });

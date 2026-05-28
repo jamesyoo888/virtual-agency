@@ -49,6 +49,16 @@ describe("glossary registry", () => {
     const linked = GLOSSARY_TERMS.filter((t) => t.relatedPostSlug);
     expect(linked.length).toBeGreaterThanOrEqual(5);
   });
+
+  it("relatedPostSlugKo (KR override) resolves to a real KR-locale post", async () => {
+    const { getPostBySlug } = await import("@/lib/blog/posts");
+    const overrides = GLOSSARY_TERMS.filter((t) => t.relatedPostSlugKo);
+    expect(overrides.length).toBeGreaterThanOrEqual(2);
+    for (const t of overrides) {
+      const post = getPostBySlug(t.relatedPostSlugKo!, "ko");
+      expect(post, `KR override for ${t.slug} should resolve`).toBeDefined();
+    }
+  });
 });
 
 describe("definedTermSetLd emits valid schema.org DefinedTermSet", () => {

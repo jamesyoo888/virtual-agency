@@ -40,6 +40,10 @@ export function characterFaqKo(character: Character): FaqEntry[] {
       question: `${character.name}은 AI인 것을 표기해야 하나요?`,
       answer: `네, 시장별 규제에 따라 표기가 필요합니다. EU AI Act Article 50, US FTC Endorsement Guides, UK ASA/CAP Code, 한국 방심위·공정위 가이드에 맞는 합성 콘텐츠 표기 메타데이터를 모든 산출물과 함께 납품합니다.`,
     },
+    {
+      question: `인보이스 결제 전에 무엇을 검수해야 하나요?`,
+      answer: `사인오프 직전 90 분을 잡고 8 가지를 확인하세요 — 얼굴 일관성, 손·제품 접점, 의상 컨티뉴이티, 디스클로저 메타데이터, 포맷 커버리지, 서면 라이선스 스코프, 학습 데이터 attestation, 리비전 속도. 결제 전 표준 게이트로 공개한 체크리스트가 /blog/synthetic-talent-qa-checklist-ko 에 단계별로 있습니다.`,
+    },
   ];
 }
 
@@ -69,6 +73,10 @@ export function characterFaqEn(character: Character): FaqEntry[] {
     {
       question: `Does ${character.name} need to be disclosed as AI?`,
       answer: `Yes — per-market rules vary, but synthetic-content disclosure metadata aligned to the EU AI Act Article 50, US FTC Endorsement Guides, UK ASA/CAP Code, and Korea KCSC guidance ships with every deliverable.`,
+    },
+    {
+      question: `What should I verify before paying the invoice?`,
+      answer: `Block 90 minutes the day before sign-off and run 8 checks — face consistency across the set, hands/product contact points, wardrobe continuity, disclosure metadata in the file, format coverage per the brief, license scope in writing, training-data attestation, and revision velocity SLA. We publish the full step-by-step checklist at /en/blog/synthetic-talent-qa-checklist-before-paying — same list we run internally on every delivery.`,
     },
   ];
 }

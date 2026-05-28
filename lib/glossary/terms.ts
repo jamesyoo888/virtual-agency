@@ -34,6 +34,8 @@ export interface GlossaryTerm {
   en: { term: string; definition: string };
   /** Cross-link to a blog post that goes deep on the term. */
   relatedPostSlug?: string;
+  /** Optional KR-locale post slug. Falls back to relatedPostSlug. */
+  relatedPostSlugKo?: string;
 }
 
 export const GLOSSARY_TERMS: GlossaryTerm[] = [
@@ -429,6 +431,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
         "A documented signal that the campaign shape has outgrown the current brand-kit tier — campaign extending past 16 weeks, cross-market expansion, quarterly cadence, category exclusivity contested, brand voice misfit, or 6+ SKU rollout. «More budget» is not a trigger; «different campaign shape» is. Upgrading without a trigger wastes optionality.",
     },
     relatedPostSlug: "brand-kit-upgrade-path-when-to-move-tiers",
+    relatedPostSlugKo: "brand-kit-upgrade-path-ko",
   },
   {
     slug: "acceptance-qa",
@@ -444,6 +447,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
         "The buyer-controlled verification step before invoice payment — face consistency, hand/product contact points, wardrobe continuity, disclosure metadata, format coverage, license scope, source attestation, revision velocity SLA. Converts the vendor's vague «approve and ship» step into a structured gate, reducing post-payment regret. A buyer-side safety net the vendor benefits from too (clearer acceptance = faster sign-off).",
     },
     relatedPostSlug: "synthetic-talent-qa-checklist-before-paying",
+    relatedPostSlugKo: "synthetic-talent-qa-checklist-ko",
   },
 ];
 
