@@ -3604,6 +3604,98 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "what-we-dont-optimize-for-and-why-ko",
+    locale: "ko",
+    title: "우리가 최적화하지 않는 것 — 그리고 그 이유",
+    excerpt:
+      "모든 벤더는 어떤 것을 다른 어떤 것의 비용으로 최적화합니다. 우리가 의도적으로 최우선이 아니라고 결정한 항목 — 다른 벤더가 우리를 이길 dimension — 을 공개합니다. 광고주가 첫 통화 전에 fit 을 판단할 수 있도록.",
+    publishedAt: "2026-08-13",
+    readingMinutes: 7,
+    tags: ["operator-honesty", "포지셔닝", "trade-off", "광고주 fit"],
+    sections: [
+      {
+        heading: "왜 이 리스트가 존재하나",
+        body: "벤더의 pitch deck 이 «최저가 + 최단 turnaround + 최대 캐릭터 라이브러리 + 모든 시장» 을 동시에 주장하면, 거짓말이거나 최소 하나의 축에서 disappoint 할 준비 중. 실제 비즈니스는 trade-off 를 합니다; trade-off 가 없는 척하는 벤더는 지킬 수 없는 기대를 세팅합니다. 그래서 우리가 최적화하지 않는 것 — 다른 벤더가 우리를 이길 dimension — 을 공개합니다. 광고주가 self-select 할 수 있도록. Trade-off stack 에 맞는 광고주가 더 좋은 경험을 얻고, 다른 것을 필요로 하는 광고주는 wasted sales cycle 을 절약합니다. 둘 다 좋은 결과.",
+      },
+      {
+        heading: "어셋당 최저가는 우리가 노리지 않습니다",
+        body: "Paired 티어 (약 ₩1,100만) 는 합성 탤런트 시장에서 어셋당 최저가가 아닙니다. 더 얇은 파이프라인의 벤더가 스케일에서 hero 컷당 약 ₩26만~₩39만에 납품할 수 있고; 우리는 paired 할당 기준 컷당 약 ₩44만~₩58만 정착. 바닥으로 race 하지 않는 이유: 어셋당 가격이 더 싸다는 건 보통 더 느슨한 디스클로저 메타데이터, 약한 likeness attestation, 빠르지만 noisier QA 를 의미. 가격으로 이기고 EU/US 규제 기관이 구체적으로 변하면 audit trail 에서 지는 경쟁사를 봐왔습니다. 광고주가 어셋당 비용에 무엇보다 민감하면 우리가 맞는 벤더가 아닙니다 — 발견 통화 전에 말씀드리는 게 계약 후 말씀드리는 것보다 낫습니다.",
+      },
+      {
+        heading: "모든 브리프에 «yes» 는 안 합니다",
+        body: "인콰이어의 약 30 % 는 거절. 절대 안 다루는 카테고리 (성인 인접 일부 버티컬, 일부 금융 상품 포지셔닝, 특정 실제 인물 likeness 생성 요구). 예산이 현실적으로 스코프를 살 수 없는 브리프. «무조건 yes» 를 원하는 광고주는 다른 operator 를 찾는 중; 모든 것에 yes 하는 벤더는 스코프 크리프·스코프 드리프트·불행한 납품에 yes 하는 셈. 거절 룰: 우리 포트폴리오에 넣을 정도로 자부심을 느낄 수 없으면 안 받습니다. 트리거 패턴은 «why-we-reject-rfps-common-patterns» 글 참조.",
+      },
+      {
+        heading: "«가장 넓은 캐릭터 라이브러리» 는 안 노립니다",
+        body: "Yuna 와 Ren 두 캐릭터. brand-kit ≥3 OR paired ≥6 검증 게이트를 둘 다 통과하기 전까지 3 번째 추가 계획 없음. 다른 벤더는 표면적 차별화로 30+ 캐릭터를 제공. 수학: 같은 엔지니어링 대역폭에 30 캐릭터 분산 = 캐릭터당 1/30 의 깊이. 우리 입장은 brand-kit 인프라 + glossary cross-link + FAQ + lookbook + attribution analytics + per-character ROI 추적을 갖춘 deep 캐릭터 2 명이 stock photo 배경 스토리의 shallow 캐릭터 30 명보다 브랜드에 더 유용하다는 것. stock 이미지용으로 30 개 다른 얼굴이 필요하면 우리가 맞는 벤더가 아닙니다.",
+      },
+      {
+        heading: "«가장 빠른 turnaround» 는 안 노립니다",
+        body: "Paired 납품 first cut 의 quoted turnaround 는 영업일 5-7 일; 경쟁사는 48-72 시간 광고. 속도로 이기지 않으려는 이유: 5-7 일 윈도우는 브리프 작성자와의 mid-week 리뷰 패스, QA 게이트, 납품 전 디스클로저 메타데이터 verification 을 포함. 48 시간 벤더는 이 게이트를 건너뛰고 — 빨리 납품하고 리뷰 시점에 광고주가 이슈를 잡길 의존. 우리는 일 6 일에 깨끗한 first cut 을 납품하고 일 3 일에 noisy 한 것을 납품 후 광고주에게 정리를 요청하는 것보다 전자를 선호. 캠페인이 fixed deadline 의 same-week turnaround 가 필요하면 일찍 물어보세요 — 가끔 수용 가능, 디폴트 흐름은 아닙니다.",
+      },
+      {
+        heading: "«day one 모든 시장» 은 안 노립니다",
+        body: "현재 KR + US + EU + SG 에 명시적 디스클로저 메타데이터 스키마로 최적화. 일본, 인도, 나머지 SEA, LATAM, MENA — 같은 품질 기준으로 캠페인 출하할 local-legal 인프라나 규제 기관 추적 깊이 없음. 일본 특히: 현지 에이전시 관계 모델이 non-trivial 하고 fake 하지 않음. 4-시장 footprint 에서 운영하는 광고주는 우리의 최선을 얻고; 일본 포함 글로벌 캠페인 운영 광고주는 일본 파트너 있는 벤더에게서 더 잘 서빙됨. 정직히 route 해드립니다.",
+      },
+      {
+        heading: "«모든 채널 포맷» 은 안 노립니다",
+        body: "기본 포맷 팩이 PDP (1:1), 릴스 (9:16), IG 피드 (4:5), hero/비디오 (16:9), 옥외 wide 를 커버. 니치 배치를 위한 native-format 최적화 (예: 특정 Pinterest 비율, 게이밍 플랫폼 스킨 변형, AR 필터 어셋) 는 출하 안 함. 브랜드 키트는 요청 시 그 포맷으로 확장 가능하지만 디폴트 deliverable 에 없음. 비표준 채널에 heavy 한 브랜드는 미리 물어보세요 — 우리가 확장 스코프를 잡거나 정직히 specialist 를 제안합니다.",
+      },
+      {
+        heading: "광고주 fit 에 의미하는 바",
+        body: "광고주의 shortlist 가 «어셋당 최저가 + 48 시간 turnaround + 30+ 캐릭터 옵션 + 일본 포함» 이면 우리는 모든 dimension 에서 패배. 다른 벤더 고르세요. Shortlist 가 «deep 캐릭터 IP + 깨끗한 컴플라이언스 추적 + 4-시장 품질 기준 + 14 컷 이후 per-day license 를 이기는 paired 티어 economics» 면 강한 매치. Trade-off stack 이 fit 을 결정. 공개하면 wrong-fit 인콰이어 (좋음) 를 잃고 right-fit (더 좋음) 을 얻습니다.",
+      },
+      {
+        heading: "벤더 shortlist 에 쓰는 법",
+        body: "shortlist 의 모든 벤더에게 «무엇을 최적화하지 않는가» 물으세요. 답이 diagnostic: «모든 것을 최적화» 는 «전략이 없다» 의 거짓말. «X 를 Y, Z 의 비용으로 최적화» 는 trade-off 를 생각해 본 operator 의 답이고 공개를 두려워하지 않음. 어느 답이든 무엇인가를 말해줍니다 — 첫 답은 더 찾으라고 말해주고, 둘째는 캠페인 라이브 시 무엇을 얻을지 말해줍니다.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-campaign-failure-modes-how-to-catch-ko",
+    locale: "ko",
+    title: "합성 탤런트 캠페인의 5 가지 failure mode — 잡는 법",
+    excerpt:
+      "캠페인은 납품에서 실패하지 않습니다 — 4-12 주 후, 브랜드가 어셋이 아무도 깃발 안 든 방향으로 drift 했음을 깨달을 때 실패합니다. 다른 벤더에서 옮겨오는 광고주 인콰이어에서 가장 흔히 보는 5 가지 failure mode, 그리고 각각을 일찍 잡는 광고주 측 detection 무브.",
+    publishedAt: "2026-08-14",
+    readingMinutes: 7,
+    tags: ["운영", "failure mode", "벤더 관리", "컴플라이언스"],
+    sections: [
+      {
+        heading: "왜 failure-mode literacy 가 중요한가",
+        body: "합성 탤런트 벤더는 납품 순간에 실패하지 않습니다. Hero 어셋이 출하되고, 브랜드가 승인하고, 캠페인이 라이브. 실패는 4-12 주 후 — 어셋 세트의 무엇이 drift 하거나 감사가 도착하거나 소비자 반응이 sideways 갈 때 — 나타납니다. 그때 계약은 결제 끝났고 벤더는 옮겨갔고; 브랜드가 비용 흡수. 아래: 가장 흔히 보는 (다른 벤더 떠나는 광고주 인콰이어에서) 5 가지 failure 패턴 + 사인오프 윈도우에서 각각을 catch 했을 광고주 측 detection 무브.",
+      },
+      {
+        heading: "Failure mode 1 — 어셋 세트 전체에 걸친 drift",
+        body: "패턴: hero asset 1 좋다. Hero asset 12 좋다. 나란히 놓으면 미묘하게 다름 — 약간 다른 눈 거리, 약간 다른 코-입 비율, 약간 다른 턱선. 소비자는 명문화하지 않지만 느낌; 브랜드가 «inconsistent» 로 읽힘, 이유는 아무도 말 안 함. Catch: 사인오프 시 모든 hero 컷을 동일 크롭+줌으로 나란히. 「같은 사람이라 망설여진다」 싶은 프레임 flag (W237 QA 체크리스트 Check 1 참조). 우리 내부 QA 기준 first-cut 납품 8 건 중 1 건은 최소 1 개 drift 프레임. Catch 시 리비전 사이클 1 회 추가; 놓치면 신뢰 약화 12 주 추가.",
+      },
+      {
+        heading: "Failure mode 2 — 디스클로저 메타데이터 누락 또는 wrong-schema",
+        body: "패턴: C2PA manifest 없이 어셋 출하, 또는 목적지 시장의 현재 규제 스키마와 일치 안 하는 manifest (예: EU AI Act Article 50 필드가 2026 년 중반에 변경되었는데 벤더가 업데이트 안 함). 브랜드 발행; 6-10 주 후 watchdog 또는 규제 letter 도착; 브랜드가 캠페인 철수, 수정 어셋 재출하, 공개 설명 강제. Catch: 결제 전 EXIF/XMP 뷰어로 납품 파일 오픈. 합성 콘텐츠 플래그 + 시장-별 마커 확인. 깨끗한 메타데이터 제공에 반대하는 벤더는 무언가를 말하고 있는 중 — per-market 스키마 reference 는 /blog/ai-content-disclosure-korea-kcc-kftc 참조.",
+      },
+      {
+        heading: "Failure mode 3 — 라이선스 스코프 모호함",
+        body: "패턴: SoW 가 «campaign use, 12 months, single market» 라고 적었지만 paid media vs. 오가닉 vs. OOH vs. 리테일러 배치 vs. point-of-sale 을 enumerate 안 함. 브랜드가 캠페인을 새 시장이나 채널로 스케일, 벤더가 예상 못 한 fee 인보이스 발송. 브랜드가 결제 (어셋당 economics 갉아먹음) 또는 반발 (관계 sour). Catch: 결제 전 사용권 (paid media + 오가닉 + OOH + POS), 영역, 기간, 독점, 채널 제한 enumerate 를 서면으로 요구. 다른 벤더 떠나는 광고주 인콰이어에서 가장 흔한 분쟁. 라이선스 스코프 구두 핸드셰이크는 일반 스케일 기준 연간 약 ₩1,950만~₩5,200만의 surprise fee 비용.",
+      },
+      {
+        heading: "Failure mode 4 — 출시 후 likeness 모호함",
+        body: "패턴: 합성 캐릭터가 실제 셀러브리티 또는 인플루언서와 미묘한 닮음. 의도하지 않은 닮음 — 학습 데이터 겹침, 유사한 스타일링 DNA, 유사한 버티컬. 4-8 주 출시 후 소셜에서 call out. 브랜드가 NIL (Name, Image, Likeness) 클레임 또는 평판 hit 직면. Catch: 결제 전 벤더로부터 서면 attestation — «캐릭터가 likeness-similarity threshold 내에서 식별 가능한 실제 인물과 일치하지 않음» — 받기. 평판 좋은 벤더는 망설임 없이 서명. 회피하는 벤더는 flag. 2026 년 NIL enforcement 가 US (CA, NY, TN 특히), 한국 (퍼블리시티권 2023+ 강화), EU (일부 해석의 GDPR Art. 9 biometric 독해) 모두에서 active.",
+      },
+      {
+        heading: "Failure mode 5 — 캠페인 중반 리비전 속도 collapse",
+        body: "패턴: 초기 납품이 빠름 (벤더 파이프라인 warm). 캠페인 중반 리프레시 요청 — 같은 캐릭터, 새 의상, 새 컨텍스트. 벤더의 quoted turnaround 가 48 시간; 실제는 12 일. 브랜드가 계획된 launch window 놓침. Catch: SoW 에서 documented 리비전 속도 (결정 → 동일 캐릭터 변형 납품) 를 historical data 로 백업한 채 요구. 벤더가 대시보드 못 보여주거나 서면 숫자 commit 못 하면 낙관에 베팅. 합성 탤런트의 우위가 속도; 속도 못 약속하는 벤더는 렌더링 컴퓨트가 추가된 느린 어셋 샵.",
+      },
+      {
+        heading: "표준 계약에 detection 을 굽는 법",
+        body: "3 가지 계약 추가가 5 mode 모두 catch: (1) 수용 기준에 «synthetic-talent-qa-checklist» 의 8 체크를 이름으로 reference. (2) 라이선스 스코프를 채널 + 영역 + 기간 + 독점을 required-fields 로 enumerate, «and other reasonable use» 아님. (3) 리비전 속도 SLA 를 구체적 숫자 (예: same-character 변형 48 시간, 새 의상 이터레이션 5 일) + 벤더 공개 track record 로 백업. 이 3 가지 추가는 계약 검토 15 분 비용 + 마케팅 리더십 주의를 소비하는 12 주 출시 후 드라마 예방.",
+      },
+      {
+        heading: "우리 측에서 하는 일 (transparency)",
+        body: "모든 납품 전에 8 체크를 내부 실행 — 얼굴 일관성 QA, 손/접점 pass, 의상 컨티뉴이티 시트, current-schema lookup per market 의 디스클로저 메타데이터 검증, 브리프 대비 포맷 커버리지 cross-check, 모든 인보이스에 동봉되는 라이선스-스코프 PDF, 캐릭터별 서명된 likeness-attestation, 공개된 리비전-속도 대시보드. 규제 기관이 모두 요구해서가 아니라 — 위 failure mode 가 2 년차에 합성 탤런트 벤더 관계를 파괴하는 정확한 것들이라서. 광고주가 교체하는 벤더가 되기보다 납품당 90 분 추가 투자를 선호합니다.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

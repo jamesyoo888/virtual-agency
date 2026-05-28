@@ -129,12 +129,13 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "ko",
     title: "컴플라이언스 시리즈",
     description:
-      "방심위·EU AI Act 등 4 시장 디스클로저 의무, 다시장 현지화 체크리스트, 캠페인 사전 사인오프 가이드.",
+      "방심위·EU AI Act 등 4 시장 디스클로저 의무, 다시장 현지화 체크리스트, 캠페인 사전 사인오프 가이드, 그리고 4-12 주 후 surface 되는 5 failure mode.",
     slugs: [
       "ai-content-disclosure-korea-kcc-kftc",
       "ai-content-disclosure-compliance-2026",
       "cross-market-localization-checklist-kr-us-eu-sg-ko",
       "synthetic-campaign-pre-launch-compliance-checklist-ko",
+      "synthetic-campaign-failure-modes-how-to-catch-ko",
     ],
     relatedService: "compliance-audit",
   },
