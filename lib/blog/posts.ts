@@ -3032,6 +3032,94 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "when-not-to-use-synthetic-talent",
+    locale: "en",
+    title: "When NOT to use synthetic talent — the campaigns we turn down",
+    excerpt:
+      "Synthetic talent isn't universally better than real models. 6 campaign patterns where we recommend our buyers walk away — or use a real face — and why.",
+    publishedAt: "2026-08-02",
+    readingMinutes: 7,
+    tags: ["buyer-guide", "honesty", "campaign-planning", "synthetic-talent"],
+    sections: [
+      {
+        heading: "Why this post",
+        body: "Most synthetic-talent vendors only write about cases where they win. We field ~30 inquiries a month and decline 6-8. The patterns are consistent enough to publish: if your campaign matches any of these, traditional models or a different approach will produce a better outcome. Recommending the wrong fit is bad business — we'd rather lose the inquiry than ship a campaign that the buyer regrets in month 3.",
+      },
+      {
+        heading: "Pattern 1 — live commerce / real-time interaction",
+        body: "Live commerce on Naver Shopping, TikTok LIVE, or Kakao Style needs a real person who can react to comments, hold products in their hands on camera, and improvise within a price-anchored sales script. Synthetic talent in 2026 is still asset-based — we ship frames, not real-time presence. The few attempts at synthetic live commerce (avatars + pre-recorded loops with live overlay) consistently underperform real hosts by 40-60% on conversion. If live is part of the channel mix, hire a real host; you can still use synthetic talent for the supporting brand campaigns that drive viewers to the live stream.",
+      },
+      {
+        heading: "Pattern 2 — celebrity endorsement / known-face premium",
+        body: "If your campaign depends on the audience recognizing a specific celebrity (and the press value that comes with naming them), synthetic talent provides zero leverage. The celebrity premium is the brand's halo from a known person — synthetic characters can build a halo over time (years of consistent appearance), but they start at zero recognition. If your CMO's question is «how do we get a known face into the campaign», the answer is a real celebrity. Synthetic talent solves a different problem: scaling unbranded creative without recurring talent fees.",
+      },
+      {
+        heading: "Pattern 3 — UGC-style authentic moments",
+        body: "Campaigns that need to look like real customers using your product — phone-shot, hand-held, imperfect — are hard to fake with synthetic talent. The «perfect imperfection» is part of what UGC sells. Synthetic frames read as commercial even when stylistically rough; consumers detect it within 2-3 seconds. We've experimented; the lift in production efficiency doesn't offset the credibility loss. Recommendation: source UGC from real customers (incentivize, license properly) and use synthetic talent for the polished campaign layer.",
+      },
+      {
+        heading: "Pattern 4 — campaigns under 8 weeks with no exclusivity needs",
+        body: "If your campaign runs 4-6 weeks, single market, no exclusivity, and you only need 8-12 assets — the synthetic ROI math doesn't beat a half-day traditional shoot (~₩8-15M for similar scope). Our pricing calculator returns «traditional shoot competitive» for exactly this case. We tell buyers this explicitly: book a traditional crew for the burst campaign, and revisit synthetic talent when scope grows (cross-market, longer run, or recurring quarterly assets). Wrong tool, wrong campaign — the right answer is honesty.",
+      },
+      {
+        heading: "Pattern 5 — categories where regulator scrutiny is hostile",
+        body: "Some categories (children's products, pharmaceutical claims, regulated financial advice) have regulators who treat synthetic talent as a flag for additional review rather than a neutral production choice. Even with perfect disclosure, the inspection burden eats into media flexibility — you can't quickly localize a creative without re-clearing it. We accept these inquiries case-by-case but recommend buyers test with a small pilot first (5-10 assets, single market) before committing to a brand-kit tier. The economics still work past the regulatory friction; it's the calendar that suffers.",
+      },
+      {
+        heading: "Pattern 6 — emotional storytelling with biographical specificity",
+        body: "Documentaries, founder-story campaigns, customer-testimonial spots — work where the value is the specificity of the human behind the camera — can't be replaced by synthetic characters. The viewer is watching for biographical authenticity. We've had brand teams ask «can the synthetic character tell our founder's origin story?» and the honest answer is no — even a perfectly-rendered character lacks the unscripted micro-expressions and personal-detail texture that make biographical content land. Use synthetic talent for the brand campaigns that surround the founder story, not for the founder story itself.",
+      },
+      {
+        heading: "How we say no",
+        body: "When an inquiry matches one of these patterns, the response is a short email: «based on your brief, traditional production / live hosting / UGC will outperform synthetic talent for this specific work. Here's the rough budget benchmark, and we'd recommend [specific partner / approach]. If a later campaign fits synthetic talent, we'd love to revisit.» Roughly 1 in 3 of those declined buyers comes back within 6 months with a different campaign that does fit. That feedback loop is why honesty here pays back — buyers remember being told «not this campaign» more vividly than they remember any pitch.",
+      },
+    ],
+  },
+  {
+    slug: "first-30-days-campaign-measurement",
+    locale: "en",
+    title: "First 30 days of a campaign — what we actually measure",
+    excerpt:
+      "Most agencies report CPM and impressions. We track a different stack: asset rotation health, format-conversion ratios, brand-recall delta, and revision velocity. Why the operator dashboard matters more than the platform one.",
+    publishedAt: "2026-08-03",
+    readingMinutes: 6,
+    tags: ["operations", "measurement", "campaign-planning", "transparency"],
+    sections: [
+      {
+        heading: "Platform dashboards are not enough",
+        body: "Meta Ads Manager and TikTok For Business give you impressions, CPM, CTR, and conversions. Those are buy-side metrics — useful for media optimization but blind to the creative health of your synthetic campaign. We see clients spending ₩100M+ on media against a 5-asset rotation, hitting target CPM, and then losing the next quarter because the campaign fatigued in week 6 and nobody noticed until conversion dropped. The first 30 days is when you build the measurement loop that prevents that. Below is the stack we use internally and recommend buyers replicate.",
+      },
+      {
+        heading: "Metric 1 — Asset rotation health (per asset, per week)",
+        body: "Each delivered asset should run roughly proportional to its production cost. If we ship 30 assets and one carries 80% of impressions by week 2, the campaign is over-reliant on a single creative — fatigue risk. The rotation report we send weekly lists impressions per asset, normalized; any asset >2× the median or <0.3× the median gets flagged. The fix isn't always more assets; sometimes it's pausing the over-performer (rest it) and rotating the under-performers harder to read whether they're genuinely weak or just under-allocated.",
+      },
+      {
+        heading: "Metric 2 — Format conversion ratio",
+        body: "We ship 4-5 format variants per concept (1:1 PDP / 9:16 reels / 4:5 IG / 16:9 hero / OOH wide). Conversion per impression should vary roughly within ±30% across formats; if 9:16 reels converts at 5x the others, something is off — either the other formats are mis-targeted (placement issue) or the 9:16 carries copy/CTA that the others don't. The fix is creative-side: bring the high-converting elements to the lower formats. We see this gap in roughly 60% of campaigns by week 3.",
+      },
+      {
+        heading: "Metric 3 — Brand recall delta (qualitative, biweekly)",
+        body: "Aided recall surveys (3-5 questions, n=200 per panel, run via Pollfish or similar at ~$200) at week 0 (control), week 2, and week 4. Delta = post-campaign recall minus pre-campaign recall, controlled for category. A typical mid-scope campaign moves aided recall 3-7 points; below 2 points and the campaign is leaking — either reach is too narrow or the creative isn't memorable. Some buyers skip this because it costs $400; that's a ₩100M campaign without a $400 sanity check, which is foolish. We do it on our own and share results.",
+      },
+      {
+        heading: "Metric 4 — Revision velocity (operator-side)",
+        body: "How fast we can ship a new asset based on performance data. Our internal target: 48h from creative-direction decision to delivery for a same-character variant. Slower than that and we're the bottleneck. The metric matters because real-time optimization is what synthetic talent's velocity advantage actually delivers — if we can't turn a v2 inside 48h, the buyer might as well have used a traditional shoot. We surface this in the project notes for transparency. Slip outside the target window twice in a row → escalation review.",
+      },
+      {
+        heading: "Metric 5 — Disclosure compliance audit",
+        body: "Each market's disclosure metadata gets validated against the regulator's current expectations once per month. The schema we publish is locked at the version we ship, but the regulator's interpretation can drift (especially in EU). Audit catches drift before it triggers a regulator notice. We've not had a regulator action in 14 months; this metric is why. Buyers don't have to run this themselves — we report exceptions, and the count is usually zero.",
+      },
+      {
+        heading: "What you read on the operator dashboard",
+        body: "/client/dashboard shows the per-project stage timeline, asset rotation report, revision tickets in flight, and the weekly metric digest (rotation health, format gap, recall results when available). It's deliberately not a full BI dashboard — too much surface area for the buyer to consume. The questions it answers in 30 seconds: is my campaign healthy, what's the action item this week, when is the next milestone. If you need deeper drill-downs (asset-level conversion analysis, multivariate testing), we share read-only access to the underlying spreadsheet.",
+      },
+      {
+        heading: "Why we publish this",
+        body: "Vendor transparency is the cheapest trust-builder in our category. Buyers comparing synthetic-talent vendors mostly see vague promises about «cutting-edge AI» — saying explicitly «here's what we measure and at what cadence» both filters out buyers who want black-box magic (we're not for them) and accelerates trust with buyers who want a serious operating partner. The first 30 days is when that trust gets built or broken; we'd rather be over-clear about the measurement loop than charm the buyer into a contract and disappoint them at week 3.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
