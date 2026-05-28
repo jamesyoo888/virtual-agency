@@ -7,6 +7,15 @@ import { INDUSTRY_LABELS, MOOD_LABELS, GENRE_LABELS } from "@/lib/tags";
 import { getCharacter } from "@/lib/characters/registry";
 import { listSeries } from "@/lib/blog/series";
 import { getSeriesOgTheme } from "@/lib/blog/series-og-theme";
+import {
+  GLOSSARY_TERMS,
+  GLOSSARY_CATEGORY_LABELS,
+  type GlossaryCategory,
+} from "@/lib/glossary/terms";
+import {
+  getGlossaryCategoryOgTheme,
+  isGlossaryCategory,
+} from "@/lib/glossary/category-og-theme";
 import type { Model } from "@/types";
 
 export const runtime = "nodejs";
@@ -128,6 +137,98 @@ function seriesCard(
   );
 }
 
+function glossaryCategoryCard(
+  category: GlossaryCategory,
+  locale: "ko" | "en"
+) {
+  const theme = getGlossaryCategoryOgTheme(category);
+  const label = GLOSSARY_CATEGORY_LABELS[category][locale];
+  const inCategory = GLOSSARY_TERMS.filter((t) => t.category === category);
+  const sampleTerms = inCategory
+    .slice(0, 3)
+    .map((t) => (locale === "en" ? t.en.term : t.ko.term))
+    .join(" · ");
+  const eyebrow =
+    locale === "en"
+      ? "VIRTUAL AGENCY · GLOSSARY"
+      : "VIRTUAL AGENCY · 용어집";
+  const count = inCategory.length;
+  const countLabel =
+    locale === "en"
+      ? `${count} term${count === 1 ? "" : "s"}`
+      : `${count}개 용어`;
+  const lede =
+    sampleTerms ||
+    (locale === "en"
+      ? "Vocabulary buyers and compliance reviewers actually use."
+      : "광고주·컴플라이언스 검토자가 실제로 쓰는 어휘.");
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          padding: 72,
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: 22,
+          background: theme.gradient,
+          color: "white",
+          fontFamily: "sans-serif",
+        }}
+      >
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <p
+            style={{
+              fontSize: 16,
+              letterSpacing: "0.4em",
+              color: theme.accent,
+              textTransform: "uppercase",
+            }}
+          >
+            {eyebrow}
+          </p>
+          <span
+            style={{
+              fontSize: 14,
+              padding: "4px 12px",
+              borderRadius: 999,
+              background: theme.chipBg,
+              border: `1px solid ${theme.chipBorder}`,
+              color: theme.accent,
+              letterSpacing: "0.08em",
+            }}
+          >
+            {countLabel}
+          </span>
+        </div>
+        <p
+          style={{
+            fontSize: 60,
+            fontWeight: 800,
+            lineHeight: 1.05,
+            color: "white",
+          }}
+        >
+          {label}
+        </p>
+        <p
+          style={{
+            fontSize: 22,
+            color: "#d4d4d8",
+            lineHeight: 1.45,
+            maxWidth: 940,
+          }}
+        >
+          {lede}
+        </p>
+      </div>
+    ),
+    { width: 1200, height: 630 }
+  );
+}
+
 function bigCard(eyebrow: string, title: string, lede: string) {
   return new ImageResponse(
     (
@@ -201,6 +302,8 @@ export async function GET(request: Request) {
   const isCharacterCompare = searchParams.get("character_compare") === "1";
   const isGlossary = searchParams.get("glossary") === "1";
   const isEnGlossary = searchParams.get("en_glossary") === "1";
+  const glossaryCategory = searchParams.get("glossary_category");
+  const enGlossaryCategory = searchParams.get("en_glossary_category");
   const series = searchParams.get("series");
   const enSeries = searchParams.get("en_series");
 
@@ -326,10 +429,13 @@ export async function GET(request: Request) {
       "Persona, lighting, palette, target verticals side by side. The reference for deciding between solo casting and a paired brand kit."
     );
   }
+  if (isGlossaryCategory(enGlossaryCategory)) {
+    return glossaryCategoryCard(enGlossaryCategory, "en");
+  }
   if (isEnGlossary) {
     return bigCard(
       "VIRTUAL AGENCY · GLOSSARY",
-      "K-aesthetic & synthetic talent — 14 terms",
+      `K-aesthetic & synthetic talent — ${GLOSSARY_TERMS.length} terms`,
       "Glass skin, styling DNA, brand kit, disclosure metadata, category exclusivity. The vocabulary that buyers and compliance reviewers actually use."
     );
   }
@@ -483,10 +589,13 @@ export async function GET(request: Request) {
       "페르소나·라이팅·팔레트·산업 적합도 9 항목 비교. 솔로 캐스팅과 페어 브랜드 키트 사이의 결정 가이드."
     );
   }
+  if (isGlossaryCategory(glossaryCategory)) {
+    return glossaryCategoryCard(glossaryCategory, "ko");
+  }
   if (isGlossary) {
     return bigCard(
       "VIRTUAL AGENCY · 용어집",
-      "K-aesthetic · 합성 모델 14 용어",
+      `K-aesthetic · 합성 모델 ${GLOSSARY_TERMS.length} 용어`,
       "글래스 스킨, 스타일링 DNA, 브랜드 키트, 디스클로저 메타데이터, 카테고리 독점. 브리프·견적·컴플라이언스 검토 시 필요한 어휘."
     );
   }

@@ -3,7 +3,10 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { Briefcase, Link2, BookOpen, TrendingUp, Sparkles } from "lucide-react";
-import { loadAgentAttribution } from "@/lib/analytics/agent-attribution";
+import {
+  loadAgentAttribution,
+  AGENT_COMMISSION_RATE,
+} from "@/lib/analytics/agent-attribution";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -52,8 +55,16 @@ export default async function AgentDashboardPage() {
   // utm_campaign carries the agent's id; pre-built link saves the partner
   // from constructing it. Same pattern as the Wave 25 referral flow.
   const referralLink = `${SITE_URL}/?utm_source=agent&utm_campaign=${client.id}`;
-  const attribution = await loadAgentAttribution(client.id, 90);
-  const commissionEstimate = Math.round(attribution.totalRevenue * 0.15);
+  const [attribution, attribution30] = await Promise.all([
+    loadAgentAttribution(client.id, 90),
+    loadAgentAttribution(client.id, 30),
+  ]);
+  const commissionEstimate = Math.round(
+    attribution.totalRevenue * AGENT_COMMISSION_RATE
+  );
+  const commissionEstimate30 = Math.round(
+    attribution30.totalRevenue * AGENT_COMMISSION_RATE
+  );
   const characterPct =
     attribution.totalInquiries > 0
       ? Math.round(
@@ -63,6 +74,14 @@ export default async function AgentDashboardPage() {
   const blogPct =
     attribution.totalInquiries > 0
       ? Math.round((attribution.blogFunnel / attribution.totalInquiries) * 100)
+      : 0;
+  // Momentum signal: trailing 30d as % of trailing 90d. >=33% means the
+  // last 30d is pulling its weight; lower means activity slowed.
+  const momentumPct =
+    attribution.totalInquiries > 0
+      ? Math.round(
+          (attribution30.totalInquiries / attribution.totalInquiries) * 100
+        )
       : 0;
 
   return (
@@ -147,6 +166,32 @@ export default async function AgentDashboardPage() {
         )}
         {attribution.totalInquiries > 0 && (
           <div className="mt-4 pt-4 border-t border-zinc-800">
+            <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">
+              Trailing 30 days
+            </p>
+            <div className="grid grid-cols-3 gap-3 text-xs text-zinc-300 mb-4">
+              <div>
+                <p className="text-zinc-500">Inquiries (30d)</p>
+                <p className="mt-1 tabular-nums">
+                  {attribution30.totalInquiries}
+                  <span className="ml-2 text-zinc-600">
+                    {momentumPct}% of 90d
+                  </span>
+                </p>
+              </div>
+              <div>
+                <p className="text-zinc-500">Delivered (30d)</p>
+                <p className="mt-1 tabular-nums text-emerald-300">
+                  {attribution30.totalDelivered}
+                </p>
+              </div>
+              <div>
+                <p className="text-zinc-500">Commission est. (30d)</p>
+                <p className="mt-1 tabular-nums text-emerald-200">
+                  ₩{commissionEstimate30.toLocaleString("ko-KR")}
+                </p>
+              </div>
+            </div>
             <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3 inline-flex items-center gap-2">
               <Sparkles className="w-3 h-3 text-violet-300" /> Funnel overlap
             </p>
