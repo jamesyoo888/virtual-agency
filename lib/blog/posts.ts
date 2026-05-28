@@ -3696,6 +3696,94 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "when-not-to-use-synthetic-talent-ko",
+    locale: "ko",
+    title: "합성 탤런트를 쓰지 말아야 할 때 — 우리가 거절하는 캠페인",
+    excerpt:
+      "합성 탤런트가 실제 모델보다 보편적으로 더 좋은 건 아닙니다. 6 가지 캠페인 패턴에선 광고주에게 walk away 또는 real face 사용을 권합니다. 그 이유.",
+    publishedAt: "2026-08-15",
+    readingMinutes: 7,
+    tags: ["광고주 가이드", "operator-honesty", "캠페인 기획", "합성 탤런트"],
+    sections: [
+      {
+        heading: "왜 이 글을 쓰나",
+        body: "대부분의 합성 탤런트 벤더는 자기가 이긴 케이스만 글을 씁니다. 우리는 월 약 30 인콰이어 중 6-8 건을 거절합니다. 패턴이 일관성 있어 공개: 캠페인이 아래 중 어디에라도 매칭되면 전통 모델 또는 다른 접근이 더 나은 outcome 을 줍니다. 잘못된 fit 을 권하는 건 나쁜 비즈니스 — 인콰이어를 잃는 게 광고주가 3 개월차에 후회할 캠페인을 출하하는 것보다 낫습니다.",
+      },
+      {
+        heading: "패턴 1 — 라이브 커머스 / 실시간 인터랙션",
+        body: "네이버 쇼핑·TikTok LIVE·카카오 스타일의 라이브 커머스는 댓글 반응 + 손에 제품을 들고 카메라 앞에서 + 가격 앵커 sales script 안에서 즉흥할 실제 사람이 필요. 2026 년 합성 탤런트는 여전히 asset-기반 — 우리는 프레임을 출하하지 실시간 presence 아님. 합성 라이브 커머스 (아바타 + pre-recorded loop + 라이브 오버레이) 의 몇 시도는 일관되게 실제 호스트 대비 전환 40-60 % 저조. 라이브가 채널 믹스에 있으면 실제 호스트 채용; 라이브 스트림으로 시청자 유도하는 supporting 브랜드 캠페인에 합성 탤런트 사용은 OK.",
+      },
+      {
+        heading: "패턴 2 — 셀러브리티 endorsement / known-face 프리미엄",
+        body: "캠페인이 audience 가 특정 셀러브리티를 인지하는 것 (그리고 그 이름으로 오는 PR 가치) 에 의존한다면 합성 탤런트는 zero leverage. 셀러브리티 프리미엄은 known person 의 halo — 합성 캐릭터는 시간 (수년의 일관 등장) 으로 halo 를 build 가능, but zero recognition 에서 시작. CMO 의 질문이 «어떻게 known face 를 캠페인에 넣나» 면 답은 실제 셀러브리티. 합성 탤런트는 다른 문제 — talent fee 없이 unbranded creative 를 스케일하는 것 — 를 풉니다.",
+      },
+      {
+        heading: "패턴 3 — UGC-스타일 진정성 순간",
+        body: "실제 고객이 제품 쓰는 것처럼 보여야 하는 — 폰 촬영·hand-held·imperfect — 캠페인은 합성 탤런트로 fake 어려움. «완벽한 imperfection» 이 UGC 가 파는 것의 일부. 합성 프레임은 스타일적으로 거칠어도 commercial 로 읽힘; 소비자가 2-3 초 내 detect. 실험해 봤습니다 — 제작 효율 lift 가 credibility loss 를 상쇄 안 함. 권장: UGC 를 실제 고객으로부터 소싱 (incentivize, properly license) + polished 캠페인 레이어에 합성 탤런트.",
+      },
+      {
+        heading: "패턴 4 — 8 주 미만·독점 불필요 캠페인",
+        body: "캠페인이 4-6 주 운영, 단일 시장, 독점 없음, 8-12 어셋만 필요면 합성 ROI 수학이 half-day 전통 촬영 (유사 스코프 ~₩800만~₩1,500만) 을 이기지 못함. 우리 견적 계산기가 정확히 이 케이스에 «traditional 촬영 경쟁적» 반환. 광고주에게 명시: burst 캠페인엔 전통 크루 book 하고, 스코프가 커지면 (다시장, 더 긴 운영, 분기 단위 어셋) 합성 탤런트 재방문. 잘못된 도구·잘못된 캠페인 — 정답은 정직.",
+      },
+      {
+        heading: "패턴 5 — 규제 기관 scrutiny 가 hostile 한 카테고리",
+        body: "일부 카테고리 (어린이 제품, 제약 클레임, 규제된 금융 자문) 의 규제 기관은 합성 탤런트를 중립 선택지가 아닌 추가 review 의 flag 로 취급. 완벽한 디스클로저로도 inspection burden 이 media 유연성을 갉아먹음 — 크리에이티브를 빠르게 현지화하려면 재clearing 필요. 이 인콰이어는 case-by-case 수용, but 광고주에게 brand-kit 티어에 commit 전 작은 파일럿 (5-10 어셋, 단일 시장) 부터 테스트 권장. 규제 마찰 후 경제학이 작동, but 일정이 고통받음.",
+      },
+      {
+        heading: "패턴 6 — 자전적 구체성을 가진 감성 스토리텔링",
+        body: "다큐멘터리·창업자 스토리 캠페인·고객 testimonial 스폿 — 가치가 카메라 뒤 인간의 specificity 인 작업 — 은 합성 캐릭터로 대체 불가. 시청자는 자전적 진정성을 보고 있는 중. 브랜드 팀이 «합성 캐릭터가 창업자 origin 스토리를 할 수 있나» 물어 — 정직한 답은 no — 완벽 렌더링된 캐릭터도 unscripted micro-expression 과 personal-detail texture 가 부족, 자전적 콘텐츠가 land 하게 만드는. 창업자 스토리 주변 브랜드 캠페인에 합성 탤런트 사용, 창업자 스토리 자체엔 아님.",
+      },
+      {
+        heading: "어떻게 no 라고 말하나",
+        body: "인콰이어가 이 패턴 중 하나에 매칭되면 응답은 짧은 이메일: «귀하의 브리프 기반, 이 특정 작업엔 전통 제작 / 라이브 호스팅 / UGC 가 합성 탤런트를 outperform. 대략 예산 벤치마크와 권장 [구체적 파트너 / 접근] 이 여기. 나중 캠페인이 합성 탤런트에 fit 하면 재방문 환영». 거절된 광고주의 약 3 분의 1 이 6 개월 내 fit 한 다른 캠페인으로 돌아옵니다. 그 피드백 루프가 정직이 pay back 하는 이유 — 광고주는 «이 캠페인은 안 됨» 들은 것을 어떤 pitch 보다도 vividly 기억합니다.",
+      },
+    ],
+  },
+  {
+    slug: "why-we-reject-rfps-common-patterns-ko",
+    locale: "ko",
+    title: "왜 RFP 를 거절하는가 — 주간 단위로 보는 5 패턴",
+    excerpt:
+      "인바운드 RFP 의 30-40 % 를 거절합니다. 패턴이 예측 가능. 광고주가 이 글을 읽고 사전에 upstream 이슈를 고치면 빠른 yes 의 확률이 높아집니다.",
+    publishedAt: "2026-08-16",
+    readingMinutes: 6,
+    tags: ["RFP", "buyer-funnel", "프로세스", "operator-honesty"],
+    sections: [
+      {
+        heading: "왜 공개하나",
+        body: "광고주가 사적으로 왜 자기 RFP 가 미응답이거나 정중한 no 를 받았는지 물어봅니다. 패턴을 공유하는 게 한 건씩 답하는 것보다 유용. 아래 5 이유가 우리 거절의 ~85 % 를 커버. RFP 가 이 중 어디에라도 fit 하면 보내기 전에 수정 — 거절해야 할 fuzzy 한 것보다 yes 할 수 있는 깨끗한 RFP 가 훨씬 좋습니다.",
+      },
+      {
+        heading: "패턴 1 — 스코프 대비 예산 불일치",
+        body: "가장 흔함. RFP 가 hero 어셋 60 개, 시장 4 개, 독점, 풀 디스클로저 메타데이터를 단일 시장 ~12 어셋 지원하는 예산으로 요청. 그 예산으로 축소 못 함 — 품질·컴플라이언스가 고통받음. 여기서 upsell 시도 안 함; 광고주에게 그 예산은 단일 시장 12-15 어셋 launch 를 지원한다고 알리거나, cross-market 스코프에 맞춰 예산 확장을 요청. 둘 다 OK; 미수정 RFP 만 안 됨. 진단: 예산 / 어셋 수. cross-market 어셋당 약 ₩200만 미만 = undersized 가능.",
+      },
+      {
+        heading: "패턴 2 — 모호한 브리프, 모호한 성공 기준",
+        body: "«우리에게 잘 performs 하는 K-aesthetic 캠페인 만들어 주세요.» 이 RFP 를 읽고 스코프 추정 불가. «잘 performs» 가 무슨 뜻 — 도달? 전환? 회상? 채널 믹스? 시장? 기존 브랜드 정체성? 모호한 브리프 → 모호한 제안 → 스코프 크리프 → 관계 독. 광고주가 paid scoping 세션 (약 ₩200만, 90 분) 으로 사용 가능한 브리프 만드는 데 open 안 하면 거절. 그 투자가 명확성에서 8-12 배 pay back.",
+      },
+      {
+        heading: "패턴 3 — likeness 충돌",
+        body: "광고주가 합성 캐릭터를 «[특정 셀러브리티] 처럼» 또는 «[인플루언서] 이전 캠페인처럼» 보이게 원함. 못 함. 캐릭터는 자체 크리에이티브여야 — 너무 가까운 likeness 는 양측에 법적 위험 + 우리는 face-similarity 감사를 이를 피하기 위해 명시적으로 실행. 광고주의 underlying 니즈가 «familiar feel 원함» 이면 옳은 reframe 은 셀러브리티가 carry 하는 브랜드 포지셔닝, 셀러브리티 얼굴 아님. 가끔 광고주가 그 reframe 수용해 진행; 가끔 안 함, OK — 깨끗하게 거절.",
+      },
+      {
+        heading: "패턴 4 — 디스클로저 저항",
+        body: "일부 광고주가 캠페인을 완전 «human-made» 처럼 보이게 원하고 EU AI Act, FTC, UK ASA, KCSC 가 요구하는 디스클로저 메타데이터에 저항. 디스클로저 없이 캠페인 운영 안 함 — 끝. 법적 노출이 asymmetric (massive downside, no upside) + 평판이 clean 출하 위에 build. 절충: 디스클로저는 tasteful 가능 — alt-text 의 작은 텍스트, C2PA 의 메타데이터, 캠페인 캡션의 한 줄. 네온 배너 고집 안 함. But 없이 출하 안 함. 광고주가 수용 못 하면 거절.",
+      },
+      {
+        heading: "패턴 5 — 단일 stakeholder 혼란",
+        body: "RFP 가 한 stakeholder (보통 마케팅) 에서 오는데 결정은 loop 안 된 다른 3 명 (법무·브랜드·재무) 을 포함. 일찍 spot 가능 — RFP 의 revision 사이에 요구사항이 wobble. 거절 이유는 제작 시 스코프 churn 예측 — 매 격주마다 이전 silent stakeholder 가 새 요구사항으로 surface. 광고주에게 먼저 internal align 요청이 낫습니다. 45 분 stakeholder-alignment 콜을 무료 제공; 약 60 % 광고주가 유용하다고 느낌.",
+      },
+      {
+        heading: "깨끗한 RFP 는 어떻게 생겼나",
+        body: "차이 만드는 5 필드. (1) 구체적 스코프: hero/서포팅 어셋 수, 시장, 채널. (2) 구체적 성공 기준: «이전 캠페인 대비 전환 lift», «35 % 이상 recall» — 무엇이든. (3) 우리가 reference 할 브랜드 어셋 (기존 크리에이티브, 팔레트, tone-of-voice 샘플). (4) 디스클로저 입장: 어느 시장에 출하 + 디스클로저 present 임을 acknowledge. (5) Internal alignment: 법무/브랜드/재무가 예산·스코프에 sign off 한 확인. 5 필드 모두 있는 RFP 는 48 시간 내 제안으로 전환.",
+      },
+      {
+        heading: "거절 → yes 경로",
+        body: "초기 거절의 약 25 % 가 광고주가 upstream 이슈 수정 후 yes 로 전환. 가장 흔한 경로: 광고주가 실제로 원하는 스코프에 맞춰 예산 확장, 또는 실제로 가진 예산에 맞춰 스코프 축소. 둘 다 OK. 우리 목표는 closed deal 최대화 아님; 자부심을 가질 캠페인 출하. 가장 깨끗한 RFP 가 이를 쉽게 만듦. 오늘 거절하고 3 주 후 working brief 로 reopen 하는 게 day one 에 구조적으로 compromised 한 프로젝트 시작보다 낫습니다.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

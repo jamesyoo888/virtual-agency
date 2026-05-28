@@ -496,6 +496,36 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     },
     relatedPostSlug: "synthetic-campaign-failure-modes-how-to-catch",
   },
+  {
+    slug: "revision-velocity-sla",
+    category: "workflow",
+    ko: {
+      term: "리비전 속도 SLA (Revision velocity SLA)",
+      definition:
+        "결정 → 동일 캐릭터 변형 납품의 turnaround time 을 벤더가 서면으로 commit 하는 표준. 우리 내부 목표는 48 시간; 평판 좋은 벤더는 숫자를 SoW 에 명시하고 dashboard 로 백업. 합성 탤런트가 전통 촬영보다 빠르다는 advantage 의 핵심 입증 — 속도 약속 못 하는 벤더는 렌더링 컴퓨트가 추가된 느린 어셋 샵에 불과.",
+    },
+    en: {
+      term: "Revision velocity SLA",
+      definition:
+        "A written vendor commitment on turnaround time (decision → delivery for a same-character variant). Our internal target is 48h; reputable vendors publish the number in the SoW and back it with a track-record dashboard. The core proof that synthetic talent is faster than traditional shoots — vendors who can't commit are just slow asset shops with extra rendering compute.",
+    },
+    relatedPostSlug: "synthetic-campaign-failure-modes-how-to-catch",
+  },
+  {
+    slug: "license-scope-in-writing",
+    category: "commercial",
+    ko: {
+      term: "서면 라이선스 스코프 (License scope in writing)",
+      definition:
+        "결제 전 인보이스 또는 동봉 라이선스 PDF 가 명시해야 하는 5 필드 — 사용권 (유료 미디어/오가닉/OOH/POS), 영역, 기간, 독점, 채널 제한. 구두 핸드셰이크하는 벤더는 새 시장·채널 진입 시 surprise fee 준비 중. 다른 벤더 떠나는 광고주 인콰이어에서 가장 흔한 분쟁의 원인.",
+    },
+    en: {
+      term: "License scope in writing",
+      definition:
+        "The 5 fields the invoice or accompanying license PDF must enumerate before payment — usage rights (paid media / organic / OOH / POS), territories, duration, exclusivity, channel limits. Vendors who handshake the license verbally are setting up surprise fees at the next market or channel expansion. The most common dispute we see in inquiries from buyers leaving other vendors.",
+    },
+    relatedPostSlug: "synthetic-campaign-failure-modes-how-to-catch",
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {
