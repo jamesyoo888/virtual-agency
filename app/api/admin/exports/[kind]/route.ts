@@ -20,6 +20,10 @@ import { loadCharacterAttribution } from "@/lib/analytics/character-attribution"
 import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
 import { loadBlogViews } from "@/lib/analytics/blog-views";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
+import {
+  loadAllAgentAttribution,
+  AGENT_COMMISSION_RATE,
+} from "@/lib/analytics/agent-attribution";
 
 /**
  * Admin-only CSV exports. Supports two kinds today:
@@ -56,6 +60,7 @@ const KINDS = new Set([
   "blog-engagement",
   "blog-attribution",
   "pricing-calculator-attribution",
+  "agent-attribution",
 ]);
 
 export async function GET(
@@ -1327,6 +1332,53 @@ export async function GET(
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(
           "blog-attribution"
+        )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "agent-attribution") {
+    // Symmetric to character/blog/pricing-calculator attribution: aggregates
+    // inquiries / delivered / revenue per agent (utm_campaign = clients.id)
+    // for the configured window. 15% commission estimate so finance can
+    // sanity-check payout totals against contract terms.
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 30;
+    const report = await loadAllAgentAttribution(windowDays);
+    const rows: { metric: string; value: string }[] = [
+      { metric: "window_days", value: String(report.windowDays) },
+      { metric: "total_inquiries", value: String(report.totalInquiries) },
+      { metric: "total_delivered", value: String(report.totalDelivered) },
+      { metric: "total_revenue_krw", value: String(report.totalRevenue) },
+      {
+        metric: "commission_estimate_krw",
+        value: String(report.commissionEstimate),
+      },
+      {
+        metric: "commission_rate",
+        value: String(AGENT_COMMISSION_RATE),
+      },
+      ...report.byAgent.flatMap((a) => [
+        { metric: `agent_${a.agentId}_inquiries`, value: String(a.inquiries) },
+        { metric: `agent_${a.agentId}_delivered`, value: String(a.delivered) },
+        { metric: `agent_${a.agentId}_revenue_krw`, value: String(a.revenue) },
+        {
+          metric: `agent_${a.agentId}_conversion_pct`,
+          value: String(a.conversionPct),
+        },
+        {
+          metric: `agent_${a.agentId}_commission_estimate_krw`,
+          value: String(Math.round(a.revenue * AGENT_COMMISSION_RATE)),
+        },
+      ]),
+    ];
+    const csv = toCSV(rows, ["metric", "value"] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "agent-attribution"
         )}"`,
         "Cache-Control": "no-store",
       },

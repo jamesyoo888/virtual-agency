@@ -1,5 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
+import { aggregateDaily, type DailyBucket } from "@/lib/analytics/daily";
+
+/** Standard 15% referral commission rate — single source of truth. */
+export const AGENT_COMMISSION_RATE = 0.15;
 
 /**
  * Per-agent referral stats — what a single agent brought in, and how much
@@ -68,11 +72,87 @@ export async function loadAgentAttribution(
  * loadPricingCalculatorAttribution shape so the admin weekly digest +
  * /admin/analytics card can render it symmetrically.
  */
+export interface AgentBreakdownRow {
+  agentId: string;
+  inquiries: number;
+  delivered: number;
+  conversionPct: number;
+  /** Sum of invoice_amount across delivered rows for this agent. */
+  revenue: number;
+}
+
 export interface AllAgentAttribution {
   windowDays: number;
   totalInquiries: number;
   totalDelivered: number;
   totalRevenue: number;
+  /** 15% standard commission estimate on totalRevenue. */
+  commissionEstimate: number;
+  /** Per-agent breakdown keyed by utm_campaign (= clients.id). */
+  byAgent: AgentBreakdownRow[];
+  daily: DailyBucket[];
+}
+
+interface AllAgentRawRow {
+  status: string | null;
+  invoice_amount: number | string | null;
+  utm_campaign: string | null;
+  created_at: string;
+}
+
+export function aggregateAllAgentAttribution(
+  rows: AllAgentRawRow[],
+  windowDays = 30
+): AllAgentAttribution {
+  const perAgent = new Map<
+    string,
+    { inquiries: number; delivered: number; revenue: number }
+  >();
+  let totalDelivered = 0;
+  let totalRevenue = 0;
+
+  for (const r of rows) {
+    const isDelivered = r.status === "delivered";
+    const amt =
+      typeof r.invoice_amount === "string"
+        ? Number.parseFloat(r.invoice_amount) || 0
+        : r.invoice_amount ?? 0;
+    if (isDelivered) {
+      totalDelivered += 1;
+      totalRevenue += amt;
+    }
+    const agentId = (r.utm_campaign ?? "").trim();
+    if (!agentId) continue;
+    const entry =
+      perAgent.get(agentId) ?? { inquiries: 0, delivered: 0, revenue: 0 };
+    entry.inquiries += 1;
+    if (isDelivered) {
+      entry.delivered += 1;
+      entry.revenue += amt;
+    }
+    perAgent.set(agentId, entry);
+  }
+
+  const byAgent: AgentBreakdownRow[] = [...perAgent.entries()]
+    .map(([agentId, c]) => ({
+      agentId,
+      inquiries: c.inquiries,
+      delivered: c.delivered,
+      revenue: c.revenue,
+      conversionPct:
+        c.inquiries > 0 ? Math.round((c.delivered / c.inquiries) * 100) : 0,
+    }))
+    .sort((a, b) => b.inquiries - a.inquiries);
+
+  return {
+    windowDays,
+    totalInquiries: rows.length,
+    totalDelivered,
+    totalRevenue,
+    commissionEstimate: Math.round(totalRevenue * AGENT_COMMISSION_RATE),
+    byAgent,
+    daily: aggregateDaily(rows, windowDays),
+  };
 }
 
 export async function loadAllAgentAttribution(
@@ -83,17 +163,20 @@ export async function loadAllAgentAttribution(
     totalInquiries: 0,
     totalDelivered: 0,
     totalRevenue: 0,
+    commissionEstimate: 0,
+    byAgent: [],
+    daily: aggregateDaily([], windowDays),
   };
   if (!SUPABASE_CONFIGURED) return empty;
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
   const since = new Date(
     Date.now() - windowDays * 24 * 60 * 60 * 1000
   ).toISOString();
 
   const { data, error } = await supabase
     .from("projects")
-    .select("status, invoice_amount")
+    .select("status, invoice_amount, utm_campaign, created_at")
     .eq("utm_source", "agent")
     .gte("created_at", since)
     .limit(5000);
@@ -103,27 +186,10 @@ export async function loadAllAgentAttribution(
     return empty;
   }
 
-  let totalDelivered = 0;
-  let totalRevenue = 0;
-  for (const r of (data ?? []) as {
-    status: string | null;
-    invoice_amount: number | string | null;
-  }[]) {
-    if (r.status === "delivered") {
-      totalDelivered += 1;
-      const amt =
-        typeof r.invoice_amount === "string"
-          ? Number.parseFloat(r.invoice_amount) || 0
-          : r.invoice_amount ?? 0;
-      totalRevenue += amt;
-    }
-  }
-  return {
-    windowDays,
-    totalInquiries: data?.length ?? 0,
-    totalDelivered,
-    totalRevenue,
-  };
+  return aggregateAllAgentAttribution(
+    (data ?? []) as AllAgentRawRow[],
+    windowDays
+  );
 }
 
 export function aggregateAgentAttribution(

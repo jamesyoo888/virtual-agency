@@ -13,6 +13,10 @@ import {
   loadPricingCalculatorAttribution,
   pathLabelForAdmin,
 } from "@/lib/analytics/pricing-calculator-attribution";
+import {
+  loadAllAgentAttribution,
+  AGENT_COMMISSION_RATE,
+} from "@/lib/analytics/agent-attribution";
 import { getKitTier, type BrandKitTier } from "@/lib/characters/brand-kits";
 
 function humanTierLabel(tier: string): string {
@@ -175,6 +179,7 @@ export default async function AnalyticsPage({
     blogViews,
     blogAttribution,
     pricingCalc,
+    agentAttribution,
   ] = await Promise.all([
     loadAnalytics(windowDays),
     loadCharacterViews(windowDays),
@@ -182,7 +187,33 @@ export default async function AnalyticsPage({
     loadBlogViews(windowDays),
     loadBlogAttribution(windowDays),
     loadPricingCalculatorAttribution(windowDays),
+    loadAllAgentAttribution(windowDays),
   ]);
+
+  // Side-load agent display names so the per-agent breakdown shows company
+  // + email instead of bare uuids. Cheap query — bounded to the agents that
+  // actually attributed in this window.
+  const agentIdsAttributed = agentAttribution.byAgent
+    .map((r) => r.agentId)
+    .slice(0, 20);
+  const agentMeta = new Map<string, { label: string }>();
+  if (SUPABASE_CONFIGURED && agentIdsAttributed.length > 0) {
+    const supabase = await createClient();
+    const { data: agentRows } = await supabase
+      .from("clients")
+      .select("id, email, agent_company, company")
+      .in("id", agentIdsAttributed);
+    for (const a of (agentRows ?? []) as {
+      id: string;
+      email: string | null;
+      agent_company: string | null;
+      company: string | null;
+    }[]) {
+      const label =
+        a.agent_company ?? a.company ?? a.email ?? a.id.slice(0, 8);
+      agentMeta.set(a.id, { label });
+    }
+  }
   const maxBlogViews = Math.max(1, ...blogViews.bySlug.slice(0, 10).map((b) => b.total));
   const maxSeriesViews = Math.max(1, ...blogViews.bySeries.map((s) => s.total));
   const maxModelInquiries = Math.max(1, ...a.topModels.map((m) => m.inquiries));
@@ -683,6 +714,134 @@ export default async function AnalyticsPage({
             <p className="mt-3 text-[11px] text-zinc-600">
               계산기 → RFP CTA 가 utm_source=pricing-calculator, utm_campaign=&lt;path&gt;
               로 attribut. KR/EN 통합 — locale 분리는 utm_medium 으로 확장 가능.
+            </p>
+          </section>
+        );
+      })()}
+
+      {agentAttribution.totalInquiries > 0 && (() => {
+        const peak = Math.max(1, ...agentAttribution.daily.map((d) => d.count));
+        const maxAgentInq = Math.max(
+          1,
+          ...agentAttribution.byAgent.map((r) => r.inquiries)
+        );
+        const top = agentAttribution.byAgent.slice(0, 8);
+        return (
+          <section className="rounded-xl border border-amber-500/30 bg-amber-500/[0.03] p-5">
+            <div className="flex items-end gap-px h-12 mb-5">
+              {agentAttribution.daily.map((d) => {
+                const heightPct = (d.count / peak) * 100;
+                return (
+                  <div
+                    key={d.date}
+                    title={`${d.date} — ${d.count}건`}
+                    className="flex-1 flex flex-col justify-end"
+                  >
+                    <div
+                      className={`w-full rounded-sm ${
+                        d.count > 0 ? "bg-amber-400/70" : "bg-zinc-900"
+                      }`}
+                      style={{ height: `${Math.max(2, heightPct)}%` }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-amber-200">
+                에이전트 referral → 문의 ({windowDays}일)
+              </h2>
+              <div className="flex items-center gap-3 text-xs">
+                <p className="text-zinc-500 tabular-nums">
+                  utm_source=agent · {agentAttribution.totalInquiries}건 · 납품{" "}
+                  {agentAttribution.totalDelivered}건 ·{" "}
+                  <span className="text-emerald-300">
+                    ₩{agentAttribution.totalRevenue.toLocaleString("ko-KR")}
+                  </span>
+                  {agentAttribution.commissionEstimate > 0 && (
+                    <>
+                      {" · "}
+                      <span
+                        className="text-amber-300"
+                        title={`${Math.round(AGENT_COMMISSION_RATE * 100)}% 표준 커미션`}
+                      >
+                        커미션 ≈ ₩
+                        {agentAttribution.commissionEstimate.toLocaleString(
+                          "ko-KR"
+                        )}
+                      </span>
+                    </>
+                  )}
+                </p>
+                <Link
+                  href={`/admin/agents`}
+                  className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                >
+                  Agents →
+                </Link>
+                <Link
+                  href={`/api/admin/exports/agent-attribution?window=${windowDays}`}
+                  className="px-2 py-0.5 rounded border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                >
+                  CSV
+                </Link>
+              </div>
+            </div>
+            {top.length > 0 && (
+              <>
+                <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+                  Top {top.length} 에이전트
+                </p>
+                <ul className="space-y-1.5">
+                  {top.map((r) => {
+                    const meta = agentMeta.get(r.agentId);
+                    const label = meta?.label ?? `${r.agentId.slice(0, 8)}…`;
+                    const widthPct = (r.inquiries / maxAgentInq) * 100;
+                    return (
+                      <li
+                        key={r.agentId}
+                        className="grid grid-cols-12 gap-3 items-center text-sm"
+                      >
+                        <span
+                          className="col-span-5 truncate text-zinc-200"
+                          title={`${label} · ${r.agentId}`}
+                        >
+                          {label}
+                        </span>
+                        <div className="col-span-4 h-2 rounded bg-zinc-900 overflow-hidden">
+                          <div
+                            className="h-full bg-amber-400"
+                            style={{ width: `${widthPct}%` }}
+                          />
+                        </div>
+                        <span className="col-span-3 text-right text-xs text-zinc-400 tabular-nums">
+                          {r.inquiries} ·{" "}
+                          <span
+                            className={
+                              r.conversionPct >= 30
+                                ? "text-emerald-400"
+                                : "text-zinc-500"
+                            }
+                          >
+                            {r.conversionPct}%
+                          </span>
+                          {r.revenue > 0 && (
+                            <span className="ml-2 text-emerald-300">
+                              ₩{r.revenue.toLocaleString("ko-KR")}
+                            </span>
+                          )}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
+            <p className="mt-3 text-[11px] text-zinc-600">
+              /agent/dashboard 의 referral link (utm_source=agent, utm_campaign=&lt;agent.id&gt;)
+              로 attribut. 커미션은 delivered 매출 × {Math.round(
+                AGENT_COMMISSION_RATE * 100
+              )}% 추정 — 실 정산은 계약별로 달라질 수 있음.
             </p>
           </section>
         );
