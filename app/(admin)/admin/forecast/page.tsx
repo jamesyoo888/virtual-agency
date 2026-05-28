@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { TrendingUp, AlertCircle, Gauge, Sparkles, Calculator } from "lucide-react";
+import {
+  TrendingUp,
+  AlertCircle,
+  Gauge,
+  Sparkles,
+  Calculator,
+  Briefcase,
+} from "lucide-react";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { loadForecast } from "@/lib/analytics/forecast";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
@@ -11,6 +18,10 @@ import {
   loadPricingCalculatorAttribution,
   pathLabelForAdmin,
 } from "@/lib/analytics/pricing-calculator-attribution";
+import {
+  loadAllAgentAttribution,
+  AGENT_COMMISSION_RATE,
+} from "@/lib/analytics/agent-attribution";
 import { getCharacter } from "@/lib/characters/registry";
 import { getKitTier } from "@/lib/characters/brand-kits";
 import { getPostBySlug } from "@/lib/blog/posts";
@@ -29,16 +40,25 @@ const STAGE_LABEL: Record<string, string> = {
 };
 
 export default async function ForecastPage() {
-  const [r, velocity, stageTiming, slowOpen, charAttr, blogAttr, pricingCalc] =
-    await Promise.all([
-      loadForecast(),
-      loadPipelineVelocity(90),
-      loadStageTiming(90),
-      loadSlowOpenProjects(5),
-      loadCharacterAttribution(90),
-      loadBlogAttribution(90),
-      loadPricingCalculatorAttribution(90),
-    ]);
+  const [
+    r,
+    velocity,
+    stageTiming,
+    slowOpen,
+    charAttr,
+    blogAttr,
+    pricingCalc,
+    agentAttr,
+  ] = await Promise.all([
+    loadForecast(),
+    loadPipelineVelocity(90),
+    loadStageTiming(90),
+    loadSlowOpenProjects(5),
+    loadCharacterAttribution(90),
+    loadBlogAttribution(90),
+    loadPricingCalculatorAttribution(90),
+    loadAllAgentAttribution(90),
+  ]);
 
   return (
     <div className="p-8 max-w-5xl mx-auto text-zinc-100">
@@ -896,6 +916,136 @@ export default async function ForecastPage() {
               })()}
               <p className="mt-3 text-[11px] text-zinc-600">
                 referrer 가 블로그 글이었던 RFP/인콰이어. 어떤 글이 매출로 직결되는지 = 콘텐츠 ROI 시그널. /admin/blog-analytics 에서 view 추세 + referrer 분석으로 drill-down.
+              </p>
+            </section>
+          )}
+
+          {agentAttr.totalInquiries > 0 && (
+            <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 mb-6">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-xs uppercase tracking-wider text-amber-300 flex items-center gap-2">
+                  <Briefcase className="w-3.5 h-3.5" />
+                  에이전트 referral → 인콰이어 (90일 attribution)
+                </h2>
+                <a
+                  href="/api/admin/exports/agent-attribution?window=90"
+                  download
+                  className="text-[10px] px-2 py-0.5 rounded-md border border-amber-500/30 text-amber-200 hover:border-amber-400 hover:text-white"
+                >
+                  CSV
+                </a>
+              </div>
+              <p className="text-[11px] text-zinc-400 mb-3">
+                utm_source=agent + utm_campaign=&lt;agent.id&gt; 경유 인콰이어 ·
+                15% 표준 커미션 추정. agent 별 분포로 referral 채널 깊이 (단일
+                power-user 의존 vs 여러 partner 분산) 파악.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 text-sm">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                    인콰이어
+                  </p>
+                  <p className="mt-1 tabular-nums text-amber-200">
+                    {agentAttr.totalInquiries}건
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                    납품
+                  </p>
+                  <p className="mt-1 tabular-nums text-emerald-300">
+                    {agentAttr.totalDelivered}건
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                    매출 (납품)
+                  </p>
+                  <p className="mt-1 tabular-nums text-emerald-300">
+                    ₩{KRW.format(agentAttr.totalRevenue)}
+                  </p>
+                </div>
+                <div>
+                  <p
+                    className="text-[10px] uppercase tracking-wider text-amber-400"
+                    title={`${Math.round(AGENT_COMMISSION_RATE * 100)}% 표준 커미션`}
+                  >
+                    커미션 추정
+                  </p>
+                  <p className="mt-1 tabular-nums text-amber-200">
+                    ₩{KRW.format(agentAttr.commissionEstimate)}
+                  </p>
+                </div>
+              </div>
+              {agentAttr.byAgent.length > 0 &&
+                (() => {
+                  const top = agentAttr.byAgent.slice(0, 5);
+                  const maxInq = Math.max(1, ...top.map((a) => a.inquiries));
+                  return (
+                    <ul className="space-y-2 text-sm">
+                      {top.map((a) => {
+                        const sharePct =
+                          agentAttr.totalInquiries > 0
+                            ? (a.inquiries / agentAttr.totalInquiries) * 100
+                            : 0;
+                        const widthPct = (a.inquiries / maxInq) * 100;
+                        return (
+                          <li
+                            key={a.agentId}
+                            className="flex items-center gap-3 text-sm"
+                          >
+                            <span
+                              className="w-32 shrink-0 text-zinc-200 truncate text-xs"
+                              title={a.agentId}
+                            >
+                              {a.agentId.slice(0, 8)}…
+                            </span>
+                            <div className="flex-1 h-2 rounded bg-zinc-900 overflow-hidden">
+                              <div
+                                className="h-full bg-amber-400"
+                                style={{ width: `${widthPct}%` }}
+                              />
+                            </div>
+                            <span className="shrink-0 text-xs text-zinc-300 tabular-nums w-12 text-right">
+                              {a.inquiries}
+                            </span>
+                            <span className="shrink-0 text-xs text-zinc-500 tabular-nums w-12 text-right">
+                              {a.conversionPct}%
+                            </span>
+                            {a.revenue > 0 && (
+                              <span className="shrink-0 text-xs text-emerald-300 tabular-nums w-32 text-right">
+                                ₩{KRW.format(a.revenue)}
+                                <span className="text-zinc-600 ml-1">
+                                  ({sharePct.toFixed(0)}%)
+                                </span>
+                              </span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  );
+                })()}
+              {agentAttr.byAgent.length > 5 && (
+                <p className="mt-2 text-[11px] text-zinc-500">
+                  + {agentAttr.byAgent.length - 5} 추가 partner ·{" "}
+                  <Link
+                    href="/admin/analytics"
+                    className="underline underline-offset-2 hover:text-white"
+                  >
+                    전체 보기
+                  </Link>
+                </p>
+              )}
+              <p className="mt-3 text-[11px] text-zinc-600">
+                Top 1 partner 가 {(() => {
+                  const top = agentAttr.byAgent[0];
+                  if (!top || agentAttr.totalInquiries === 0) return "0%";
+                  return `${Math.round(
+                    (top.inquiries / agentAttr.totalInquiries) * 100
+                  )}%`;
+                })()}{" "}
+                점유 — 50% 초과면 channel 집중 위험; 30% 미만이면 분산 잘 됨.
               </p>
             </section>
           )}

@@ -32,6 +32,7 @@ import { loadCharacterAttribution } from "@/lib/analytics/character-attribution"
 import { loadBlogViews } from "@/lib/analytics/blog-views";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
+import { loadAllAgentAttribution } from "@/lib/analytics/agent-attribution";
 import AdminCopySummary from "@/components/admin-copy-summary";
 import DailyRevenueSparkline, {
   DailyCountSparkline,
@@ -54,6 +55,7 @@ import {
   Sparkles,
   BookOpen,
   Calculator,
+  Briefcase,
 } from "lucide-react";
 
 const STAGE_LABELS_KO: Record<string, string> = {
@@ -438,6 +440,7 @@ export default async function AdminHomePage() {
     blogViews30d,
     blogAttribution30d,
     pricingCalc30d,
+    agentAttribution30d,
   ] = await Promise.all([
     loadKPIs(),
     summarizeUsage(),
@@ -457,6 +460,7 @@ export default async function AdminHomePage() {
     loadBlogViews(30),
     loadBlogAttribution(30),
     loadPricingCalculatorAttribution(30),
+    loadAllAgentAttribution(30),
   ]);
   const wow = wowDaily.wow;
   const dailyRevenue = wowDaily.daily;
@@ -721,7 +725,8 @@ export default async function AdminHomePage() {
       {(characterAttribution30d.totalInquiries > 0 ||
         blogViews30d.total > 0 ||
         blogAttribution30d.totalInquiries > 0 ||
-        pricingCalc30d.totalInquiries > 0) && (
+        pricingCalc30d.totalInquiries > 0 ||
+        agentAttribution30d.totalInquiries > 0) && (
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {characterAttribution30d.totalInquiries > 0 && (
             <Link
@@ -800,6 +805,44 @@ export default async function AdminHomePage() {
                   <> · 1위 {blogViews30d.bySlug[0].total}회</>
                 )}
                 {" "}· /admin/blog-analytics
+              </p>
+            </Link>
+          )}
+          {agentAttribution30d.totalInquiries > 0 && (
+            <Link
+              href="/admin/analytics"
+              className="block rounded-xl border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-colors p-5"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
+                  에이전트 → 문의 (30일)
+                </p>
+                <Briefcase className="w-4 h-4 text-amber-300" />
+              </div>
+              <p className="mt-3 text-2xl font-bold tabular-nums text-amber-100">
+                {agentAttribution30d.totalInquiries}
+                <span className="text-sm text-amber-300/60 ml-2">건</span>
+              </p>
+              <p className="mt-1 text-[11px] text-zinc-400 tabular-nums">
+                납품 {agentAttribution30d.totalDelivered} ·{" "}
+                {agentAttribution30d.totalRevenue > 0 ? (
+                  <span className="text-emerald-300">
+                    ₩{agentAttribution30d.totalRevenue.toLocaleString("ko-KR")}
+                  </span>
+                ) : (
+                  <span className="text-zinc-500">대기 중</span>
+                )}
+                {agentAttribution30d.commissionEstimate > 0 && (
+                  <>
+                    {" · "}
+                    <span className="text-amber-300">
+                      커미션 ≈ ₩
+                      {agentAttribution30d.commissionEstimate.toLocaleString(
+                        "ko-KR"
+                      )}
+                    </span>
+                  </>
+                )}
               </p>
             </Link>
           )}
