@@ -4008,6 +4008,102 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "synthetic-talent-vendor-evaluation-5-questions-ko",
+    locale: "ko",
+    title: "합성 탤런트 벤더 평가 — 광고주가 물어야 할 5 가지 질문",
+    excerpt:
+      "2026 년 글로벌 광고주에게 마케팅하는 합성 탤런트 벤더가 약 24 곳. 대부분 동일한 방식으로 pitch. 이 5 질문이 운영자와 포장재를 구분합니다 — 디스커버리 콜에서 물어보고 어떤 벤더가 squirm 하는지 관찰.",
+    publishedAt: "2026-08-22",
+    readingMinutes: 8,
+    tags: ["buyer-guide", "벤더 평가", "운영", "합성 탤런트"],
+    sections: [
+      {
+        heading: "이 가이드가 존재하는 이유",
+        body: "우리는 합성 탤런트 카테고리의 나머지와 경쟁. 이 질문들을 내부에 유지하고 단지 잘 답변해도 됐지만 — 가격이나 demo reel 만 보고 쇼핑하는 광고주는 가끔 month 2 이후 납품할 운영 인프라를 구축 못 한 벤더에 lands. 광고주가 잘못된 벤더에서 churn 해 month 4 에 우리에게 도착하면 캠페인은 이미 모멘텀의 4 분의 1 잃음. 광고주가 디스커버리 콜에서 옳은 질문 하고 day one 에 유능한 벤더에 land 하는 게 낫습니다 — 그 벤더가 우리가 아니어도. 아래는 우리 자체 어카운트 매니저가 광고주가 더 많이 사용했으면 하는 디리전스 리스트.",
+      },
+      {
+        heading: "질문 1 — «18 개월 전 납품한 캠페인 + 오늘 어떻게 되고 있는지 보여달라»",
+        body: "합성 탤런트는 longevity 로 판매됨 — 같은 캐릭터, 여러 캠페인, 누적 브랜드 equity. 벤더가 실제로 longevity 출하 가능한지 테스트는 18+ 개월 시장에 있고 여전히 운영 중인 캐릭터가 있는지. 2026 년 대부분 벤더는 2025 년 launch; 6 개월 케이스는 보여줄 수 있어도 24 개월 케이스는 못 보여줌. 그게 disqualifying 은 아님 — 여전히 잘 운영화할 수 있음 — but 광고주가 벤더의 첫 24 개월 학습 곡선을 funding 한다는 뜻. 명시적으로 물어보세요: «2024 년 이전에 launch 한 캐릭터 중 여전히 활성인 것은 무엇이고 month 18 의 운영 cadence 는 어떻게 보이는지?» 구체적으로 답할 수 있는 벤더 (month 9 의 룩북 refresh, month 14 의 brand-kit 버전 2, month 16 의 채널 확장) 가 운영 muscle 갖고 있음. «좋은 질문, 여기 우리 로드맵» 으로 pivot 하는 벤더는 아님.",
+      },
+      {
+        heading: "질문 2 — «어셋 승인 → 어셋 납품 사이에 무엇이 일어나는지 walk-through»",
+        body: "대부분의 demo reel 은 최종 어셋을 보여줌. 거의 어떤 벤더도 제작 파이프라인 walk 안 함. 실제 워크플로우 요청: 어느 렌더러, 어느 face-lock 스텝, 어느 컴포지팅 패스, 어느 QA 게이트, 어느 메타데이터 주입 스텝, 어느 납품 포맷 파이프라인. 답이 벤더가 인프라 구축했는지 또는 각 프로젝트에 무료 도구를 stitching 하는지 말해줌. 스티치 도구 벤더는 낮은 스코프 (분기당 1-2 brand kit) 에선 fine 납품하지만 스케일 (분기당 10+ brand kit) 에서 choke — 매 프로젝트마다 senior 가 같은 수동 스텝으로 어셋을 walk 해야 하니까. 인프라 벤더는 모든 볼륨에서 일관되게 납품 — 파이프라인이 일 함. 차이는 month 4-6 에 surface — 정확히 광고주의 미디어 spend 가 ramping 하고 벤더가 reliably 출하해야 할 때.",
+      },
+      {
+        heading: "질문 3 — «디스클로저 메타데이터 스키마 + 규제 당국과 어떻게 current 유지?»",
+        body: "3 시장의 3 규제 당국 (EU AI Act, US FTC + 주별 NIL 법령, 한국 KCSC) 이 2025 년에 AI-디스클로저 기대를 업데이트. 기대는 계속 drift. Serious 벤더는 현재 스키마 (어느 필드, 무슨 값, 파일의 어디) 출판, 업데이트 owner 명시, changelog 보여줌. «모든 관련 규제 준수» 라고만 답하는 벤더는 컴플라이언스가 sales-pitch language 이지 실제 워크플로우 아님을 시그널. 광고주 자체의 EXIF 도구로 최근 납품 파일의 메타데이터 보여달라 요청. C2PA manifest 가 missing 또는 AI-디스클로저 필드가 빈 경우 벤더의 컴플라이언스 자세는 sales rep 가 무엇을 말하든 깨졌음.",
+      },
+      {
+        heading: "질문 4 — «리비전 속도 SLA + 미스 시 어떻게 되는지?»",
+        body: "리비전 속도 (결정 → 변형 납품) 가 합성 탤런트의 이론적 advantage 를 실세계 responsiveness 로 번역하는 운영 metric. 48 시간 동일 캐릭터 변형 납품 hit 가능한 벤더는 광고주가 performance data 기반 실시간 크리에이티브 최적화 실행 가능. 5-7 일 벤더는 광고주가 moderate 빠른 전통 제작 스튜디오에서 받을 수 있었던 어셋 납품. 숫자 서면 요청. 그 다음 벤더가 미스 시 무엇이 일어나는지 물어: 다음 인보이스의 크레딧, 사과 이메일, 또는 radio silence? SLA 미스에 대한 consequence 구조 없는 벤더는 내부 책임 없음. 이 질문 안 묻는 광고주는 reliably 2 주 slip 하는 벤더와 끝남 — 6 개월 engagement 전반 compound.",
+      },
+      {
+        heading: "질문 5 — «Churn rate + 광고주가 떠나는 이유?»",
+        body: "건강한 SaaS-style 벤더는 churn 에 대해 openly 이야기 — 숫자가 운영 disclipline 의 일부. 합성 탤런트 벤더도 다르지 않아야. paired 티어 광고주 몇 % 가 같은 티어에 re-up, 몇 % 가 업그레이드, 몇 % 가 churn 하는지 물어. 그 다음 churn 자가 떠난 이유 물어. «우리는 그걸 추적 안 함» 또는 «광고주는 에이전시 바꿀 때만 churn» 이라 말하는 벤더는 거짓말 또는 blind 운영. 정직한 답 (예: «약 25 % paired 광고주가 캠페인이 performance 못 해 re-up 안 함 — 보통 우리가 못 푼 brief 측면 이슈 — 그리고 post-mortem 출판») 은 드물고 valuable. 벤더가 본인 performance 와 feedback 루프 갖고 있다고 말하는 것 — 년 단위 compound.",
+      },
+      {
+        heading: "보너스 질문 — «떠난 광고주와 통화 가능?»",
+        body: "현재 happy 고객과의 reference call 은 theater. 떠난 광고주와의 reference call 은 디리전스. 대부분 벤더 이 요청 거절 (이해됨; 누구도 hostile reference call 사랑 안 함). Confident 벤더는 caveat 와 함께 하나 제공: «한 캠페인 후 우리를 떠난 광고주 — 그들 캠페인이 작동 안 함; 동의한 이유는 여기». 벤더가 이를 제공하면 콜 take. 30 분이 벤더의 polished 세일즈 프로세스가 묻은 마찰을 surface 시킴. 거절하면 typical churn case 가 어떻게 보이는지 적어도 묘사하라고 요청 — 구체성 vs 추상화 들어봄.",
+      },
+      {
+        heading: "우리 자체 답변",
+        body: "Q1: 유나 2024 년 11 월 launch; 현재 4 번째 캠페인 진행 + 2 brand-kit refresh 출하 (하나 분기, 하나 연간). 룩북 버전 3 다음 분기 출하. 렌 2025 년 2 월 launch; 2 캠페인 + 1 refresh. Q2: 파이프라인 doc 은 내부 — 30 분 콜에서 walk-through 기꺼이. 렌더러는 내부 (forked SDXL 스택 + custom face-lock LoRA); QA 는 우리 출판 8-체크 리스트; 메타데이터는 export 시 C2PA-compliant manifest. Q3: 스키마는 /legal/ai-disclosure 에 거주; EU/US/KR 규제 당국이 새 guidance 출판 후 30 일 내 업데이트. 마지막 업데이트 2026 년 3 월 EU AI Act Article 50. Q4: 동일 캐릭터 변형에 48 시간 SLA; 미스 시 변형에 10 % 크레딧 트리거; 운영 metric 페이지에 공개 추적. Q5: 약 22 % paired 광고주 re-up 안 함; 약 63 % paired 에 re-up; 약 15 % 업그레이드. 이유는 failure-modes 글에. 보너스: yes — churn 한 광고주 2 명 + reference 동의. 요청 시 가능.",
+      },
+      {
+        heading: "경쟁자에게 도움 됨에도 출판하는 이유",
+        body: "5 모두 답 가능한 벤더는 건강한 운영 비즈니스. 글로벌 시장에 지금 약 4-5 개 있음. 디리전스 실행하고 그 5 벤더 중 어느 것 picking 하는 광고주는 잘 서비스 받을 것 — 우리 안 선택해도. 디리전스 skip 하고 가장 슬릭한 demo 가진 누구든 picking 하는 광고주는 주사위 굴리는 중이고, 나쁜 결과는 카테고리 평판을 다치게 해 모두를 다침. 약점을 가장 잘 숨기는 사람보다 운영 깊이로 경쟁하는 게 낫습니다.",
+      },
+    ],
+  },
+  {
+    slug: "brand-kit-first-year-pnl-what-buyers-actually-get-ko",
+    locale: "ko",
+    title: "브랜드 키트 첫 1 년 P&L — 12 개월 후 광고주가 실제로 받는 것",
+    excerpt:
+      "실제 (anonymized) paired-티어 engagement 의 worked example: month-by-month 어셋 납품, 캠페인 런칭, refresh 사이클, candid 매출/비용 breakdown. «12 개월 brand kit» 가 실제 운영에서 어떤 의미인지.",
+    publishedAt: "2026-08-23",
+    readingMinutes: 9,
+    tags: ["브랜드 키트", "case-study", "buyer-guide", "가격"],
+    sections: [
+      {
+        heading: "왜 이 글이 쓰여야 했나",
+        body: "우리는 brand-kit 티어 가격 + 계산기 출판. 잘 출판 안 한 것은 광고주의 12 개월 경험이 실제로 어떻게 보이는지 — month 3 vs month 9 에 무엇이 도착, refresh 가 언제 일어남, 계약 갱신 대화가 언제 시작. 광고주가 묻고 우리는 콜에서 walk-through; scale 잘 안 됨. 이 글은 written-down 대화. 숫자는 실제 paired-티어 engagement (2025 년 초 launch, 2026 년 초 month 12 완료) 에서; 클라이언트가 anonymized 출판에 동의. 가치가 specific 에 있기에 reading time 평소보다 김.",
+      },
+      {
+        heading: "계약 — ₩1,100 만 paired-티어 brand kit, KR-only launch, 12-개월 라이선스",
+        body: "중견 K-뷰티 브랜드, 4-SKU launch (3 hero SKU + 1 리미티드 드롭). Paired tier (유나 as cast). 서명 시 KR-only 영역, month 6 에 +₩400 만 으로 US 추가 옵션. 25 hero 어셋 base 할당, 어셋당 4 포맷 변형 (month 1-3 에 100 deliverables), 6-어셋 분기 refresh, 계약 기간 동안 유나의 slate 내 K-뷰티에 카테고리 독점. 캠페인 목표: 전통 모델 spend 의 60 % 합성으로 대체, month-12 숫자 유지 시 2027 년 풀 마이그레이션을 위해 채널 검증.",
+      },
+      {
+        heading: "Month 1-3 — 온보딩 + 첫 어셋 배치",
+        body: "Month 1: 킥오프 콜, brief 샤프닝 (이에 비용 청구 안 함; senior 시간 4-5 시간 들고 양측의 20 시간 나중 절약), 의상 팔레트 lock, 내러티브 아크 드래프트. Month 2: 첫 8 hero 컴포지션 리뷰 납품; 2 개 face-consistency 튜닝 위해 다시 갔고, 6 개 5 일 내 승인. Month 3: 나머지 17 hero 와 full 포맷 변형 패스 — 100 deliverables in hand. 광고주의 첫 SKU 일정에 출시. 비용: 계약 서명 시 ₩1,100 만 결제. 광고주 측 시간: 마케팅 디렉터, 크리에이티브 리드, 브랜드 매니저 across 약 25 시간 (전통 촬영보다 가벼움 — 평균 40-60 시간 내부 시간).",
+      },
+      {
+        heading: "Month 4-6 — 캠페인 운영, refresh 시작, US 옵션 활성화",
+        body: "Month 4-5: SKU 1 + 2 launch 대상 유료 미디어; performance metric 추적 (first-30-days 글에서 다룬 4 개). Mid-month-5: 컨트롤 윈도우 대비 assisted conversion lift +14 %. 광고주가 US 옵션 활성화 (₩400 만, US 시장용 +6 의상 변형 + bilingual 디스클로저 메타데이터). Month 6: SKU 3 launch; 분기 refresh 납품 (performance data 응답해 6 신규 hero 어셋 — best 운영한 변형이 컴패니언 컴포지션 얻음). 운영 cadence: 주간 metric 다이제스트 이메일, 월간 리뷰 콜. 광고주의 CMO 가 season tier 업그레이드 물음; usage 패턴이 정당화하는지 보려 month 9 까지 대기 권장 (정당화함, but 나중에).",
+      },
+      {
+        heading: "Month 7-9 — 리미티드 드롭, 두 번째 refresh, US 모멘텀",
+        body: "Month 7: 리미티드 드롭 SKU launch; 두 번째 분기 refresh 납품 (리미티드 드롭 전용 추가 3 hero 어셋 + 4 포맷 변형). US 캠페인 week 4 에 회상 delta +5 포인트 hit — 목표 내. Month 8: KR 캠페인 fatigue inflection hit; rotation 리포트가 노출 중앙값 2 배 초과 carry 한 2 어셋 flag. 그것들 일시 정지, under-allocated 4 어셋에 rotation 가속, 10 일 내 전환 회복. Month 9: season-티어 업그레이드 대화 시작 — 광고주가 2027 년 JP + SG 확장 계획 + 분기 cadence vs 캠페인-by-캠페인 고려. 양쪽 modeling; 분기 cadence 가 4 paired 계약 대비 year 2 에 ₩1,500 만 절약.",
+      },
+      {
+        heading: "Month 10-12 — 최종 refresh, 갱신 대화, 결정 시점",
+        body: "Month 10: 최종 분기 refresh 납품 (Q4 시즌 내러티브 커버하는 5 hero 어셋). Month 11: 갱신 제안 테이블에 — 3 옵션: (a) year 2 에 paired ₩1,100 만 갱신 + JP 영역 추가 ₩400 만, (b) KR/US/JP/SG 풀 커버 + 분기 cadence 내장한 season 으로 풀 년 ₩2,900 만 업그레이드, (c) engagement 종료. 광고주 옵션 (b) 선택; mid-month-12 에 계약 서명. Month 12: paired → season 부드러운 핸드오프, 어셋 disruption 없음, 캐릭터 연속성 유지. 12 개월 KR/US 캠페인은 풀 윈도우 전반 컨트롤 대비 assisted conversion lift +18 % 로 마감.",
+      },
+      {
+        heading: "광고주의 정직한 P&L 요약",
+        body: "12 개월에 우리에게 결제 총: ₩1,500 만 (₩1,100 만 paired + ₩400 만 US 옵션). 광고주 측 내부 시간: 약 95 시간 across 년 (vs 비교 가능 전통 캠페인의 약 250 시간). 캠페인 동안 추정 미디어 spend: 약 ₩4 억 5,000 만 (광고주의 숫자, 우리 것 아님). 캠페인 전반 assisted conversion lift: KR 컨트롤 윈도우 대비 +18 %, US 에서 +12 %. 캠페인에 직접 귀속 가능한 광고주의 매출 lift 내부 추정: 약 ₩24 억. brand kit 비용을 매출 lift % 로: 약 0.6 %. brand kit 비용을 캠페인 예산 % 로: 약 3.4 %. 숫자가 깨끗해서 season 업그레이드는 쉬운 결정이었지만 — 운영 cadence (주간 다이제스트, rotation 리밸런싱, refresh 일정대로) 없으면 깨끗하지 않을 것.",
+      },
+      {
+        heading: "이것이 보여주지 않는 것",
+        body: "같은 코호트에 운영한 3 캠페인은 이 숫자 hit 안 함. 한 광고주는 assisted conversion lift +4 % (re-up 권장 +12 % 임계값 미만) 로 month 8 churn — brief 이 너무 좁아 캠페인이 회복 못 함. 한 광고주는 내부 재구조화로 month 6 일시 정지 (캠페인 잘못 아님; 9 개월 후 다시 옴). 한 광고주는 month 12 까지 +9 % lift 운영하고 업그레이드 대신 paired 에 다시 re-up — 캠페인 작동했지만 season-티어 스코프 정당화 못 함. 위 +18 % 케이스가 upside; +4 % 가 downside; +9 % 가 median. 이 글 읽는 광고주는 +6 % ~ +14 % 범위 어딘가가 현실적 outcome 분포로 예상하고 그에 맞춰 P&L 계획해야.",
+      },
+      {
+        heading: "«12-개월 brand kit» 가 운영에서 실제 의미",
+        body: "Month 1 의 one-shot 납품 후 11 개월 어셋 재사용 아님. 그것은: month 1-3 base 납품, 두 scheduled 분기 refresh (month 6 + 9), 한 final pre-갱신 refresh (month 10), continuous 운영 cadence (주간 다이제스트, 월간 리뷰), mid-year 카테고리 독점 체크인, month 9 시작 갱신 대화. 라이선스 fee 가 모두 커버; refresh 할당 pre-예산; month 7 에 change order 로 광고주 놀라지 않음. brand-kit 티어의 정직한 테스트는 누군가 벤더 chase 안 해도 cadence 유지되는지. 이 engagement 에선 유지. 광고주 churn 하는 약 22 % paired engagement 에선 보통 안 함.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

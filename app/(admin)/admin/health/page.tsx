@@ -11,6 +11,7 @@ import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { loadCharacterViews } from "@/lib/analytics/character-views";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
+import { loadAllAgentAttribution } from "@/lib/analytics/agent-attribution";
 import { BLOG_SERIES } from "@/lib/blog/series";
 import { getPostBySlug } from "@/lib/blog/posts";
 import {
@@ -237,6 +238,8 @@ export default async function AdminHealthPage() {
     charViews30d,
     charAttr30d,
     pricingCalc30d,
+    agentAttr30d,
+    agentAttr7d,
   ] = await Promise.all([
       loadPulse(),
       summarizeUsage(),
@@ -253,6 +256,8 @@ export default async function AdminHealthPage() {
       loadCharacterViews(30),
       loadCharacterAttribution(30),
       loadPricingCalculatorAttribution(30),
+      loadAllAgentAttribution(30),
+      loadAllAgentAttribution(7),
     ]);
 
   // Bottleneck = slowest stage's median exceeds 14d. We check the SLOWEST
@@ -549,6 +554,63 @@ export default async function AdminHealthPage() {
       runbook:
         "utm_campaign 이 5 RecommendedPath (license_daily / paired_editorial / season_anchor / custom_build / traditional_competitive) 중 어디에도 매칭 안 되면 path-별 카드 + inbox 칩 서브라벨에 surface 안 됨. 가장 흔한 원인은 /pricing-calculator 의 RFP CTA href 가 path 토큰을 캐멜케이스나 오타로 보내는 것 — lib/pricing/calculator.ts 의 recommendedPath() 가 반환하는 값과 /rfp 폼이 받는 값이 정확히 일치하는지 확인. legacy bookmark 도 unknown 으로 들어옴 (정상). 30% 초과면 새 path 토큰을 추가했거나 정의 drift.",
     },
+    (() => {
+      // Agent channel concentration risk. If a single agent accounts for
+      // >50% of all agent-referred inquiries in the 30d window, the agent
+      // channel is fragile — losing that one partner cuts the channel in
+      // half. Fires only when there's enough sample (≥10) to distinguish
+      // real concentration from coincidence.
+      const top = agentAttr30d.byAgent[0];
+      const topShare =
+        top && agentAttr30d.totalInquiries > 0
+          ? top.inquiries / agentAttr30d.totalInquiries
+          : 0;
+      return {
+        label: "에이전트 채널 집중도",
+        ok: agentAttr30d.totalInquiries < 10 || topShare <= 0.5,
+        detail:
+          agentAttr30d.totalInquiries < 10
+            ? `30d 인콰이어 ${agentAttr30d.totalInquiries} — 표본 부족 (10+ 부터 측정)`
+            : `Top 1 partner share ${Math.round(topShare * 100)}% (${
+                top?.inquiries ?? 0
+              }/${agentAttr30d.totalInquiries}) · 총 ${
+                agentAttr30d.byAgent.length
+              } partner`,
+        runbook:
+          "단일 partner 가 50% 초과 점유하면 그 partner 가 churn 하거나 가격 협상 leverage 갖게 됨. 대응 1: /admin/agents 에서 second-tier partner pending 큐 우선 검토 + 승인. 대응 2: 우수 partner 의 onboarding 자료를 분석해 다른 partner 에게 패턴 전파. 대응 3: agent referral 외 다른 채널 (가격 계산기 / 캐릭터 / 블로그) 의 attribution 30d 비율 확인 — agent 의존이 전체 매출 대비 너무 높으면 다양화.",
+      };
+    })(),
+    (() => {
+      // Agent channel decay. If 30d agent referrals are growing but the
+      // most recent 7d is well below the trailing 30d run-rate, the
+      // channel is decaying. Trailing 7d should be roughly 7/30 ≈ 23% of
+      // 30d under steady state; below 10% signals decay worth checking
+      // before it shows up in monthly P&L. Sample gate at 10 in the 30d
+      // window so a quiet week doesn't false-alarm.
+      const expected7dShare = 7 / 30; // ~0.233
+      const actual7dShare =
+        agentAttr30d.totalInquiries > 0
+          ? agentAttr7d.totalInquiries / agentAttr30d.totalInquiries
+          : 0;
+      // Decay = trailing 7d running below 45% of expected steady-state share.
+      const decayThreshold = expected7dShare * 0.45;
+      return {
+        label: "에이전트 채널 활동",
+        ok:
+          agentAttr30d.totalInquiries < 10 ||
+          actual7dShare >= decayThreshold,
+        detail:
+          agentAttr30d.totalInquiries < 10
+            ? `30d 인콰이어 ${agentAttr30d.totalInquiries} — 표본 부족 (10+ 부터 측정)`
+            : `7d ${agentAttr7d.totalInquiries}건 (30d ${
+                agentAttr30d.totalInquiries
+              }건의 ${Math.round(actual7dShare * 100)}%, 평형값 ${Math.round(
+                expected7dShare * 100
+              )}%)`,
+        runbook:
+          "7일 윈도우가 30일 run-rate 의 1/3 미만이면 채널 활동 떨어짐. 가능한 원인: (1) 활성 partner 가 본인 referral 링크 잊음 — /agent/dashboard 의 referral 카드 prominent 한지 확인 + 월간 활성 partner 에게 nudge 메일. (2) Partner 가 광고주 churn 으로 referral 보낼 source 잃음 — top partner 와 1:1 콜로 paipeline 점검. (3) 단순 시즌성 (분기 시작 직전 차분기 휴면). Q4 시즌이면 false-alarm 가능. 가능하면 /admin/forecast 의 agent 90d trend 와 대조.",
+      };
+    })(),
   ];
 
   return (
