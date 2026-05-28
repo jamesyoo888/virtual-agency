@@ -10,6 +10,7 @@ import ModelCard from "@/components/model-card";
 import RfpFilterChips from "@/components/rfp-filter-chips";
 import RfpPrintButton from "@/components/rfp-print-button";
 import { composeRfpBrief, budgetBandToRange } from "@/lib/rfp/compose";
+import { applyCalculatorPrefills } from "@/lib/rfp/calculator-prefill";
 import { persistRfpSubmission } from "@/lib/rfp/persist";
 import { ArrowLeft, FileText, Send } from "lucide-react";
 
@@ -51,6 +52,10 @@ interface PageProps {
     budget_band?: string;
     budget_per_day?: string;
     exclusive?: string;
+    // /pricing-calculator inputs — translated by applyCalculatorPrefills
+    assets?: string;
+    weeks?: string;
+    markets?: string;
   }>;
 }
 
@@ -77,16 +82,27 @@ export default async function RfpPage({ searchParams }: PageProps) {
   const campaign = sp.campaign ?? "";
   const advertiser = sp.advertiser ?? "";
   const launch = sp.launch ?? "";
-  const duration = sp.duration_days ?? "";
+  const prefill = applyCalculatorPrefills(
+    {
+      assets: sp.assets,
+      weeks: sp.weeks,
+      markets: sp.markets,
+      exclusive: sp.exclusive,
+      duration_days: sp.duration_days,
+      message: sp.message,
+    },
+    "ko"
+  );
+  const duration = prefill.durationDays;
   const channels = parseCsv(sp.channels, CHANNEL_OPTIONS.map((c) => c.value));
-  const message = sp.message ?? "";
+  const message = prefill.message;
   const heroCopy = sp.hero_copy ?? "";
   const industries = parseCsv(sp.industries, INDUSTRY_OPTIONS.map((o) => o.value));
   const moods = parseCsv(sp.moods, MOOD_OPTIONS.map((o) => o.value));
   const targetAge = sp.target_age ?? "";
   const budgetBand = sp.budget_band ?? "";
   const budgetPerDay = sp.budget_per_day ? Number.parseInt(sp.budget_per_day, 10) : null;
-  const needsExclusive = sp.exclusive === "true";
+  const needsExclusive = prefill.needsExclusive;
 
   const hasInput =
     campaign.length > 0 ||
@@ -187,6 +203,12 @@ export default async function RfpPage({ searchParams }: PageProps) {
           </p>
         </div>
 
+        {prefill.fromCalculator && (
+          <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 px-4 py-2.5 text-xs text-emerald-200 mb-4 print:hidden">
+            가격 계산기에서 받은 입력으로 일부 필드를 채웠습니다 (운영기간 +
+            메시지). 필요한 경우 수정 후 제출하세요.
+          </div>
+        )}
         <form method="GET" className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-5 mb-8 print:hidden">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="캠페인명" name="campaign" defaultValue={campaign} placeholder="2026 FW 뷰티 캠페인" />

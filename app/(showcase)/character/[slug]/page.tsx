@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  Calculator,
   Lightbulb,
   Palette,
   Shirt,
@@ -292,6 +293,34 @@ export default async function KrCharacterPage({
             티어별 산출물·독점성 차이는 브랜드 키트 페이지에서 확인하세요.
             솔로 캠페인은 일별 라이선스로 별도 견적합니다.
           </p>
+        </section>
+
+        <section className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors">
+          <Link
+            href={`/pricing-calculator?utm_source=character&utm_campaign=character_budget_${character.slug}`}
+            className="block"
+          >
+            <div className="flex items-start gap-4">
+              <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-2 mt-0.5">
+                <Calculator className="w-4 h-4 text-emerald-200" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-1">
+                  견적 계산기
+                </p>
+                <p className="text-base font-semibold text-zinc-100">
+                  {character.name} 캠페인 예산은 얼마일까?
+                </p>
+                <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+                  어셋 수·시즌·시장·독점 4 입력으로 즉시 KRW + USD 견적과 권장
+                  path. RFP 보내기 전에 예산 상한을 확인하세요.
+                </p>
+                <p className="mt-2 text-xs text-emerald-300 inline-flex items-center gap-1">
+                  계산기 열기 <ArrowRight className="w-3 h-3" />
+                </p>
+              </div>
+            </div>
+          </Link>
         </section>
 
         <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-12">

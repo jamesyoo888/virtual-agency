@@ -12,6 +12,7 @@ import {
 } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import RfpFilterChips from "@/components/rfp-filter-chips";
+import { applyCalculatorPrefills } from "@/lib/rfp/calculator-prefill";
 import { persistRfpSubmission } from "@/lib/rfp/persist";
 import { ArrowLeft, FileText } from "lucide-react";
 
@@ -79,6 +80,10 @@ interface PageProps {
     budget_band?: string;
     budget_per_day?: string;
     exclusive?: string;
+    // /pricing-calculator inputs — translated by applyCalculatorPrefills
+    assets?: string;
+    weeks?: string;
+    markets?: string;
   }>;
 }
 
@@ -113,12 +118,23 @@ export default async function EnRfpPage({ searchParams }: PageProps) {
   const campaign = sp.campaign ?? "";
   const advertiser = sp.advertiser ?? "";
   const launch = sp.launch ?? "";
-  const duration = sp.duration_days ?? "";
+  const prefill = applyCalculatorPrefills(
+    {
+      assets: sp.assets,
+      weeks: sp.weeks,
+      markets: sp.markets,
+      exclusive: sp.exclusive,
+      duration_days: sp.duration_days,
+      message: sp.message,
+    },
+    "en"
+  );
+  const duration = prefill.durationDays;
   const channels = parseCsv(
     sp.channels,
     CHANNEL_OPTIONS.map((c) => c.value)
   );
-  const message = sp.message ?? "";
+  const message = prefill.message;
   const heroCopy = sp.hero_copy ?? "";
   const industries = parseCsv(
     sp.industries,
@@ -130,7 +146,7 @@ export default async function EnRfpPage({ searchParams }: PageProps) {
   const budgetPerDay = sp.budget_per_day
     ? Number.parseInt(sp.budget_per_day, 10)
     : null;
-  const needsExclusive = sp.exclusive === "true";
+  const needsExclusive = prefill.needsExclusive;
 
   const hasInput =
     campaign.length > 0 ||
@@ -231,6 +247,12 @@ export default async function EnRfpPage({ searchParams }: PageProps) {
           </p>
         </div>
 
+        {prefill.fromCalculator && (
+          <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 px-4 py-2.5 text-xs text-emerald-200 mb-4 print:hidden">
+            We prefilled a few fields from your pricing calculator inputs
+            (run duration · message). Edit before submitting if needed.
+          </div>
+        )}
         <form
           method="GET"
           className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-5 mb-8 print:hidden"

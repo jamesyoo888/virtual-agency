@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  Calculator,
   Lightbulb,
   Palette,
   Shirt,
@@ -269,6 +270,35 @@ export default async function CharacterPage({
             Tiers cover paired campaigns with both characters. Solo campaigns
             are quoted on a per-day license — request a custom quote via RFP.
           </p>
+        </section>
+
+        <section className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors">
+          <Link
+            href={`/en/pricing-calculator?utm_source=character&utm_campaign=character_budget_${character.slug}`}
+            className="block"
+          >
+            <div className="flex items-start gap-4">
+              <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-2 mt-0.5">
+                <Calculator className="w-4 h-4 text-emerald-200" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-1">
+                  Budget estimator
+                </p>
+                <p className="text-base font-semibold text-zinc-100">
+                  What would a {character.name} campaign cost?
+                </p>
+                <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+                  4 inputs — assets, season weeks, markets, exclusivity — and
+                  you get an instant USD + KRW estimate plus a recommended
+                  path. Check the upper bound before you send an RFP.
+                </p>
+                <p className="mt-2 text-xs text-emerald-300 inline-flex items-center gap-1">
+                  Open the calculator <ArrowRight className="w-3 h-3" />
+                </p>
+              </div>
+            </div>
+          </Link>
         </section>
 
         <section className="rounded-xl border border-zinc-800 p-6 bg-zinc-950/40 mb-12">

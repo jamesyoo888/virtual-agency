@@ -9,6 +9,10 @@ import { loadBlogViews } from "@/lib/analytics/blog-views";
 import { getPostBySlug } from "@/lib/blog/posts";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
+import {
+  loadPricingCalculatorAttribution,
+  pathLabelForAdmin,
+} from "@/lib/analytics/pricing-calculator-attribution";
 import { getKitTier, type BrandKitTier } from "@/lib/characters/brand-kits";
 
 function humanTierLabel(tier: string): string {
@@ -164,12 +168,20 @@ export default async function AnalyticsPage({
 }) {
   const sp = await searchParams;
   const windowDays = WINDOWS[sp.window ?? ""] ?? 30;
-  const [a, characterViews, characterAttribution, blogViews, blogAttribution] = await Promise.all([
+  const [
+    a,
+    characterViews,
+    characterAttribution,
+    blogViews,
+    blogAttribution,
+    pricingCalc,
+  ] = await Promise.all([
     loadAnalytics(windowDays),
     loadCharacterViews(windowDays),
     loadCharacterAttribution(windowDays),
     loadBlogViews(windowDays),
     loadBlogAttribution(windowDays),
+    loadPricingCalculatorAttribution(windowDays),
   ]);
   const maxBlogViews = Math.max(1, ...blogViews.bySlug.slice(0, 10).map((b) => b.total));
   const maxSeriesViews = Math.max(1, ...blogViews.bySeries.map((s) => s.total));
@@ -555,6 +567,118 @@ export default async function AnalyticsPage({
           </p>
         </section>
       )}
+
+      {pricingCalc.totalInquiries > 0 && (() => {
+        const maxPath = Math.max(
+          1,
+          ...pricingCalc.byPath.map((p) => p.inquiries)
+        );
+        const toneClass: Record<string, { bar: string; text: string }> = {
+          amber: { bar: "bg-amber-400", text: "text-amber-300" },
+          emerald: { bar: "bg-emerald-400", text: "text-emerald-300" },
+          violet: { bar: "bg-violet-400", text: "text-violet-300" },
+          fuchsia: { bar: "bg-fuchsia-400", text: "text-fuchsia-300" },
+          zinc: { bar: "bg-zinc-400", text: "text-zinc-300" },
+        };
+        return (
+          <section className="rounded-xl border border-emerald-500/30 bg-emerald-500/[0.03] p-5">
+            {(() => {
+              const peak = Math.max(
+                1,
+                ...pricingCalc.daily.map((d) => d.count)
+              );
+              return (
+                <div className="flex items-end gap-px h-12 mb-5">
+                  {pricingCalc.daily.map((d) => {
+                    const heightPct = (d.count / peak) * 100;
+                    return (
+                      <div
+                        key={d.date}
+                        title={`${d.date} — ${d.count}건`}
+                        className="flex-1 flex flex-col justify-end"
+                      >
+                        <div
+                          className={`w-full rounded-sm ${
+                            d.count > 0 ? "bg-emerald-400/70" : "bg-zinc-900"
+                          }`}
+                          style={{ height: `${Math.max(2, heightPct)}%` }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+            <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-emerald-200">
+                가격 계산기 → 문의 ({windowDays}일)
+              </h2>
+              <p className="text-xs text-zinc-500 tabular-nums">
+                utm_source=pricing-calculator · 총{" "}
+                {pricingCalc.totalInquiries}건 · 납품{" "}
+                {pricingCalc.totalDelivered}건 ·{" "}
+                <span className="text-emerald-300">
+                  ₩{pricingCalc.totalRevenue.toLocaleString("ko-KR")}
+                </span>
+                {pricingCalc.unknown > 0 && (
+                  <span className="ml-2 text-zinc-600">
+                    · 미분류 {pricingCalc.unknown}
+                  </span>
+                )}
+              </p>
+            </div>
+            <p className="text-[11px] text-zinc-500 mb-3">
+              계산기가 추천한 path 별로 인콰이어 분포. paired/season 비중이 크면
+              brand-kit funnel 작동, license/traditional 비중이 크면 buyer
+              스코프가 brand-kit floor 아래.
+            </p>
+            <ul className="space-y-2">
+              {pricingCalc.byPath.map((p) => {
+                const widthPct = (p.inquiries / maxPath) * 100;
+                const meta = pathLabelForAdmin(p.path);
+                const tone = toneClass[meta.tone] ?? toneClass.zinc;
+                return (
+                  <li
+                    key={p.path}
+                    className="grid grid-cols-12 gap-3 items-center text-sm"
+                  >
+                    <span className="col-span-4 text-zinc-200 truncate" title={meta.short}>
+                      {meta.short}
+                    </span>
+                    <div className="col-span-4 h-2 rounded bg-zinc-900 overflow-hidden">
+                      <div
+                        className={`h-full ${tone.bar}`}
+                        style={{ width: `${widthPct}%` }}
+                      />
+                    </div>
+                    <span className="col-span-4 text-right text-xs text-zinc-400 tabular-nums">
+                      {p.inquiries} ·{" "}
+                      <span
+                        className={
+                          p.conversionPct >= 30
+                            ? "text-emerald-400"
+                            : "text-zinc-500"
+                        }
+                      >
+                        {p.conversionPct}%
+                      </span>
+                      {p.revenue > 0 && (
+                        <span className="ml-2 text-emerald-300">
+                          ₩{p.revenue.toLocaleString("ko-KR")}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-3 text-[11px] text-zinc-600">
+              계산기 → RFP CTA 가 utm_source=pricing-calculator, utm_campaign=&lt;path&gt;
+              로 attribut. KR/EN 통합 — locale 분리는 utm_medium 으로 확장 가능.
+            </p>
+          </section>
+        );
+      })()}
 
       {blogViews.total > 0 && (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
