@@ -744,6 +744,79 @@ export default async function ForecastPage() {
                 {pricingCalc.totalDelivered}건 · 매출 ₩{KRW.format(pricingCalc.totalRevenue)}
                 {pricingCalc.unknown > 0 && ` · 미분류 ${pricingCalc.unknown}건`}
               </p>
+              {(() => {
+                // Weekly composition trend — stacked bar per week showing how the
+                // path mix shifts. Surface early signal that buyer scope is
+                // drifting (license_daily share rising = buyer pool getting smaller-
+                // budget; paired_editorial share rising = brand-kit funnel working).
+                const weeks = pricingCalc.weeklyByPath.filter(
+                  (w) => w.total > 0
+                );
+                if (weeks.length < 2) return null;
+                const PATH_COLORS: Record<string, string> = {
+                  license_daily: "bg-amber-400",
+                  paired_editorial: "bg-emerald-400",
+                  season_anchor: "bg-violet-400",
+                  custom_build: "bg-fuchsia-400",
+                  traditional_competitive: "bg-zinc-500",
+                };
+                const PATH_ORDER = [
+                  "license_daily",
+                  "paired_editorial",
+                  "season_anchor",
+                  "custom_build",
+                  "traditional_competitive",
+                ] as const;
+                const maxTotal = Math.max(...weeks.map((w) => w.total));
+                return (
+                  <div className="mt-4 pt-4 border-t border-teal-500/20">
+                    <p className="text-[11px] uppercase tracking-wider text-teal-300 mb-2">
+                      주간 path 구성 트렌드 ({weeks.length}주)
+                    </p>
+                    <div className="flex items-end gap-1 h-20">
+                      {weeks.map((w) => {
+                        const heightPct = (w.total / maxTotal) * 100;
+                        return (
+                          <div
+                            key={w.weekStart}
+                            className="flex-1 min-w-0 flex flex-col items-stretch justify-end gap-px"
+                            title={`주 ${w.weekStart} · ${w.total}건`}
+                          >
+                            <div
+                              className="flex flex-col-reverse rounded-sm overflow-hidden bg-zinc-900/40"
+                              style={{ height: `${heightPct}%` }}
+                            >
+                              {PATH_ORDER.map((p) => {
+                                const n = w.counts[p];
+                                if (n === 0) return null;
+                                const segPct = (n / w.total) * 100;
+                                return (
+                                  <div
+                                    key={p}
+                                    className={PATH_COLORS[p]}
+                                    style={{ height: `${segPct}%` }}
+                                    title={`${pathLabelForAdmin(p).short}: ${n}`}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-500 tabular-nums">
+                      <span>{weeks[0].weekStart}</span>
+                      <span>{weeks[weeks.length - 1].weekStart}</span>
+                    </div>
+                    <p className="mt-2 text-[10px] text-zinc-500 leading-relaxed">
+                      각 바 = 1주, 색 = path. License (amber) 비중이 빠르게
+                      올라가면 buyer 스코프가 paired 손익분기 (≈14 컷) 아래로
+                      이동 중인 signal. Paired (emerald) 가 안정적으로 상승하면
+                      brand-kit funnel 작동 중.
+                    </p>
+                  </div>
+                );
+              })()}
             </section>
           )}
 

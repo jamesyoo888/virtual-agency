@@ -34,6 +34,15 @@ export interface PricingPathRow {
   revenue: number;
 }
 
+export interface WeeklyPathBucket {
+  /** ISO date (YYYY-MM-DD) of the Monday that starts this week. */
+  weekStart: string;
+  /** Per-path inquiry count for this week. Missing paths default to 0. */
+  counts: Record<RecommendedPath, number>;
+  /** Total inquiries this week (sum across paths + unknown). */
+  total: number;
+}
+
 export interface PricingCalculatorAttributionReport {
   windowDays: number;
   totalInquiries: number;
@@ -44,6 +53,9 @@ export interface PricingCalculatorAttributionReport {
    *  match a known RecommendedPath (e.g. legacy values, manual edits). */
   unknown: number;
   daily: DailyBucket[];
+  /** Path composition shifted by week — early signal that buyer scope is
+   *  drifting (e.g. license_daily share rising relative to paired_editorial). */
+  weeklyByPath: WeeklyPathBucket[];
 }
 
 interface Row {
@@ -120,6 +132,89 @@ export function summarizePricingCalculatorAttribution(
   };
 }
 
+/**
+ * Group rows into weekly buckets keyed by Monday (UTC) and tally per-path
+ * counts. Returns a contiguous array of weeks covering the requested window
+ * (zero-filled so the trend chart doesn't gap mid-period).
+ */
+export function aggregateWeeklyByPath(
+  rows: RowWithDate[],
+  windowDays: number
+): WeeklyPathBucket[] {
+  const dayMs = 24 * 60 * 60 * 1000;
+  // Anchor "now" to UTC midnight so the bucket boundaries line up regardless
+  // of the server's local timezone.
+  const now = new Date();
+  const today = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  );
+  const since = new Date(today.getTime() - (windowDays - 1) * dayMs);
+
+  function mondayOf(d: Date): string {
+    const utc = new Date(
+      Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+    );
+    // getUTCDay: Sunday=0, Monday=1, ... Saturday=6. Shift to Monday-start.
+    const dow = utc.getUTCDay();
+    const offset = dow === 0 ? 6 : dow - 1;
+    utc.setUTCDate(utc.getUTCDate() - offset);
+    return utc.toISOString().slice(0, 10);
+  }
+
+  function emptyCounts(): Record<RecommendedPath, number> {
+    return {
+      license_daily: 0,
+      paired_editorial: 0,
+      season_anchor: 0,
+      custom_build: 0,
+      traditional_competitive: 0,
+    };
+  }
+
+  // Pre-populate weeks across the window so the chart shows zeros, not gaps.
+  const weeks = new Map<string, WeeklyPathBucket>();
+  for (let t = since.getTime(); t <= today.getTime(); t += 7 * dayMs) {
+    const key = mondayOf(new Date(t));
+    if (!weeks.has(key)) {
+      weeks.set(key, { weekStart: key, counts: emptyCounts(), total: 0 });
+    }
+  }
+  // Also pre-populate the Monday of "today" — covers the edge where the
+  // window length doesn't divide cleanly by 7.
+  const todayKey = mondayOf(today);
+  if (!weeks.has(todayKey)) {
+    weeks.set(todayKey, {
+      weekStart: todayKey,
+      counts: emptyCounts(),
+      total: 0,
+    });
+  }
+
+  for (const r of rows) {
+    const created = new Date(r.created_at);
+    if (Number.isNaN(created.getTime())) continue;
+    const key = mondayOf(created);
+    const bucket =
+      weeks.get(key) ??
+      (() => {
+        const fresh: WeeklyPathBucket = {
+          weekStart: key,
+          counts: emptyCounts(),
+          total: 0,
+        };
+        weeks.set(key, fresh);
+        return fresh;
+      })();
+    bucket.total += 1;
+    const path = parsePathFromCampaign(r.utm_campaign);
+    if (path) bucket.counts[path] += 1;
+  }
+
+  return [...weeks.values()].sort((a, b) =>
+    a.weekStart.localeCompare(b.weekStart)
+  );
+}
+
 export async function loadPricingCalculatorAttribution(
   windowDays: number = 30
 ): Promise<PricingCalculatorAttributionReport> {
@@ -131,6 +226,7 @@ export async function loadPricingCalculatorAttribution(
     byPath: [],
     unknown: 0,
     daily: aggregateDaily([], windowDays),
+    weeklyByPath: aggregateWeeklyByPath([], windowDays),
   };
   if (!SUPABASE_CONFIGURED) return empty;
 
@@ -156,7 +252,8 @@ export async function loadPricingCalculatorAttribution(
   const rowsWithDate = (data ?? []) as RowWithDate[];
   const summary = summarizePricingCalculatorAttribution(rowsWithDate);
   const daily = aggregateDaily(rowsWithDate, windowDays);
-  return { windowDays, ...summary, daily };
+  const weeklyByPath = aggregateWeeklyByPath(rowsWithDate, windowDays);
+  return { windowDays, ...summary, daily, weeklyByPath };
 }
 
 export function pathLabelForAdmin(

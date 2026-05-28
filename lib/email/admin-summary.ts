@@ -12,6 +12,7 @@ import { loadStageTiming, type TimedStage } from "@/lib/analytics/stage-timing";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
+import { listPosts, postLocale, type BlogPost } from "@/lib/blog/posts";
 
 /**
  * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
@@ -68,6 +69,12 @@ export interface AdminWeeklySummary {
   pricingCalculatorAttributedInquiries: number;
   /** 30d delivered revenue from pricing-calculator-attributed projects. */
   pricingCalculatorAttributedRevenueKrw: number;
+  /** Blog posts published within the last 7 days (operator content velocity). */
+  newPostsKo: number;
+  newPostsEn: number;
+  /** First three new-post titles for the digest body — KR + EN combined,
+   *  ordered most-recent first. Empty when no new posts this window. */
+  newPostsSample: { title: string; slug: string; locale: "ko" | "en" }[];
 }
 
 interface SearchLogRow {
@@ -236,11 +243,42 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       blogAttributedRevenueKrw: blogAttribution.totalRevenue,
       pricingCalculatorAttributedInquiries: pricingCalcAttribution.totalInquiries,
       pricingCalculatorAttributedRevenueKrw: pricingCalcAttribution.totalRevenue,
+      ...summarizeNewPosts(),
     };
   } catch (err) {
     console.warn("[admin-summary] build failed:", err);
     return null;
   }
+}
+
+/**
+ * Snapshot of blog posts whose publishedAt is within the last 7 days.
+ * Pure function (reads from the in-memory registry, not DB) so the digest
+ * can render content velocity without a network round-trip.
+ */
+export function summarizeNewPosts(
+  now: Date = new Date()
+): Pick<AdminWeeklySummary, "newPostsKo" | "newPostsEn" | "newPostsSample"> {
+  const cutoffMs = now.getTime() - 7 * 24 * 60 * 60 * 1000;
+  const all: BlogPost[] = [...listPosts("ko"), ...listPosts("en")];
+  const recent = all
+    .filter((p) => {
+      const t = Date.parse(p.publishedAt);
+      // Standard semantics: published within the last 7 days. Posts dated in
+      // the future (more than today) are excluded — they're not "live" to
+      // consumers yet.
+      return Number.isFinite(t) && t >= cutoffMs && t <= now.getTime();
+    })
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+
+  const newPostsKo = recent.filter((p) => postLocale(p) === "ko").length;
+  const newPostsEn = recent.filter((p) => postLocale(p) === "en").length;
+  const newPostsSample = recent.slice(0, 3).map((p) => ({
+    title: p.title,
+    slug: p.slug,
+    locale: postLocale(p),
+  }));
+  return { newPostsKo, newPostsEn, newPostsSample };
 }
 
 export async function loadAdminEmails(): Promise<string[]> {
@@ -331,6 +369,15 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
     lines.push(
       `가격 계산기 → 문의 (30일): ${s.pricingCalculatorAttributedInquiries}건${revPart}`
     );
+  }
+  const newPostsTotal = s.newPostsKo + s.newPostsEn;
+  if (newPostsTotal > 0) {
+    lines.push(
+      `신규 발행 글 (7일): ${newPostsTotal}편 (KR ${s.newPostsKo} · EN ${s.newPostsEn})`
+    );
+    for (const p of s.newPostsSample) {
+      lines.push(`  - [${p.locale.toUpperCase()}] ${p.title}`);
+    }
   }
   lines.push("");
   if (s.topSearches.length > 0) {
@@ -450,7 +497,34 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
             )
           : ""
       }
+      ${
+        s.newPostsKo + s.newPostsEn > 0
+          ? stat(
+              "신규 글 (7d)",
+              `${s.newPostsKo + s.newPostsEn}편 (KR ${s.newPostsKo} · EN ${s.newPostsEn})`
+            )
+          : ""
+      }
     </div>
+    ${
+      s.newPostsSample.length > 0
+        ? `<h3 style="margin:24px 0 8px;font-size:14px;color:#fafafa">최근 발행 글</h3>
+    <ul style="padding-left:18px;margin:0;color:#d4d4d8">${s.newPostsSample
+      .map(
+        (p) =>
+          `<li style="font-size:13px;margin:4px 0"><span style="color:#71717a;font-size:11px;margin-right:6px">${escapeHtml(
+            p.locale.toUpperCase()
+          )}</span><a href="${escapeHtml(baseUrl)}${
+            p.locale === "en" ? "/en" : ""
+          }/blog/${encodeURIComponent(
+            p.slug
+          )}" style="color:#fafafa;text-decoration:none">${escapeHtml(
+            p.title
+          )}</a></li>`
+      )
+      .join("")}</ul>`
+        : ""
+    }
     <h3 style="margin:24px 0 8px;font-size:14px;color:#fafafa">인기 검색어</h3>
     ${list(s.topSearches.map((t) => ({ q: t.q, n: `${t.count}회 · 평균 ${t.avgResults}` })))}
     <h3 style="margin:24px 0 8px;font-size:14px;color:#fafafa">0결과 검색어 (콘텐츠 갭)</h3>

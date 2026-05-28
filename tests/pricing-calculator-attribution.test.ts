@@ -3,6 +3,7 @@ import {
   parsePathFromCampaign,
   summarizePricingCalculatorAttribution,
   pathLabelForAdmin,
+  aggregateWeeklyByPath,
 } from "@/lib/analytics/pricing-calculator-attribution";
 
 describe("parsePathFromCampaign", () => {
@@ -82,6 +83,85 @@ describe("summarizePricingCalculatorAttribution", () => {
     expect(result.totalInquiries).toBe(0);
     expect(result.byPath).toEqual([]);
     expect(result.unknown).toBe(0);
+  });
+});
+
+describe("aggregateWeeklyByPath", () => {
+  function rowsAt(date: string, count: number, campaign: string) {
+    return Array.from({ length: count }, () => ({
+      status: "inquiry",
+      utm_campaign: campaign,
+      created_at: `${date}T12:00:00.000Z`,
+    }));
+  }
+
+  it("returns a contiguous weekly series (zero-filled) when no rows", () => {
+    const weeks = aggregateWeeklyByPath([], 30);
+    expect(weeks.length).toBeGreaterThanOrEqual(1);
+    for (const w of weeks) {
+      expect(w.total).toBe(0);
+      expect(w.counts.license_daily).toBe(0);
+      expect(w.counts.paired_editorial).toBe(0);
+    }
+  });
+
+  it("tallies per-path counts into the right week", () => {
+    // Use 90d window so we have multiple weeks to land rows into.
+    const today = new Date();
+    const recentISO = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const olderISO = new Date(today.getTime() - 21 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const weeks = aggregateWeeklyByPath(
+      [
+        ...rowsAt(recentISO, 3, "paired_editorial"),
+        ...rowsAt(recentISO, 2, "license_daily"),
+        ...rowsAt(olderISO, 1, "season_anchor"),
+      ],
+      90
+    );
+    const totalInquiries = weeks.reduce((sum, w) => sum + w.total, 0);
+    expect(totalInquiries).toBe(6);
+    const totalPaired = weeks.reduce(
+      (sum, w) => sum + w.counts.paired_editorial,
+      0
+    );
+    expect(totalPaired).toBe(3);
+    const totalSeason = weeks.reduce(
+      (sum, w) => sum + w.counts.season_anchor,
+      0
+    );
+    expect(totalSeason).toBe(1);
+  });
+
+  it("uses Monday as week start (ISO YYYY-MM-DD)", () => {
+    const weeks = aggregateWeeklyByPath([], 30);
+    for (const w of weeks) {
+      expect(w.weekStart).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      // Day-of-week of weekStart must be Monday (1) in UTC.
+      const d = new Date(`${w.weekStart}T00:00:00.000Z`);
+      expect(d.getUTCDay()).toBe(1);
+    }
+  });
+
+  it("treats unknown utm_campaign as total but not in any path bucket", () => {
+    const today = new Date();
+    const recentISO = new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const weeks = aggregateWeeklyByPath(
+      [
+        ...rowsAt(recentISO, 2, "license_daily"),
+        ...rowsAt(recentISO, 1, "garbage_path"),
+      ],
+      30
+    );
+    const total = weeks.reduce((sum, w) => sum + w.total, 0);
+    const license = weeks.reduce((sum, w) => sum + w.counts.license_daily, 0);
+    expect(total).toBe(3); // garbage row counted in total
+    expect(license).toBe(2); // but only license tallied per-path
   });
 });
 
