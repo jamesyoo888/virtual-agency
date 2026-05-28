@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Users, Calendar } from "lucide-react";
+import { ArrowRight, Sparkles, Users, Calendar, Calculator } from "lucide-react";
 import { listCharacters } from "@/lib/characters/registry";
 import { itemListLd, ldScript } from "@/lib/seo/json-ld";
 
@@ -177,9 +177,32 @@ export default function KrCharacterBrandKitsPage() {
           <h2 className="text-xl font-semibold tracking-tight mb-2">
             3개 티어
           </h2>
-          <p className="text-sm text-zinc-500 mb-6">
+          <p className="text-sm text-zinc-500 mb-4">
             모든 가격은 부가세 별도 KRW. 정식 견적은 24시간 이내 회신.
           </p>
+          <Link
+            href="/pricing-calculator?utm_source=character&utm_campaign=brand_kit_calc_anchor"
+            className="block mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-1.5 mt-0.5">
+                <Calculator className="w-3.5 h-3.5 text-emerald-200" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-0.5">
+                  내 스코프엔 어떤 티어?
+                </p>
+                <p className="text-sm font-semibold text-zinc-100">
+                  3 티어 중 본인 캠페인에 맞는 path 찾기 →{" "}
+                  <span className="text-emerald-300">견적 계산기</span>
+                </p>
+                <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                  어셋 수·시즌·시장·독점 입력 → paired/season/custom 권장 path
+                  자동 매핑 + KRW + USD 견적. 티어 결정 전에 무료 체크.
+                </p>
+              </div>
+            </div>
+          </Link>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {KITS.map((k, i) => (
               <article

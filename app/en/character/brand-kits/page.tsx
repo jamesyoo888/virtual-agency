@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Users, Calendar } from "lucide-react";
+import { ArrowRight, Sparkles, Users, Calendar, Calculator } from "lucide-react";
 import { listCharacters } from "@/lib/characters/registry";
 import { itemListLd, ldScript } from "@/lib/seo/json-ld";
 
@@ -173,10 +173,34 @@ export default function CharacterBrandKitsPage() {
           <h2 className="text-xl font-semibold tracking-tight mb-2">
             Three tiers
           </h2>
-          <p className="text-sm text-zinc-500 mb-6">
+          <p className="text-sm text-zinc-500 mb-4">
             All prices illustrative USD. Quoted in 24 hours; paid via Stripe
             or wire.
           </p>
+          <Link
+            href="/en/pricing-calculator?utm_source=character&utm_campaign=brand_kit_calc_anchor"
+            className="block mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-1.5 mt-0.5">
+                <Calculator className="w-3.5 h-3.5 text-emerald-200" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-0.5">
+                  Which tier fits my scope?
+                </p>
+                <p className="text-sm font-semibold text-zinc-100">
+                  Map your campaign to the right tier first →{" "}
+                  <span className="text-emerald-300">Cost estimator</span>
+                </p>
+                <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                  Enter assets, weeks, markets, exclusivity → the calculator
+                  recommends paired / season / custom and gives a USD + KRW
+                  range. Free pre-tier check.
+                </p>
+              </div>
+            </div>
+          </Link>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {KITS.map((k, i) => (
               <article

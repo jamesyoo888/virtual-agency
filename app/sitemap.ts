@@ -94,8 +94,8 @@ export default async function sitemap(
           {
             url: `${SITE_URL}/en/pricing-calculator`,
             lastModified: now,
-            changeFrequency: "monthly",
-            priority: 0.8,
+            changeFrequency: "weekly",
+            priority: 0.9,
             alternates: {
               languages: {
                 en: `${SITE_URL}/en/pricing-calculator`,
@@ -392,8 +392,8 @@ export default async function sitemap(
           {
             url: `${SITE_URL}/pricing-calculator`,
             lastModified: now,
-            changeFrequency: "monthly",
-            priority: 0.8,
+            changeFrequency: "weekly",
+            priority: 0.9,
             alternates: {
               languages: {
                 ko: `${SITE_URL}/pricing-calculator`,

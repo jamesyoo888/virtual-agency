@@ -12,7 +12,7 @@ import {
   MOOD_OPTIONS_EN,
 } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Calculator } from "lucide-react";
 import { recommendCharacters } from "@/lib/characters/recommend";
 
 const SITE_URL =
@@ -174,10 +174,34 @@ export default async function EnMatchPage({ searchParams }: PageProps) {
           <Sparkles className="w-5 h-5 text-zinc-400" />
           <h1 className="text-3xl font-bold">AI Model Matching</h1>
         </div>
-        <p className="text-sm text-zinc-500 mb-8">
+        <p className="text-sm text-zinc-500 mb-6">
           Describe your campaign — industry, mood, day-rate budget — and we
           surface the K-aesthetic models that fit. No shortlist emails.
         </p>
+
+        <Link
+          href="/en/pricing-calculator?utm_source=match&utm_campaign=match_budget_check"
+          className="block mb-8 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-1.5 mt-0.5">
+              <Calculator className="w-3.5 h-3.5 text-emerald-200" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-0.5">
+                Check budget first?
+              </p>
+              <p className="text-sm font-semibold text-zinc-100">
+                Want a budget anchor before matching? →{" "}
+                <span className="text-emerald-300">Cost estimator</span>
+              </p>
+              <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                Assets, season weeks, markets, exclusivity — instant USD + KRW
+                estimate. Useful before you commit to a day-rate budget here.
+              </p>
+            </div>
+          </div>
+        </Link>
 
         <form
           method="GET"

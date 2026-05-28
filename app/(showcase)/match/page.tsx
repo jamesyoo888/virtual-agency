@@ -8,7 +8,7 @@ import { loadPersonaSignals } from "@/lib/matching/persona";
 import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import ShareLinkButton from "@/components/share-link-button";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Calculator } from "lucide-react";
 import { recommendCharacters } from "@/lib/characters/recommend";
 
 const SITE_URL =
@@ -133,9 +133,33 @@ export default async function MatchPage({ searchParams }: PageProps) {
           <Sparkles className="w-5 h-5 text-zinc-400" />
           <h1 className="text-3xl font-bold">AI 모델 매칭</h1>
         </div>
-        <p className="text-sm text-zinc-500 mb-8">
+        <p className="text-sm text-zinc-500 mb-6">
           광고 컨셉·산업·예산을 입력하면 어울리는 모델을 자동 추천합니다.
         </p>
+
+        <Link
+          href="/pricing-calculator?utm_source=match&utm_campaign=match_budget_check"
+          className="block mb-8 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-1.5 mt-0.5">
+              <Calculator className="w-3.5 h-3.5 text-emerald-200" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-0.5">
+                먼저 예산 확인?
+              </p>
+              <p className="text-sm font-semibold text-zinc-100">
+                매칭 전에 예산 범위부터 점검하고 싶으시면 →{" "}
+                <span className="text-emerald-300">견적 계산기</span>
+              </p>
+              <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                어셋 수·시즌·시장·독점 4 입력으로 즉시 KRW + USD 견적. 매칭에
+                예산 입력하기 전 상한 잡기 좋음.
+              </p>
+            </div>
+          </div>
+        </Link>
 
         <form
           method="GET"
