@@ -9,6 +9,7 @@ import {
   Sparkles,
   BookOpen,
   Calculator,
+  Users,
 } from "lucide-react";
 import { parseBlogReferrer } from "@/lib/analytics/blog-attribution";
 import {
@@ -71,6 +72,9 @@ async function loadSummaries(): Promise<{
   blogAttributedIds: Set<string>;
   /** Set of client_ids whose projects originated from /pricing-calculator (utm_source=pricing-calculator). */
   pricingCalculatorAttributedIds: Set<string>;
+  /** Set of client_ids whose projects originated from an agent referral link
+   *  (utm_source=agent — 15% commission flow). */
+  agentAttributedIds: Set<string>;
   /** At-risk = ≥2 delivered + silent ≥60d. Materialized from project rows
    *  joined to the same clients fetch so the order matches the table. */
   atRiskClients: AtRiskClient[];
@@ -86,6 +90,7 @@ async function loadSummaries(): Promise<{
       characterAttributedIds: new Set(),
       blogAttributedIds: new Set(),
       pricingCalculatorAttributedIds: new Set(),
+      agentAttributedIds: new Set(),
       atRiskClients: [],
       cohorts: [],
     };
@@ -210,6 +215,13 @@ async function loadSummaries(): Promise<{
       .filter((p) => p.utm_source === "pricing-calculator" && p.client_id)
       .map((p) => p.client_id)
   );
+  // Clients with at least one project tagged utm_source=agent.
+  // 15% commission referral flow from /agent/dashboard.
+  const agentAttributedIds = new Set(
+    projects
+      .filter((p) => p.utm_source === "agent" && p.client_id)
+      .map((p) => p.client_id)
+  );
   const atRiskClients = computeAtRiskClients(deliveredRows, {
     minDelivered: 2,
     silentDays: 60,
@@ -225,6 +237,7 @@ async function loadSummaries(): Promise<{
     characterAttributedIds,
     blogAttributedIds,
     pricingCalculatorAttributedIds,
+    agentAttributedIds,
     atRiskClients,
     cohorts,
   };
@@ -380,6 +393,7 @@ export default async function AdminClientsPage({
   const showCharacter = filter === "character-attributed";
   const showBlog = filter === "blog-attributed";
   const showPricingCalc = filter === "pricing-calculator-attributed";
+  const showAgent = filter === "agent-attributed";
   const {
     clients: allClients,
     totalRevenue,
@@ -388,6 +402,7 @@ export default async function AdminClientsPage({
     characterAttributedIds,
     blogAttributedIds,
     pricingCalculatorAttributedIds,
+    agentAttributedIds,
     atRiskClients,
     cohorts,
   } = await loadSummaries();
@@ -406,12 +421,15 @@ export default async function AdminClientsPage({
     ? allClients.filter((c) => blogAttributedIds.has(c.id))
     : showPricingCalc
     ? allClients.filter((c) => pricingCalculatorAttributedIds.has(c.id))
+    : showAgent
+    ? allClients.filter((c) => agentAttributedIds.has(c.id))
     : allClients;
   const neglectedCount = neglectedIds.size;
   const atRiskCount = atRiskClients.length;
   const characterCount = characterAttributedIds.size;
   const blogCount = blogAttributedIds.size;
   const pricingCalcCount = pricingCalculatorAttributedIds.size;
+  const agentCount = agentAttributedIds.size;
 
   const activeClients = allClients.filter((c) => c.campaignCount > 0);
   const repeatClients = allClients.filter((c) => c.campaignCount >= 2);
@@ -476,7 +494,8 @@ export default async function AdminClientsPage({
             !showAtRisk &&
             !showCharacter &&
             !showBlog &&
-            !showPricingCalc
+            !showPricingCalc &&
+            !showAgent
               ? "bg-white text-black border-white"
               : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
           }`}
@@ -527,6 +546,21 @@ export default async function AdminClientsPage({
           Calculator 유입
           {pricingCalcCount > 0 && (
             <span className="opacity-90 tabular-nums">{pricingCalcCount}</span>
+          )}
+        </Link>
+        <Link
+          href="/admin/clients?filter=agent-attributed"
+          className={`px-3 py-1.5 rounded-md border transition-colors inline-flex items-center gap-1 ${
+            showAgent
+              ? "bg-amber-500/20 text-amber-200 border-amber-500/50"
+              : "bg-transparent text-amber-300 border-amber-500/30 hover:border-amber-400 hover:text-amber-200"
+          }`}
+          title="utm_source=agent — 에이전트 referral 링크 경유 인입 광고주 (15% 커미션 attribution)"
+        >
+          <Users className="w-3 h-3" />
+          Agent 유입
+          {agentCount > 0 && (
+            <span className="opacity-90 tabular-nums">{agentCount}</span>
           )}
         </Link>
         <Link
@@ -720,9 +754,20 @@ export default async function AdminClientsPage({
                             ★ Calc
                           </span>
                         )}
-                      {blogAttributedIds.has(c.id) &&
+                      {agentAttributedIds.has(c.id) &&
                         !characterAttributedIds.has(c.id) &&
                         !pricingCalculatorAttributedIds.has(c.id) && (
+                          <span
+                            className="ml-1.5 text-[10px] text-amber-300 border border-amber-500/30 rounded px-1.5 py-0.5 bg-amber-500/10"
+                            title="utm_source=agent — 에이전트 referral · 15% 커미션 attribution 대상"
+                          >
+                            ★ Agent
+                          </span>
+                        )}
+                      {blogAttributedIds.has(c.id) &&
+                        !characterAttributedIds.has(c.id) &&
+                        !pricingCalculatorAttributedIds.has(c.id) &&
+                        !agentAttributedIds.has(c.id) && (
                           <span
                             className="ml-1.5 text-[10px] text-emerald-300 border border-emerald-500/30 rounded px-1.5 py-0.5 bg-emerald-500/10"
                             title="referrer matches /blog/* — 블로그 글 경유 인입"
