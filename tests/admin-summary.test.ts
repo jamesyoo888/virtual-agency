@@ -36,6 +36,8 @@ const fixture: AdminWeeklySummary = {
   characterAttributedRevenueKrw: 11_000_000,
   blogAttributedInquiries: 3,
   blogAttributedRevenueKrw: 6_500_000,
+  pricingCalculatorAttributedInquiries: 5,
+  pricingCalculatorAttributedRevenueKrw: 14_000_000,
 };
 
 describe("formatAdminSummaryText", () => {
@@ -169,6 +171,21 @@ describe("formatAdminSummaryText", () => {
       blogAttributedRevenueKrw: 0,
     };
     expect(formatAdminSummaryText(quiet)).not.toMatch(/블로그 글/);
+  });
+
+  it("includes pricing-calculator-attribution line with revenue when present", () => {
+    const out = formatAdminSummaryText(fixture);
+    expect(out).toMatch(/가격 계산기 → 문의 \(30일\): 5건/);
+    expect(out).toMatch(/매출 ₩14,000,000/);
+  });
+
+  it("omits pricing-calculator-attribution line entirely when inquiries=0", () => {
+    const quiet: AdminWeeklySummary = {
+      ...fixture,
+      pricingCalculatorAttributedInquiries: 0,
+      pricingCalculatorAttributedRevenueKrw: 0,
+    };
+    expect(formatAdminSummaryText(quiet)).not.toMatch(/가격 계산기/);
   });
 });
 

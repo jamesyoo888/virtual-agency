@@ -8,6 +8,7 @@ import {
   Flame,
   Sparkles,
   BookOpen,
+  Calculator,
 } from "lucide-react";
 import { parseBlogReferrer } from "@/lib/analytics/blog-attribution";
 import {
@@ -68,6 +69,8 @@ async function loadSummaries(): Promise<{
   characterAttributedIds: Set<string>;
   /** Set of client_ids whose projects' referrer matches /blog/* or /en/blog/*. */
   blogAttributedIds: Set<string>;
+  /** Set of client_ids whose projects originated from /pricing-calculator (utm_source=pricing-calculator). */
+  pricingCalculatorAttributedIds: Set<string>;
   /** At-risk = ≥2 delivered + silent ≥60d. Materialized from project rows
    *  joined to the same clients fetch so the order matches the table. */
   atRiskClients: AtRiskClient[];
@@ -82,6 +85,7 @@ async function loadSummaries(): Promise<{
       neglectedIds: new Set(),
       characterAttributedIds: new Set(),
       blogAttributedIds: new Set(),
+      pricingCalculatorAttributedIds: new Set(),
       atRiskClients: [],
       cohorts: [],
     };
@@ -199,6 +203,13 @@ async function loadSummaries(): Promise<{
       .filter((p) => p.client_id && parseBlogReferrer(p.referrer) !== null)
       .map((p) => p.client_id)
   );
+  // Clients with at least one project tagged utm_source=pricing-calculator.
+  // Mutex at render time with character/blog (character > pricing-calculator > blog).
+  const pricingCalculatorAttributedIds = new Set(
+    projects
+      .filter((p) => p.utm_source === "pricing-calculator" && p.client_id)
+      .map((p) => p.client_id)
+  );
   const atRiskClients = computeAtRiskClients(deliveredRows, {
     minDelivered: 2,
     silentDays: 60,
@@ -213,6 +224,7 @@ async function loadSummaries(): Promise<{
     neglectedIds,
     characterAttributedIds,
     blogAttributedIds,
+    pricingCalculatorAttributedIds,
     atRiskClients,
     cohorts,
   };
@@ -367,6 +379,7 @@ export default async function AdminClientsPage({
   const showAtRisk = filter === "at-risk";
   const showCharacter = filter === "character-attributed";
   const showBlog = filter === "blog-attributed";
+  const showPricingCalc = filter === "pricing-calculator-attributed";
   const {
     clients: allClients,
     totalRevenue,
@@ -374,6 +387,7 @@ export default async function AdminClientsPage({
     neglectedIds,
     characterAttributedIds,
     blogAttributedIds,
+    pricingCalculatorAttributedIds,
     atRiskClients,
     cohorts,
   } = await loadSummaries();
@@ -390,11 +404,14 @@ export default async function AdminClientsPage({
     ? allClients.filter((c) => characterAttributedIds.has(c.id))
     : showBlog
     ? allClients.filter((c) => blogAttributedIds.has(c.id))
+    : showPricingCalc
+    ? allClients.filter((c) => pricingCalculatorAttributedIds.has(c.id))
     : allClients;
   const neglectedCount = neglectedIds.size;
   const atRiskCount = atRiskClients.length;
   const characterCount = characterAttributedIds.size;
   const blogCount = blogAttributedIds.size;
+  const pricingCalcCount = pricingCalculatorAttributedIds.size;
 
   const activeClients = allClients.filter((c) => c.campaignCount > 0);
   const repeatClients = allClients.filter((c) => c.campaignCount >= 2);
@@ -455,7 +472,11 @@ export default async function AdminClientsPage({
         <Link
           href="/admin/clients"
           className={`px-3 py-1.5 rounded-md border transition-colors ${
-            !showNeglected && !showAtRisk && !showCharacter && !showBlog
+            !showNeglected &&
+            !showAtRisk &&
+            !showCharacter &&
+            !showBlog &&
+            !showPricingCalc
               ? "bg-white text-black border-white"
               : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
           }`}
@@ -491,6 +512,21 @@ export default async function AdminClientsPage({
           Blog 유입
           {blogCount > 0 && (
             <span className="opacity-90 tabular-nums">{blogCount}</span>
+          )}
+        </Link>
+        <Link
+          href="/admin/clients?filter=pricing-calculator-attributed"
+          className={`px-3 py-1.5 rounded-md border transition-colors inline-flex items-center gap-1 ${
+            showPricingCalc
+              ? "bg-teal-500/20 text-teal-200 border-teal-500/50"
+              : "bg-transparent text-teal-300 border-teal-500/30 hover:border-teal-400 hover:text-teal-200"
+          }`}
+          title="utm_source=pricing-calculator — /pricing-calculator 경유 인입 광고주"
+        >
+          <Calculator className="w-3 h-3" />
+          Calculator 유입
+          {pricingCalcCount > 0 && (
+            <span className="opacity-90 tabular-nums">{pricingCalcCount}</span>
           )}
         </Link>
         <Link
@@ -675,8 +711,18 @@ export default async function AdminClientsPage({
                           ★ Char
                         </span>
                       )}
-                      {blogAttributedIds.has(c.id) &&
+                      {pricingCalculatorAttributedIds.has(c.id) &&
                         !characterAttributedIds.has(c.id) && (
+                          <span
+                            className="ml-1.5 text-[10px] text-teal-300 border border-teal-500/30 rounded px-1.5 py-0.5 bg-teal-500/10"
+                            title="utm_source=pricing-calculator — /pricing-calculator 경유"
+                          >
+                            ★ Calc
+                          </span>
+                        )}
+                      {blogAttributedIds.has(c.id) &&
+                        !characterAttributedIds.has(c.id) &&
+                        !pricingCalculatorAttributedIds.has(c.id) && (
                           <span
                             className="ml-1.5 text-[10px] text-emerald-300 border border-emerald-500/30 rounded px-1.5 py-0.5 bg-emerald-500/10"
                             title="referrer matches /blog/* — 블로그 글 경유 인입"

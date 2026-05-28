@@ -11,6 +11,7 @@ import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
 import { loadStageTiming, type TimedStage } from "@/lib/analytics/stage-timing";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
+import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
 
 /**
  * 7-day operations summary sent to every admin every Monday morning (KST 09:00).
@@ -63,6 +64,10 @@ export interface AdminWeeklySummary {
   blogAttributedInquiries: number;
   /** 30d delivered revenue from blog-attributed projects. */
   blogAttributedRevenueKrw: number;
+  /** 30d pricing-calculator-attributed inquiry count (utm_source=pricing-calculator). */
+  pricingCalculatorAttributedInquiries: number;
+  /** 30d delivered revenue from pricing-calculator-attributed projects. */
+  pricingCalculatorAttributedRevenueKrw: number;
 }
 
 interface SearchLogRow {
@@ -99,6 +104,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       stageTiming,
       characterAttribution,
       blogAttribution,
+      pricingCalcAttribution,
     ] = await Promise.all([
       supabase
         .from("projects")
@@ -151,6 +157,7 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       loadStageTiming(90),
       loadCharacterAttribution(30),
       loadBlogAttribution(30),
+      loadPricingCalculatorAttribution(30),
     ]);
 
     const searchAgg = aggregateSearchRows(
@@ -227,6 +234,8 @@ export async function buildAdminWeeklySummary(): Promise<AdminWeeklySummary | nu
       characterAttributedRevenueKrw: characterAttribution.totalRevenue,
       blogAttributedInquiries: blogAttribution.totalInquiries,
       blogAttributedRevenueKrw: blogAttribution.totalRevenue,
+      pricingCalculatorAttributedInquiries: pricingCalcAttribution.totalInquiries,
+      pricingCalculatorAttributedRevenueKrw: pricingCalcAttribution.totalRevenue,
     };
   } catch (err) {
     console.warn("[admin-summary] build failed:", err);
@@ -312,6 +321,15 @@ export function formatAdminSummaryText(s: AdminWeeklySummary): string {
         : "";
     lines.push(
       `블로그 글 → 문의 (30일): ${s.blogAttributedInquiries}건${revPart}`
+    );
+  }
+  if (s.pricingCalculatorAttributedInquiries > 0) {
+    const revPart =
+      s.pricingCalculatorAttributedRevenueKrw > 0
+        ? ` · 매출 ₩${s.pricingCalculatorAttributedRevenueKrw.toLocaleString("ko-KR")}`
+        : "";
+    lines.push(
+      `가격 계산기 → 문의 (30일): ${s.pricingCalculatorAttributedInquiries}건${revPart}`
     );
   }
   lines.push("");
@@ -415,6 +433,18 @@ export function formatAdminSummaryHtml(s: AdminWeeklySummary, baseUrl: string): 
               `${s.blogAttributedInquiries}건${
                 s.blogAttributedRevenueKrw > 0
                   ? ` · ₩${s.blogAttributedRevenueKrw.toLocaleString("ko-KR")}`
+                  : ""
+              }`
+            )
+          : ""
+      }
+      ${
+        s.pricingCalculatorAttributedInquiries > 0
+          ? stat(
+              "계산기 attribut (30d)",
+              `${s.pricingCalculatorAttributedInquiries}건${
+                s.pricingCalculatorAttributedRevenueKrw > 0
+                  ? ` · ₩${s.pricingCalculatorAttributedRevenueKrw.toLocaleString("ko-KR")}`
                   : ""
               }`
             )

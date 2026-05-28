@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TrendingUp, AlertCircle, Gauge, Sparkles } from "lucide-react";
+import { TrendingUp, AlertCircle, Gauge, Sparkles, Calculator } from "lucide-react";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
 import { loadForecast } from "@/lib/analytics/forecast";
 import { loadPipelineVelocity } from "@/lib/analytics/pipeline-velocity";
@@ -7,6 +7,10 @@ import { loadStageTiming } from "@/lib/analytics/stage-timing";
 import { loadSlowOpenProjects } from "@/lib/analytics/slow-open-projects";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
+import {
+  loadPricingCalculatorAttribution,
+  pathLabelForAdmin,
+} from "@/lib/analytics/pricing-calculator-attribution";
 import { getCharacter } from "@/lib/characters/registry";
 import { getKitTier } from "@/lib/characters/brand-kits";
 import { getPostBySlug } from "@/lib/blog/posts";
@@ -25,14 +29,16 @@ const STAGE_LABEL: Record<string, string> = {
 };
 
 export default async function ForecastPage() {
-  const [r, velocity, stageTiming, slowOpen, charAttr, blogAttr] = await Promise.all([
-    loadForecast(),
-    loadPipelineVelocity(90),
-    loadStageTiming(90),
-    loadSlowOpenProjects(5),
-    loadCharacterAttribution(90),
-    loadBlogAttribution(90),
-  ]);
+  const [r, velocity, stageTiming, slowOpen, charAttr, blogAttr, pricingCalc] =
+    await Promise.all([
+      loadForecast(),
+      loadPipelineVelocity(90),
+      loadStageTiming(90),
+      loadSlowOpenProjects(5),
+      loadCharacterAttribution(90),
+      loadBlogAttribution(90),
+      loadPricingCalculatorAttribution(90),
+    ]);
 
   return (
     <div className="p-8 max-w-5xl mx-auto text-zinc-100">
@@ -660,6 +666,83 @@ export default async function ForecastPage() {
               )}
               <p className="mt-3 text-[11px] text-zinc-500">
                 Total 90일: 인콰이어 {charAttr.totalInquiries}건 · 납품 {charAttr.totalDelivered}건 · 매출 ₩{KRW.format(charAttr.totalRevenue)}{charAttr.unknown > 0 && ` · 미분류 ${charAttr.unknown}건`}
+              </p>
+            </section>
+          )}
+
+          {pricingCalc.totalInquiries > 0 && (
+            <section className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-5 mb-6">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-xs uppercase tracking-wider text-teal-300 flex items-center gap-2">
+                  <Calculator className="w-3.5 h-3.5" />
+                  가격 계산기 → 인콰이어 (90일 attribution)
+                </h2>
+                <a
+                  href="/api/admin/exports/pricing-calculator-attribution?window=90"
+                  download
+                  className="text-[10px] px-2 py-0.5 rounded-md border border-teal-500/30 text-teal-200 hover:border-teal-400 hover:text-white"
+                >
+                  CSV
+                </a>
+              </div>
+              <p className="text-[11px] text-zinc-400 mb-3">
+                /pricing-calculator → /rfp CTA 경유 인콰이어(utm_source=pricing-calculator).
+                다음 90일 예상 = 현재 run-rate 유지 가정. paired/season 비중이 높으면
+                brand-kit funnel 작동 중, license/traditional 비중이 높으면 buyer
+                스코프가 floor 아래.
+              </p>
+              {pricingCalc.byPath.length > 0 && (
+                <ul className="space-y-2 text-sm">
+                  {(() => {
+                    const maxInq = Math.max(
+                      1,
+                      ...pricingCalc.byPath.map((p) => p.inquiries)
+                    );
+                    return pricingCalc.byPath.map((p) => {
+                      const meta = pathLabelForAdmin(p.path);
+                      const sharePct =
+                        pricingCalc.totalRevenue > 0
+                          ? (p.revenue / pricingCalc.totalRevenue) * 100
+                          : 0;
+                      const widthPct = (p.inquiries / maxInq) * 100;
+                      return (
+                        <li
+                          key={p.path}
+                          className="flex items-center gap-3 text-sm"
+                        >
+                          <span className="w-44 shrink-0 text-zinc-200 truncate">
+                            {meta.short}
+                          </span>
+                          <div className="flex-1 h-2 rounded bg-zinc-900 overflow-hidden">
+                            <div
+                              className="h-full bg-teal-400"
+                              style={{ width: `${widthPct}%` }}
+                            />
+                          </div>
+                          <span className="shrink-0 text-xs text-zinc-300 tabular-nums w-12 text-right">
+                            {p.inquiries}
+                          </span>
+                          <span className="shrink-0 text-xs text-zinc-500 tabular-nums w-12 text-right">
+                            {p.conversionPct}%
+                          </span>
+                          {p.revenue > 0 && (
+                            <span className="shrink-0 text-xs text-emerald-300 tabular-nums w-32 text-right">
+                              ₩{KRW.format(p.revenue)}
+                              <span className="text-zinc-600 ml-1">
+                                ({sharePct.toFixed(0)}%)
+                              </span>
+                            </span>
+                          )}
+                        </li>
+                      );
+                    });
+                  })()}
+                </ul>
+              )}
+              <p className="mt-3 text-[11px] text-zinc-500">
+                Total 90일: 인콰이어 {pricingCalc.totalInquiries}건 · 납품{" "}
+                {pricingCalc.totalDelivered}건 · 매출 ₩{KRW.format(pricingCalc.totalRevenue)}
+                {pricingCalc.unknown > 0 && ` · 미분류 ${pricingCalc.unknown}건`}
               </p>
             </section>
           )}
