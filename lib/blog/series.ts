@@ -15,7 +15,12 @@
 
 import type { BlogLocale } from "./posts";
 
-export type BlogSeriesId = "rfp-funnel" | "character-ip" | "compliance";
+export type BlogSeriesId =
+  | "rfp-funnel"
+  | "character-ip"
+  | "compliance"
+  | "pricing-and-cost"
+  | "operator-honesty";
 
 export interface BlogSeries {
   id: BlogSeriesId;
@@ -129,6 +134,34 @@ export const BLOG_SERIES: BlogSeries[] = [
       "synthetic-campaign-pre-launch-compliance-checklist-ko",
     ],
     relatedService: "compliance-audit",
+  },
+  {
+    id: "pricing-and-cost",
+    locale: "en",
+    title: "Pricing & cost series",
+    description:
+      "How the cost estimator works, what total campaign cost actually decomposes into, when to upgrade your brand-kit tier, and the QA checks that justify what you paid.",
+    slugs: [
+      "inside-the-pricing-calculator-4-inputs",
+      "total-campaign-cost-decomposition",
+      "brand-kit-upgrade-path-when-to-move-tiers",
+      "synthetic-talent-qa-checklist-before-paying",
+    ],
+    relatedService: "brand-kit",
+  },
+  {
+    id: "operator-honesty",
+    locale: "en",
+    title: "Operator honesty series",
+    description:
+      "Posts we publish even when they cost us inquiries — when not to use synthetic talent, RFPs we turn down, metrics that actually matter, and what we measure in the first 30 days.",
+    slugs: [
+      "when-not-to-use-synthetic-talent",
+      "why-we-reject-rfps-common-patterns",
+      "post-launch-metrics-which-numbers-actually-matter",
+      "first-30-days-campaign-measurement",
+    ],
+    relatedService: "rfp",
   },
 ];
 
