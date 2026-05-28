@@ -6,6 +6,7 @@ import { getPostBySlug, listPostsByTag } from "@/lib/blog/posts";
 import { INDUSTRY_LABELS, MOOD_LABELS, GENRE_LABELS } from "@/lib/tags";
 import { getCharacter } from "@/lib/characters/registry";
 import { listSeries } from "@/lib/blog/series";
+import { getSeriesOgTheme } from "@/lib/blog/series-og-theme";
 import type { Model } from "@/types";
 
 export const runtime = "nodejs";
@@ -48,6 +49,84 @@ async function loadModel(id: string | null): Promise<Model | null> {
 }
 
 const KRW = new Intl.NumberFormat("ko-KR");
+
+function seriesCard(
+  seriesId: string,
+  eyebrow: string,
+  title: string,
+  partCountLabel: string,
+  description: string
+) {
+  const theme = getSeriesOgTheme(seriesId);
+  if (!theme) {
+    return bigCard(eyebrow, title, `${partCountLabel} · ${description}`);
+  }
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          padding: 72,
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: 22,
+          background: theme.gradient,
+          color: "white",
+          fontFamily: "sans-serif",
+        }}
+      >
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <p
+            style={{
+              fontSize: 16,
+              letterSpacing: "0.4em",
+              color: theme.accent,
+              textTransform: "uppercase",
+            }}
+          >
+            {eyebrow}
+          </p>
+          <span
+            style={{
+              fontSize: 14,
+              padding: "4px 12px",
+              borderRadius: 999,
+              background: theme.chipBg,
+              border: `1px solid ${theme.chipBorder}`,
+              color: theme.accent,
+              letterSpacing: "0.08em",
+            }}
+          >
+            {partCountLabel}
+          </span>
+        </div>
+        <p
+          style={{
+            fontSize: 60,
+            fontWeight: 800,
+            lineHeight: 1.05,
+            color: "white",
+          }}
+        >
+          {title}
+        </p>
+        <p
+          style={{
+            fontSize: 22,
+            color: "#d4d4d8",
+            lineHeight: 1.45,
+            maxWidth: 940,
+          }}
+        >
+          {description}
+        </p>
+      </div>
+    ),
+    { width: 1200, height: 630 }
+  );
+}
 
 function bigCard(eyebrow: string, title: string, lede: string) {
   return new ImageResponse(
@@ -257,10 +336,12 @@ export async function GET(request: Request) {
   if (enSeries) {
     const s = listSeries("en").find((x) => x.id === enSeries);
     if (s) {
-      return bigCard(
-        "VIRTUAL AGENCY · BLOG SERIES",
+      return seriesCard(
+        s.id,
+        "Virtual Agency · Blog series",
         s.title,
-        `${s.slugs.length} posts · ${s.description}`
+        `${s.slugs.length}-part series`,
+        s.description
       );
     }
   }
@@ -412,10 +493,12 @@ export async function GET(request: Request) {
   if (series) {
     const s = listSeries("ko").find((x) => x.id === series);
     if (s) {
-      return bigCard(
-        "VIRTUAL AGENCY · 블로그 시리즈",
+      return seriesCard(
+        s.id,
+        "Virtual Agency · 블로그 시리즈",
         s.title,
-        `${s.slugs.length}편 · ${s.description}`
+        `${s.slugs.length}편 시리즈`,
+        s.description
       );
     }
   }

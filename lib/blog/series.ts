@@ -86,10 +86,11 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "en",
     title: "Compliance series",
     description:
-      "Disclosure metadata, regulator requirements, and pre-launch sign-off for synthetic-talent campaigns.",
+      "Disclosure metadata, regulator requirements, cross-market localization, and pre-launch sign-off for synthetic-talent campaigns.",
     slugs: [
       "ai-content-disclosure-metadata-4-markets",
       "eu-ai-act-article-50-for-brand-marketers",
+      "cross-market-localization-checklist-kr-us-eu-sg",
       "synthetic-campaign-pre-launch-compliance-checklist",
     ],
     relatedService: "compliance-audit",
@@ -140,10 +141,11 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "en",
     title: "Pricing & cost series",
     description:
-      "How the cost estimator works, what total campaign cost actually decomposes into, when to upgrade your brand-kit tier, and the QA checks that justify what you paid.",
+      "How the cost estimator works, what total campaign cost actually decomposes into, the license-vs-brand-kit break-even point, when to upgrade your brand-kit tier, and the QA checks that justify what you paid.",
     slugs: [
       "inside-the-pricing-calculator-4-inputs",
       "total-campaign-cost-decomposition",
+      "license-vs-brand-kit-break-even-worked-example",
       "brand-kit-upgrade-path-when-to-move-tiers",
       "synthetic-talent-qa-checklist-before-paying",
     ],

@@ -3225,6 +3225,98 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
   },
   {
+    slug: "license-vs-brand-kit-break-even-worked-example",
+    locale: "en",
+    title: "License or brand-kit? The break-even math, worked out by asset count",
+    excerpt:
+      "Per-day license looks cheaper until the asset count crosses a quiet threshold and paired starts winning. A worked example with three asset volumes — 12, 24, 48 — that shows where the line actually sits and why most buyers miss it.",
+    publishedAt: "2026-08-07",
+    readingMinutes: 7,
+    tags: ["pricing", "brand-kits", "decision-frame", "worked-example"],
+    sections: [
+      {
+        heading: "The decision most buyers get wrong",
+        body: "Two doors lead into a synthetic-talent campaign: a per-day license (~$2,400/day all-in, character + studio + delivery) or a paired brand kit (~$8.5K flat, ~25 hero frames with format variants included). The license looks obviously cheaper on the order form — fewer dollars, no commitment. That intuition is correct for a tiny campaign and quietly wrong for anything larger. Below we walk three campaign sizes through the actual math so you can see where the line sits before you sign.",
+      },
+      {
+        heading: "Campaign A — 12 hero assets, single market, 4-week window",
+        body: "License math: at 3-4 assets per shoot day, you'll need 3-4 license days. At $2,400/day, that's $7,200 - $9,600 before formatting variants (1:1, 9:16, 4:5, 16:9 add ~30% in revision time, billed as additional license days at our scale). All-in: $9,000 - $12,500. Paired math: $8,500 flat, includes ~25 frames + native format variants + 2 revisions. Verdict at 12 assets: it's close — license wins by ~$500-1,000 in the cheap case, paired wins by ~$3K once you need format coverage. If you genuinely need 12 hero frames and nothing else, license is fine; the moment formats enter the brief, paired is cheaper.",
+      },
+      {
+        heading: "Campaign B — 24 hero assets, single market, 8-week window",
+        body: "License math: 6-8 license days at $2,400 = $14,400 - $19,200, plus format coverage at +30% billed time = $18,700 - $25,000 all-in. Paired math: $8,500 flat, includes 25 frames + formats + 2 revisions. Even at the cheap end, license loses by ~$10K. At the realistic end (you'll need formats and a revision pass), license loses by $14-16K. Verdict at 24 assets: paired is unambiguously the right call. The break-even sits between Campaign A and Campaign B — somewhere around the 15-18 asset mark with format coverage included.",
+      },
+      {
+        heading: "Campaign C — 48 hero assets, multi-SKU, 12-week window",
+        body: "License math at this scale gets ugly: 12-16 license days = $28,800 - $38,400, plus formats = $37K - $50K all-in. Paired covers 25 frames cleanly but starts straining at 40+ — you're looking at paired + a license tail, or just stepping up to Season ($22K, 60-80 frames included with format variants and a built-in refresh allocation). Verdict at 48 assets: Season wins decisively against any combination of license + paired stacking. The math gets worse for license as you stretch — license is priced for short bursts, not sustained campaigns.",
+      },
+      {
+        heading: "The break-even formula in one line",
+        body: "Rough rule: if you need more than ~14 final hero assets WITH format variants (which is most brand campaigns), paired beats license. If you need more than ~40, Season beats paired. License only wins when you have a tiny, format-light campaign (e.g., 6 PDP shots for one product launch, no social variants). The pricing calculator at /pricing-calculator does this math live — punch in your asset count, weeks, markets, and exclusivity needs, and it'll point you at the right tier with the ranges in your locale's currency.",
+      },
+      {
+        heading: "Why the intuition is so persistent",
+        body: "License feels cheaper because the unit cost ($2,400/day) is the most visible number. Brain economics says «smaller number = cheaper choice». But the realized cost is shooting days × format coverage × revision cycles — three multipliers that compound under the license model and are flat-rated under paired. Vendors who don't publish their break-even math benefit from this confusion; we publish it because buyers who feel ambushed at month 3 churn at month 9, and we'd rather take a smaller deal honestly than a bigger one resentfully.",
+      },
+      {
+        heading: "When license is still the right call",
+        body: "Three scenarios: (1) Tiny campaign — under 8 final assets, no format coverage needed beyond the native shoot ratio. (2) Trial run — first-time buyer wanting to test our quality on a low-commitment, low-stakes deliverable before signing a brand-kit contract. (3) Specific one-off — you need 4 frames for a product detail page next week, that's it. In all other cases, paired or Season is the cheaper math. Don't overpay for «flexibility» you won't use; license-day flexibility costs about $3K-5K versus the fixed-tier alternative for a typical campaign.",
+      },
+      {
+        heading: "What to put in your RFP to lock the math",
+        body: "Send these four numbers and the vendor can give you a binding quote: final asset count (hero frames only, not all format variants), format coverage required (count of aspect ratios per hero), revision tolerance (how many cycles your team realistically needs), and market count. Vendors who can't quote against those four numbers — or who handshake the formats in conversation — are setting up a billing surprise. Our quotes are tier-anchored, so you'll see the break-even bands in the response automatically.",
+      },
+    ],
+  },
+  {
+    slug: "cross-market-localization-checklist-kr-us-eu-sg",
+    locale: "en",
+    title: "Cross-market localization checklist — what changes between KR, US, EU, and SG launches",
+    excerpt:
+      "Same character, four markets, dozens of small differences. A line-item checklist of what shifts between launches — wardrobe, disclosure metadata, legal copy, media mix — so a brand running multi-market doesn't ship the same asset everywhere by accident.",
+    publishedAt: "2026-08-08",
+    readingMinutes: 8,
+    tags: ["cross-market", "localization", "compliance", "operations"],
+    sections: [
+      {
+        heading: "Why one master deck doesn't work",
+        body: "Brands new to synthetic talent often imagine a single «master» asset set that ships globally with minimal tweaks. That model holds for ~40% of the deliverable (the character likeness, the brand kit colors, the product) and breaks for the other 60% (disclosure copy, format mixes, wardrobe context, legal text). The hidden cost of treating master-as-global isn't the production rework — it's the regulatory exposure and the local-team backlash when «the brand looks American» lands in Seoul. Below: what changes per market, line item, in the order you'll hit them during prep.",
+      },
+      {
+        heading: "Wardrobe + setting — context shifts most by market",
+        body: "KR launches: cool-leaning palette (cream, soft blues), minimalist interior context, glass-skin lighting register. US launches: warmer palette is fine (clay, terracotta), more «aspirational lifestyle» context (outdoor, dynamic), softer brand-on-product ratio. EU launches: editorial-leaning, less product-forward, more «mood» framing (especially DE/FR/IT). SG launches: tropical-warm palette, hawker/urban context register, code-switching between Western and East Asian style cues. Same character can wear all four — but the brief needs four separate wardrobe sketches, not one.",
+      },
+      {
+        heading: "Disclosure metadata — different fields per regulator",
+        body: "KR (방심위·KCSC): «AI 생성» label visible in the post / asset, plus C2PA manifest at the file level. US (FTC Endorsement Guides): #Ad if paid placement, plus AI disclosure if the model would mislead a reasonable consumer (synthetic talent triggers this). EU (AI Act Art. 50): visible machine-readable AI-generated marker in the file, plus consumer-facing disclosure on the surface where the content lives. SG (IMDA + ASAS): currently softer requirement but trending toward EU-style; we ship the EU marker for SG by default to stay ahead of the regulator. Each market gets a different XMP block on export — not one block reused.",
+      },
+      {
+        heading: "Legal copy — small phrase shifts have real weight",
+        body: "«Synthetic model» (US neutral) vs. «AI 모델» (KR neutral) vs. «AI-generated content» (EU formal) vs. «virtual model» (SG marketing-friendly). Same disclosure idea, four phrasings, each tested against the local regulator's currently-preferred language. Get the phrase wrong and you'll either spook the consumer (overformal) or attract a regulator letter (underformal). We ship per-market copy variants with every deliverable; if your in-house legal has a strong opinion on phrasing, share it early so the export doesn't burn a revision cycle.",
+      },
+      {
+        heading: "Format mix — channel mix shifts by market",
+        body: "KR media mix in 2026: Naver banner + KakaoTalk channel + Instagram + YouTube Shorts (heavy). US: Instagram + TikTok + Meta paid + retailer-site placements. EU: Instagram + TikTok + heavy native-display on local publishers (especially DE/FR). SG: Instagram + TikTok + LINE in some segments + retailer placements. The aspect-ratio mix per market reflects this: KR needs more 9:16 (Shorts heavy), US needs more 1:1 + 9:16 mix, EU needs more native-display banners (16:9 or 4:1 panoramic), SG looks like a US/KR hybrid. Don't ship the same format pack to all four.",
+      },
+      {
+        heading: "Talent attestation — likeness law varies",
+        body: "US: Strong right-of-publicity protection, state-by-state (CA, NY, TN especially aggressive). Synthetic likeness that resembles a real celebrity triggers NIL claims fast. KR: 퍼블리시티권 jurisprudence has been hardening since 2023; threshold for «similarity» has dropped. EU: GDPR Art. 9 implicates likeness as biometric data in some readings, plus member-state image-rights law. SG: lighter regime but contractual norms expect explicit attestation. Get a signed attestation from your synthetic talent vendor that the character does not match an identifiable real person within a likeness-similarity threshold — for all four markets, regardless of where the campaign primarily runs.",
+      },
+      {
+        heading: "Pricing currency + payment terms — operational, not creative",
+        body: "KR: KRW invoicing, 30-day net standard. US: USD, often 30/45/60-day net depending on procurement. EU: EUR, often 60-day net (German enterprise) or 30-day net (UK), with VAT requirements per member state. SG: SGD or USD, 30-day net common. Match your invoice to local norms — the synthetic-talent vendor relationship outlasts the campaign and friction at billing costs trust. If you're running multi-market from a single procurement seat, agree the invoicing currency at contract signing, not at first invoice.",
+      },
+      {
+        heading: "What stays the same across all four",
+        body: "(1) Character likeness — the whole point of synthetic talent is character consistency, and the buyer is right to insist on it. (2) Brand kit colors and typography — the brand identity travels intact. (3) Product photography references — the SKU is the SKU. (4) Quality bars — face consistency, hand rendering, format compositions don't get a relaxation in any market. The 40% that stays constant is what justifies synthetic talent over local-shoot-per-market; the 60% that varies is what justifies hiring a vendor who can localize without losing the character.",
+      },
+      {
+        heading: "How to actually run multi-market",
+        body: "Three operational moves: (1) Brief once with four market sketches — same character, four wardrobe/context variations, sketched in the original RFP, not added later. (2) Approve master separately from market variants — get sign-off on the character + brand kit, then approve each market's variants against that approved base. (3) Localize legal + disclosure copy with in-market counsel — don't translate the US disclosure into Korean and expect it to satisfy 방심위. The Season tier ($22K+) and Custom tier ($50K+) include cross-market production allocation by design. Paired ($8.5K) is single-market; multi-market on paired is buying twice. The pricing calculator surfaces this when «markets > 1» in the input.",
+      },
+    ],
+  },
+  {
     slug: "brand-kit-upgrade-path-ko",
     locale: "ko",
     title: "브랜드 키트 업그레이드 결정 ― paired / season / custom 언제 옮길까",
