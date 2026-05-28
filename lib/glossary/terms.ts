@@ -526,6 +526,37 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     },
     relatedPostSlug: "synthetic-campaign-failure-modes-how-to-catch",
   },
+  {
+    slug: "campaign-refresh-cadence",
+    category: "workflow",
+    ko: {
+      term: "캠페인 리프레시 cadence (Campaign refresh cadence)",
+      definition:
+        "캐릭터를 시장에서 fresh 하게 유지하기 위해 신규 hero 어셋·포즈·시즌 컨텍스트를 추가하는 정기 사이클. Paired tier 의 디폴트는 분기당 1 회 (6 어셋); season tier 는 quarterly + 연 1 회 narrative refresh; custom 은 월 단위 가능. 4 개월 초과 캠페인에서 fatigue 방지의 핵심 메커니즘 — 리프레시 없는 캠페인은 평균 6 주차부터 rotation 건강도 무너짐. 계약 체결 시점에 cadence 가 SoW 에 명시되어야 (post-hoc 추가는 비싸짐).",
+    },
+    en: {
+      term: "Campaign refresh cadence",
+      definition:
+        "The scheduled cycle for adding new hero assets, poses, and seasonal contexts to keep the character fresh in market. Paired tier defaults to once per quarter (6 assets); season tier is quarterly + one annual narrative refresh; custom can be monthly. The core mechanism preventing fatigue past month 4 — campaigns without refresh allocations average rotation-health collapse by week 6. The cadence must be specified in the SoW at contract signing (adding it post-hoc gets expensive).",
+    },
+    relatedPostSlug: "brand-kit-first-year-pnl-what-buyers-actually-get",
+  },
+  {
+    slug: "delivery-format-pack",
+    category: "product",
+    ko: {
+      term: "납품 포맷 팩 (Delivery format pack)",
+      definition:
+        "어셋이 캠페인에 사용 가능하도록 컨셉당 출하되는 표준 종횡비 묶음 — 1:1 (PDP), 9:16 (릴스/숏폼), 4:5 (IG 피드), 16:9 (hero/비디오), OOH wide (옥외). 각 포맷은 의도적 구성 (deliberate composition) 이어야 — hero 의 center-crop 아님. 포맷 팩이 brief 에서 약속한 것에 매칭하는지가 QA checklist 의 Check 5; 미스매치는 «brand-kit 티어 가격에 이미 포함됐는데 lazy 출하» 의 시그널.",
+    },
+    en: {
+      term: "Delivery format pack",
+      definition:
+        "The standard aspect-ratio bundle delivered per concept so the asset is campaign-ready — 1:1 (PDP), 9:16 (reels/shorts), 4:5 (IG feed), 16:9 (hero/video), OOH wide (out-of-home). Each format should be a deliberate composition, not a center-crop of the hero. Format-pack coverage matching the brief is QA checklist Check 5; mismatch signals «you already paid for it in the brand-kit tier and the vendor shipped lazily».",
+    },
+    relatedPostSlug: "synthetic-talent-qa-checklist-before-paying",
+    relatedPostSlugKo: "synthetic-talent-qa-checklist-ko",
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {

@@ -3872,6 +3872,142 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "synthetic-talent-vs-real-models-cost-ko",
+    locale: "ko",
+    title: "합성 탤런트 vs 실사 모델 — 캠페인당 비용 breakdown",
+    excerpt:
+      "실제 캠페인 숫자. 합성 탤런트가 비용에서 어디서 이기고, 전통 캐스팅이 여전히 합리적인 곳은 어디인지, 그리고 대부분의 브랜드가 실제로 원하는 하이브리드 모델.",
+    publishedAt: "2026-08-21",
+    readingMinutes: 7,
+    tags: ["가격", "ROI", "전략", "buyer-funnel"],
+    sections: [
+      {
+        heading: "왜 이 비교가 계속 회자되나",
+        body: "구매팀은 AI 탤런트를 «더 저렴함» 으로 브리핑받지만 like-for-like 표를 거의 못 봅니다. 그래서 default 는 원칙적으로 거절하거나 over-buy. 정직한 답은 비용이 order of magnitude 로 다르지만 적절한 워크로드에만 — 이 글이 이를 구체화하려는 시도.",
+      },
+      {
+        heading: "캠페인당 비용 — 일반적 figure",
+        body: "중견 시장 인간 모델 + 스튜디오 캠페인 (5 hero stills, 3 라이프스타일, 단편 영상 1, 14 일 non-exclusive): typically ₩5,500만~₩1억6,500만 fully loaded (탤런트, 스튜디오, retouching, 에이전시 마진). 동등한 합성 탤런트 engagement: ₩680만~₩2,050만. 5-10 배 gap 은 실제이고 광고주가 둘 다 시도한 모든 벤치마크에서 보임.",
+      },
+      {
+        heading: "합성이 비용 절감 못 하는 곳",
+        body: "라이브 이벤트, 인플루언서-driven 스토리텔링, long-form 인터뷰 콘텐츠, 그리고 실제 사람의 audience 가 전체 premise 인 모든 캠페인. 실제 fanbase 에 대한 합성 substitute 없음. Brief 가 셀러브리티 endorsement 를 요구하면 합성은 잘못된 도구.",
+      },
+      {
+        heading: "대부분 글로벌 브랜드가 정착하는 하이브리드 패턴",
+        body: "합성은 카탈로그, look development, e-commerce hero, 시즌 lookbook 용. 인간 탤런트는 hero 캠페인 앵커, 라이브 활성화, lived experience 요구하는 narrative 용. 이 split 사용 브랜드는 typically 인간-only 프로그램 대비 30-50 % 덜 쓰면서 humanity 요구하는 순간 보존.",
+      },
+      {
+        heading: "스케일에서 가변 비용",
+        body: "추가 합성 샷의 marginal cost 는 대략 그것이 소비한 GPU 전력. A/B 테스팅 economics 완전히 바꿈 — 12 hero variant 실행이 인간 촬영 3 개 실행보다 저렴해짐. 이 advantage 활용하는 브랜드는 audience 가 무엇에 반응하는지 더 빨리 학습.",
+      },
+      {
+        heading: "예산에 잡아야 할 숨은 비용",
+        body: "디스클로저 오버헤드 (워터마크 + 캡션 + 어셋 메타데이터) 가 modest 크리에이티브 팀 시간 추가. 합성 콘텐츠 컴플라이언스 리뷰가 첫 캠페인에 법무 시간 추가 후 거의 0 로 떨어짐. AI-콘텐츠 권리·라이선싱이 인간 release 보다 단순 — 재협상할 usage clock 없음.",
+      },
+      {
+        heading: "정직한 결론",
+        body: "3+ 시장 전반 분기별 K-aesthetic 캠페인 운영하는 글로벌 브랜드의 경우 합성 탤런트는 경제적으로 이기기 어려움. 셀러브리티 endorsement 있는 단일 시장 hero 캠페인의 경우 인간 탤런트가 여전히 답. 대부분 브랜드는 둘 다 필요하고, 대부분 브랜드는 합성 측면을 underuse.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-talent-vendor-evaluation-5-questions",
+    locale: "en",
+    title: "Synthetic talent vendor evaluation — 5 questions every buyer should ask",
+    excerpt:
+      "There are roughly two dozen synthetic-talent vendors marketing to global advertisers in 2026. Most pitch the same way. These 5 questions separate operators from packaging — ask them on the discovery call and watch which vendors squirm.",
+    publishedAt: "2026-08-19",
+    readingMinutes: 8,
+    tags: ["buyer-guide", "vendor-evaluation", "operations", "synthetic-talent"],
+    sections: [
+      {
+        heading: "Why this guide exists",
+        body: "We compete against the rest of the synthetic-talent category. We could keep these questions internal and just answer them well — but buyers who shop only on price or only on the demo reel sometimes end up with vendors who haven't built the operational infrastructure to deliver past month two. When a buyer churns out of a bad vendor and lands at us at month four, the campaign has already lost a quarter of momentum. Better that the buyer asks the right questions on the discovery call and lands at a competent vendor day one — even if that vendor is not us. Below is the diligence list our own account managers wish more buyers used.",
+      },
+      {
+        heading: "Question 1 — «Show me a campaign you delivered 18 months ago and what's happening with it today»",
+        body: "Synthetic talent is sold as longevity — same character, multiple campaigns, compound brand equity. The test of whether a vendor can actually deliver longevity is whether they have characters in market for 18+ months that are still running. Most vendors in 2026 launched in 2025; they can show you a 6-month case but not a 24-month one. That's not disqualifying — they might still operationalize well — but it means the buyer is funding the vendor's first 24-month learning curve. Ask explicitly: «what character that you launched in 2024 or earlier is still active, and what does the operations cadence look like at month 18?» Vendors who can answer concretely (lookbook refresh in month 9, brand-kit version 2 in month 14, channel expansion in month 16) have operational muscle. Vendors who pivot to «that's a great question, here's our roadmap» do not.",
+      },
+      {
+        heading: "Question 2 — «Walk me through what happens between asset approval and asset delivery»",
+        body: "Most demo reels show the final asset. Almost no vendor walks through the production pipeline. Ask for the actual workflow: which renderer, which face-lock step, which compositing pass, which QA gate, which metadata-injection step, which delivery format pipeline. The answers tell you whether the vendor built infrastructure or whether they're stitching free tools together for each project. Stitched-tools vendors deliver fine at low scope (1-2 brand kits per quarter) but choke at scale (10+ brand kits per quarter) because every project requires a senior person walking the asset through the same manual steps. Infrastructure vendors deliver consistently at any volume because the pipeline does the work. The difference shows up at month 4-6 — exactly when the buyer's media spend is ramping and the vendor needs to ship reliably.",
+      },
+      {
+        heading: "Question 3 — «What's your disclosure metadata schema, and how do you keep it current with regulators?»",
+        body: "Three regulators in three markets (EU AI Act, US FTC + state-level NIL statutes, Korea KCSC) updated their AI-disclosure expectations in 2025. The expectations will keep drifting. A serious vendor publishes their current schema (which fields, what values, where in the file), names who owns updating it, and shows you the changelog. A vendor who answers «we comply with all relevant regulations» without specifics is signaling that compliance is sales-pitch language, not an actual workflow. Ask to see the metadata in a recent delivered file using your own EXIF tool. If the C2PA manifest is missing or the AI-disclosure field is empty, the vendor's compliance posture is broken regardless of what the sales rep says.",
+      },
+      {
+        heading: "Question 4 — «What's your revision velocity SLA, and what happens when you miss it?»",
+        body: "Revision velocity (decision → variant delivery) is the operational metric that translates synthetic-talent's theoretical advantage into real-world responsiveness. Vendors who can hit 48-hour same-character variant delivery let buyers run real-time creative optimization off performance data. Vendors at 5-7 days deliver assets the buyer could have gotten from a moderately-fast traditional production studio. Ask for the number in writing. Then ask what happens when the vendor misses it: a credit on the next invoice, an apology email, or radio silence? Vendors with no consequence structure for SLA misses have no internal accountability. Buyers who don't ask this question end up with vendors who reliably slip 2 weeks, which compounds across a 6-month engagement.",
+      },
+      {
+        heading: "Question 5 — «What's your churn rate, and why do buyers leave?»",
+        body: "Healthy SaaS-style vendors talk about churn openly because the number is part of the operating discipline. Synthetic-talent vendors should be no different. Ask what percentage of paired-tier buyers re-up at the same tier, what percentage upgrade, and what percentage churn. Then ask why the churners left. Vendors who say «we don't track that» or «buyers only churn when they switch agencies» are either lying or operating blind. The honest answer (e.g., «about 25% of paired buyers don't re-up because the campaign didn't perform — usually a brief-side issue we couldn't solve — and we publish post-mortems») is rare and valuable. It tells you the vendor has a feedback loop with their own performance, which compounds across years.",
+      },
+      {
+        heading: "Bonus question — «Can I talk to a buyer who left you?»",
+        body: "Reference calls with current happy customers are theater. Reference calls with buyers who left are diligence. Most vendors will refuse this request (understandable; nobody loves a hostile reference call). A confident vendor will offer one, with caveats: «here's a buyer who left us after one campaign — their campaign didn't work; here's why we agreed». If a vendor offers this, take the call. The 30 minutes you spend will surface friction the vendor's polished sales process buries. If they refuse, ask them to at least describe what a typical churn case looks like — listen for specificity vs. abstraction.",
+      },
+      {
+        heading: "What we'd answer ourselves",
+        body: "Q1: Yuna launched November 2024; she's currently in her 4th campaign with 2 brand-kit refreshes shipped (one quarterly, one annual). Lookbook version 3 ships next quarter. Ren launched February 2025; 2 campaigns + 1 refresh. Q2: Pipeline doc is internal — happy to walk through it on a 30-min call. Renderer is internal (forked SDXL stack + custom face-lock LoRA); QA is the 8-check list we publish; metadata via C2PA-compliant manifest at export. Q3: schema lives in /legal/ai-disclosure; we update within 30 days of any of EU/US/KR regulator publishing new guidance. Last update was March 2026 for EU AI Act Article 50. Q4: 48h SLA on same-character variants; miss triggers 10% credit on the variant; tracked publicly on our operations metric page. Q5: ~22% paired buyers don't re-up; ~63% re-up at paired; ~15% upgrade. Reasons in the failure-modes post. Bonus: yes — we have 2 buyers who churned + agreed to be referenced. Available on request.",
+      },
+      {
+        heading: "Why we publish this even though it helps competitors",
+        body: "Vendors who can answer all 5 are healthy operating businesses. There are probably 4-5 of us in the global market right now. The buyer who runs this diligence and picks any of those 5 vendors will be served well — even if they don't pick us. The buyer who skips the diligence and picks whoever has the slickest demo is rolling dice, and the bad outcomes hurt the category's reputation, which hurts us all. Better to compete on operational depth than on who hides their weaknesses best.",
+      },
+    ],
+  },
+  {
+    slug: "brand-kit-first-year-pnl-what-buyers-actually-get",
+    locale: "en",
+    title: "Brand-kit first-year P&L — what buyers actually get after 12 months",
+    excerpt:
+      "A worked example from a real (anonymized) paired-tier engagement: month-by-month asset deliveries, campaign launches, refresh cycles, and a candid revenue/cost breakdown. What «12-month brand kit» really means in practice.",
+    publishedAt: "2026-08-20",
+    readingMinutes: 9,
+    tags: ["brand-kits", "case-study", "buyer-guide", "pricing"],
+    sections: [
+      {
+        heading: "Why this post needed to be written",
+        body: "We publish brand-kit tier pricing and a calculator. What we don't publish well is what the buyer's experience actually looks like over 12 months — what arrives in month 3 vs. month 9, when the refresh happens, when the contract renewal conversation starts. Buyers ask for this and we walk them through it on calls; that scales poorly. This post is the conversation written down. The numbers are from a real paired-tier engagement (early 2025 launch, completing month 12 in early 2026); the client agreed to anonymized publication. Reading time is longer than usual because the value is in the specifics.",
+      },
+      {
+        heading: "The contract — $8,500 paired-tier brand kit, KR-only launch, 12-month license",
+        body: "Mid-sized K-beauty brand, 4-SKU launch (3 hero SKUs + 1 limited drop). Paired tier (Yuna as cast). KR-only territory at signing, with option-to-add US in month 6 at +$3K. 25 hero assets in the base allocation, 4 format variants per asset (100 total deliverables in month 1-3), 6-asset quarterly refresh, category exclusivity in K-beauty within Yuna's slate for the contract duration. The campaign goal: replace 60% of traditional model spend with synthetic, validate the channel for full migration in 2027 if month-12 numbers held.",
+      },
+      {
+        heading: "Months 1-3 — Onboarding + first asset batch",
+        body: "Month 1: kickoff call, brief sharpening (we charge nothing for this; it takes 4-5 hours of senior time and saves both sides 20 hours later), wardrobe palette lock, narrative arc draft. Month 2: first 8 hero compositions delivered for review; 2 went back for face-consistency tuning, 6 approved within 5 days. Month 3: remaining 17 heroes plus full format variant pass — 100 deliverables in hand. Buyer's first SKU launched on schedule. Cost: $8,500 paid at contract signing. Buyer-side time: ~25 hours across marketing director, creative lead, and brand manager (lighter than a traditional shoot, which averages 40-60 hours of internal time).",
+      },
+      {
+        heading: "Months 4-6 — Campaign runs, refresh kicks in, US option activated",
+        body: "Months 4-5: paid media against SKU 1 + 2 launches; performance metrics tracked (the 4 we cover in the first-30-days post). Mid-month-5: assisted conversion lift vs. control window: +14%. Buyer activated US option ($3K, +6 wardrobe variants for US market + bilingual disclosure metadata). Month 6: SKU 3 launches; quarterly refresh delivered (6 new hero assets responding to performance data — the variants that ran best got companion compositions). Operational cadence: weekly metric digest emails, monthly review call. Buyer's CMO asked about upgrading to season tier; we recommended waiting until month 9 to see if usage patterns warranted it (they did, but later).",
+      },
+      {
+        heading: "Months 7-9 — Limited drop, second refresh, US momentum",
+        body: "Month 7: limited drop SKU launches; second quarterly refresh delivered (3 additional hero assets specifically for the limited drop + 4 format variants). US campaign hit recall delta +5 points at week 4 — within target. Month 8: KR campaign hit a fatigue inflection; rotation report flagged 2 assets carrying >2× median impressions. We paused those, accelerated rotation on 4 under-allocated assets, recovered conversion within 10 days. Month 9: season-tier upgrade conversation opened — buyer was planning 2027 expansion to JP + SG and considering quarterly cadence vs. campaign-by-campaign. We modeled both; quarterly cadence saved $11K in year 2 over four paired contracts.",
+      },
+      {
+        heading: "Months 10-12 — Final refresh, renewal conversation, decision point",
+        body: "Month 10: final quarterly refresh delivered (5 hero assets covering Q4 seasonal narrative). Month 11: renewal proposals on the table — three options: (a) renew paired for year 2 at $8.5K + add JP territory at $3K, (b) upgrade to season at $22K for the full year covering KR/US/JP/SG with built-in quarterly cadence, (c) end the engagement. Buyer chose option (b); contract signed mid-month-12. Month 12: smooth handoff from paired to season, no asset disruption, character continuity maintained. The 12-month KR/US campaign closed with assisted conversion lift +18% vs. control across the full window.",
+      },
+      {
+        heading: "The honest P&L summary for the buyer",
+        body: "Total paid to us in 12 months: $11,500 ($8.5K paired + $3K US option). Buyer-side internal time: ~95 hours across the year (vs. ~250 hours for a comparable traditional campaign). Estimated media spend during the campaign: ~$340K (this is the buyer's number, not ours). Assisted conversion lift over the campaign: +18% vs. control window in KR, +12% in US. The buyer's internal estimate of revenue lift directly attributable to the campaign: ~$1.8M. Brand kit cost as % of revenue lift: ~0.6%. Brand kit cost as % of campaign budget: ~3.4%. The numbers are clean enough that the season upgrade was an easy decision — but they wouldn't have been clean without the operational cadence (weekly digests, rotation rebalancing, refresh on schedule).",
+      },
+      {
+        heading: "What this doesn't show",
+        body: "Three campaigns we ran in the same cohort didn't hit these numbers. One buyer churned at month 8 after assisted conversion lift came in at +4% (below the +12% threshold we recommend for re-up) — the brief was too narrow and the campaign couldn't recover. One buyer paused at month 6 due to internal restructuring (no fault of the campaign; they came back 9 months later). One buyer ran at +9% lift through month 12 and re-upped at paired again rather than upgrading — the campaign worked but didn't justify season-tier scope. The +18% case above is the upside; +4% is the downside; +9% is the median. Buyers reading this should expect somewhere in the +6% to +14% range as the realistic outcome distribution and plan their P&L accordingly.",
+      },
+      {
+        heading: "What «12-month brand kit» actually means in operations",
+        body: "It's not a one-shot delivery in month 1 followed by 11 months of asset reuse. It's: month 1-3 base delivery, two scheduled quarterly refreshes (months 6 and 9), one final pre-renewal refresh (month 10), continuous operational cadence (weekly digests, monthly reviews), a mid-year category-exclusivity check-in, and a renewal conversation starting month 9. The license fee covers all of it; refresh allocations are pre-budgeted; nothing surprises the buyer in month 7 with a change order. The honest test of a brand-kit tier is whether the cadence holds without anyone having to chase the vendor. In this engagement it did. In the ~22% of paired engagements where buyers churn, the cadence usually didn't.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
