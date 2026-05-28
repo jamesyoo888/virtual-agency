@@ -70,7 +70,7 @@ export default function EnCharacterComparePage() {
             {characters.map((c) => c.name).join(" vs ")}
           </h1>
           <p className="mt-4 text-zinc-400 leading-relaxed">
-            When you're deciding between solo casting and a paired brand kit,
+            When you&apos;re deciding between solo casting and a paired brand kit,
             this page collapses the trade-off into one screen. The pair shares
             a styling DNA but targets different verticals, moods, and lighting
             registers.

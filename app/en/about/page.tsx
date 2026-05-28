@@ -115,8 +115,8 @@ export default function EnAboutPage() {
         </p>
         <p className="text-zinc-400 text-sm leading-relaxed mb-12">
           Brands that need K-aesthetic credibility without re-casting every
-          season license a character. NL/US competitors who don't ship from
-          inside the Korean visual register can't replicate this layer — it
+          season license a character. NL/US competitors who don&apos;t ship from
+          inside the Korean visual register can&apos;t replicate this layer — it
           is the IP moat behind the studio.{" "}
           <Link
             href="/en/character"

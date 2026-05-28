@@ -110,7 +110,7 @@ export default function EnCharacterLaunchPress() {
             recognizable ad-category cue worldwide. But global brands have
             struggled with consistency — re-casting every season drifts the
             tone, and simultaneous launches across markets rarely keep the
-            same face. Virtual Agency's character licensing infrastructure
+            same face. Virtual Agency&apos;s character licensing infrastructure
             solves that problem.
           </p>
 
@@ -134,7 +134,7 @@ export default function EnCharacterLaunchPress() {
             carries the K-pop visual register — strong jawline, sharp eye,
             editorial restraint — without being a literal K-pop reference.
             Built for global fragrance, watch, luxury menswear, and
-            cinematic ad campaigns. He shares Yuna's styling DNA, enabling
+            cinematic ad campaigns. He shares Yuna&apos;s styling DNA, enabling
             paired casting.
           </p>
 
