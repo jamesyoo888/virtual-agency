@@ -9,6 +9,10 @@ import InboxSearch from "@/components/inbox-search";
 import InboxBulkBar from "@/components/inbox-bulk-bar";
 import { computeLeadScore, TIER_LABEL_KO, TIER_TONE } from "@/lib/analytics/lead-score";
 import { parseBlogReferrer } from "@/lib/analytics/blog-attribution";
+import {
+  parsePathFromCampaign,
+  pathLabelForAdmin,
+} from "@/lib/analytics/pricing-calculator-attribution";
 
 export const dynamic = "force-dynamic";
 
@@ -502,15 +506,29 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                         Char
                       </span>
                     )}
-                    {p.utm_source === "pricing-calculator" && (
-                      <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border bg-teal-500/15 text-teal-200 border-teal-500/30"
-                        title={`가격 계산기 경유 — ${p.utm_campaign ?? "path 미상"}`}
-                      >
-                        <Calculator className="w-3 h-3" />
-                        Calc
-                      </span>
-                    )}
+                    {p.utm_source === "pricing-calculator" && (() => {
+                      // Surface the recommended path as a sub-label so the
+                      // operator can read scope (license/paired/season/custom)
+                      // at a glance without opening the row. parsePathFromCampaign
+                      // guards against legacy/manual utm_campaign values that
+                      // don't map to a known path.
+                      const path = parsePathFromCampaign(p.utm_campaign);
+                      const pathShort = path ? pathLabelForAdmin(path).short : null;
+                      return (
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border bg-teal-500/15 text-teal-200 border-teal-500/30"
+                          title={`가격 계산기 경유 — ${p.utm_campaign ?? "path 미상"}`}
+                        >
+                          <Calculator className="w-3 h-3" />
+                          Calc
+                          {pathShort && (
+                            <span className="text-teal-300/80 normal-case tracking-normal text-[10px] ml-0.5">
+                              · {pathShort}
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })()}
                     {(() => {
                       // Surface blog-attributed inquiries with an emerald chip
                       // — mirrors the violet Char chip pattern. Tie-breaker:
