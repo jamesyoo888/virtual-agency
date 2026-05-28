@@ -190,10 +190,12 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "ko",
     title: "Operator honesty 시리즈",
     description:
-      "인콰이어를 잃더라도 출판하는 글 — 합성 탤런트를 쓰지 말아야 할 때, 거절하는 RFP, 자체 포지셔닝 trade-off. 광고주 측 정직 시그널 + brand voice 정립.",
+      "인콰이어를 잃더라도 출판하는 글 — 합성 탤런트를 쓰지 말아야 할 때, 거절하는 RFP, 실제로 중요한 metric, 첫 30 일 측정 stack, 자체 포지셔닝 trade-off. 광고주 측 정직 시그널 + brand voice 정립.",
     slugs: [
       "when-not-to-use-synthetic-talent-ko",
       "why-we-reject-rfps-common-patterns-ko",
+      "post-launch-metrics-which-numbers-actually-matter-ko",
+      "first-30-days-campaign-measurement-ko",
       "what-we-dont-optimize-for-and-why-ko",
     ],
     relatedService: "rfp",

@@ -3784,6 +3784,94 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "post-launch-metrics-which-numbers-actually-matter-ko",
+    locale: "ko",
+    title: "출시 후 metric 심층 — 어떤 숫자가 실제로 중요한가",
+    excerpt:
+      "Day 60 즈음 캐릭터에 데이터가 쌓입니다. 대부분의 팀은 잘못된 것을 측정합니다. 시그널을 노이즈에서 분리하는 4 가지 metric — 현실적 baseline 과 함께.",
+    publishedAt: "2026-08-17",
+    readingMinutes: 7,
+    tags: ["측정", "출시 후", "buyer-funnel", "운영"],
+    sections: [
+      {
+        heading: "왜 측정이 더 쉬워지지 않고 더 어려워지나",
+        body: "출시 전엔 metric 질문이 간단 — 예산, 일정, deliverable. 출시 후엔 질문이 «작동 중인가?» 로 변하고 — 가장 흔한 실패 모드는 매일 움직이지만 캐릭터가 실제로 pay back 하는지 아무것도 말해주지 않는 것을 측정하는 것. 이 가이드는 Season Anchor + Custom 티어 광고주와 Day 60 / Day 90 리뷰에서 사용하는 프레임워크. 4 metric; 나머지는 이게 깨끗해질 때까지 무시.",
+      },
+      {
+        heading: "Metric 1 — 컨트롤 대비 assisted conversion lift",
+        body: "정직한 top-line. 캐릭터의 첫 메이저 캠페인 drop 직후 30 일을 그 전의 매칭된 30 일 윈도우와 비교. 카테고리 시즌성으로 매칭 (Q3 vs Q3 of last year, 카테고리 시즌 변동 강하면 Q3 vs Q2 아님). 컨트롤 윈도우 대비 전환 12 %+ 이고 나머지 마케팅이 일정했으면 캐릭터가 기여 중. 6 % 미만? 아직 시그널 없음 — 30 일 더 대기. 25 % 초과? skeptical 하고 confound 찾아봄; 이 숫자가 인위적으로 높은 케이스 3 번 봤고 2 번은 측정 버그였지 실제 lift 아님.",
+      },
+      {
+        heading: "Metric 2 — 관련 검색어의 share of voice",
+        body: "선택 도구 (Brandwatch, Sprinklr, 또는 수동 SERP audit) 실행해 캐릭터가 카테고리 관련 대화 / 검색 결과에 surface 되는지 확인. 목표는 셀러브리티 레벨 인지가 아니라 «헤드라인 없이 언급되는 것». Day 60 의 paired 캐릭터엔 mid-sized 브랜드의 카테고리에서 메이저 소셜 플랫폼 전반 약 80-150 오가닉 멘션 기대. 30 미만 = launch 가 충분히 promote 안 되었거나 (가장 흔함) 캐릭터가 resonance 안 함 (두 번째로 흔함). 수정 다름.",
+      },
+      {
+        heading: "Metric 3 — 인지도 점수 (audience study)",
+        body: "타겟 audience 의 작은 패널 서베이 (n=200-400). 3 이미지 보여줌: 본인 캐릭터, generic 합성 탤런트 placeholder, 무관 컨트롤. «우리 브랜드 콘텐츠에서 이 중 어느 것 본 적 있는지» 물어. 적절히 launch 한 캐릭터의 Day 60 엔 35-50 % 인지 기대. 20 % 미만 = audience 가 캐릭터를 충분히 본 적 없음 (미디어 spend 의 빈도 cap 을 낮춰서; 캐릭터가 더 touch 필요). 65 % 초과 = 놀랍게 빠름; 다음 캠페인을 빠르게 lean in.",
+      },
+      {
+        heading: "Metric 4 — 콘텐츠 velocity 비율",
+        body: "대부분의 팀이 무시하는 leading indicator. 주당 콘텐츠 출하율을 캐릭터 launch 전 90 일 동안의 동일 metric 과 비교. 캐릭터가 1.4-2.2 배 velocity lift 줘야 — 추가 어셋 비용이 dramatically 낮으니까. 같은 율로 출하 중이거나 더 느리면 캐릭터를 적절히 운영화하지 않음 — 어셋 파이프라인과 brand-kit registry 리뷰. Velocity 가 합성 탤런트 economics 가 작동 중임을 증명하는 metric — 캠페인당 performance 보다 더.",
+      },
+      {
+        heading: "중요해 보이지만 아닌 metric",
+        body: "개별 포스트의 engagement rate — 너무 noisy, 플랫폼 알고리즘 변화·시간대 효과에 좌우. 댓글 sentiment — 흥미롭지만 명확성으로 읽기 느림, vocal minority 에 쉽게 skew. 팔로워 성장 — 캐릭터-driven 캠페인에 잘못된 metric; audience 는 브랜드를 팔로우, 캐릭터 아님. 어셋당 비용 — 합성 탤런트로 거의 항상 떨어짐, but 떨어지는 비용이 승리 아님; 비용 떨어졌기에 가능해진 새 일이 승리. input metric 축하 말고; output 축하.",
+      },
+      {
+        heading: "Day 90 P&L 대화",
+        body: "Day 90 즈음 답할 수 있어야: «이 캐릭터가 우리에게 얼마 벌어주고 얼마 들었나?» 수익 = 매칭 컨트롤 윈도우 대비 assisted conversion lift 의 원·달러 환산. 비용 = brand-kit 라이선스 + supporting 어셋 제작 + 캐릭터에 incremental 한 미디어 spend. 비율이 중요; 2 배 수용 가능, 3-4 배 좋음, 5+ 배 명확한 keep. Day 90 에 1.5 배 미만은 운영화 변경 (대개 velocity + 디스클로저 메타데이터 파이프라인) 또는 Q+2 에서 캐릭터 wind down 의 시그널.",
+      },
+      {
+        heading: "우리가 자체로 측정하는 것",
+        body: "정직한 transparency: Yuna 와 Ren 에 광고주에게 권장하는 같은 4 metric 을 측정. Day 60 에 Yuna 가 assisted conversion lift +14 %, 카테고리 전반 약 120 오가닉 멘션, K-aesthetic buyer 패널 41 % 인지, 콘텐츠 velocity 1.7 배. Ren 은 인지 (32 %) 에 뒤졌지만 velocity (1.9 배) 에 lead — 누아르/directional 미학이 글래스 스킨보다 더 많은 캠페인 형태에 flex. Q+1 리프레시 후 Ren 인지 44 % 로 올림. 프레임워크가 에이전시 자체 캐릭터에 작동; 광고주에게도 작동해야.",
+      },
+    ],
+  },
+  {
+    slug: "first-30-days-campaign-measurement-ko",
+    locale: "ko",
+    title: "캠페인 첫 30 일 — 우리가 실제로 측정하는 것",
+    excerpt:
+      "대부분의 에이전시는 CPM·노출수를 보고. 우리는 다른 stack — 어셋 rotation 건강도, 포맷-전환 비율, 브랜드 회상 delta, 리비전 속도. 운영자 대시보드가 플랫폼 대시보드보다 더 중요한 이유.",
+    publishedAt: "2026-08-18",
+    readingMinutes: 6,
+    tags: ["운영", "측정", "캠페인 기획", "transparency"],
+    sections: [
+      {
+        heading: "플랫폼 대시보드만으론 부족",
+        body: "Meta Ads Manager 와 TikTok For Business 는 노출, CPM, CTR, 전환을 줌. 그건 buy-side metric — 미디어 최적화엔 유용, but 합성 캠페인의 크리에이티브 건강도엔 blind. 광고주가 5-어셋 rotation 에 ₩100M+ 미디어 쓰고, 목표 CPM 달성, 그리고 다음 분기를 잃는 것 — 캠페인이 6 주차에 fatigue 됐고 전환 떨어질 때까지 아무도 안 알아챘기 때문에 — 봤음. 첫 30 일은 그를 막는 측정 루프를 build 하는 시기. 아래는 우리가 내부적으로 사용하고 광고주에게 복제 권하는 stack.",
+      },
+      {
+        heading: "Metric 1 — 어셋 rotation 건강도 (어셋당, 주당)",
+        body: "각 납품된 어셋이 제작 비용에 대략 비례해 운영되어야. 30 어셋 출하했는데 하나가 2 주차에 노출 80 % carry 하면 캠페인이 단일 크리에이티브에 over-reliant — fatigue 위험. 매주 보내는 rotation 리포트가 어셋당 노출 (normalize) 을 리스트; 중앙값 2 배 초과 또는 0.3 배 미만 어셋은 flag. 수정이 항상 더 많은 어셋은 아님; 가끔 over-performer 를 일시 정지 (rest) + under-performer 를 더 rotate 해 실제 약한지 단지 under-allocated 인지 읽기.",
+      },
+      {
+        heading: "Metric 2 — 포맷 전환 비율",
+        body: "컨셉당 4-5 포맷 변형 출하 (1:1 PDP / 9:16 릴스 / 4:5 IG / 16:9 hero / OOH wide). 노출당 전환이 포맷 전반 약 ±30 % 내에서 변동해야; 9:16 릴스가 다른 것의 5 배 전환하면 무언가 off — 다른 포맷이 mis-targeted (배치 이슈) 또는 9:16 이 다른 것엔 없는 copy/CTA carry. 수정은 크리에이티브 측면 — high-converting 요소를 낮은 포맷에 가져옴. 이 gap 을 캠페인 60 % 에서 3 주차에 봄.",
+      },
+      {
+        heading: "Metric 3 — 브랜드 회상 delta (질적, 격주)",
+        body: "Aided recall 서베이 (3-5 질문, n=200 per 패널, Pollfish 또는 유사 ~약 ₩26만) 를 0 주 (컨트롤), 2 주, 4 주. Delta = 캠페인 후 회상 - 캠페인 전 회상, 카테고리 통제. Typical mid-스코프 캠페인이 aided recall 3-7 포인트 이동; 2 포인트 미만 = 캠페인이 leaking — 도달이 너무 좁거나 크리에이티브가 기억 안 남. 일부 광고주가 약 ₩50만 비용이라 skip — ₩100M 캠페인에 약 ₩50만 sanity check 없는 것이 foolish. 우리는 자체로 실행 + 결과 공유.",
+      },
+      {
+        heading: "Metric 4 — 리비전 속도 (운영자 측)",
+        body: "Performance data 기반 새 어셋 출하 속도. 우리 내부 목표: 크리에이티브-방향 결정 → same-character 변형 납품 48 시간. 그보다 느리면 우리가 bottleneck. Metric 이 중요한 이유는 실시간 최적화가 합성 탤런트의 velocity advantage 가 실제로 delivering 하는 것 — v2 를 48 시간 내 turn 못 하면 광고주는 전통 촬영 썼어도 됐을 정도. 프로젝트 노트에 transparency 로 surface. 목표 윈도우 밖 slip 2 번 연속 → escalation 리뷰.",
+      },
+      {
+        heading: "Metric 5 — 디스클로저 컴플라이언스 감사",
+        body: "각 시장의 디스클로저 메타데이터를 월 1 회 규제 기관의 현재 기대 대비 validate. 출하 스키마는 그 버전에 lock, but 규제 기관 해석은 drift 가능 (EU 특히). 감사가 규제 기관 notice 발동 전 drift catch. 14 개월 동안 규제 기관 action 없었음; 이 metric 이 이유. 광고주가 자체 실행 안 해도 — 예외 보고 + count 보통 0.",
+      },
+      {
+        heading: "운영자 대시보드에서 읽는 것",
+        body: "/client/dashboard 가 프로젝트별 단계 timeline, 어셋 rotation 리포트, in-flight 리비전 티켓, 주간 metric 디지스트 (rotation 건강도, 포맷 gap, recall 결과 가능 시) 표시. 의도적으로 full BI 대시보드 아님 — 광고주 소비할 surface area 너무 큼. 30 초에 답하는 질문: 캠페인 건강한가, 이번 주 action item 무엇, 다음 마일스톤 언제. 더 깊은 drill-down (어셋별 전환 분석, multivariate 테스트) 필요하면 underlying 스프레드시트 read-only 액세스 공유.",
+      },
+      {
+        heading: "왜 이를 출판하나",
+        body: "벤더 transparency 는 우리 카테고리에서 가장 싼 trust-builder. 합성 탤런트 벤더 비교하는 광고주는 대부분 «cutting-edge AI» 의 vague 약속을 봄 — «우리가 무엇을 어떤 cadence 로 측정하는지» 명시는 black-box magic 원하는 광고주를 filter out (우리에게 안 맞음) + serious 운영 파트너 원하는 광고주와 trust 가속. 첫 30 일이 trust 가 build 되거나 깨지는 시기; 광고주를 매력으로 계약에 끌어들이고 3 주차에 disappoint 시키기보다 측정 루프에 over-clear 하는 편 선호.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
