@@ -67,6 +67,7 @@ export interface InquiryReceivedVars {
 export function inquiryReceived(vars: InquiryReceivedVars): RenderedEmail {
   const greet = vars.clientName ? `${vars.clientName}님,` : "안녕하세요,";
   const url = `${BASE_URL}/client/dashboard`;
+  const calcUrl = `${BASE_URL}/pricing-calculator?utm_source=email&utm_campaign=inquiry_received_ko`;
   const subject = `[Virtual Agency] ${vars.modelName} 문의가 접수되었습니다`;
 
   const text =
@@ -74,7 +75,8 @@ export function inquiryReceived(vars: InquiryReceivedVars): RenderedEmail {
     `담당자가 24시간 내 회신드릴 예정입니다.\n\n` +
     `프로젝트: ${vars.projectTitle}\n` +
     (vars.brief ? `요청사항:\n${vars.brief}\n\n` : "\n") +
-    `대시보드: ${url}\n`;
+    `대시보드: ${url}\n` +
+    `예산 점검? 견적 계산기: ${calcUrl}\n`;
 
   const html = wrap(
     subject,
@@ -90,7 +92,8 @@ ${
     : ""
 }
 </div>
-<p style="margin:0"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">대시보드 열기</a></p>`
+<p style="margin:0 0 14px"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">대시보드 열기</a></p>
+<p style="margin:0;font-size:13px;color:#a1a1aa">담당자 회신 기다리는 동안 예산 범위가 궁금하시면 <a href="${calcUrl}" style="color:#6ee7b7">견적 계산기</a>에서 4 입력으로 즉시 확인 가능합니다.</p>`
   );
 
   return { subject, html, text };

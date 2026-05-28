@@ -235,6 +235,12 @@ export default function EnCharacterComparePage() {
             Submit an RFP
           </Link>
           <Link
+            href="/en/pricing-calculator?utm_source=character&utm_campaign=character_compare_estimate"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-sm font-medium hover:bg-emerald-500/20"
+          >
+            Cost estimator
+          </Link>
+          <Link
             href="/en/character"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-900"
           >

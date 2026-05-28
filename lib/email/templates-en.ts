@@ -62,6 +62,7 @@ export interface InquiryReceivedEnVars {
 export function inquiryReceivedEn(vars: InquiryReceivedEnVars): RenderedEmail {
   const greet = vars.clientName ? `Hi ${vars.clientName},` : "Hello,";
   const url = `${BASE_URL}/client/dashboard`;
+  const calcUrl = `${BASE_URL}/en/pricing-calculator?utm_source=email&utm_campaign=inquiry_received_en`;
   const subject = `[Virtual Agency] We received your inquiry — ${vars.modelName}`;
 
   const text =
@@ -69,7 +70,8 @@ export function inquiryReceivedEn(vars: InquiryReceivedEnVars): RenderedEmail {
     `An account manager will get back to you within 24 hours.\n\n` +
     `Project: ${vars.projectTitle}\n` +
     (vars.brief ? `Brief:\n${vars.brief}\n\n` : "\n") +
-    `Dashboard: ${url}\n`;
+    `Dashboard: ${url}\n` +
+    `Want a budget anchor in the meantime? Cost estimator: ${calcUrl}\n`;
 
   const html = wrap(
     subject,
@@ -85,7 +87,8 @@ ${
     : ""
 }
 </div>
-<p style="margin:0"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">Open dashboard</a></p>`
+<p style="margin:0 0 14px"><a href="${url}" style="display:inline-block;background:#fafafa;color:#0a0a0a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:500">Open dashboard</a></p>
+<p style="margin:0;font-size:13px;color:#a1a1aa">While you wait for our reply, the <a href="${calcUrl}" style="color:#6ee7b7">cost estimator</a> gives you an instant 4-input budget anchor.</p>`
   );
 
   return { subject, html, text };

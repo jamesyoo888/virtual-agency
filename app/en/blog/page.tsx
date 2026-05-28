@@ -3,7 +3,7 @@ import Link from "next/link";
 import { listPosts, listTags, tagSlug } from "@/lib/blog/posts";
 import { listSeries } from "@/lib/blog/series";
 import { itemListLd, ldScript } from "@/lib/seo/json-ld";
-import { ArrowRight, Rss, BookOpen } from "lucide-react";
+import { ArrowRight, Rss, BookOpen, Calculator } from "lucide-react";
 
 export const revalidate = 3600;
 
@@ -91,6 +91,33 @@ export default function EnBlogIndexPage() {
             </div>
           )}
         </header>
+
+        <Link
+          href="/en/pricing-calculator?utm_source=blog&utm_campaign=blog_index_featured"
+          className="block mb-10 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-5"
+        >
+          <div className="flex items-start gap-4">
+            <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-2 mt-0.5">
+              <Calculator className="w-4 h-4 text-emerald-200" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-1">
+                Interactive tool
+              </p>
+              <p className="text-base font-semibold text-zinc-100">
+                Check the budget before you read — Cost estimator
+              </p>
+              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+                4 inputs (assets, season weeks, markets, exclusivity) → instant
+                USD + KRW range and a recommended path. The working version of
+                the ROI frameworks this blog covers.
+              </p>
+              <p className="mt-2 text-xs text-emerald-300 inline-flex items-center gap-1">
+                Open the calculator <ArrowRight className="w-3 h-3" />
+              </p>
+            </div>
+          </div>
+        </Link>
 
         {series.length > 0 && (
           <section className="mb-12">
