@@ -150,6 +150,20 @@ export const BLOG_SERIES: BlogSeries[] = [
     relatedService: "brand-kit",
   },
   {
+    id: "pricing-and-cost",
+    locale: "ko",
+    title: "가격과 비용 시리즈",
+    description:
+      "견적 계산기 4 입력의 의미, 캠페인 총 비용 분해, 브랜드 키트 티어 업그레이드 결정, 그리고 ROI 계산기 프레임워크 — 광고주의 buyer-funnel 깊이 읽기.",
+    slugs: [
+      "inside-the-pricing-calculator-4-inputs-ko",
+      "total-campaign-cost-decomposition-ko",
+      "brand-kit-upgrade-path-ko",
+      "k-aesthetic-campaign-roi-calculator-ko",
+    ],
+    relatedService: "brand-kit",
+  },
+  {
     id: "operator-honesty",
     locale: "en",
     title: "Operator honesty series",
