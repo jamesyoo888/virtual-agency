@@ -69,20 +69,45 @@ export function PricingCalculator({ locale }: PricingCalculatorProps) {
     return null;
   }, [output]);
 
+  // The license-daily vs paired break-even sits at ~14 hero assets with
+  // format coverage. Surface this directly when the user is in the gray zone
+  // (≤18 assets) so they see the reasoning before the recommended-path chip
+  // changes mid-slide. Links to the worked-example post for the math.
+  const showBreakEvenHint = assetCount <= 18;
+  const breakEvenHref =
+    locale === "en"
+      ? "/en/blog/license-vs-brand-kit-break-even-worked-example"
+      : "/blog/license-vs-brand-kit-break-even-worked-example-ko";
+
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-950/50 p-6 md:p-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <Slider
-            label={t.assetLabel}
-            hint={t.assetHint}
-            value={assetCount}
-            min={5}
-            max={200}
-            step={1}
-            onChange={setAssetCount}
-            unit={t.assetUnit}
-          />
+          <div>
+            <Slider
+              label={t.assetLabel}
+              hint={t.assetHint}
+              value={assetCount}
+              min={5}
+              max={200}
+              step={1}
+              onChange={setAssetCount}
+              unit={t.assetUnit}
+              breakEvenAt={14}
+              breakEvenLabel={t.breakEvenTick}
+            />
+            {showBreakEvenHint && (
+              <Link
+                href={breakEvenHref}
+                className="mt-2 block rounded-md border border-amber-500/25 bg-amber-500/[0.04] hover:border-amber-400/45 hover:bg-amber-500/[0.08] transition-colors px-3 py-2 text-[11px] text-amber-200 leading-relaxed"
+              >
+                <span className="font-semibold">
+                  {t.breakEvenHintTitle}
+                </span>{" "}
+                <span className="text-zinc-400">{t.breakEvenHintBody}</span>
+              </Link>
+            )}
+          </div>
           <Slider
             label={t.weeksLabel}
             hint={t.weeksHint}
@@ -245,6 +270,8 @@ function Slider({
   step,
   onChange,
   unit,
+  breakEvenAt,
+  breakEvenLabel,
 }: {
   label: string;
   hint: string;
@@ -254,7 +281,14 @@ function Slider({
   step: number;
   onChange: (n: number) => void;
   unit: string;
+  /** Optional marker — renders a small tick + label at this value (e.g. 14 = break-even on the asset slider). */
+  breakEvenAt?: number;
+  breakEvenLabel?: string;
 }) {
+  const tickPct =
+    breakEvenAt !== undefined && breakEvenAt >= min && breakEvenAt <= max
+      ? ((breakEvenAt - min) / (max - min)) * 100
+      : null;
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2">
@@ -264,16 +298,35 @@ function Slider({
           <span className="text-xs text-zinc-500 ml-1">{unit}</span>
         </span>
       </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-emerald-500"
-      />
-      <p className="mt-1 text-xs text-zinc-500">{hint}</p>
+      <div className="relative">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="w-full accent-emerald-500"
+        />
+        {tickPct !== null && (
+          <div
+            className="pointer-events-none absolute -bottom-1 h-2 w-px bg-amber-400/60"
+            style={{ left: `calc(${tickPct}% )` }}
+            aria-hidden="true"
+          />
+        )}
+      </div>
+      <div className="mt-1 flex items-baseline justify-between gap-3">
+        <p className="text-xs text-zinc-500">{hint}</p>
+        {tickPct !== null && breakEvenLabel && (
+          <p
+            className="text-[10px] uppercase tracking-wider text-amber-400/80 tabular-nums shrink-0"
+            title={breakEvenLabel}
+          >
+            ↑ {breakEvenAt} · {breakEvenLabel}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -298,6 +351,10 @@ const STRINGS_KO = {
   ctaHint: "polished RFP 폼으로 이동. 입력값이 자동 prefill 됩니다.",
   rationaleLabel: "산정 근거",
   caveatsLabel: "주의 / 미포함 항목",
+  breakEvenTick: "손익분기",
+  breakEvenHintTitle: "↑ 약 14 컷부터 paired 가 license 보다 저렴 —",
+  breakEvenHintBody:
+    "어셋 수가 적은 구간에서는 일별 라이선스가 paired 보다 싸 보입니다. 포맷 커버리지 포함 약 14 컷 손익분기 후엔 paired 가 우위. 워크 예시 →",
 };
 
 const STRINGS_EN = {
@@ -320,4 +377,8 @@ const STRINGS_EN = {
   ctaHint: "Continues to a polished RFP form. Inputs prefill automatically.",
   rationaleLabel: "Cost rationale",
   caveatsLabel: "Caveats / not included",
+  breakEvenTick: "Break-even",
+  breakEvenHintTitle: "↑ Paired beats per-day license past ≈14 assets —",
+  breakEvenHintBody:
+    "At low asset counts, per-day license looks cheaper. Once you include format coverage past ≈14 hero frames, paired wins. See the worked example →",
 };

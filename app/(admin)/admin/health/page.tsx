@@ -11,6 +11,8 @@ import { loadBlogAttribution } from "@/lib/analytics/blog-attribution";
 import { loadCharacterViews } from "@/lib/analytics/character-views";
 import { loadCharacterAttribution } from "@/lib/analytics/character-attribution";
 import { loadPricingCalculatorAttribution } from "@/lib/analytics/pricing-calculator-attribution";
+import { BLOG_SERIES } from "@/lib/blog/series";
+import { getPostBySlug } from "@/lib/blog/posts";
 import {
   computeAtRiskClients,
   computeCohortRetention,
@@ -502,6 +504,34 @@ export default async function AdminHealthPage() {
       runbook:
         "트래픽은 들어오는데 인콰이어가 없으면 CTA 가 깨졌거나 referrer 가 capture 안 되는 중. /admin/blog-analytics 에서 top 글의 OG/CTA 확인 → /admin/forecast 의 블로그 attribut 카드와 대조. RFP/match 폼이 referrer 를 projects.referrer 로 저장하는지 점검.",
     },
+    (() => {
+      // Blog series integrity — every slug declared in BLOG_SERIES.slugs must
+      // resolve to a real post in its declared locale. CI catches this with
+      // tests/blog-series.test.ts, but a runtime check on the operator
+      // dashboard catches drift between content edits and series declarations
+      // (e.g. someone renamed a post slug and forgot to update the series).
+      const missing: { id: string; locale: string; slug: string }[] = [];
+      for (const series of BLOG_SERIES) {
+        for (const slug of series.slugs) {
+          if (!getPostBySlug(slug, series.locale)) {
+            missing.push({ id: series.id, locale: series.locale, slug });
+          }
+        }
+      }
+      return {
+        label: "블로그 시리즈 무결성",
+        ok: missing.length === 0,
+        detail:
+          missing.length === 0
+            ? `${BLOG_SERIES.length}개 시리즈 / 모든 slug 해결 OK`
+            : `${missing.length}개 깨진 ref: ${missing
+                .slice(0, 3)
+                .map((m) => `${m.id}/${m.locale}:${m.slug}`)
+                .join(", ")}${missing.length > 3 ? " ..." : ""}`,
+        runbook:
+          "lib/blog/series.ts 의 declared slug 가 lib/blog/posts.ts BLOG_POSTS 에 같은 locale 로 존재하지 않음. 시리즈 declare 했지만 글 publish 안 했거나 / 글 slug 가 rename 되었거나 / locale 이 mismatch. CI 가 tests/blog-series.test.ts 로 잡지만 deploy 후 hotfix 시점에 surface 될 수 있음.",
+      };
+    })(),
     {
       // Calc-path attribution hygiene. If utm_campaign on a pricing-calculator
       // inquiry doesn't map to a known RecommendedPath, the inquiry counts in
