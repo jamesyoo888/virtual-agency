@@ -2,7 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Inbox, Download, Flame, Sparkles, BookOpen, Calculator } from "lucide-react";
+import {
+  Inbox,
+  Download,
+  Flame,
+  Sparkles,
+  BookOpen,
+  Calculator,
+  Users,
+} from "lucide-react";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
 import InboxSearch from "@/components/inbox-search";
@@ -506,6 +514,15 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                         Char
                       </span>
                     )}
+                    {p.utm_source === "agent" && (
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border bg-amber-500/15 text-amber-200 border-amber-500/30"
+                        title={`에이전트 referral — ${p.utm_campaign ?? "agent id 미상"} · 15% 커미션 attribution 대상`}
+                      >
+                        <Users className="w-3 h-3" />
+                        Agent
+                      </span>
+                    )}
                     {p.utm_source === "pricing-calculator" && (() => {
                       // Surface the recommended path as a sub-label so the
                       // operator can read scope (license/paired/season/custom)
@@ -532,11 +549,12 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                     {(() => {
                       // Surface blog-attributed inquiries with an emerald chip
                       // — mirrors the violet Char chip pattern. Tie-breaker:
-                      // if utm_source is already "character" or
+                      // if utm_source is already "character", "agent", or
                       // "pricing-calculator", skip so the row doesn't carry
                       // two competing source chips.
                       if (
                         p.utm_source === "character" ||
+                        p.utm_source === "agent" ||
                         p.utm_source === "pricing-calculator"
                       )
                         return null;
