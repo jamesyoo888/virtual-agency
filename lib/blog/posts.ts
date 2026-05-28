@@ -4192,6 +4192,46 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "buyer-self-check-before-inquiry-4-questions-ko",
+    locale: "ko",
+    title: "인콰이어 보내기 전 — 3 주 절약하는 4 셀프체크",
+    excerpt:
+      "합성 탤런트 벤더에서 좋은 결과 얻는 광고주는 모두 대략 같은 upstream 작업을 함. Month 3 에 churn 하는 광고주는 이 체크들을 skip. 깨끗한 킥오프 + 짧은 time-to-first-asset 로 compound 하는 15 분.",
+    publishedAt: "2026-08-26",
+    readingMinutes: 6,
+    tags: ["buyer-guide", "브리프 템플릿", "운영", "합성 탤런트"],
+    sections: [
+      {
+        heading: "왜 brief 자체보다 이 리스트가 더 중요한가",
+        body: "우리 카테고리의 대부분의 buyer-side 가이던스는 brief 작성에 초점. Brief 는 downstream. drafting 시점엔 캠페인 작동 여부 결정짓는 4 개의 implicit 결정 이미 made — 그중 어느 것 wrong 이면 brief 는 단지 구조적 문제를 month 3 까지 smooth, 그때 캠페인 visibly 실패 + 모두가 벤더 탓. 이 패턴을 인콰이어 across 매월 봄. 이 4 체크에 보낸 15 분이 typical 6-8 주 «discovery → kickoff» 윈도우를 2-3 주로 압축 — 답이 back-and-forth 의 80 % 제거.",
+      },
+      {
+        heading: "체크 1 — 캠페인이 실제로 합성 탤런트 fit?",
+        body: "일부 캠페인은 합성 전혀 운영 말아야. 정직한 disqualifier: (a) 실제 audience-기반 premise (creator deals, founder content, 인플루언서 관계); (b) 물리적 존재 필요한 라이브 활성화; (c) 셀러브리티-endorsement equivalent intent; (d) lived experience 의존하는 narrative (합성 캐릭터가 credibly carry 못 함). 캠페인이 그중 어느 것 hit 하면 합성 탤런트 벤더 pitch 가 디스커버리 콜에서 great 하게 들리고 캠페인이 시장에서 underperform — form 이 function 에 wrong 이라서. Month-3 숫자 후보다 지금 아는 게 나음. 나머지 케이스 — 통제된 브랜드 surface (PDP, hero, 룩북, 소셜 ads), cross-market 일관성, 높은 어셋 velocity — 가 합성 탤런트 winning 영역. 그 안에 있는지 확인 후 진행.",
+      },
+      {
+        heading: "체크 2 — 내부 stakeholder alignment 있는지?",
+        body: "마케팅이 인콰이어 보내는데 법무가 디스클로저-메타데이터 요구사항 리뷰 안 했고, 브랜드가 캐릭터 voice 승인 안 했고, 재무가 «예산 있음» 너머 계약 sizing 안 했으면: 중단. 캠페인 drag 의 가장 큰 단일 소스가 벤더가 한 stakeholder 에서 brief 받고 week 4 에 다른 3 명이 surface 안 한 objection 있음 발견. 4 기능 모두 함께 30 분 pre-인콰이어 alignment 미팅 — yes, excessive 느껴짐; no, 그렇지 않음. 다음에 명시적 yes 받기: 타겟 시장 list (+ 시장당 디스클로저 tolerance), 브랜드 voice 방향 (custom vs 기존 캐릭터), 라이선스 스코프 envelope (유료 미디어 + 오가닉 + OOH? 또는 유료만?), 결제 조건. 그중 어느 것 yes 없으면 upstream 작업 — 인콰이어 보내지 마. 벤더가 unblock 못 함; 동료만 가능.",
+      },
+      {
+        heading: "체크 3 — 성공 모습 numerical 로 정의했는지?",
+        body: "«합성 탤런트가 우리에게 작동하는지 테스트하고 싶음» 은 성공 기준 아님; vibe. 운영자가 읽고 «클라이언트가 무엇 원하는지 모름, 스코프 크리프 예상» 으로 번역. engagement 갱신할 numerical 결과 정의: «컨트롤 윈도우 대비 +10 % assisted conversion lift», «QA 에서 90 % 어셋-set face-consistency rate», «week 6 에 타겟 audience 35 % aided recall». 1-2 개 pick. 야심차야 할 필요 없음 — specific 해야 함. 그것 없으면 캠페인엔 termination 조건 없음; 누군가의 narrative 로 success 또는 fail 가능. 그들의 craft 존중하는 벤더는 정의된 기준을 brief 에서 읽고 commit 또는 unrealistic 라고 말함 — 둘 다 유용. 알아채지 못한 벤더는 그들의 운영 maturity 에 대해 무언가 말함.",
+      },
+      {
+        heading: "체크 4 — Week 12 에 QA 시간 set aside?",
+        body: "대부분 광고주는 킥오프와 launch date 는 스케줄링하지만 QA 윈도우는 안 함. QA 체크리스트 (face consistency / 손 / 의상 / 디스클로저 메타데이터 / 포맷 커버리지 / 라이선스 스코프 / 소스 어테스테이션 / 리비전 속도) 가 senior 90 분 attention properly 실행 필요. 그 시간이 프로젝트 plan 에 안 존재하면 skip (defect 를 post-launch 발견, 비쌈) 또는 deadline 압박 하에 batch-approve (silently 더 나쁜 어셋 set 수용). Sign-off 48 시간 전 90 분 block. 계정 측 서포트 available 하도록 벤더에게 언제인지 알려. 품질이 QA real 일 때 compound; theatre 일 때 decay. 우리는 광고주의 confirmed sign-off 없이 출하 거절 — 압박 하에 승인보다 launch 2 일 slip 선호.",
+      },
+      {
+        heading: "15 분에 4 개 모두 실행하는 법",
+        body: "문서 열어. 캠페인을 한 문장으로 list. 아래: (1) 이 캠페인이 합성 탤런트 fit? Yes/no + one-line 이유. (2) 내부 yes: 마케팅 ___, 법무 ___, 브랜드 ___, 재무 ___ (날짜 스탬프). (3) Numerical 성공 타겟: ___. (4) QA 윈도우: 날짜 ___, owner ___, 90 분 block confirmed. 그것들 채울 수 있으면 인콰이어 보낼 준비. 못 채우면 인콰이어 전에 gap 작업 — 벤더가 fix 못 하고 engagement 안에서 fix 시도가 캠페인 drag 의 원인.",
+      },
+      {
+        heading: "깨끗한 인콰이어 보낼 때 무엇을 알아챌까",
+        body: "벤더의 첫 응답이 더 빠를 것 (인콰이어가 질문 아닌 결정 포함). 킥오프가 3-4 디스커버리 콜 skip (답 이미 lock). 첫 크리에이티브 방향이 타겟에 더 가까이 hit (brief 이 성공 모습에 정직). Total time-to-first-asset 가 typically 약 6-8 주에서 약 2-3 주로 떨어짐. 어느 것도 마법 아님 — upstream 작업 compounding. 이 리스트 skip 하는 광고주가 더 나쁜 벤더 얻는 게 아님; 같은 벤더 얻지만 더 나쁜 위치에서 시작.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

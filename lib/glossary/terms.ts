@@ -557,6 +557,36 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     relatedPostSlug: "synthetic-talent-qa-checklist-before-paying",
     relatedPostSlugKo: "synthetic-talent-qa-checklist-ko",
   },
+  {
+    slug: "synthetic-human-ratio",
+    category: "commercial",
+    ko: {
+      term: "합성/인간 ratio (Synthetic/human ratio)",
+      definition:
+        "캠페인 어셋 spend 중 합성 탤런트 vs 인간 탤런트 분배. 3 표준: 80/20 (브랜드 surface 위주, D2C·K-aesthetic·e-commerce), 60/40 (균형, 기존 브랜드·B2B-leaning premium), 40/60 (trust-led, 금융·헬스케어·premium hospitality). 1 년 lock 아닌 분기 dial — 시장 확장·런칭 quarter·시즌 anchor 마다 조정. 가장 흔한 실수는 실 spend audit 안 하고 추측으로 ratio 설정.",
+    },
+    en: {
+      term: "Synthetic/human ratio",
+      definition:
+        "The split of campaign asset spend between synthetic and human talent. Three published ratios: 80/20 (brand-surface heavy: D2C, K-aesthetic, e-commerce), 60/40 (balanced flagship: established brands, B2B-leaning premium), 40/60 (trust-led: financial services, healthcare-adjacent, premium hospitality). Not a yearly lock but a quarterly dial — adjust with market expansion / launch quarter / seasonal anchor. The most common mistake is setting the ratio by guess without auditing actual spend.",
+    },
+    relatedPostSlug: "synthetic-human-balanced-media-mix-when-to-shift-ratios",
+  },
+  {
+    slug: "pre-inquiry-self-check",
+    category: "workflow",
+    ko: {
+      term: "인콰이어 전 셀프체크 (Pre-inquiry self-check)",
+      definition:
+        "광고주가 벤더 인콰이어 보내기 전 15 분 내 완료해야 할 4 질문: (1) 합성 탤런트 fit 여부 (라이브·creator·셀러브리티 premise 면 wrong tool), (2) 마케팅·법무·브랜드·재무 내부 yes (날짜 stamp), (3) 숫자 success criterion (예: «+10 % assisted conversion lift»), (4) 90 분 QA 윈도우 (sign-off 48 시간 전, owner + 차단됨). 빠진 답이 있으면 인콰이어 보내지 말고 upstream 작업 — 벤더가 unblock 못 함. 6-8 주 kickoff 윈도우를 2-3 주로 압축.",
+    },
+    en: {
+      term: "Pre-inquiry self-check",
+      definition:
+        "A 4-question 15-minute diligence the buyer should complete before sending a vendor inquiry: (1) synthetic-talent fit (live / creator / celebrity-equivalent premise = wrong tool); (2) marketing / legal / brand / finance internal yeses (date-stamped); (3) numerical success criterion (e.g., «+10% assisted conversion lift»); (4) 90-minute QA window (48 hours before sign-off, owner + blocked time). If any answer is missing, work upstream — don't send the inquiry; the vendor can't unblock you. Compresses the typical 6-8 week kickoff into 2-3 weeks.",
+    },
+    relatedPostSlug: "buyer-self-check-before-inquiry-4-questions",
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {
