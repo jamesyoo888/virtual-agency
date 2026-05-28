@@ -7,7 +7,7 @@ import {
   listRelatedPosts,
 } from "@/lib/blog/posts";
 import { getSeriesForPost } from "@/lib/blog/series";
-import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Calculator } from "lucide-react";
 import { trackBlogView } from "@/lib/analytics/track-blog-view";
 import {
   blogPostingLd,
@@ -123,6 +123,38 @@ export default async function EnBlogPostPage({
             {post.publishedAt} · {post.readingMinutes} min read
           </p>
         </header>
+
+        {(post.tags.includes("calculator") ||
+          post.tags.includes("pricing") ||
+          post.tags.includes("ROI") ||
+          /calculator|roi-/.test(post.slug)) && (
+          <Link
+            href={`/en/pricing-calculator?utm_source=blog&utm_campaign=blog_${post.slug.slice(0, 32)}`}
+            className="block mb-10 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-5"
+          >
+            <div className="flex items-start gap-4">
+              <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-2 mt-0.5">
+                <Calculator className="w-4 h-4 text-emerald-200" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 mb-1">
+                  Cost estimator — 4 inputs
+                </p>
+                <p className="text-base font-semibold text-zinc-100">
+                  Run this post&rsquo;s math on your own scope
+                </p>
+                <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+                  Assets, season weeks, market count, exclusivity — instant
+                  USD + KRW estimate and a recommended path. Same framework
+                  this post describes.
+                </p>
+                <p className="mt-2 text-xs text-emerald-300 inline-flex items-center gap-1">
+                  Open the calculator <ArrowRight className="w-3 h-3" />
+                </p>
+              </div>
+            </div>
+          </Link>
+        )}
 
         {seriesPos && (
           <div className="mb-10 rounded-lg border border-violet-500/30 bg-violet-500/5 px-4 py-3">

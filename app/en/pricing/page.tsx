@@ -124,7 +124,7 @@ export default function EnPricingPage() {
           paid via Stripe or wire.
         </p>
         <Link
-          href="/en/pricing-calculator"
+          href="/en/pricing-calculator?utm_source=pricing-page&utm_campaign=pricing_hero"
           className="mb-12 inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 text-sm font-medium hover:bg-emerald-500/20"
         >
           Cost estimator — 4 inputs, instant range →

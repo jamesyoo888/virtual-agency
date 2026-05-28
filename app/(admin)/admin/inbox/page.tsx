@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURED } from "@/lib/supabase/config";
-import { Inbox, Download, Flame, Sparkles, BookOpen } from "lucide-react";
+import { Inbox, Download, Flame, Sparkles, BookOpen, Calculator } from "lucide-react";
 import ProjectStatusSelect from "@/components/project-status-select";
 import InquiryAcceptButton from "@/components/inquiry-accept-button";
 import InboxSearch from "@/components/inbox-search";
@@ -502,12 +502,26 @@ export default async function AdminInboxPage({ searchParams }: Props) {
                         Char
                       </span>
                     )}
+                    {p.utm_source === "pricing-calculator" && (
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border bg-teal-500/15 text-teal-200 border-teal-500/30"
+                        title={`가격 계산기 경유 — ${p.utm_campaign ?? "path 미상"}`}
+                      >
+                        <Calculator className="w-3 h-3" />
+                        Calc
+                      </span>
+                    )}
                     {(() => {
                       // Surface blog-attributed inquiries with an emerald chip
                       // — mirrors the violet Char chip pattern. Tie-breaker:
-                      // if utm_source is already "character", skip so the row
-                      // doesn't carry two competing source chips.
-                      if (p.utm_source === "character") return null;
+                      // if utm_source is already "character" or
+                      // "pricing-calculator", skip so the row doesn't carry
+                      // two competing source chips.
+                      if (
+                        p.utm_source === "character" ||
+                        p.utm_source === "pricing-calculator"
+                      )
+                        return null;
                       const blog = parseBlogReferrer(p.referrer);
                       if (!blog) return null;
                       return (

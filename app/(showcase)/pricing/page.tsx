@@ -159,7 +159,7 @@ export default async function PricingPage() {
             아래는 활성 모델 기준 일반적인 가격 범위입니다.
           </p>
           <Link
-            href="/pricing-calculator"
+            href="/pricing-calculator?utm_source=pricing-page&utm_campaign=pricing_hero"
             className="mt-6 inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 text-sm font-medium hover:bg-emerald-500/20"
           >
             견적 계산기 — 4 입력으로 즉시 견적 →
