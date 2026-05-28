@@ -44,6 +44,10 @@ export function characterFaqKo(character: Character): FaqEntry[] {
       question: `인보이스 결제 전에 무엇을 검수해야 하나요?`,
       answer: `사인오프 직전 90 분을 잡고 8 가지를 확인하세요 — 얼굴 일관성, 손·제품 접점, 의상 컨티뉴이티, 디스클로저 메타데이터, 포맷 커버리지, 서면 라이선스 스코프, 학습 데이터 attestation, 리비전 속도. 결제 전 표준 게이트로 공개한 체크리스트가 /blog/synthetic-talent-qa-checklist-ko 에 단계별로 있습니다.`,
     },
+    {
+      question: `${character.name}을 일별 라이선스로 시작할까요, paired 키트로 시작할까요?`,
+      answer: `결정 기준은 hero 컷 어셋 수입니다. 포맷 커버리지 포함 ~14 컷 미만이면 일별 라이선스가 더 저렴할 수 있고, 그 이상이면 paired 키트 (약 ₩1,100만) 가 거의 항상 이깁니다. 작은 캠페인 (8 컷 미만, 단일 포맷) 또는 우리 품질을 처음 테스트하는 trial run 이면 라이선스 권장. 다중 포맷 + 분기 단위 캠페인이면 paired 가 견적 수학상 합리적입니다. /pricing-calculator 에서 어셋 수·주·시장 입력하면 ${character.name} 캠페인에 맞는 path 가 즉시 surface 됩니다.`,
+    },
   ];
 }
 
@@ -77,6 +81,10 @@ export function characterFaqEn(character: Character): FaqEntry[] {
     {
       question: `What should I verify before paying the invoice?`,
       answer: `Block 90 minutes the day before sign-off and run 8 checks — face consistency across the set, hands/product contact points, wardrobe continuity, disclosure metadata in the file, format coverage per the brief, license scope in writing, training-data attestation, and revision velocity SLA. We publish the full step-by-step checklist at /en/blog/synthetic-talent-qa-checklist-before-paying — same list we run internally on every delivery.`,
+    },
+    {
+      question: `Should I start with a per-day license for ${character.name} or jump to a paired brand kit?`,
+      answer: `The decision pivots on hero asset count. Under ~14 hero frames (with format coverage), per-day license can be cheaper; past that, the paired kit ($8.5K) almost always wins. License makes sense for tiny campaigns (under 8 frames, single format) or a trial run testing our quality before committing. For multi-format quarterly campaigns, the paired math is decisive. Run your scope through /en/pricing-calculator — enter assets, weeks, markets, and the right path for a ${character.name} campaign surfaces immediately.`,
     },
   ];
 }

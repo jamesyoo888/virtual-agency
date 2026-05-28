@@ -465,6 +465,37 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     relatedPostSlug: "license-vs-brand-kit-break-even-worked-example",
     relatedPostSlugKo: "license-vs-brand-kit-break-even-worked-example-ko",
   },
+  {
+    slug: "format-coverage",
+    category: "workflow",
+    ko: {
+      term: "포맷 커버리지 (Format coverage)",
+      definition:
+        "캠페인이 요구하는 채널별 종횡비 + 시장별 변형의 매트릭스 — PDP (1:1), 릴스 (9:16), IG 피드 (4:5), hero/비디오 (16:9), 옥외 (wide). 각 hero 컷이 «포맷 N 개» 로 변형되어 실제 deliverable 수가 hero 수 × 포맷 배수가 됨. 견적 단계에서 포맷 커버리지를 빠뜨리면 라이선스가 paired 보다 저렴해 보이는 착시를 만들고, 손익분기 계산을 망가뜨림.",
+    },
+    en: {
+      term: "Format coverage",
+      definition:
+        "The matrix of aspect ratios + market variants a campaign requires — PDP (1:1), reels (9:16), IG feed (4:5), hero/video (16:9), OOH (wide). Each hero frame becomes «N format variants», so the realized deliverable count is hero count × format multiplier. Omitting format coverage from the quote creates the illusion that per-day license beats paired, distorting the break-even math.",
+    },
+    relatedPostSlug: "cross-market-localization-checklist-kr-us-eu-sg",
+    relatedPostSlugKo: "cross-market-localization-checklist-kr-us-eu-sg-ko",
+  },
+  {
+    slug: "training-data-attestation",
+    category: "compliance",
+    ko: {
+      term: "학습 데이터 어테스테이션 (Training-data attestation)",
+      definition:
+        "합성 캐릭터가 식별 가능한 실제 인물과 likeness-similarity threshold 내에서 일치하지 않음을 벤더가 서명하는 서면 진술. EU AI Act 가 일부 시장에서 명시적으로 요구; US (NIL — Name/Image/Likeness 강화 추세), 한국 (퍼블리시티권 jurisprudence 강화) 도 사실상 필수. 인보이스 결제 전에 받아두면 downstream right-of-publicity 클레임으로부터 광고주를 보호.",
+    },
+    en: {
+      term: "Training-data attestation",
+      definition:
+        "A vendor-signed written statement that the synthetic character does not match any identifiable real person within a likeness-similarity threshold. EU AI Act mandates it in some markets; US NIL (Name/Image/Likeness) enforcement and Korea's hardened 퍼블리시티권 jurisprudence make it effectively required everywhere. Obtain before invoice payment to protect the brand from downstream right-of-publicity claims.",
+    },
+    relatedPostSlug: "synthetic-campaign-failure-modes-how-to-catch",
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {

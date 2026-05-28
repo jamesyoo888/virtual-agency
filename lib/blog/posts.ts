@@ -3512,6 +3512,98 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "what-we-dont-optimize-for-and-why",
+    locale: "en",
+    title: "What we don't optimize for — and why",
+    excerpt:
+      "Every vendor optimizes for something at the cost of something else. We publish the trade-offs we've made — what we deliberately don't try to be best at — so buyers can decide whether we fit before the first call. Saying yes to one thing means saying no to four others.",
+    publishedAt: "2026-08-11",
+    readingMinutes: 7,
+    tags: ["operator-honesty", "positioning", "trade-offs", "buyer-fit"],
+    sections: [
+      {
+        heading: "Why this list exists",
+        body: "When a vendor's pitch deck claims «best price + fastest turnaround + widest character library + every market», they're either lying or about to disappoint on at least one axis. Real businesses make trade-offs; vendors who pretend they don't are setting expectations they can't keep. So we publish what we're not optimizing for — the dimensions where another vendor will beat us — so buyers self-select. The buyers who fit our trade-off stack get a better experience; the buyers who need something else save themselves a wasted sales cycle. Both outcomes are good.",
+      },
+      {
+        heading: "We don't optimize for being the cheapest per-asset",
+        body: "Our paired tier ($8.5K) is not the cheapest per-asset price in the synthetic-talent market. Vendors running a thinner pipeline can deliver hero frames for $200-300 each at scale; ours land at $340-450/frame at the paired allocation. Why we don't race to the bottom: cheaper-per-asset usually means looser disclosure metadata, weaker likeness attestation, and faster-but-noisier QA. We've watched competitors win on price and lose on the audit trail when EU/US regulators got specific. If your buyer is sensitive to per-asset cost above all else, we're not the right vendor — and we'd rather tell you that on the discovery call than after the contract.",
+      },
+      {
+        heading: "We don't optimize for «yes to every brief»",
+        body: "Roughly 30% of inquiries we decline. Categories we won't touch (some adult-adjacent verticals, some financial-products positioning, anything that requires generating a specific real person's likeness). Briefs we decline because the budget can't realistically buy the scope. Buyers who want unconditional «yes» are looking for a different operator; vendors who say yes to everything are saying yes to scope creep, scope drift, and unhappy delivery. Our reject rule: if we wouldn't be proud to put the asset in our own portfolio, we won't take the work. See «why-we-reject-rfps-common-patterns» for the patterns that trigger a no.",
+      },
+      {
+        heading: "We don't optimize for «widest character library»",
+        body: "Two characters — Yuna and Ren — and we have no plan to add a third until both hit the brand-kit ≥3 OR paired ≥6 validation gate. Other vendors offer 30+ characters with surface-level differentiation. The math: 30 characters spread across the same engineering bandwidth means 1/30 of the depth per character. Our position is that 2 deep characters with brand-kit infrastructure, glossary cross-links, FAQ, lookbook, attribution analytics, and per-character ROI tracking is more useful to a brand than 30 shallow characters with stock photo backstories. If you need 30 different faces for stock imagery, we're not the right vendor.",
+      },
+      {
+        heading: "We don't optimize for «fastest turnaround»",
+        body: "Our quoted turnaround is 5-7 business days for a paired delivery's first cut; competitors advertise 48-72 hours. Why we don't try to win on speed: the 5-7 day window includes a mid-week review pass with the brief author, a QA gate, and a disclosure-metadata verification before delivery. The 48-hour vendors skip those gates — they deliver fast and rely on the buyer to catch issues at review. We'd rather deliver a clean first cut on day 6 than a noisy one on day 3 and ask the buyer to clean up. If your campaign needs same-week turnaround on a fixed deadline, ask early — we can sometimes accommodate, but it's not our default flow.",
+      },
+      {
+        heading: "We don't optimize for «every market on day one»",
+        body: "We currently optimize for KR + US + EU + SG with explicit disclosure metadata schemas. Japan, India, the rest of SEA, LATAM, MENA — we don't have the local-legal infrastructure or the regulator-tracking depth to ship campaigns in those markets at the same quality bar. Japan especially: the local-agency relationship model is non-trivial and we won't fake it. Buyers running campaigns in our 4-market footprint get the best of us; buyers running global-with-Japan campaigns are better served by a vendor with a Japan partner. We'll honestly route you there.",
+      },
+      {
+        heading: "We don't optimize for «every channel format»",
+        body: "Our default format pack covers PDP (1:1), reels (9:16), IG feed (4:5), hero/video (16:9), and OOH wide. We don't ship native-format optimization for niche placements (e.g. specific Pinterest aspect ratios, gaming-platform skin variants, AR filter assets). The brand kits we offer can be extended to those formats on request, but it's not in the default deliverable. Brands running heavy on a non-standard channel should ask up-front so we can scope the extension or honestly suggest a specialist.",
+      },
+      {
+        heading: "What this means for buyer fit",
+        body: "If your shortlist is «cheapest per-asset + 48h turnaround + 30+ character options + Japan-included», we will lose on every dimension. Pick a different vendor. If your shortlist is «deep character IP + clean compliance trail + 4-market quality bar + paired-tier economics that beat per-day license past 14 hero assets», we're a strong match. The trade-off stack determines the fit. Publishing it publicly costs us the wrong-fit inquiries (good) and earns the right-fit ones (better).",
+      },
+      {
+        heading: "How to use this when shortlisting vendors",
+        body: "Ask every shortlist vendor what they don't optimize for. The answers are diagnostic: «we optimize for everything» is a lie that translates to «we don't have a strategy». «We optimize for X at the cost of Y, Z» is the answer of an operator who has thought about trade-offs and isn't afraid to publish them. Either answer tells you something — the first tells you to keep looking, the second tells you what you'll get when the campaign goes live.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-campaign-failure-modes-how-to-catch",
+    locale: "en",
+    title: "Synthetic-talent campaign failure modes — 5 patterns and how to catch them",
+    excerpt:
+      "Campaigns don't fail at delivery — they fail 4-12 weeks in, when a brand realizes the assets were drifting in the directions nobody flagged. Five failure modes we see in inquiries from buyers leaving other vendors, and the buyer-side detection moves that catch each one early.",
+    publishedAt: "2026-08-12",
+    readingMinutes: 7,
+    tags: ["operations", "failure-modes", "vendor-management", "compliance"],
+    sections: [
+      {
+        heading: "Why failure-mode literacy matters",
+        body: "Synthetic-talent vendors don't fail at the delivery moment. The hero assets ship, the brand approves, the campaign goes live. Failure shows up 4-12 weeks in, when something in the asset set drifts, an audit lands, or the consumer reaction goes sideways. By then the contract is paid and the vendor has moved on; the brand absorbs the cost. Below: the five failure patterns we see most often (in inquiries from buyers leaving other vendors) and the buyer-side detection move that would have caught each one in the sign-off window.",
+      },
+      {
+        heading: "Failure mode 1 — Drift across the asset set",
+        body: "The pattern: hero asset 1 looks great. Hero asset 12 looks great. Side-by-side, they're subtly different — slightly different eye distance, slightly different nose-to-mouth ratio, slightly different chin sharpness. Consumers don't articulate it but they feel it; the brand reads as «inconsistent» without anyone saying why. How to catch: lay every hero shot side-by-side at identical crop + zoom during sign-off (see «synthetic-talent-qa-checklist» Check 1). Flag any frame where you'd hesitate to call it the same person. Roughly 1 in 8 first-cut deliveries in our internal QA has at least one drift frame. Catching it adds 1 revision cycle; missing it adds 12 weeks of weakening trust.",
+      },
+      {
+        heading: "Failure mode 2 — Disclosure metadata missing or wrong-schema",
+        body: "The pattern: assets ship without C2PA manifest, or with a manifest that doesn't match the destination market's current regulator schema (e.g. EU AI Act Article 50 field changes mid-2026 and the vendor didn't update). The brand publishes; a watchdog or regulator letter arrives 6-10 weeks later; the brand has to pull the campaign, re-ship corrected assets, and explain itself publicly. How to catch: open delivered files in an EXIF/XMP viewer before payment. Confirm the synthetic-content flag and the market-specific marker. Vendors who object to providing clean metadata are telling you something — see «ai-content-disclosure-metadata-4-markets» for the per-market schema reference.",
+      },
+      {
+        heading: "Failure mode 3 — License scope ambiguity",
+        body: "The pattern: SoW says «campaign use, 12 months, single market», but doesn't enumerate paid media vs. organic vs. OOH vs. retailer placements vs. point-of-sale. Brand scales the campaign into a new market or channel, vendor sends an unexpected fee invoice. Brand either pays (eroding the per-asset economics) or pushes back (souring the relationship). How to catch: before payment, require explicit enumeration of usage rights (paid media + organic + OOH + POS), territories, duration, exclusivity, and channel limits in writing. This is the most common dispute we see in inquiries from buyers leaving other vendors. Verbal handshakes on license scope cost brands ~$15-40K in surprise fees per year at typical scale.",
+      },
+      {
+        heading: "Failure mode 4 — Likeness ambiguity post-launch",
+        body: "The pattern: a synthetic character bears subtle resemblance to a real celebrity or influencer. Resemblance is unintentional — training data overlap, similar styling DNA, similar verticals. 4-8 weeks post-launch, social media calls it out. Brand faces NIL (Name, Image, Likeness) claim or reputation hit. How to catch: get a written attestation from the vendor — «the character does not match any identifiable real person within a likeness-similarity threshold» — before payment. Reputable vendors sign without hesitation. Vendors who get evasive are flagging something. US (CA, NY, TN especially), Korea (퍼블리시티권 since 2023), and EU (GDPR Art. 9 biometric reading in some interpretations) all have active NIL enforcement in 2026.",
+      },
+      {
+        heading: "Failure mode 5 — Revision velocity collapse mid-campaign",
+        body: "The pattern: initial delivery is fast (vendor's pipeline is warm). Mid-campaign refresh request — same character, new wardrobe, new context. Vendor's quoted turnaround was 48h; actual is 12 days. Brand misses the planned launch window. How to catch: ask in the SoW for documented revision velocity (decision → delivery for same-character variant) backed by historical data. If the vendor can't show you the dashboard or won't commit to a number in writing, you're betting on optimism. The synthetic-talent advantage is velocity; a vendor who can't deliver on velocity is a slow asset shop with rendering compute.",
+      },
+      {
+        heading: "How to bake detection into your standard contract",
+        body: "Three contract additions catch all five modes: (1) Acceptance criteria with the 8 checks from «synthetic-talent-qa-checklist» referenced by name. (2) License scope enumerated with channel + territory + duration + exclusivity as required-fields, not as «and other reasonable use». (3) Revision velocity SLA with concrete numbers (e.g. 48h for same-character variant, 5-day for new wardrobe iteration), backed by vendor-published track record. These three additions cost you 15 minutes of contract review and prevent the 12-week-post-launch dramas that consume marketing leadership attention.",
+      },
+      {
+        heading: "What we do on our side (transparency)",
+        body: "We run the 8 checks internally before every delivery — face consistency QA, hands/contact-points pass, wardrobe continuity sheet, disclosure metadata verification with current-schema lookup per market, format coverage cross-check against the brief, license-scope PDF accompanying every invoice, signed likeness-attestation per character, and a published revision-velocity dashboard. Not because regulators require all of it, but because the failure modes above are exactly what destroy synthetic-talent vendor relationships at year 2. We'd rather invest the extra 90 minutes per delivery than be the vendor a buyer is replacing.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

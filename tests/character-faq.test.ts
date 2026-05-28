@@ -3,20 +3,20 @@ import { characterFaqKo, characterFaqEn } from "@/lib/characters/faq";
 import { getCharacter } from "@/lib/characters/registry";
 
 describe("character FAQ (KR + EN)", () => {
-  it("KR FAQ surfaces 7 entries per character — covers solo, market, exclusivity, IP, preview, disclosure, acceptance QA", () => {
+  it("KR FAQ surfaces 8 entries per character — covers solo, market, exclusivity, IP, preview, disclosure, acceptance QA, paired-vs-license", () => {
     const yuna = getCharacter("yuna")!;
     const faq = characterFaqKo(yuna);
-    expect(faq).toHaveLength(7);
+    expect(faq).toHaveLength(8);
     for (const e of faq) {
       expect(e.question.length).toBeGreaterThan(0);
       expect(e.answer.length).toBeGreaterThan(40);
     }
   });
 
-  it("EN FAQ surfaces 7 entries per character", () => {
+  it("EN FAQ surfaces 8 entries per character", () => {
     const ren = getCharacter("ren")!;
     const faq = characterFaqEn(ren);
-    expect(faq).toHaveLength(7);
+    expect(faq).toHaveLength(8);
     for (const e of faq) {
       expect(e.question.length).toBeGreaterThan(0);
       expect(e.answer.length).toBeGreaterThan(40);
@@ -63,5 +63,21 @@ describe("character FAQ (KR + EN)", () => {
     const enQa = en.find((e) => e.question.toLowerCase().includes("verify"));
     expect(koQa?.answer).toMatch(/qa-checklist-ko/);
     expect(enQa?.answer).toMatch(/qa-checklist-before-paying/);
+  });
+
+  it("Paired-vs-license entry surfaces the break-even threshold + calculator link", () => {
+    const yuna = getCharacter("yuna")!;
+    const ko = characterFaqKo(yuna);
+    const en = characterFaqEn(yuna);
+    const koPv = ko.find((e) => e.question.includes("라이선스") && e.question.includes("paired"));
+    const enPv = en.find(
+      (e) =>
+        e.question.toLowerCase().includes("license") &&
+        e.question.toLowerCase().includes("paired")
+    );
+    expect(koPv?.answer).toMatch(/14/);
+    expect(koPv?.answer).toMatch(/pricing-calculator/);
+    expect(enPv?.answer).toMatch(/14/);
+    expect(enPv?.answer).toMatch(/pricing-calculator/);
   });
 });

@@ -86,12 +86,13 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "en",
     title: "Compliance series",
     description:
-      "Disclosure metadata, regulator requirements, cross-market localization, and pre-launch sign-off for synthetic-talent campaigns.",
+      "Disclosure metadata, regulator requirements, cross-market localization, pre-launch sign-off, and the 5 failure modes that show up 4-12 weeks post-launch.",
     slugs: [
       "ai-content-disclosure-metadata-4-markets",
       "eu-ai-act-article-50-for-brand-marketers",
       "cross-market-localization-checklist-kr-us-eu-sg",
       "synthetic-campaign-pre-launch-compliance-checklist",
+      "synthetic-campaign-failure-modes-how-to-catch",
     ],
     relatedService: "compliance-audit",
   },
@@ -173,12 +174,13 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "en",
     title: "Operator honesty series",
     description:
-      "Posts we publish even when they cost us inquiries — when not to use synthetic talent, RFPs we turn down, metrics that actually matter, and what we measure in the first 30 days.",
+      "Posts we publish even when they cost us inquiries — when not to use synthetic talent, RFPs we turn down, metrics that actually matter, what we measure in the first 30 days, and the trade-offs we've made in our own positioning.",
     slugs: [
       "when-not-to-use-synthetic-talent",
       "why-we-reject-rfps-common-patterns",
       "post-launch-metrics-which-numbers-actually-matter",
       "first-30-days-campaign-measurement",
+      "what-we-dont-optimize-for-and-why",
     ],
     relatedService: "rfp",
   },
