@@ -879,6 +879,20 @@ export default async function AdminHomePage() {
         </section>
       )}
 
+      {(characterAttribution30d.totalInquiries > 0 ||
+        blogAttribution30d.totalInquiries > 0 ||
+        pricingCalc30d.totalInquiries > 0 ||
+        agentAttribution30d.totalInquiries > 0) && (
+        <div className="-mt-4 flex justify-end">
+          <Link
+            href="/api/admin/exports/attribution-rollup?window=30"
+            className="text-[11px] text-zinc-500 hover:text-zinc-300 underline underline-offset-2"
+          >
+            attribution roll-up CSV (30d) →
+          </Link>
+        </div>
+      )}
+
       {mtd.mtdRevenue > 0 || mtd.priorMonthTotal > 0 ? (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
           <div className="flex items-baseline justify-between mb-3">

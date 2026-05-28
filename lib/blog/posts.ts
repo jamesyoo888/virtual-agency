@@ -4104,6 +4104,94 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "buyer-self-check-before-inquiry-4-questions",
+    locale: "en",
+    title: "Before you send the inquiry — 4 self-checks that save 3 weeks",
+    excerpt:
+      "The buyers who get good outcomes from synthetic-talent vendors all do roughly the same upstream work. The buyers who churn at month 3 skipped these checks. 15 minutes that compound into clean kickoffs and shorter time-to-first-asset.",
+    publishedAt: "2026-08-24",
+    readingMinutes: 6,
+    tags: ["buyer-guide", "brief-template", "operations", "synthetic-talent"],
+    sections: [
+      {
+        heading: "Why this list matters more than the brief itself",
+        body: "Most buyer-side guidance in our category focuses on writing the brief. The brief is downstream. By the time you're drafting it you've already made 4 implicit decisions that determine whether the campaign works — and if any of them are wrong, the brief just smooths over a structural problem until month 3, when the campaign visibly fails and everyone blames the vendor. We see this pattern monthly across inquiries. The 15 minutes spent on these 4 checks compress the typical 6-8 week «discovery → kickoff» window to 2-3 weeks because the answers eliminate 80% of the back-and-forth.",
+      },
+      {
+        heading: "Check 1 — Is the campaign actually a synthetic-talent fit?",
+        body: "Some campaigns shouldn't run synthetic at all. The honest disqualifiers: (a) a real audience-based premise (creator deals, founder content, influencer relationships); (b) live activation that needs physical presence; (c) celebrity-endorsement equivalent intent; (d) any narrative whose value depends on lived experience the synthetic character can't credibly carry. If your campaign hits any of those, the synthetic-talent vendor pitch will sound great in the discovery call and the campaign will underperform in market because the form is wrong for the function. Better to know now than after month-3 numbers. The remaining cases — controlled brand surfaces (PDP, hero, lookbook, social ads), cross-market consistency, high asset velocity — are where synthetic talent wins. Check that you're in those before continuing.",
+      },
+      {
+        heading: "Check 2 — Do you have internal stakeholder alignment?",
+        body: "If marketing is sending the inquiry and legal hasn't reviewed disclosure-metadata requirements, brand hasn't approved the character voice, and finance hasn't sized the contract beyond «we have budget»: stop. The single biggest source of campaign drag is a vendor receiving a brief from one stakeholder and discovering at week 4 that three others have objections nobody surfaced. Run a 30-minute pre-inquiry alignment meeting with all four functions — yes, it feels excessive; no, it's not. Get explicit yeses on: target market list (and per-market disclosure tolerance), brand voice direction (custom vs. existing character), license-scope envelope (paid media + organic + OOH? or paid only?), payment terms. If any of those don't have a yes, work on them upstream — don't send the inquiry yet. The vendor can't unblock you here; only your colleagues can.",
+      },
+      {
+        heading: "Check 3 — Have you defined what success looks like, numerically?",
+        body: "«We want to test if synthetic talent works for us» is not a success criterion; it's a vibe. Operators read it and translate it to «client doesn't know what they want, expect scope creep». Define the numerical outcome that would make you renew the engagement: «+10% assisted conversion lift vs. control window», «90% asset-set face-consistency rate at QA», «35% aided recall in target audience at week 6». Pick one or two. They don't have to be ambitious — they have to be specific. Without them the campaign has no termination condition; it can succeed or fail by anyone's narrative. Vendors who respect their craft will read your defined criterion in the brief and either commit to it or tell you it's unrealistic — both useful. Vendors who don't notice it told you something about their operating maturity.",
+      },
+      {
+        heading: "Check 4 — Have you set aside time for QA in week 12?",
+        body: "Most buyers schedule the kickoff and the launch date but not the QA window. The QA checklist (face consistency / hands / wardrobe / disclosure metadata / format coverage / license scope / source attestation / revision velocity) takes ~90 minutes of senior attention to run properly. If that time doesn't exist in your project plan, you'll either skip it (and discover defects post-launch, expensive) or batch-approve under deadline pressure (and silently accept a worse asset set). Block the 90 minutes 48 hours before sign-off. Tell the vendor when it's happening so they can have account-side support available. Quality compounds when QA is real; it decays when QA is theatre. We refuse to ship without the buyer's confirmed sign-off — and we'd rather slip the launch by 2 days than approve under pressure.",
+      },
+      {
+        heading: "How to run all four in 15 minutes",
+        body: "Open a doc. List your campaign in one sentence. Below it: (1) Is this campaign a synthetic-talent fit? Yes/no, with one-line reason. (2) Internal yeses: marketing ___, legal ___, brand ___, finance ___ (date stamped). (3) Numerical success target: ___. (4) QA window: date ___, owner ___, 90-min block confirmed. If you can fill those out, you're ready to send the inquiry. If you can't, work on the gaps before the inquiry — the vendor can't fix them and trying to fix them inside the engagement is what makes campaigns drag.",
+      },
+      {
+        heading: "What you'll notice when you send a clean inquiry",
+        body: "The vendor's first response will be faster (your inquiry contains decisions, not questions). The kickoff will skip 3-4 discovery calls (the answers are already locked). The first creative direction will hit closer to target (the brief is honest about what success looks like). Total time-to-first-asset typically drops from ~6-8 weeks to ~2-3 weeks. None of this is magic — it's the upstream work compounding. The buyers who skip this list aren't getting worse vendors; they're getting the same vendors but starting from a worse position.",
+      },
+    ],
+  },
+  {
+    slug: "synthetic-human-balanced-media-mix-when-to-shift-ratios",
+    locale: "en",
+    title: "Balanced media mix — when synthetic should be 80%, 60%, or 40%",
+    excerpt:
+      "Hybrid is the right answer for most brands, but «hybrid» is too vague to act on. We publish the specific ratios that work, the campaign signals that shift them, and the 2 most common mistakes buyers make at each ratio.",
+    publishedAt: "2026-08-25",
+    readingMinutes: 7,
+    tags: ["strategy", "media-mix", "buyer-guide", "synthetic-talent"],
+    sections: [
+      {
+        heading: "Why «hybrid» needs ratios attached",
+        body: "Most strategy posts in our category land on «hybrid is the answer» and stop there. That's correct and useless. A brand running 95% synthetic + 5% creator content has fundamentally different operations from one running 40% synthetic + 60% creator content — different vendor relationships, different budget shapes, different risk profiles. Calling both «hybrid» hides the decisions that actually drive outcomes. This post publishes the three ratios we see work across our buyer base and what signals shift between them.",
+      },
+      {
+        heading: "Ratio 1 — Synthetic 80% / human 20% — «brand surface heavy»",
+        body: "Best for: D2C brands with a tightly controlled visual identity, K-beauty/K-aesthetic brands going cross-market, e-commerce-led businesses where most assets are PDP / lookbook / hero. The synthetic 80% handles every controlled brand surface; the human 20% handles creator partnerships, founder content, and one anchor live activation per quarter. This split runs typically $25K-$70K per quarter in synthetic spend + $30K-$120K in creator spend depending on category. The math: synthetic carries asset volume cheaply, humans carry trust signals expensively but selectively. Most globally-expanding K-beauty brands settle here within 2 quarters.",
+      },
+      {
+        heading: "Ratio 2 — Synthetic 60% / human 40% — «balanced flagship»",
+        body: "Best for: established brands with strong category presence, mid-market consumer brands across multiple verticals, B2B-leaning premium brands. The synthetic 60% covers PDP + most paid media + lookbook. The human 40% covers hero campaign anchor, brand-ambassador content, all live/event/PR, and select influencer activations. This split runs typically $40K-$100K synthetic + $80K-$250K human per quarter. The math: human content carries the campaign's narrative spine (especially for awareness-stage), synthetic carries the working repeat-impression frequency cheaply. Most established brands with a real brand-ambassador relationship sit here.",
+      },
+      {
+        heading: "Ratio 3 — Synthetic 40% / human 60% — «trust-led»",
+        body: "Best for: financial services, healthcare-adjacent, premium hospitality, anywhere consumer trust depends on the brand being explicitly «not artificial». Synthetic 40% handles motion graphics, abstract brand imagery, B-roll, internal-comms. Human 60% handles every consumer-facing asset where the brand promise depends on real-person credibility. This split runs typically $15K-$40K synthetic + $150K-$500K human per quarter. The math: human dominance is correct because the category's trust premium is the asset. Synthetic exists to compress the operational long tail (motion design, abstract assets, internal tools) without challenging the trust frame.",
+      },
+      {
+        heading: "Signal 1 — Shift synthetic up when…",
+        body: "(a) Cross-market expansion adds a 3rd or 4th country — synthetic's consistency advantage compounds with market count. (b) Asset velocity needs jump (e.g., new SKU launches >6 per quarter) — human production doesn't scale linearly. (c) Channel mix shifts toward paid (TikTok ads, Meta retargeting) — paid wants high-volume cheap creative iteration; synthetic excels. (d) Performance data shows synthetic assets matching human assets within ±10% on CTR/conversion — proves the floor isn't dropping when you move the ratio.",
+      },
+      {
+        heading: "Signal 2 — Shift synthetic down when…",
+        body: "(a) Recall or sentiment data shows audience confusion («I keep seeing the same model and I don't know who they are») — over-rotation in synthetic without enough character storytelling. (b) A regulator decision in your category materially raises disclosure friction — temporary recalibration. (c) An influencer relationship matures into ambassador territory and warrants more share-of-voice. (d) Internal brand voice gets refreshed and the synthetic character no longer matches — bring in human content while the new character is built.",
+      },
+      {
+        heading: "Mistake 1 — Pick a ratio without auditing actual asset spend",
+        body: "Most marketing leaders don't actually know what % of last quarter's asset spend went to synthetic vs. human. They have rough impressions. Run the audit before picking a target ratio. The number you find is often 10-20 points off what you guessed — and the right move depends on starting from truth. The audit takes a procurement intern half a day if you have invoice line items; longer if you don't (which is itself a signal).",
+      },
+      {
+        heading: "Mistake 2 — Lock the ratio for the year",
+        body: "The ratio should breathe with the campaign calendar. Pre-launch quarter (trust-build): shift human up. Mid-cycle paid-heavy quarter (efficiency): shift synthetic up. Q4 holiday + hero campaign: shift human up for the anchor, shift synthetic up for the long tail of paid retargeting. The brands that get the most out of synthetic talent treat the ratio as a quarterly dial, not a yearly commitment. The brands that lock the ratio and then fight it for 3 quarters are leaving 15-25% efficiency on the table.",
+      },
+      {
+        heading: "What we tell buyers in discovery",
+        body: "We don't push a ratio. We ask: «what's your starting ratio today, what's your target, and what's the campaign signal that would shift it next quarter?» If they can answer, the engagement design is straightforward. If they can't, we run the audit with them (no fee; it makes the engagement work better, which is in everyone's interest). The buyers who think hardest about the ratio are the ones who get the most out of synthetic talent — and the ratio they pick is rarely the one they started the conversation with.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {

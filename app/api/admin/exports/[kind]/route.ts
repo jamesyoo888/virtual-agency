@@ -61,6 +61,7 @@ const KINDS = new Set([
   "blog-attribution",
   "pricing-calculator-attribution",
   "agent-attribution",
+  "attribution-rollup",
 ]);
 
 export async function GET(
@@ -1332,6 +1333,115 @@ export async function GET(
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${csvFilename(
           "blog-attribution"
+        )}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (kind === "attribution-rollup") {
+    // Single-page roll-up: side-by-side totals + revenue for every
+    // attribution channel we track. Finance / leadership pulls this once a
+    // week to compare relative channel contribution without opening four
+    // separate exports. Window controlled by ?window=7|30|90; defaults to
+    // 30 (matches the home-page chips + weekly digest).
+    const w = Number.parseInt(url.searchParams.get("window") ?? "", 10);
+    const windowDays = [7, 30, 90].includes(w) ? w : 30;
+    const [character, blog, calc, agent] = await Promise.all([
+      loadCharacterAttribution(windowDays),
+      loadBlogAttribution(windowDays),
+      loadPricingCalculatorAttribution(windowDays),
+      loadAllAgentAttribution(windowDays),
+    ]);
+    type Row = Record<string, unknown> & {
+      channel: string;
+      inquiries: string;
+      delivered: string;
+      revenue_krw: string;
+      conversion_pct: string;
+      commission_estimate_krw: string;
+    };
+    function pct(d: number, i: number): string {
+      return i > 0 ? String(Math.round((d / i) * 100)) : "0";
+    }
+    const rows: Row[] = [
+      {
+        channel: "character",
+        inquiries: String(character.totalInquiries),
+        delivered: String(character.totalDelivered),
+        revenue_krw: String(character.totalRevenue),
+        conversion_pct: pct(character.totalDelivered, character.totalInquiries),
+        commission_estimate_krw: "0",
+      },
+      {
+        channel: "blog",
+        inquiries: String(blog.totalInquiries),
+        delivered: String(blog.totalDelivered),
+        revenue_krw: String(blog.totalRevenue),
+        conversion_pct: pct(blog.totalDelivered, blog.totalInquiries),
+        commission_estimate_krw: "0",
+      },
+      {
+        channel: "pricing-calculator",
+        inquiries: String(calc.totalInquiries),
+        delivered: String(calc.totalDelivered),
+        revenue_krw: String(calc.totalRevenue),
+        conversion_pct: pct(calc.totalDelivered, calc.totalInquiries),
+        commission_estimate_krw: "0",
+      },
+      {
+        channel: "agent",
+        inquiries: String(agent.totalInquiries),
+        delivered: String(agent.totalDelivered),
+        revenue_krw: String(agent.totalRevenue),
+        conversion_pct: pct(agent.totalDelivered, agent.totalInquiries),
+        commission_estimate_krw: String(agent.commissionEstimate),
+      },
+    ];
+    const totalInquiries =
+      character.totalInquiries +
+      blog.totalInquiries +
+      calc.totalInquiries +
+      agent.totalInquiries;
+    const totalDelivered =
+      character.totalDelivered +
+      blog.totalDelivered +
+      calc.totalDelivered +
+      agent.totalDelivered;
+    const totalRevenue =
+      character.totalRevenue +
+      blog.totalRevenue +
+      calc.totalRevenue +
+      agent.totalRevenue;
+    rows.push({
+      channel: "_total_attributed",
+      inquiries: String(totalInquiries),
+      delivered: String(totalDelivered),
+      revenue_krw: String(totalRevenue),
+      conversion_pct: pct(totalDelivered, totalInquiries),
+      commission_estimate_krw: String(agent.commissionEstimate),
+    });
+    rows.push({
+      channel: "_window_days",
+      inquiries: String(windowDays),
+      delivered: "",
+      revenue_krw: "",
+      conversion_pct: "",
+      commission_estimate_krw: "",
+    });
+    const csv = toCSV(rows, [
+      "channel",
+      "inquiries",
+      "delivered",
+      "revenue_krw",
+      "conversion_pct",
+      "commission_estimate_krw",
+    ] as const);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${csvFilename(
+          "attribution-rollup"
         )}"`,
         "Cache-Control": "no-store",
       },
