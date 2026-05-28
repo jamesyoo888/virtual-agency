@@ -3120,6 +3120,110 @@ export const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+  {
+    slug: "synthetic-talent-qa-checklist-before-paying",
+    locale: "en",
+    title: "The synthetic talent QA checklist — what to verify before you pay the invoice",
+    excerpt:
+      "Acceptance criteria the buyer controls — 8 checks that catch the failure modes synthetic-talent vendors quietly hope you skip. Run these in the last 48 hours before sign-off.",
+    publishedAt: "2026-08-04",
+    readingMinutes: 7,
+    tags: ["buyer-guide", "qa", "operations", "synthetic-talent"],
+    sections: [
+      {
+        heading: "Why this list exists",
+        body: "Most synthetic-talent vendors include a final-review step on the project plan but leave the acceptance criteria vague — «approve and we ship the high-res masters». A vague review favors the vendor: ambiguity gets resolved in the direction of «good enough». We publish our internal QA list so buyers can run the same checks against any vendor, including us. If a vendor pushes back on any item below, that's a signal worth weighing before you sign the invoice.",
+      },
+      {
+        heading: "Check 1 — Face consistency across the asset set",
+        body: "Lay every delivered hero shot side-by-side at the same crop and zoom. The character should be unambiguously the same person across formats — same eye distance, same nose-to-mouth ratio, same jawline. Small drift (different lighting changing perceived skin tone) is fine. Large drift (the eyes are visibly different shapes between two assets) is not. Mark any frame where you'd hesitate to say «that's the same person» — those go back for regeneration. Roughly 1 in 8 first-cut deliveries has at least one drift frame in our internal QA; the vendor side often misses it because we look at frames in isolation, not as a set.",
+      },
+      {
+        heading: "Check 2 — Hands, feet, and product contact points",
+        body: "Synthetic generation in 2026 has solved faces but still occasionally fumbles hands holding a product, fingers gripping a strap, or feet pressing into a surface. Zoom each frame to 400% and check every contact point. Look for: finger count, finger length symmetry between hands, fingernail shape consistency, plausible grip pressure on soft objects. Reject any frame where the hand looks «off» even if you can't articulate why — the consumer's instinct will fire the same way and erode trust in the rest of the asset.",
+      },
+      {
+        heading: "Check 3 — Wardrobe + accessory continuity",
+        body: "If the brand kit specifies a wardrobe palette (e.g., «cream linen + tan leather»), every frame must respect it. Drift to «beige cotton + brown leather» across a 24-asset set is a contract issue, not creative latitude. Same for accessory placement: if the model wears a watch in three frames, it should be the same watch (same dial, same band). Continuity errors at this level are caught by the obsessive segment of your audience and discussed publicly. Track them in a shared sheet and request regeneration for any divergence.",
+      },
+      {
+        heading: "Check 4 — Disclosure metadata in the file itself",
+        body: "Open the delivered file in an EXIF/XMP viewer (online tools work fine — verexif.com, exiftool). Confirm the synthetic-content flag is present in the C2PA manifest or equivalent provenance field. For EU/UK deliveries: confirm the AI-generated marker matches the regulator's current schema. For Korea: confirm 「AI 생성」 disclosure is wired. If a vendor delivers files without metadata, ask why — clean metadata is a 10-minute step at export and there's no legitimate reason to skip it. Vendors who object usually haven't built the pipeline; that's a maturity signal.",
+      },
+      {
+        heading: "Check 5 — Format coverage matches the brief",
+        body: "Pull up the original brief and the delivery package side-by-side. Count: 1:1 for PDP, 9:16 for reels, 4:5 for IG feed, 16:9 for hero/video, OOH wide if applicable. Each format should be a deliberate composition, not a center-crop of the hero. A 16:9 hero crammed into 9:16 will show empty headroom or chopped wardrobe — that's not coverage, that's lazy export. Reject and request native compositions per format. The cost differential is built into the brand-kit tier; you've already paid for it.",
+      },
+      {
+        heading: "Check 6 — License scope in writing",
+        body: "Before payment, the invoice or accompanying license PDF must state: usage rights (paid media, organic, OOH, point-of-sale), territories (KR-only, KR+US, global), duration (12-month default, extension terms), exclusivity (category-locked or non-exclusive), and channel limits if any. Vendors who handshake the license verbally are setting up a fee surprise when you scale into a new market. Get it in writing before the final payment clears. This is the most common dispute we see in inquiries from buyers leaving other vendors.",
+      },
+      {
+        heading: "Check 7 — Source / training disclosure for audits",
+        body: "Some markets (EU under the AI Act) require vendors to attest that the training data didn't include unauthorized celebrity likenesses. Ask the vendor for a written statement: «the character does not match any identifiable real person within a likeness-similarity threshold». Reputable vendors will sign this without hesitation. Vendors who get squirmy are telling you something. This protects you from downstream right-of-publicity claims, which are increasingly aggressive in 2026 (US celebrity NIL enforcement, Korea's 퍼블리시티권 jurisprudence).",
+      },
+      {
+        heading: "Check 8 — Revision velocity attested on the project page",
+        body: "The vendor should be tracking and showing you their revision turnaround time (decision → delivery for a same-character variant). Our internal target is 48h; any vendor with a track record should publish theirs. If they can't show you the velocity dashboard or won't commit to a number in writing, you're betting on optimism. Revision velocity is the synthetic-talent advantage; a vendor who can't deliver on velocity is just a slow asset shop with extra rendering compute. Push for the number in the SoW before you sign.",
+      },
+      {
+        heading: "How to run this efficiently",
+        body: "Block 90 minutes the day before the sign-off deadline. Run checks 1-3 on a large external monitor (face consistency is invisible on a 13\" laptop). Checks 4-7 are written-confirmation gates — request them by email so you have an audit trail. Check 8 is a conversation with the account manager. Document any rejection with a screenshot + the frame ID; vendors who get reproducible feedback iterate fast, vendors who get vague «doesn't feel right» feedback push back. The 90 minutes saves you the 3 months of regretting a quietly-approved bad asset set running on your media spend.",
+      },
+    ],
+  },
+  {
+    slug: "brand-kit-upgrade-path-when-to-move-tiers",
+    locale: "en",
+    title: "Brand-kit upgrade path — when to move from paired → season → custom",
+    excerpt:
+      "Each tier exists for a campaign shape. We publish the upgrade triggers in writing so buyers don't either over-buy day one or under-buy and feel locked. 6 signals that say «move up», 3 that say «stay where you are».",
+    publishedAt: "2026-08-05",
+    readingMinutes: 6,
+    tags: ["brand-kits", "pricing", "campaign-planning", "upgrade-path"],
+    sections: [
+      {
+        heading: "Why this needs to be public",
+        body: "The three tiers — paired ($8.5K), season ($22K), custom ($50K+) — solve different problems, not «more is better». Buyers who over-buy on tier 1 burn budget that should have gone to media; buyers who under-buy hit a ceiling at month 4 and feel locked. The decision belongs to the buyer, not the vendor, so we publish the criteria. If our calculator suggests one tier and the signals below suggest another, trust the signals — the calculator anchors on the brief, not on where the campaign will actually go.",
+      },
+      {
+        heading: "Paired ($8.5K) is the right call when…",
+        body: "(1) Campaign duration is 12 weeks or less. (2) Single market launch (KR-only, or US-only). (3) Asset volume under 25 hero frames. (4) Brand voice doesn't need a custom character — Yuna or Ren as cast fits the verticals (beauty, fashion, F&B for Yuna; tech, premium men's, finance-adjacent for Ren). (5) The campaign is testing the waters with synthetic talent — first time, lower commitment makes sense. Most first-time buyers should start here; ~70% of our paired buyers re-buy at the same tier for the next campaign before considering an upgrade.",
+      },
+      {
+        heading: "Trigger 1 — Campaign extending past 16 weeks",
+        body: "Once your campaign is running 4+ months, you'll need creative refreshes (new poses, new wardrobe variations, new seasonal contexts). Paired covers the initial set; season includes a refresh allocation built in. Buying a second paired package for the refresh costs more than upgrading to season retroactively. If you're past week 12 and discussing a refresh, season is the cheaper math.",
+      },
+      {
+        heading: "Trigger 2 — Cross-market expansion",
+        body: "Going from KR to KR+US (or KR+EU+SG) means: localized wardrobe, market-specific disclosure metadata, additional format variants per market, potentially a market-specific narrative arc. Paired doesn't include cross-market production allocation; season does. If the next 6 months will hit 2+ markets, upgrade before you generate the localization assets — building them as one batch is 30-40% cheaper than building them sequentially under a paired contract.",
+      },
+      {
+        heading: "Trigger 3 — Recurring quarterly cadence",
+        body: "If marketing is committing to a quarterly campaign cadence with the same character (Spring/Summer/Fall/Winter), you're past the «one campaign» pricing logic. Season is built for this — quarterly drops with shared character continuity. Custom (tier 3) makes sense when the cadence is monthly or when each campaign needs a distinct visual narrative. Don't run quarterly under paired; the per-quarter cost works out 20-30% higher than booking season annually.",
+      },
+      {
+        heading: "Trigger 4 — Category exclusivity becoming a real concern",
+        body: "If a direct competitor in your category starts running campaigns with Yuna or Ren, you'll want category exclusivity (we sell it as an add-on at paired tier, included at season+). The trigger isn't «I want exclusivity in theory» — it's «my competitor just booked the same character». Once the category is contested, exclusivity costs more (we're pricing in lost optionality on our side). Buyers who anticipate this and lock category at the contract signing get a better number than buyers who react after the competitor signs.",
+      },
+      {
+        heading: "Trigger 5 — Brand voice doesn't fit Yuna or Ren",
+        body: "Custom ($50K+) exists for buyers whose brand voice genuinely needs a character that doesn't exist in our catalog — a different age, different ethnicity, different lifestyle archetype. Most buyers think they need custom (every brand thinks they're unique); most actually fit Yuna or Ren after the brief is sharpened. The honest check: write your character description in 3 sentences. If a copywriter could match it to either Yuna or Ren within 2 minutes of reading our character pages, paired or season fits. If you genuinely can't see the fit, book a custom consultation — we'll either build the new character or talk you out of it.",
+      },
+      {
+        heading: "Trigger 6 — Multi-product / multi-SKU rollout in one quarter",
+        body: "Launching 6+ SKUs in one quarter under one campaign umbrella stretches the asset count past what paired efficiently supports (~25 frames). Season's allocation handles 60-80 frames with format variants. If procurement just dropped a 6-SKU launch plan on marketing, look at season directly — the savings per SKU vs. running 6 paired contracts is significant (~$11K all-in cheaper at typical scope).",
+      },
+      {
+        heading: "Reasons to STAY where you are",
+        body: "(1) Last campaign worked and the next one is the same shape — no need to up-tier just because budget exists. (2) You're between marketing leadership changes — wait for the new strategy to clarify before locking a season contract. (3) You're testing a new channel mix (e.g., adding TikTok where you had only IG) — run paired first to validate the channel, then upgrade if the channel proves out. Buying ahead of certainty wastes optionality. We'd rather you re-buy paired 4 times than commit to season prematurely and regret the lock-in.",
+      },
+      {
+        heading: "How to actually upgrade",
+        body: "Email your account manager (or hello@aihubs.uk if you don't have one yet). We don't charge an upgrade penalty — the season contract just starts fresh from the upgrade date with a credit for unused paired allocation. The transition typically takes 5-7 business days for contract reissue and re-scope. If a competitor is about to sign category exclusivity, mention it in the email; we'll prioritize. The path is designed to be friction-light because buyers who feel locked-in churn at year 2.",
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string, locale?: BlogLocale): BlogPost | undefined {
