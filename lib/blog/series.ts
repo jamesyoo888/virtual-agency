@@ -128,10 +128,11 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "ko",
     title: "컴플라이언스 시리즈",
     description:
-      "방심위·EU AI Act 등 4 시장 디스클로저 의무와 캠페인 사전 체크리스트.",
+      "방심위·EU AI Act 등 4 시장 디스클로저 의무, 다시장 현지화 체크리스트, 캠페인 사전 사인오프 가이드.",
     slugs: [
       "ai-content-disclosure-korea-kcc-kftc",
       "ai-content-disclosure-compliance-2026",
+      "cross-market-localization-checklist-kr-us-eu-sg-ko",
       "synthetic-campaign-pre-launch-compliance-checklist-ko",
     ],
     relatedService: "compliance-audit",
@@ -156,10 +157,11 @@ export const BLOG_SERIES: BlogSeries[] = [
     locale: "ko",
     title: "가격과 비용 시리즈",
     description:
-      "견적 계산기 4 입력의 의미, 캠페인 총 비용 분해, 브랜드 키트 티어 업그레이드 결정, ROI 계산기 프레임워크, 그리고 인보이스 결제 전 QA 체크리스트 — 광고주의 buyer-funnel 깊이 읽기.",
+      "견적 계산기 4 입력의 의미, 캠페인 총 비용 분해, 라이선스-vs-브랜드 키트 손익분기점, 브랜드 키트 티어 업그레이드 결정, ROI 계산기 프레임워크, 그리고 인보이스 결제 전 QA 체크리스트 — 광고주의 buyer-funnel 깊이 읽기.",
     slugs: [
       "inside-the-pricing-calculator-4-inputs-ko",
       "total-campaign-cost-decomposition-ko",
+      "license-vs-brand-kit-break-even-worked-example-ko",
       "brand-kit-upgrade-path-ko",
       "k-aesthetic-campaign-roi-calculator-ko",
       "synthetic-talent-qa-checklist-ko",

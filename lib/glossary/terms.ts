@@ -449,6 +449,22 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     relatedPostSlug: "synthetic-talent-qa-checklist-before-paying",
     relatedPostSlugKo: "synthetic-talent-qa-checklist-ko",
   },
+  {
+    slug: "license-brand-kit-break-even",
+    category: "commercial",
+    ko: {
+      term: "라이선스-브랜드 키트 손익분기점 (License-brand-kit break-even)",
+      definition:
+        "일별 라이선스가 paired 브랜드 키트보다 싸지 않게 되는 어셋 수 임계점 — 포맷 커버리지 포함 약 14 hero 컷. 그 이상에선 paired 가, 약 40 컷 이상에선 Season 이 결정적. 라이선스의 단위 비용 (일당) 이 작은 숫자라 「더 싸다」고 잘못 인식되지만, 촬영일 × 포맷 × 리비전이 compound 되어 임계점을 넘기면 빠르게 paired 가 우위.",
+    },
+    en: {
+      term: "License–brand-kit break-even",
+      definition:
+        "The asset-count threshold beyond which per-day license stops being cheaper than a paired brand kit — roughly 14 hero frames with format coverage. Past that, paired wins; past ~40, Season wins decisively. The license unit cost (per-day) is the visible number that anchors «cheaper» intuition, but shoot-day × format coverage × revision cycles compound and the line crosses faster than buyers expect.",
+    },
+    relatedPostSlug: "license-vs-brand-kit-break-even-worked-example",
+    relatedPostSlugKo: "license-vs-brand-kit-break-even-worked-example-ko",
+  },
 ];
 
 export function getTerm(slug: string): GlossaryTerm | undefined {

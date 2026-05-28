@@ -182,7 +182,7 @@ export default function KrCharacterBrandKitsPage() {
           </p>
           <Link
             href="/pricing-calculator?utm_source=character&utm_campaign=brand_kit_calc_anchor"
-            className="block mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
+            className="block mb-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
           >
             <div className="flex items-start gap-3">
               <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-1.5 mt-0.5">
@@ -199,6 +199,28 @@ export default function KrCharacterBrandKitsPage() {
                 <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
                   어셋 수·시즌·시장·독점 입력 → paired/season/custom 권장 path
                   자동 매핑 + KRW + USD 견적. 티어 결정 전에 무료 체크.
+                </p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            href="/blog/license-vs-brand-kit-break-even-worked-example-ko"
+            className="block mb-6 rounded-xl border border-amber-500/25 bg-amber-500/[0.03] hover:border-amber-400/50 hover:bg-amber-500/[0.07] transition-colors p-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-1.5 mt-0.5 text-amber-200 font-bold text-[10px] leading-none flex items-center justify-center w-6 h-6">
+                ÷
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-amber-300 mb-0.5">
+                  라이선스 vs paired — 어디서 갈리나
+                </p>
+                <p className="text-sm font-semibold text-zinc-100">
+                  손익분기점은 hero 컷 ≈ 14 — 워크 예시 3 가지로 풀이
+                </p>
+                <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                  12 / 24 / 48 컷 캠페인의 실제 수학. 일별 라이선스가 더 싸
+                  보이는 어셋 수와 paired 가 이기는 어셋 수의 임계점.
                 </p>
               </div>
             </div>

@@ -179,7 +179,7 @@ export default function CharacterBrandKitsPage() {
           </p>
           <Link
             href="/en/pricing-calculator?utm_source=character&utm_campaign=brand_kit_calc_anchor"
-            className="block mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
+            className="block mb-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-colors p-4"
           >
             <div className="flex items-start gap-3">
               <div className="rounded-md border border-emerald-400/40 bg-emerald-500/10 p-1.5 mt-0.5">
@@ -197,6 +197,29 @@ export default function CharacterBrandKitsPage() {
                   Enter assets, weeks, markets, exclusivity → the calculator
                   recommends paired / season / custom and gives a USD + KRW
                   range. Free pre-tier check.
+                </p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            href="/en/blog/license-vs-brand-kit-break-even-worked-example"
+            className="block mb-6 rounded-xl border border-amber-500/25 bg-amber-500/[0.03] hover:border-amber-400/50 hover:bg-amber-500/[0.07] transition-colors p-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-1.5 mt-0.5 text-amber-200 font-bold text-[10px] leading-none flex items-center justify-center w-6 h-6">
+                ÷
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-amber-300 mb-0.5">
+                  License vs paired — where the line is
+                </p>
+                <p className="text-sm font-semibold text-zinc-100">
+                  Break-even sits at ≈14 hero assets — 3 worked examples
+                </p>
+                <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                  12 / 24 / 48-asset campaigns walked through the actual
+                  math. Where per-day license still looks cheaper, and where
+                  paired starts winning.
                 </p>
               </div>
             </div>
