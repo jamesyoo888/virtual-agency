@@ -502,6 +502,23 @@ export default async function AdminHealthPage() {
       runbook:
         "트래픽은 들어오는데 인콰이어가 없으면 CTA 가 깨졌거나 referrer 가 capture 안 되는 중. /admin/blog-analytics 에서 top 글의 OG/CTA 확인 → /admin/forecast 의 블로그 attribut 카드와 대조. RFP/match 폼이 referrer 를 projects.referrer 로 저장하는지 점검.",
     },
+    {
+      // Calc-path attribution hygiene. If utm_campaign on a pricing-calculator
+      // inquiry doesn't map to a known RecommendedPath, the inquiry counts in
+      // totalInquiries but is invisible in the per-path breakdown — making the
+      // path mix unreliable. Fires only when there's enough sample (≥10) to
+      // distinguish a real drift from a small-N quirk.
+      label: "가격 계산기 path 어트리뷰션 hygiene",
+      ok:
+        pricingCalc30d.totalInquiries < 10 ||
+        pricingCalc30d.unknown / pricingCalc30d.totalInquiries <= 0.3,
+      detail:
+        pricingCalc30d.totalInquiries < 10
+          ? `30d 인콰이어 ${pricingCalc30d.totalInquiries} — 표본 부족 (10+ 부터 측정)`
+          : `30d 미분류 ${pricingCalc30d.unknown}/${pricingCalc30d.totalInquiries} (${Math.round((pricingCalc30d.unknown / pricingCalc30d.totalInquiries) * 100)}%)`,
+      runbook:
+        "utm_campaign 이 5 RecommendedPath (license_daily / paired_editorial / season_anchor / custom_build / traditional_competitive) 중 어디에도 매칭 안 되면 path-별 카드 + inbox 칩 서브라벨에 surface 안 됨. 가장 흔한 원인은 /pricing-calculator 의 RFP CTA href 가 path 토큰을 캐멜케이스나 오타로 보내는 것 — lib/pricing/calculator.ts 의 recommendedPath() 가 반환하는 값과 /rfp 폼이 받는 값이 정확히 일치하는지 확인. legacy bookmark 도 unknown 으로 들어옴 (정상). 30% 초과면 새 path 토큰을 추가했거나 정의 drift.",
+    },
   ];
 
   return (
