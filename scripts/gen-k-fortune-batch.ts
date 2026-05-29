@@ -13,7 +13,7 @@
  *   output/k-fortune-characters/manifest.json
  *   output/k-fortune-characters/index.html   (contact sheet)
  */
-import { writeFile, mkdir, readFile, stat } from "node:fs/promises";
+import { writeFile, mkdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { ARCHETYPES, buildPrompt, type Archetype } from "./k-fortune-archetypes";
 

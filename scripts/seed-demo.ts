@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Demo seed — populates `models` with 12 representative entries so a fresh
  * Supabase instance has something to show on /, /match, /compare, /admin.

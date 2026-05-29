@@ -67,7 +67,6 @@ export default async function AdminRfpsPage() {
             </p>
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
         <a
           href="/api/admin/exports/rfps"
           download

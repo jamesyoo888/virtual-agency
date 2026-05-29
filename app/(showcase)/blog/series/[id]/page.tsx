@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, ArrowRight, Sparkles } from "lucide-react";
-import { BLOG_SERIES, listSeries, type BlogSeriesId } from "@/lib/blog/series";
+import { listSeries } from "@/lib/blog/series";
 import { getPostBySlug } from "@/lib/blog/posts";
 import { getCharacter } from "@/lib/characters/registry";
 import { breadcrumbLd, itemListLd, ldScript } from "@/lib/seo/json-ld";

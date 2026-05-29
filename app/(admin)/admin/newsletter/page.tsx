@@ -75,7 +75,6 @@ export default async function NewsletterAdminPage() {
             푸터 구독 폼에서 수집된 이메일. 향후 마케팅 provider 로 이전 예정.
           </p>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Content-Disposition download */}
         <a
           href="/api/admin/exports/newsletter"
           download

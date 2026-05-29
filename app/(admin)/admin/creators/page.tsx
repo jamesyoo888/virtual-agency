@@ -66,7 +66,6 @@ export default async function AdminCreatorsPage({ searchParams }: PageProps) {
             </p>
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Content-Disposition download */}
         <a
           href="/api/admin/exports/creators"
           download

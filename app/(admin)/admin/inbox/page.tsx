@@ -268,7 +268,6 @@ export default async function AdminInboxPage({ searchParams }: Props) {
               Stale CSV
             </a>
           )}
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
           <a
             href="/api/admin/exports/projects"
             download

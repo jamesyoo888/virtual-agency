@@ -8,7 +8,7 @@ import { signReferralToken } from "@/lib/referral/token";
  * caller's own client id as the code; sharing it attributes any inquiries
  * that result back to them via the standard utm_campaign pipeline.
  */
-export async function POST(_request: Request) {
+export async function POST() {
   if (!SUPABASE_CONFIGURED) {
     return NextResponse.json(
       { error: "Supabase not configured" },

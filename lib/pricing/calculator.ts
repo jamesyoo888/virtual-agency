@@ -171,7 +171,6 @@ export function estimate(input: CalculatorInput): CalculatorOutput {
     }
   } else if (recommendedPath === "season_anchor" && season) {
     anchorTier = season;
-    const baseAssets = Math.min(60, assetCount);
     const overflowAssets = Math.max(0, assetCount - 60);
     const extraMarkets = Math.max(0, marketCount - 1);
     krwLow =

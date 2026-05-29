@@ -1,5 +1,12 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element --
+ * AI-generated image picker: URLs come from dynamic hosts
+ * (Easy Diffusion / Replicate / Supabase Storage). next/image would require
+ * tracking every possible remotePattern + risks 5xx when AI host is down.
+ * Admin-only wizard, so LCP optimization is not the goal.
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -7,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-// AI-generated images use raw <img> to bypass Next.js image optimization.
 import { Loader2, Check, Upload, Box, Image as ImageIcon, RefreshCw, ExternalLink } from "lucide-react";
 import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 

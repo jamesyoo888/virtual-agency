@@ -5,7 +5,7 @@ import { devModelStore } from "@/lib/dev-store";
 import type { Model } from "@/types";
 import { rankModels, type MatchBrief } from "@/lib/matching/score";
 import { loadPersonaSignals } from "@/lib/matching/persona";
-import { INDUSTRY_OPTIONS, GENRE_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
+import { INDUSTRY_OPTIONS, MOOD_OPTIONS } from "@/lib/tags";
 import ModelCard from "@/components/model-card";
 import RfpFilterChips from "@/components/rfp-filter-chips";
 import RfpPrintButton from "@/components/rfp-print-button";

@@ -58,7 +58,6 @@ export default async function ModelPerformancePage({
             );
           })}
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
         <a
           href={
             windowDays === 30

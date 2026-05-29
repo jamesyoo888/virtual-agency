@@ -71,7 +71,6 @@ export default async function AdminReviewsPage({ searchParams }: Props) {
             클라이언트 리뷰 모더레이션 — 승인 시 공개 상세에 노출
           </p>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
         <a
           href="/api/admin/exports/reviews"
           download

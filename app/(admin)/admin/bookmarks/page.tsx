@@ -62,7 +62,6 @@ export default async function AdminBookmarksPage() {
             </p>
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Content-Disposition download */}
         <a
           href="/api/admin/exports/bookmarks"
           download

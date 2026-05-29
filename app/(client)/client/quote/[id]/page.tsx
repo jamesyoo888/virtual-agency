@@ -105,7 +105,6 @@ export default async function QuotePage({
             }
           />
           <QuoteShareButton projectId={project.id} />
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
           <a
             href={`/api/client/quote/${project.id}/pdf`}
             download

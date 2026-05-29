@@ -67,7 +67,6 @@ export default async function SharedQuotePage({
       <div className="print:hidden border-b border-zinc-200 px-6 py-4 flex items-center justify-between bg-zinc-50">
         <p className="text-xs text-zinc-500">공유된 견적서 (열람 전용)</p>
         <div className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- needs real navigation for Content-Disposition download */}
           <a
             href={`/api/client/quote/${id}/pdf?t=${t}`}
             download
